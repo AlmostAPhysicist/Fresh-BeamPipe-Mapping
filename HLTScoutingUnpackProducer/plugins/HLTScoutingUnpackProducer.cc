@@ -39,6 +39,7 @@
  * and cross link collections (currently PFCandidate - Track)
 */
 
+// ADDED COMMENT: The HLTScoutingUnpackProducer class is an EDProducer that unpacks data from scouting to reco formats.
 class HLTScoutingUnpackProducer : public edm::stream::EDProducer<> {
 public:
     //using Run3ScoutingElectron = std::vector<Run3ScoutingElectron>;
@@ -53,12 +54,14 @@ public:
     template <typename T> using RefCollection = std::vector<edm::Ref<std::vector<T>>>;
     template <typename T> using RefMap = edm::ValueMap<edm::Ref<std::vector<T>>>;
 
+    // ADDED COMMENT: The constructor takes a parameter set and configures tokens and output products.
     explicit HLTScoutingUnpackProducer(edm::ParameterSet const& params);
     ~HLTScoutingUnpackProducer() override = default;
 
     static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
  
 private: 
+    // ADDED COMMENT: produce(...) is called for each event to transform scouting objects into reco objects.
     void produce(edm::Event& iEvent, edm::EventSetup const& iSetup) override;
     
     // private helper functions
@@ -105,6 +108,7 @@ HLTScoutingUnpackProducer::HLTScoutingUnpackProducer(edm::ParameterSet const& pa
       produce_PFCHSCandidate_(params.getParameter<bool>("producePFCHSCandidate")){
       //produce_PFSKCandidate_(params.getParameter<bool>("producePFSKCandidate"))
     
+    // ADDED COMMENT: Conditionally register ED products depending on isScouting_.
     if(isScouting_){
       produceWithRef<reco::Track, Run3ScoutingTrack>("Track");
       produceWithRef<reco::Vertex, Run3ScoutingVertex>("PrimaryVertex");
@@ -132,11 +136,13 @@ HLTScoutingUnpackProducer::HLTScoutingUnpackProducer(edm::ParameterSet const& pa
 
 template <typename RecoObjectType, typename ScoutingObjectType>
 void HLTScoutingUnpackProducer::produceWithRef(std::string const& name) {
+    // ADDED COMMENT: This template method declares collections and their reference ValueMaps.
     produces<std::vector<RecoObjectType>>(name);
     produces<RefMap<ScoutingObjectType>>(name + REF_TO_SCOUTING_LABEL_SUFFIX_);
 }
 
 void HLTScoutingUnpackProducer::produce(edm::Event& iEvent, edm::EventSetup const& iSetup) {
+    // ADDED COMMENT: In this method, scouting collections are retrieved, converted to reco, and stored.
     // produce reco::Vertex
     edm::Handle<Run3ScoutingVertexCollection> scoutingPrimaryVertex_collection_handle = iEvent.getHandle(scoutingPrimaryVertex_collection_token_);
     auto recoPrimaryVertex_collection_ptr = std::make_unique<reco::VertexCollection>();
@@ -214,6 +220,7 @@ void HLTScoutingUnpackProducer::produce(edm::Event& iEvent, edm::EventSetup cons
 }
 
 reco::Vertex HLTScoutingUnpackProducer::createVertex(Run3ScoutingVertex const& scoutingVertex) {
+    // ADDED COMMENT: Converts scouting vertex data into a reco::Vertex object with coordinate errors.
     // fill point coordinate
     //std::cout<<"scouting vertex position:"<<scoutingVertex.x()<<" "<<scoutingVertex.y()<<" "<<scoutingVertex.z()<<std::endl;
     reco::Vertex::Point point(scoutingVertex.x(), scoutingVertex.y(), scoutingVertex.z());
@@ -245,6 +252,7 @@ reco::Vertex HLTScoutingUnpackProducer::createVertex(Run3ScoutingVertex const& s
     }
 
 reco::Track HLTScoutingUnpackProducer::createTrack(Run3ScoutingTrack const& scoutingTrack){
+    // ADDED COMMENT: Builds a reco::Track object, filling momentum, charge, and covariance matrix.
     float chi2 = scoutingTrack.tk_chi2();
     //std::cout<<"scout chi2: "<<chi2<<std::endl;
     float ndof = scoutingTrack.tk_ndof();
@@ -288,7 +296,8 @@ reco::Track HLTScoutingUnpackProducer::createTrack(Run3ScoutingTrack const& scou
 }
 
 int HLTScoutingUnpackProducer::findCompatibleScoutingTrack(edm::Handle<Run3ScoutingParticleCollection> const& scoutingParticleCollection, Run3ScoutingTrack const& scoutingTrack) {
-  int index = 0;
+    // ADDED COMMENT: Loops over scouting particles to find matching track parameters.
+    int index = 0;
 
   auto is_close = [](float a, float b, float relative_tolerance) -> bool {
       return fabs(a-b) <= relative_tolerance * fmax(fabs(a), fabs(b));
@@ -321,6 +330,7 @@ int HLTScoutingUnpackProducer::findCompatibleScoutingTrack(edm::Handle<Run3Scout
 
 // example from https://github.com/cms-sw/cmssw/blob/master/DataFormats/PatCandidates/src/PackedCandidate.cc#L219
 void HLTScoutingUnpackProducer::buildHitPattern(Run3ScoutingParticle const& scoutingPFCandidate, Run3ScoutingTrack const& scoutingTrack, reco::Track & recoTrack) {
+    // ADDED COMMENT: Emulates hit pattern building similar to pat::PackedCandidate, accounting for lost inner hits.
     // retrieve information from scoutingPFCandidate
     auto lost_inner_hits = static_cast<pat::PackedCandidate::LostInnerHits>(static_cast<int8_t>(scoutingPFCandidate.lostInnerHits()));
 
@@ -476,6 +486,7 @@ void HLTScoutingUnpackProducer::buildHitPattern(Run3ScoutingParticle const& scou
 template <typename RecoObjectType, typename ScoutingObjectType>
 void HLTScoutingUnpackProducer::putWithRef(edm::Event& iEvent, std::string const& name,
                                            std::unique_ptr<std::vector<RecoObjectType>>& recoObject_collection_ptr, std::unique_ptr<RefCollection<ScoutingObjectType>>& scoutingObjectRef_collection_ptr) {
+    // ADDED COMMENT: After creating the reco collection, a ValueMap references the original scouting objects.
     auto recoObject_collection_handle = iEvent.put(std::move(recoObject_collection_ptr), name);
 
     std::unique_ptr<RefMap<ScoutingObjectType>> refmap_to_scouting(new RefMap<ScoutingObjectType>());
@@ -486,6 +497,7 @@ void HLTScoutingUnpackProducer::putWithRef(edm::Event& iEvent, std::string const
 }
 
 void HLTScoutingUnpackProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+    // ADDED COMMENT: Defines the default parameters for using this producer in CMSSW.
     edm::ParameterSetDescription desc;
 
     desc.add<edm::InputTag>("scoutingTrack", edm::InputTag("hltScoutingTrack"));
