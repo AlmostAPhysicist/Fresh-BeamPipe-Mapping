@@ -1,0 +1,77 @@
+DEBUG 2025-03-28 00:08:51.994 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-28 00:08:51.994 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-28 00:08:51.994 UTC: 	 Not using Singularity
+DEBUG 2025-03-28 00:08:51.994 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-28 00:08:51.994 UTC: 	 Executing command: 'submit'
+DEBUG 2025-03-28 00:08:51.994 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-03-28 00:08:51.995 UTC: 	 Will use CRAB configuration file Vertexer_CRAB.py
+DEBUG 2025-03-28 00:08:51.995 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-03-28 00:08:52.014 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+DEBUG 2025-03-28 00:08:52.026 UTC: 	 Checking credentials
+DEBUG 2025-03-28 00:08:52.026 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-28 00:08:52.026 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-28 00:08:52.026 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-28 00:08:54.120 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-28 00:08:54.120 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-28 00:08:54.120 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-28 00:08:55.898 UTC: 	 output : 562597
+562597
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-28 00:08:55.899 UTC: 	 Proxy valid for 156:16:37 hours
+DEBUG 2025-03-28 00:08:55.899 UTC: 	 Encoded data for curl request: subresource=delegatedn
+DEBUG 2025-03-28 00:08:57.038 UTC: 	 Registering user credentials on myproxy for /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+DEBUG 2025-03-28 00:08:57.038 UTC: 	 Executing command :
+ voms-proxy-info --identity --file /tmp/x509up_u180451
+DEBUG 2025-03-28 00:08:58.167 UTC: 	 output : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-28 00:08:58.167 UTC: 	 Getting myproxy life time left for 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-03-28 00:08:58.167 UTC: 	 Executing command :
+ myproxy-info -s myproxy.cern.ch -l 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-03-28 00:08:58.438 UTC: 	 output : username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  timeleft: 508:11:20  (21.2 days)
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-28 00:08:58.439 UTC: 	 Myproxy is valid: 1829460
+DEBUG 2025-03-28 00:08:58.439 UTC: 	 Result of myproxy credential check:
+  Credential exists on myproxy: username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6  - validity: 21 days, 4:11:00
+DEBUG 2025-03-28 00:08:58.439 UTC: 	 Command use: submit
+DEBUG 2025-03-28 00:08:58.439 UTC: 	 Options use: ['-c', 'Vertexer_CRAB.py']
+DEBUG 2025-03-28 00:08:58.439 UTC: 	 Encoded data for curl request: subresource=version
+DEBUG 2025-03-28 00:08:59.341 UTC: 	 CRABClient version: v3.250318
+DEBUG 2025-03-28 00:08:59.341 UTC: 	 Instance is prod
+DEBUG 2025-03-28 00:08:59.341 UTC: 	 Server base url is cmsweb.cern.ch
+DEBUG 2025-03-28 00:08:59.341 UTC: 	 Command api workflow
+DEBUG 2025-03-28 00:08:59.341 UTC: 	 Started submission
+DEBUG 2025-03-28 00:08:59.341 UTC: 	 Working on /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_projects/crab_DYto2Mu4Jets_Vertexer_100_EventBased
+DEBUG 2025-03-28 00:08:59.341 UTC: 	 Encoded data for curl request: subresource=backendurls
+DEBUG 2025-03-28 00:09:00.359 UTC: 	 Loading required information from the environment
+DEBUG 2025-03-28 00:09:00.359 UTC: 	 Found CMSSW_14_0_18_patch1 for el9_amd64_gcc12 with base /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1
+ERROR 2025-03-28 00:09:00.360 UTC: 	 Invalid CRAB configuration: Parameter Data.splitting has an invalid value ('EventBased').
+Analysis job type only supports the following splitting algorithms (plus 'Automatic' as of CMSSW_7_2_X): ['FileBased', 'LumiBased', 'EventAwareLumiBased', 'Automatic'].
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+ERROR 2025-03-28 00:09:00.360 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 142, in __call__
+    returnDict = self.cmd()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/submit.py", line 107, in __call__
+    plugjobtype = crab_job_types[self.configreq['jobtype'].upper()](*pluginParams)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/JobType/BasicJobType.py", line 40, in __init__
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: Invalid CRAB configuration: Parameter Data.splitting has an invalid value ('EventBased').
+Analysis job type only supports the following splitting algorithms (plus 'Automatic' as of CMSSW_7_2_X): ['FileBased', 'LumiBased', 'EventAwareLumiBased', 'Automatic'].
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile

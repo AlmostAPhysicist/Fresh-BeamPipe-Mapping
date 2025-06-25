@@ -1,0 +1,920 @@
+WARN $TMPDIR(/var/lib/condor/execute/dir_1004398/glide_ddVxJm/execute/dir_1425782) is not a writable directory setting $TMPDIR = $PWD
+======== gWMS-CMSRunAnalysis.sh STARTING at Thu Mar 20 22:54:10 GMT 2025 on batch1322.desy.de ========
+User id:    uid=40901(cmsplt001) gid=4090(cmsplt) groups=4090(cmsplt),65534(nobody) context=system_u:system_r:condor_startd_t:s0
+Local time: Thu Mar 20 22:54:10 UTC 2025
+Hostname:   batch1322.desy.de
+System:     Linux batch1322.desy.de 5.14.0-503.16.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Thu Nov 21 07:26:21 EST 2024 x86_64 x86_64 x86_64 GNU/Linux
+Arguments are --jobId=1
+======== Startup environment - STARTING ========
+======== Startup environment - FINISHING ========
+======== Auxiliary Functions - STARTING ========
+======== Auxiliary Functions - FINISHING ========
+======== gWMS-CMSRunAnalysis.sh STARTED at Thu Mar 20 22:54:10 GMT 2025 on batch1322.desy.de ========
+======== HTCONDOR JOB SUMMARY at Thu Mar 20 22:54:10 GMT 2025 START ========
+CRAB ID: 1
+Execution site: T2_DE_DESY
+Current hostname: batch1322.desy.de
+Output files: HLTUnpackerOutput.root=HLTUnpackerOutput_1.root
+==== HTCONDOR JOB AD CONTENTS START ====
+== JOB AD: AccountingGroup = "analysis.amalhotr"
+== JOB AD: AcctGroup = "analysis"
+== JOB AD: AcctGroupUser = "amalhotr"
+== JOB AD: Arguments = "--jobId=1"
+== JOB AD: CMSGroups = "/cms,T3_US_FNALLPC,/cms/uscms"
+== JOB AD: CMS_ALLOW_OVERFLOW = "True"
+== JOB AD: CMS_JobType = "Analysis"
+== JOB AD: CMS_SubmissionTool = "CRAB"
+== JOB AD: CMS_TaskType = "cmsRun"
+== JOB AD: CMS_Type = "Analysis"
+== JOB AD: CMS_WMTool = "User"
+== JOB AD: CRAB_ASOTimeout = 604800
+== JOB AD: CRAB_AdditionalOutputFiles = {  }
+== JOB AD: CRAB_AlgoArgs = "{'halt_job_on_file_boundaries': False, 'splitOnRun': False, 'files_per_job': 1, 'runs': [], 'lumis': [], 'algorithm': 'FileBased', 'total_files': 1.0, 'applyLumiCorrection': True}"
+== JOB AD: CRAB_AsyncDest = "T3_CH_CERNBOX"
+== JOB AD: CRAB_DAGType = "Job"
+== JOB AD: CRAB_DBSURL = "https://cmsweb.cern.ch/dbs/prod/global/DBSReader"
+== JOB AD: CRAB_DataBlock = "/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24MiniAOD-140X_mcRun3_2024_realistic_v26-v2/MINIAODSIM#82a8443f-a972-4297-8790-8aae20c55f4c"
+== JOB AD: CRAB_DbInstance = "prod"
+== JOB AD: CRAB_Destination = "davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/DYto2Mu4Jets_Unpacker/250320_224627/0000/log/cmsRun_1.log.tar.gz, davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/DYto2Mu4Jets_Unpacker/250320_224627/0000/HLTUnpackerOutput_1.root"
+== JOB AD: CRAB_EDMOutputFiles = { "HLTUnpackerOutput.root" }
+== JOB AD: CRAB_ISB = "https://cmsweb.cern.ch/S3/crabcache_prod"
+== JOB AD: CRAB_Id = "1"
+== JOB AD: CRAB_JobArch = "el9_amd64_gcc12"
+== JOB AD: CRAB_JobCount = 1
+== JOB AD: CRAB_JobLogURL = "https://cmsweb.cern.ch:8443/scheddmon/0197/amalhotr/250320_224627:amalhotr_crab_DYto2Mu4Jets_Unpacker/job_out.1.1.txt"
+== JOB AD: CRAB_JobSW = "CMSSW_14_0_18_patch1"
+== JOB AD: CRAB_NumAutomJobRetries = 2
+== JOB AD: CRAB_OutLFNDir = "/store/user/amalhotr/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/DYto2Mu4Jets_Unpacker/250320_224627"
+== JOB AD: CRAB_OutTempLFNDir = "/store/temp/user/amalhotr.2382a3cf28fdeacb1de9b039908761ea517a5ed6/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/DYto2Mu4Jets_Unpacker/250320_224627"
+== JOB AD: CRAB_PostJobLastUpdate = 0
+== JOB AD: CRAB_PostJobLogURL = "https://cmsweb.cern.ch:8443/scheddmon/0197/amalhotr/250320_224627:amalhotr_crab_DYto2Mu4Jets_Unpacker/postjob.1.1.txt"
+== JOB AD: CRAB_PostJobStatus = "NOT RUN"
+== JOB AD: CRAB_PrimaryDataset = "DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8"
+== JOB AD: CRAB_Publish = 1
+== JOB AD: CRAB_PublishDBSURL = "https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter"
+== JOB AD: CRAB_PublishName = "DYto2Mu4Jets_Unpacker-00000000000000000000000000000000"
+== JOB AD: CRAB_Reqname = "250320_224627:amalhotr_crab_DYto2Mu4Jets_Unpacker"
+== JOB AD: CRAB_RequestedCores = 1
+== JOB AD: CRAB_RequestedMemory = 2000
+== JOB AD: CRAB_RestHost = "cmsweb.cern.ch:8443"
+== JOB AD: CRAB_Retry = 1
+== JOB AD: CRAB_RetryOnASOFailures = 1
+== JOB AD: CRAB_SaveLogsFlag = 0
+== JOB AD: CRAB_SiteBlacklist = {  }
+== JOB AD: CRAB_SiteWhitelist = {  }
+== JOB AD: CRAB_SplitAlgo = "FileBased"
+== JOB AD: CRAB_StageoutPolicy = "local,remote"
+== JOB AD: CRAB_SubmitterIpAddr = "188.184.73.32"
+== JOB AD: CRAB_TFileOutputFiles = {  }
+== JOB AD: CRAB_TaskEndTime = 1745102809
+== JOB AD: CRAB_TaskLifetimeDays = 30
+== JOB AD: CRAB_TaskWorker = "crab-prod-tw01"
+== JOB AD: CRAB_TransferOutputs = 1
+== JOB AD: CRAB_UserDN = "/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra"
+== JOB AD: CRAB_UserGroup = undefined
+== JOB AD: CRAB_UserHN = "amalhotr"
+== JOB AD: CRAB_UserRole = undefined
+== JOB AD: CRAB_Workflow = "250320_224627:amalhotr_crab_DYto2Mu4Jets_Unpacker"
+== JOB AD: CRAB_localOutputFiles = "HLTUnpackerOutput.root=HLTUnpackerOutput_1.root"
+== JOB AD: CRAB_oneEventMode = 0
+== JOB AD: ClusterId = 119294922
+== JOB AD: Cmd = "/data/srv/glidecondor/condor_local/spool/4868/0/cluster119294868.proc0.subproc0/gWMS-CMSRunAnalysis.sh"
+== JOB AD: CommittedSlotTime = 0
+== JOB AD: CommittedSuspensionTime = 0
+== JOB AD: CommittedTime = 0
+== JOB AD: CondorPlatform = "$CondorPlatform: x86_64_AlmaLinux9 $"
+== JOB AD: CondorVersion = "$CondorVersion: 23.9.6 2024-08-08 BuildID: 748275 PackageID: 23.9.6-1 GitSHA: dfdd9eaa $"
+== JOB AD: CoreSize = 0
+== JOB AD: CpusProvisioned = 1
+== JOB AD: CumulativeRemoteSysCpu = 0.0
+== JOB AD: CumulativeRemoteUserCpu = 0.0
+== JOB AD: CumulativeSlotTime = 0
+== JOB AD: CumulativeSuspensionTime = 0
+== JOB AD: CurrentHosts = 1
+== JOB AD: DAGManJobId = 119294868
+== JOB AD: DAGManNodesLog = "/data/srv/glidecondor/condor_local/spool/4868/0/cluster119294868.proc0.subproc0/RunJobs.dag.nodes.log"
+== JOB AD: DAGManNodesMask = "0,1,2,4,5,7,8,9,10,11,12,13,16,17,24,27,35,36"
+== JOB AD: DAGNodeName = "Job1"
+== JOB AD: DAGParentNodeNames = ""
+== JOB AD: DESIRED_CMSDataLocations = "T2_DE_DESY,T2_US_Vanderbilt"
+== JOB AD: DESIRED_CMSDataset = "/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24MiniAOD-140X_mcRun3_2024_realistic_v26-v2/MINIAODSIM"
+== JOB AD: DESIRED_Overflow_Region = strcat(ifthenelse(OVERFLOW_US =?= "True","US","none"),",",ifthenelse(OVERFLOW_IT =?= "True","IT","none"),",",ifthenelse(OVERFLOW_UK =?= "True","UK","none"))
+== JOB AD: DESIRED_SITES = "T2_DE_DESY,T2_US_Vanderbilt"
+== JOB AD: DelegatedProxyExpiration = 1742597647
+== JOB AD: DiskProvisioned = 1402021
+== JOB AD: DiskUsage = 1250
+== JOB AD: DiskUsage_RAW = 1210
+== JOB AD: EnteredCurrentStatus = 1742511247
+== JOB AD: Environment = "CRAB_RUNTIME_TARBALL=local CRAB_TASKMANAGER_TARBALL=local SCRAM_ARCH="
+== JOB AD: Err = "_condor_stderr"
+== JOB AD: EstimatedWallTimeMins = 1250
+== JOB AD: ExecutableSize = 10
+== JOB AD: ExecutableSize_RAW = 10
+== JOB AD: ExitBySignal = false
+== JOB AD: ExitStatus = 0
+== JOB AD: GlobalJobId = "crab3@vocms0197.cern.ch#119294922.0#1742511168"
+== JOB AD: GpusProvisioned = 0
+== JOB AD: ImageSize = 10
+== JOB AD: ImageSize_RAW = 10
+== JOB AD: In = "/dev/null"
+== JOB AD: Iwd = "/var/lib/condor/execute/dir_1004398/glide_ddVxJm/execute/dir_1425782"
+== JOB AD: JOBGLIDEIN_CMSSite = "T2_DE_DESY"
+== JOB AD: JOB_CMSSite = "T2_DE_DESY"
+== JOB AD: JOB_GLIDECLIENT_Name = "CMSG-v1_0.main"
+== JOB AD: JOB_GLIDEIN_CMSSite = "T2_DE_DESY"
+== JOB AD: JOB_GLIDEIN_ClusterId = "1330739"
+== JOB AD: JOB_GLIDEIN_Entry_Name = "CMSHTPC_T2_DE_DESY_grid-htc-ce03"
+== JOB AD: JOB_GLIDEIN_Factory = "CERN-Prod"
+== JOB AD: JOB_GLIDEIN_Job_Max_Time = "14400"
+== JOB AD: JOB_GLIDEIN_MaxMemMBs = "20000"
+== JOB AD: JOB_GLIDEIN_Max_Walltime = "171000"
+== JOB AD: JOB_GLIDEIN_Memory = "2048"
+== JOB AD: JOB_GLIDEIN_Name = "gfactory_instance"
+== JOB AD: JOB_GLIDEIN_ProcId = "6"
+== JOB AD: JOB_GLIDEIN_SEs = "Unknown"
+== JOB AD: JOB_GLIDEIN_Schedd = "schedd_glideins9@vocms0206.cern.ch"
+== JOB AD: JOB_GLIDEIN_Site = "DESY"
+== JOB AD: JOB_GLIDEIN_SiteWMS = "HTCondor"
+== JOB AD: JOB_GLIDEIN_SiteWMS_JobId = "4816863.0"
+== JOB AD: JOB_GLIDEIN_SiteWMS_Queue = "grid-htc-ce03.desy.de"
+== JOB AD: JOB_GLIDEIN_SiteWMS_Slot = "slot1_14@batch1322.desy.de"
+== JOB AD: JOB_GLIDEIN_ToDie = "1742605708"
+== JOB AD: JOB_GLIDEIN_ToRetire = "1742591308"
+== JOB AD: JOB_Gatekeeper = ifthenelse(substr(Used_Gatekeeper,0,1) =!= "$",Used_Gatekeeper,ifthenelse(MATCH_GLIDEIN_Gatekeeper =!= undefined,MATCH_GLIDEIN_Gatekeeper,"Unknown"))
+== JOB AD: JOB_Site = "DESY"
+== JOB AD: JobAdInformationAttrs = "MATCH_EXP_JOBGLIDEIN_CMSSite, JOBGLIDEIN_CMSSite, RemoteSysCpu, RemoteUserCpu"
+== JOB AD: JobBatchId = "119294868.0"
+== JOB AD: JobBatchName = "RunJobs.dag+119294868"
+== JOB AD: JobCurrentReconnectAttempt = undefined
+== JOB AD: JobCurrentStartDate = 1742511247
+== JOB AD: JobLeaseDuration = 2400
+== JOB AD: JobNotification = 0
+== JOB AD: JobPrio = 10
+== JOB AD: JobRunCount = 1
+== JOB AD: JobStartDate = 1742511247
+== JOB AD: JobStatus = 2
+== JOB AD: JobSubmitFile = "Job.1.submit"
+== JOB AD: JobSubmitMethod = 1
+== JOB AD: JobUniverse = 5
+== JOB AD: LastJobLeaseRenewal = 1742511247
+== JOB AD: LastJobStatus = 1
+== JOB AD: LastMatchTime = 1742511247
+== JOB AD: LastRejMatchReason = "no match found "
+== JOB AD: LastRejMatchTime = 1742511240
+== JOB AD: LastSuspensionTime = 0
+== JOB AD: LeaveJobInQueue = ifThenElse((JobStatus =?= 4 || JobStatus =?= 3) && (time() - EnteredCurrentStatus < 30 * 60 * 60),true,false)
+== JOB AD: MachineAttrArch0 = "X86_64"
+== JOB AD: MachineAttrCMSProcessingSiteName0 = "T2_DE_DESY"
+== JOB AD: MachineAttrCMSSF_ResourceType0 = "x86_64:pledged"
+== JOB AD: MachineAttrCMSSubSiteName0 = undefined
+== JOB AD: MachineAttrCUDACapability0 = undefined
+== JOB AD: MachineAttrCUDAClockMhz0 = undefined
+== JOB AD: MachineAttrCUDAComputeUnits0 = undefined
+== JOB AD: MachineAttrCUDACoresPerCU0 = undefined
+== JOB AD: MachineAttrCUDADeviceName0 = undefined
+== JOB AD: MachineAttrCUDADriverVersion0 = undefined
+== JOB AD: MachineAttrCUDAECCEnabled0 = undefined
+== JOB AD: MachineAttrCUDAGlobalMemoryMb0 = undefined
+== JOB AD: MachineAttrCpuModelName0 = "AMD_EPYC_7443_24-Core_Processor"
+== JOB AD: MachineAttrCpuModelNumber0 = 1
+== JOB AD: MachineAttrCpus0 = 1
+== JOB AD: MachineAttrDIRACBenchmark0 = 18.51803173000464
+== JOB AD: MachineAttrGLIDEIN_OVERLOAD_ENABLED0 = false
+== JOB AD: MachineAttrHAS_SINGULARITY0 = true
+== JOB AD: MachineAttrMJF_JOB_HS06_JOB0 = "Unknown"
+== JOB AD: MachineAttrMicroarch0 = "x86_64-v3"
+== JOB AD: MachineAttrSlotWeight0 = 1
+== JOB AD: MachineAttrTotalSlotCpus0 = 1
+== JOB AD: MaxHosts = 1
+== JOB AD: MaxWallTimeMins = 1250
+== JOB AD: MaxWallTimeMinsRun = 1250
+== JOB AD: MaxWallTimeMins_RAW = 1250
+== JOB AD: MemoryProvisioned = 2048
+== JOB AD: MinHosts = 1
+== JOB AD: MyAddress = "<188.184.31.249:4080?addrs=[2001-1458-d00-30--100-23c]-4080+188.184.31.249-4080&alias=vocms0197.cern.ch&noUDP&sock=shadow_899374_1816_4901220>"
+== JOB AD: MyType = "Job"
+== JOB AD: NumCkpts = 0
+== JOB AD: NumCkpts_RAW = 0
+== JOB AD: NumJobCompletions = 0
+== JOB AD: NumJobMatches = 1
+== JOB AD: NumJobStarts = 0
+== JOB AD: NumRestarts = 0
+== JOB AD: NumShadowStarts = 1
+== JOB AD: NumSystemHolds = 0
+== JOB AD: OVERFLOW_CHECK = ifthenelse(MATCH_GLIDEIN_CMSSite =!= undefined,ifthenelse(stringListMember(MATCH_GLIDEIN_CMSSite,DESIRED_Sites),false,true),false)
+== JOB AD: OVERFLOW_IT = ifthenelse(regexp("T[1,2]_IT_",DESIRED_Sites),"True",undefined)
+== JOB AD: OVERFLOW_UK = ifthenelse(regexp("T2_UK_London_",DESIRED_Sites),"True",undefined)
+== JOB AD: OVERFLOW_US = ifthenelse(regexp("T[1,2]_US_",DESIRED_Sites),"True",undefined)
+== JOB AD: OrigCmd = "/data/srv/glidecondor/condor_local/spool/4868/0/cluster119294868.proc0.subproc0/gWMS-CMSRunAnalysis.sh"
+== JOB AD: OrigIwd = "/data/srv/glidecondor/condor_local/spool/4868/0/cluster119294868.proc0.subproc0"
+== JOB AD: OrigMaxHosts = 1
+== JOB AD: OriginalErr = "job_err.1"
+== JOB AD: OriginalOut = "job_out.1"
+== JOB AD: Out = "_condor_stdout"
+== JOB AD: Owner = "crabtw"
+== JOB AD: PeriodicRelease = (HoldReasonCode == 28) || (HoldReasonCode == 30) || (HoldReasonCode == 13) || (HoldReasonCode == 6)
+== JOB AD: PeriodicRemove = ((JobStatus =?= 5) && (time() - EnteredCurrentStatus > 7 * 60)) || ((JobStatus =?= 1) && (time() - EnteredCurrentStatus > 7 * 24 * 60 * 60)) || ((JobStatus =?= 2) && ((MemoryUsage =!= undefined && MemoryUsage > RequestMemory) || (MaxWallTimeMinsRun * 60 < (time() - EnteredCurrentStatus)) || (DiskUsage > 20000000))) || (time() > CRAB_TaskEndTime) || ((JobStatus =?= 1) && (time() > (x509UserProxyExpiration + 86400)))
+== JOB AD: PeriodicRemoveReason = ifThenElse(((time() - EnteredCurrentStatus) > (7 * 24 * 60 * 60)) && isUndefined(MemoryUsage),"Removed due to idle time limit",ifThenElse(time() > x509UserProxyExpiration,"Removed job due to proxy expiration",ifThenElse(MemoryUsage > RequestMemory,"Removed due to memory use",ifThenElse(MaxWallTimeMinsRun * 60 < (time() - EnteredCurrentStatus),"Removed due to wall clock limit",ifThenElse(DiskUsage > 20000000,"Removed due to disk usage",ifThenElse(time() > CRAB_TaskEndTime,"Removed due to reached CRAB_TaskEndTime","Removed due to job being held"))))))
+== JOB AD: PostJobPrio1 = 1742510876
+== JOB AD: PostJobPrio2 = 1
+== JOB AD: PreJobPrio1 = 0
+== JOB AD: ProcId = 0
+== JOB AD: ProvisionedResources = "Cpus Memory Disk Swap GPUs"
+== JOB AD: PublicClaimId = "<131.169.164.60:32781?CCBID=128.142.196.160:9618%3faddrs%3d[2001-1458-301-4f--100-74]-9618+128.142.196.160-9618%26alias%3dvocms0815.cern.ch%26noUDP%26sock%3dcollector9627#3602549%20131.225.189.165:9618%3faddrs%3d[2620-6a-0-8421-f0-0-189-165]-9618+131.225.189.165-9618%26alias%3dcmssrv2314.fnal.gov%26noUDP%26sock%3dcollector9705#118548&PrivNet=batch1322.desy.de&addrs=[2001-638-700-10a0--1-43c]-32781+131.169.164.60-32781&alias=batch1322.desy.de&noUDP>#1742438008#68#..."
+== JOB AD: QDate = 1742511168
+== JOB AD: REQUIRED_ARCH = "X86_64"
+== JOB AD: REQUIRED_MINIMUM_MICROARCH = 0
+== JOB AD: REQUIRED_OS = "rhel9"
+== JOB AD: Rank = 0.0
+== JOB AD: RemoteHost = "slot1_5@glidein_1004524_166962765@batch1322.desy.de"
+== JOB AD: RemoteSlotID = 1
+== JOB AD: RemoteSysCpu = 0.0
+== JOB AD: RemoteUserCpu = 0.0
+== JOB AD: RemoteWallClockTime = 0.0
+== JOB AD: RequestCpus = 1
+== JOB AD: RequestDisk = 100000
+== JOB AD: RequestDisk_RAW = 1
+== JOB AD: RequestMemory = 2000
+== JOB AD: RequestMemory_RAW = 2000
+== JOB AD: Requirements = (stringListMember(TARGET.Arch,REQUIRED_ARCH)) && (TARGET.OpSys == "LINUX") && (TARGET.Disk >= RequestDisk) && (TARGET.Memory >= RequestMemory) && (TARGET.HasFileTransfer)
+== JOB AD: ShadowBday = 1742511247
+== JOB AD: ShadowIpAddr = "<188.184.31.249:4080?addrs=[2001-1458-d00-30--100-23c]-4080+188.184.31.249-4080&alias=vocms0197.cern.ch&noUDP&sock=shadow_899374_1816_4901220>"
+== JOB AD: ShadowVersion = "$CondorVersion: 23.9.6 2024-08-08 BuildID: 748275 PackageID: 23.9.6-1 GitSHA: dfdd9eaa $"
+== JOB AD: ShouldTransferFiles = "YES"
+== JOB AD: StartdIpAddr = "<131.169.164.60:32781?CCBID=128.142.196.160:9618%3faddrs%3d[2001-1458-301-4f--100-74]-9618+128.142.196.160-9618%26alias%3dvocms0815.cern.ch%26noUDP%26sock%3dcollector9627#3602549%20131.225.189.165:9618%3faddrs%3d[2620-6a-0-8421-f0-0-189-165]-9618+131.225.189.165-9618%26alias%3dcmssrv2314.fnal.gov%26noUDP%26sock%3dcollector9705#118548&PrivNet=batch1322.desy.de&addrs=[2001-638-700-10a0--1-43c]-32781+131.169.164.60-32781&alias=batch1322.desy.de&noUDP>"
+== JOB AD: StartdPrincipal = "execute-side@matchsession/2001:638:700:10a0::1:43c"
+== JOB AD: StreamErr = false
+== JOB AD: StreamOut = false
+== JOB AD: SubmitEventNotes = "DAG Node: Job1"
+== JOB AD: TargetType = "Machine"
+== JOB AD: TotalSubmitProcs = 1
+== JOB AD: TotalSuspensions = 0
+== JOB AD: TransferIn = false
+== JOB AD: TransferInput = "CMSRunAnalysis.sh,cmscp.py,CMSRunAnalysis.tar.gz,sandbox.tar.gz,input_args.json,run_and_lumis.tar.gz,input_files.tar.gz,submit_env.sh,cmscp.sh"
+== JOB AD: TransferInputSizeMB = 1
+== JOB AD: TransferOutput = "jobReport.json.1"
+== JOB AD: TransferSocket = "<188.184.31.249:4080?addrs=[2001-1458-d00-30--100-23c]-4080+188.184.31.249-4080&alias=vocms0197.cern.ch&noUDP&sock=shadow_899374_1816_4901220>"
+== JOB AD: UidDomain = "cms"
+== JOB AD: Used_Gatekeeper = "grid-htc-ce03.desy.de grid-htc-ce03.desy.de:9619"
+== JOB AD: User = "crabtw@cms"
+== JOB AD: UserLog = "/data/srv/glidecondor/condor_local/spool/4868/0/cluster119294868.proc0.subproc0/job_log"
+== JOB AD: WhenToTransferOutput = "ON_EXIT_OR_EVICT"
+== JOB AD: accounting_group = analysis
+== JOB AD: use_x509userproxy = true
+== JOB AD: x509UserProxyEmail = "aryan.malhotra@cern.ch"
+== JOB AD: x509UserProxyExpiration = 1743114952
+== JOB AD: x509userproxy = "/data/srv/glidecondor/condor_local/spool/4868/0/cluster119294868.proc0.subproc0/bcad16b12b0625f29d14d85dca26b9b13dce2f85"
+== JOB AD: x509userproxysubject = "/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra"
+==== HTCONDOR JOB AD CONTENTS FINISH ====
+======== HTCONDOR JOB SUMMARY at Thu Mar 20 22:54:10 GMT 2025 FINISH ========
+======== PROXY INFORMATION START at Thu Mar 20 22:54:10 GMT 2025 ========
+subject   : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra/CN=1225661219/CN=722478927/CN=495566384/CN=1643561124/CN=1516930771/CN=2111175139
+issuer    : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra/CN=1225661219/CN=722478927/CN=495566384/CN=1643561124/CN=1516930771
+identity  : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra/CN=1225661219/CN=722478927/CN=495566384/CN=1643561124/CN=1516930771
+type      : RFC compliant proxy
+strength  : 2048 bits
+path      : /srv/bcad16b12b0625f29d14d85dca26b9b13dce2f85
+timeleft  : 23:59:58
+key usage : Digital Signature, Key Encipherment
+=== VO cms extension information ===
+VO        : cms
+subject   : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+issuer    : /DC=ch/DC=cern/OU=computers/CN=cms-auth.cern.ch
+attribute : /cms/Role=NULL/Capability=NULL
+attribute : /cms/uscms/Role=NULL/Capability=NULL
+timeleft  : 167:41:42
+uri       : voms-cms-auth.cern.ch:15000
+======== PROXY INFORMATION FINISH at Thu Mar 20 22:54:10 GMT 2025 ========
+======== CMSRunAnalysis.sh at Thu Mar 20 22:54:10 GMT 2025 STARTING ========
+======== CMSRunAnalysis.sh STARTING at Thu Mar 20 22:54:10 GMT 2025 ========
+Local time : Thu Mar 20 22:54:10 UTC 2025
+Current system : Linux batch1322.desy.de 5.14.0-503.16.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Thu Nov 21 07:26:21 EST 2024 x86_64 x86_64 x86_64 GNU/Linux
+Current processor: model name	: AMD EPYC 7443 24-Core Processor
+======== CMS environment load starting at Thu Mar 20 22:54:10 GMT 2025 ========
+WN with a LCG style environment, thus using VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
+CRAB job bootstrap: thinks it found the correct CMSSW setup script
+======== CMS environment load finished at Thu Mar 20 22:54:10 GMT 2025 ========
+
+======== python bootstrap for stageout at Thu Mar 20 22:54:10 GMT 2025 STARTING ========
+Job requires OS: rhel9, thus setting ScramArch to: rhel9_x86_64
+WMAgent bootstrap: COMP Python path is: /cvmfs/cms.cern.ch/COMP/rhel9_x86_64/external
+WMAgent bootstrap: latest python3 release is: 3.9.6
+Sourcing python future library from: /cvmfs/cms.cern.ch/COMP/rhel9_x86_64/external/py3-future/0.18.2/etc/profile.d/init.sh
+WMAgent bootstrap: found python3 at..
+/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/python3/3.9.6-2c93591d796451daeaf67dc8130bfa35/bin/python3
+======== python bootstrap for stageout at Thu Mar 20 22:54:10 GMT 2025 FINISHED ========
+==== Make sure $HOME is defined ====
+======== Current environment dump STARTING ========
+== ENV: IDTOKENS_FILE=/var/lib/gwms-factory/client-proxies/user_fecmsglobal/glidein_gfactory_instance/credential_CMSG-v1_0.main_CMSHTPC_T2_DE_DESY_grid-htc-ce03.idtoken
+== ENV: NVIDIA_VISIBLE_DEVICES=none
+== ENV: GWMS_SINGULARITY_IMAGE_HUMAN=/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel9-x86_64
+== ENV: VO_OLYMPUS_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: GLIDEIN_CPUS=8
+== ENV: GLIDEIN_Monitoring_Enabled=False
+== ENV: _CONDOR_CHIRP_CONFIG=/srv/.chirp.config
+== ENV: _CONDOR_JOB_IWD=/srv
+== ENV: GWMS_SINGULARITY_REEXEC=1
+== ENV: CVSROOT=:gserver:cmssw.cvs.cern.ch:/local/reps/CMSSW
+== ENV: _CONDOR_WRAPPER_ERROR_FILE=/var/lib/condor/execute/dir_1004398/glide_ddVxJm/execute/dir_1425782/.job_wrapper_failure
+== ENV: LCG_GFAL_INFOSYS=grid-bdii-intern.desy.de:2170
+== ENV: GLIDEIN_Schedd=schedd_glideins9@vocms0206.cern.ch
+== ENV: GLIDEIN_BLACKHOLE=False
+== ENV: HISTCONTROL=ignoredups
+== ENV: CMSSF_ResourceType=x86_64:pledged
+== ENV: GWMS_SINGULARITY_IMAGE_RESTRICTIONS=cvmfs
+== ENV: _CONDOR_MACHINE_AD=/srv/.machine.ad
+== ENV: CONDORCE_COLLECTOR_HOST=grid-htc-ce03.desy.de:9619
+== ENV: VO_ILC_SW_DIR=/cvmfs/ilc.desy.de
+== ENV: DCACHE_CLIENT_ACTIVE=1
+== ENV: SOURCED_ADD_CONFIG_LINE=1
+== ENV: ROOT_MAX_THREADS=1
+== ENV: HOSTNAME=batch1322.desy.de
+== ENV: HISTSIZE=1000
+== ENV: HOLD_GRACE_TIME=0
+== ENV: GT_PROXY_MODE=old
+== ENV: SINGULARITY_NAME=7723ba44b56aa1a355fce19c7762f95ef320f9adb256806dac113d81ef9ac2
+== ENV: GLIDEIN_NODES=1
+== ENV: NUMEXPR_NUM_THREADS=1
+== ENV: GLIDEIN_Max_Tail=600
+== ENV: GLIDEIN_GridType=condor
+== ENV: GLIDEIN_Name=gfactory_instance
+== ENV: JAVA_HOME=
+== ENV: CUBACORES=1
+== ENV: GWMS_SINGULARITY_BIND_CVMFS=1
+== ENV: VO_ILC_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: _CHIRP_DELAYED_UPDATE_PREFIX=Chirp*
+== ENV: OMP_THREAD_LIMIT=1
+== ENV: GLIDEIN_CONDOR_TOKEN=/var/lib/condor/execute/dir_1004398/glide_ddVxJm/cred.d/idtokens/credential_CMSG-v1_0.main_CMSHTPC_T2_DE_DESY_grid-htc-ce03.idtoken
+== ENV: GWMS_CONTAINERSW_VERSION=1.3.6-1.el9
+== ENV: CVMFS_REPOS_LIST=
+== ENV: OSG_MACHINE_GPUS=0
+== ENV: CRAB_RUNTIME_TARBALL=local
+== ENV: java_options=-Xms128m
+== ENV: -Xmx512m
+== ENV: GWMS_SINGULARITY_PATH=/bin/apptainer
+== ENV: VO_GHEP_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: CRAB_ReqName=
+== ENV: CRAB_Retry=1
+== ENV: CONTAINERSW_PATH=/bin/apptainer
+== ENV: SINGULARITY_ENVIRONMENT=/.singularity.d/env/91-environment.sh
+== ENV: VO_ATLAS_SW_DIR=/cvmfs/atlas.cern.ch/repo/sw
+== ENV: GWMS_CONTAINERSW_MODE=unprivileged
+== ENV: VO_CALICE_SW_DIR=/cvmfs/calice.desy.de
+== ENV: GWMS_SINGULARITY_OUTSIDE_PWD=/var/lib/condor/execute/dir_1004398/glide_ddVxJm/execute/dir_1425782
+== ENV: CHIRP_DELAYED_UPDATE_MAX_ATTRS=200
+== ENV: GLIDEIN_REQUIRE_VOMS=False
+== ENV: PWD=/srv
+== ENV: LOGNAME=cmsplt001
+== ENV: VO_BELLE_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: MODULESHOME=/usr/share/Modules
+== ENV: _CONDOR_JOB_AD=/srv/.job.ad
+== ENV: MANPATH=/cvmfs/cms.cern.ch/share/man:/usr/share/man:/cvmfs/grid.cern.ch/alma9-ui-test/usr/share/man::/opt/puppetlabs/puppet/share/man
+== ENV: USE_PSS=True
+== ENV: LCG_LOCATION=/cvmfs/grid.cern.ch/alma9-ui-test/usr
+== ENV: JOB_TOKENS=/data/lib/gwms-factory/server-credentials/entry_CMSHTPC_T2_DE_DESY_grid-htc-ce03/tokens.tgz
+== ENV: VOMS_USERCONF=/cvmfs/grid.cern.ch/etc/grid-security/vomses
+== ENV: GLIDEIN_ProcId=6
+== ENV: VO_HONE_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: GLIDECLIENT_Group=main
+== ENV: GLIDEIN_Max_Idle=600
+== ENV: AA_GRID_ENV_SET=TRUE
+== ENV: CONTAINERSW_VERSION=1.3.6-1.el9
+== ENV: VO_CALICE_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: MYPROXY_SERVER=grid-px0.desy.de
+== ENV: GLIDECLIENT_Group_Signature=ccc1380854cdc52ab3d77bf019f1ea667dbbf4fe
+== ENV: X509_VOMS_DIR=/cvmfs/grid.cern.ch/etc/grid-security/vomsdir
+== ENV: GLIDEIN_Factory=CERN-Prod
+== ENV: PYTHON_CPU_COUNT=8
+== ENV: GLIDEIN_ResourceName=DESY-HH
+== ENV: TZ=UTC
+== ENV: OPENBLAS_NUM_THREADS=1
+== ENV: _CONDOR_BIN=/var/lib/condor/execute/dir_1004398/glide_ddVxJm/main/condor/bin
+== ENV: GLIDEIN_Job_Max_Time=14400
+== ENV: GWMS_SINGULARITY_OUTSIDE_PWD_LIST=/var/lib/condor/execute/dir_1004398/glide_ddVxJm/execute/dir_1425782
+== ENV: BDII_LIST=grid-bdii-intern.desy.de:2170
+== ENV: GLIDEIN_CMSSite=T2_DE_DESY
+== ENV: USER_PATH=/usr/bin:/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+== ENV: APPTAINER_ENVIRONMENT=/.singularity.d/env/91-environment.sh
+== ENV: APPTAINER_APPNAME=
+== ENV: VO_ENMR_EU_DEFAULT_SE=se-enmr.chemie.uni-frankfurt.de
+== ENV: GLIDEIN_Site=DESY
+== ENV: __MODULES_SHARE_MANPATH=:1
+== ENV: HOME=/srv
+== ENV: GWMS_CONTAINERSW_PATH=/bin/apptainer
+== ENV: VO_CMS_DEFAULT_SE=dcache-se-cms.desy.de
+== ENV: LANG=C
+== ENV: VO_GEANT4_SW_DIR=/cvmfs/geant4.cern.ch
+== ENV: VO_DTEAM_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: VO_BELLE_SW_DIR=/cvmfs/belle.cern.ch
+== ENV: TRUST_DOMAIN=cmssrv2313.fnal.gov:9618?sock=collectorRANDOM
+== ENV: APPTAINER_COMMAND=exec
+== ENV: _CONDOR_EXECUTE=/var/lib/condor/execute/dir_1004398/glide_ddVxJm/execute
+== ENV: _CONDOR_ANCESTOR_1425782=1425785:1742511249:1973307974
+== ENV: _CONDOR_ANCESTOR_1023052=1425782:1742511247:2770168503
+== ENV: VO_DTEAM_SW_DIR=
+== ENV: SITE_GIIS_URL=grid-giis.desy.de
+== ENV: ATLAS_SITE_NAME=DESY-HH
+== ENV: SINGULARITY_CONTAINER=/cvmfs/singularity.opensciencegrid.org/.images/09/7723ba44b56aa1a355fce19c7762f95ef320f9adb256806dac113d81ef9ac2
+== ENV: X509_VOMSES=/cvmfs/grid.cern.ch/etc/grid-security/vomses
+== ENV: GPU_USE=0
+== ENV: VO_ATLAS_DEFAULT_SE=dcache-se-atlas.desy.de
+== ENV: GWMS_OLDENV_PERL5LIB=/cvmfs/grid.cern.ch/alma9-ui-test/usr/lib64/perl5/vendor_perl:/cvmfs/grid.cern.ch/alma9-ui-test/usr/lib/perl5/vendor_perl
+== ENV: CMS_MATCH_MICROARCH=(Microarch
+== ENV: is
+== ENV: undefined
+== ENV: ||
+== ENV: REQUIRED_MINIMUM_MICROARCH
+== ENV: is
+== ENV: undefined
+== ENV: ||
+== ENV: int(REQUIRED_MINIMUM_MICROARCH)<=int(substr(split(Microarch,"-")[1],1)))
+== ENV: PROMPT_COMMAND=PS1="Apptainer>
+== ENV: ";
+== ENV: unset
+== ENV: PROMPT_COMMAND
+== ENV: _CONDOR_SCRATCH_DIR=/srv
+== ENV: HAS_UNPRIVILEGED_USER_NAMESPACES=enabled
+== ENV: VO_OPS_SW_DIR=
+== ENV: VO_HERMES_SW_DIR=/cvmfs/hermes.desy.de
+== ENV: VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
+== ENV: GLIDEIN_CONTAINER_ENV_CLEARLIST=GFAL_CONFIG_DIR,GFAL_PLUGIN_DIR,PERL5LIB
+== ENV: GLITE_LOCATION_VAR=/var
+== ENV: GLIDEIN_REQUIRED_OS=any
+== ENV: OSG_SINGULARITY_BINARY=/cvmfs/oasis.opensciencegrid.org/mis/apptainer/1.2.5/bin/apptainer
+== ENV: GWMS_SINGULARITY_IMAGES_DICT=default:/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel8-x86_64,rhel6:/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel6-x86_64,rhel7:/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel7-x86_64,rhel8:/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel8-x86_64,rhel9:/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel9-x86_64
+== ENV: GLOBUS_LOCATION=/cvmfs/grid.cern.ch/alma9-ui-test/usr
+== ENV: SCRAM_ARCH=el9_amd64_gcc12
+== ENV: GLIDEIN_Tmp_Dir=/var/lib/condor/execute/dir_1004398/glide_ddVxJm/tmp
+== ENV: GLIDEIN_Gatekeeper=grid-htc-ce03.desy.de
+== ENV: grid-htc-ce03.desy.de:9619
+== ENV: GLIDEIN_LOCAL_TMP_DIR=/tmp/glide_cmsplt001_6IaQZP
+== ENV: CRAB_TASKMANAGER_TARBALL=local
+== ENV: VO_DESY_SW_DIR=/cvmfs/desy.desy.de
+== ENV: GWMS_SINGULARITY_IMAGE=/cvmfs/singularity.opensciencegrid.org/.images/09/7723ba44b56aa1a355fce19c7762f95ef320f9adb256806dac113d81ef9ac2
+== ENV: CONTAINERSW_FULL_VERSION=apptainer
+== ENV: version
+== ENV: 1.3.6-1.el9
+== ENV: InitializeModulesEnv=0
+== ENV: VO_OPS_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: VO_HERMES_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: GWMS_CONTAINERSW_FULL_VERSION=apptainer
+== ENV: version
+== ENV: 1.3.6-1.el9
+== ENV: GWMS_PATH=/var/lib/condor/execute/dir_1004398/glide_ddVxJm/.gwms.d/bin:
+== ENV: GWMS_SINGULARITY_LIB_VERSION=2
+== ENV: CUDA_VISIBLE_DEVICES=10000
+== ENV: JOB_WRAPPER_SINGULARITY=/srv/.gwms-user-job-wrapper.sh
+== ENV: CONDOR_PROCD_ADDRESS=/var/lib/condor/execute/dir_1004398/glide_ddVxJm/log/procd_address
+== ENV: GLIDEIN_CLAIM_WORKLIFE_DYNAMIC=cpus*(6*3600)
+== ENV: CONDOR_PROCD_ADDRESS_BASE=/var/lib/condor/execute/dir_1004398/glide_ddVxJm/log/procd_address
+== ENV: APPTAINER_CONTAINER=/cvmfs/singularity.opensciencegrid.org/.images/09/7723ba44b56aa1a355fce19c7762f95ef320f9adb256806dac113d81ef9ac2
+== ENV: GLIDECLIENT_Signature=76f12c231f827b90eb064f0626cf0a660122f29d
+== ENV: PYTHONPATH=/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/py3-future/0.18.2-d6a34b02a270da4bceeb32adc20d6f15/lib/python3.9/site-packages
+== ENV: VO_HONE_SW_DIR=/cvmfs/hone.desy.de
+== ENV: LESSOPEN=||/usr/bin/lesspipe.sh
+== ENV: %s
+== ENV: USER=cmsplt001
+== ENV: FRONTIER_ID=CRAB-
+== ENV: ATLAS_LOCAL_AREA=/etc/vo/atlas/local
+== ENV: GWMS_SINGULARITY_MODE=unprivileged
+== ENV: _CONDOR_JOB_PIDS=
+== ENV: GPU_DEVICE_ORDINAL=10000
+== ENV: VO_DESY_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: MODULES_RUN_QUARANTINE=LD_LIBRARY_PATH
+== ENV: LD_PRELOAD
+== ENV: GWMS_SINGULARITY_AUTOLOAD=1
+== ENV: GWMS_SUBDIR=.gwms.d
+== ENV: LOADEDMODULES=
+== ENV: GLIDEIN_DEBUG_OUTPUT=
+== ENV: VO_XFEL_EU_DEFAULT_SE=dcache-se-xfel.desy.de
+== ENV: GOMAXPROCS=1
+== ENV: HAS_SINGULARITY=1
+== ENV: SITECONFIG_PATH=/cvmfs/cms.cern.ch/SITECONF/local
+== ENV: VO_ZEUS_SW_DIR=/cvmfs/zeus.desy.de
+== ENV: EMI_TARBALL_BASE=/cvmfs/grid.cern.ch/alma9-ui-test
+== ENV: VO_GHEP_SW_DIR=/cvmfs/ghep.desy.de
+== ENV: SHLVL=1
+== ENV: OSGVO_SUBMITTER=crabtw@cms
+== ENV: VO_ICECUBE_SW_DIR=/cvmfs/icecube.opensciencegrid.org
+== ENV: CONDOR_PARENT_ID=batch1322:1425782:1742511248
+== ENV: TF_NUM_THREADS=1
+== ENV: OSG_WN_TMP=/tmp
+== ENV: VO_LHCB_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: GLIDEIN_ClusterId=1330739
+== ENV: VO_OLYMPUS_SW_DIR=/cvmfs/olympus.desy.de
+== ENV: EMI_UI_CONF=/cvmfs/grid.cern.ch/alma9-ui-test
+== ENV: VO_ICECUBE_DEFAULT_SE=globe-door.ifh.de
+== ENV: APPTAINER_NAME=7723ba44b56aa1a355fce19c7762f95ef320f9adb256806dac113d81ef9ac2
+== ENV: SINGULARITY_BIND=/etc/grid-security,/etc/hosts,/etc/localtime,/cvmfs
+== ENV: BATCH_SYSTEM=HTCondor
+== ENV: GLIDEIN_Proxy_URL=None
+== ENV: APPTAINER_BIND=/etc/grid-security,/etc/hosts,/etc/localtime,/cvmfs
+== ENV: _CONDOR_SLOT=slot1_5
+== ENV: GWMS_OLDENV_GFAL_CONFIG_DIR=/cvmfs/grid.cern.ch/alma9-ui-test/etc/gfal2.d/
+== ENV: GLITE_LOCATION=/cvmfs/grid.cern.ch/alma9-ui-test/usr
+== ENV: GLIDEIN_Singularity_Use=REQUIRED
+== ENV: LD_LIBRARY_PATH=/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/python3/3.9.6-2c93591d796451daeaf67dc8130bfa35/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/python3/3.9.6-2c93591d796451daeaf67dc8130bfa35/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/xz/5.2.5-4fdf584c0d81808d2831b2beffcb3bc7/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/libffi/3.4.2-e85996f97b0d0d51c90ef791f0a0eb91/lib64:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/sqlite/3.36.0-75618d5efd993d082fe7b262e7fa9233/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/gdbm/1.10-5f2d27dcab439561d0b6183df82e89bc/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/db6/6.2.32-c47b386f7c1834d01b1862bb63c56932/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/expat/2.1.0-c35050073fa86c04d08fecf74125e2eb/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/bz2lib/1.0.6-a8795c5492b25410af2fdbfc34f86eab/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/zlib/1.2.11-31d2ceb65830b90a6cc7a5a90279f5d6/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/gcc/11.2.1-f478fee2760dbd22aaabb4e3a8fe1640/lib64:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/gcc/11.2.1-f478fee2760dbd22aaabb4e3a8fe1640/lib:/.singularity.d/libs
+== ENV: CMS_VALIDATION_FRONTIER=0
+== ENV: DCACHE_DEBUG=2
+== ENV: TF_LOOP_PARALLEL_ITERATIONS=1
+== ENV: GSI_AUTHZ_CONF=/dev/null
+== ENV: REQUIRED_OS=rhel9
+== ENV: STASHCACHE=0
+== ENV: S_COLORS=auto
+== ENV: GLIDEIN_Signature=e33e87b5652bb33f1f7330c42ae0f62e8a89e671
+== ENV: __MODULES_LMINIT=module
+== ENV: use
+== ENV: --append
+== ENV: /usr/share/Modules/modulefiles:module
+== ENV: use
+== ENV: --append
+== ENV: /etc/modulefiles:module
+== ENV: use
+== ENV: --append
+== ENV: /usr/share/modulefiles
+== ENV: VO_DECH_SW_DIR=
+== ENV: GLIDEIN_SINGULARITY_BINDPATH=/storage,/lfs_roots,/cms,/etc/cvmfs/SITECONF,/cvmfs/grid.cern.ch/etc/grid-security:/etc/grid-security
+== ENV: OMP_NUM_THREADS=1
+== ENV: GWMS_SINGULARITY_BIND_GPU_LIBS=1
+== ENV: which_declare=declare
+== ENV: -f
+== ENV: GLIDEIN_OVERLOAD_ENABLED=False
+== ENV: GLIDEIN_Entry_Name=CMSHTPC_T2_DE_DESY_grid-htc-ce03
+== ENV: STASHCACHE_WRITABLE=0
+== ENV: GLIDECLIENT_Name=CMSG-v1_0.main
+== ENV: SITE_NAME=DESY-HH
+== ENV: CMS_PATH=/cvmfs/cms.cern.ch
+== ENV: XDG_DATA_DIRS=/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share
+== ENV: PATH=/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/py3-future/0.18.2-d6a34b02a270da4bceeb32adc20d6f15/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/python3/3.9.6-2c93591d796451daeaf67dc8130bfa35/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/python3/3.9.6-2c93591d796451daeaf67dc8130bfa35/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/xz/5.2.5-4fdf584c0d81808d2831b2beffcb3bc7/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/sqlite/3.36.0-75618d5efd993d082fe7b262e7fa9233/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/gdbm/1.10-5f2d27dcab439561d0b6183df82e89bc/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/db6/6.2.32-c47b386f7c1834d01b1862bb63c56932/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/expat/2.1.0-c35050073fa86c04d08fecf74125e2eb/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/bz2lib/1.0.6-a8795c5492b25410af2fdbfc34f86eab/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/gcc/11.2.1-f478fee2760dbd22aaabb4e3a8fe1640/bin:/cvmfs/cms.cern.ch/common:/srv/.gwms.d/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+== ENV: MACHINEFEATURES=/etc/batch/machinefeatures/
+== ENV: VO_XFEL_EU_SW_DIR=/cvmfs/xfel.desy.de
+== ENV: CMS_GLIDEIN_VERSION=32
+== ENV: VO_DECH_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: MODULEPATH=/usr/share/Modules/modulefiles:/etc/modulefiles:/usr/share/modulefiles
+== ENV: GLIDEIN_Expose_Grid_Env=True
+== ENV: CRAB_Id=1
+== ENV: SRM_PATH=/cvmfs/grid.cern.ch/alma9-ui-test/usr/share/srm
+== ENV: GLIDEIN_Entry_Signature=52cbb04bdd6d599b55740f7a15ad5bc5251d5428
+== ENV: GLIDEIN_Country=DE
+== ENV: VO_GEANT4_DEFAULT_SE=lxdpm101.cern.ch
+== ENV: JULIA_NUM_THREADS=1
+== ENV: add_config_line_source=/var/lib/condor/execute/dir_1004398/glide_ddVxJm/add_config_line.source
+== ENV: MODULE_USE=0
+== ENV: MKL_NUM_THREADS=1
+== ENV: VO_LHCB_SW_DIR=/cvmfs/lhcb.cern.ch
+== ENV: BELLE2_CONDB_PROXY=http://b2-db-squid.desy.de:3128
+== ENV: condor_vars_file=/var/lib/condor/execute/dir_1004398/glide_ddVxJm/main/condor_vars.lst
+== ENV: MAIL=/var/spool/mail/cmsplt001
+== ENV: CONTAINERSW_MODE=unprivileged
+== ENV: LoadModules=
+== ENV: EDG_WL_SCRATCH=/tmp
+== ENV: VO_BIOMED_SW_DIR=/cvmfs/biomed.egi.eu
+== ENV: _CONDOR_ANCESTOR_1023043=1023052:1742438007:2364295917
+== ENV: VO_ENMR_EU_SW_DIR=/cvmfs/wenmr.egi.eu
+== ENV: POSIXSTASHCACHE=0
+== ENV: GWMS_OLDENV_GFAL_PLUGIN_DIR=/cvmfs/grid.cern.ch/alma9-ui-test/usr/lib64/gfal2-plugins/
+== ENV: GWMS_SINGULARITY_VERSION=1.3.6-1.el9
+== ENV: GLIDEIN_PROVIDES=singularity/unprivileged
+== ENV: X509_USER_PROXY=/srv/bcad16b12b0625f29d14d85dca26b9b13dce2f85
+== ENV: GWMS_AUX_SUBDIR=.gwms_aux
+== ENV: GWMS_SINGULARITY_STATUS=REQUIRED
+== ENV: MEMORY_USAGE_METRIC=((ProportionalSetSizeKb
+== ENV: ?:
+== ENV: ResidentSetSize)
+== ENV: +
+== ENV: 1023)
+== ENV: /
+== ENV: 1024
+== ENV: VO_BIOMED_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: VO_ZEUS_DEFAULT_SE=dcache-se-desy.desy.de
+== ENV: SLOTS_LAYOUT=partitionable
+== ENV: JOBSTARTDIR=/srv
+== ENV: OLDPWD=/srv/.gwms.d/exec/prejob
+== ENV: GWMS_DIR=/srv/.gwms.d
+== ENV: MODULES_CMD=/usr/share/Modules/libexec/modulecmd.tcl
+== ENV: OSGVO_PROJECT_NAME=
+== ENV: BASH_FUNC_ml%%=()
+== ENV: {
+== ENV: module
+== ENV: ml
+== ENV: "$@"
+== ENV: }
+== ENV: BASH_FUNC_which%%=()
+== ENV: {
+== ENV: (
+== ENV: alias;
+== ENV: eval
+== ENV: ${which_declare}
+== ENV: )
+== ENV: |
+== ENV: /usr/bin/which
+== ENV: --tty-only
+== ENV: --read-alias
+== ENV: --read-functions
+== ENV: --show-tilde
+== ENV: --show-dot
+== ENV: $@
+== ENV: }
+== ENV: BASH_FUNC_cmsrel%%=()
+== ENV: {
+== ENV: scramv1
+== ENV: project
+== ENV: CMSSW
+== ENV: $@
+== ENV: }
+== ENV: BASH_FUNC_module%%=()
+== ENV: {
+== ENV: local
+== ENV: _mlredir=0;
+== ENV: if
+== ENV: [
+== ENV: -n
+== ENV: "${MODULES_REDIRECT_OUTPUT+x}"
+== ENV: ];
+== ENV: then
+== ENV: if
+== ENV: [
+== ENV: "$MODULES_REDIRECT_OUTPUT"
+== ENV: =
+== ENV: '0'
+== ENV: ];
+== ENV: then
+== ENV: _mlredir=0;
+== ENV: else
+== ENV: if
+== ENV: [
+== ENV: "$MODULES_REDIRECT_OUTPUT"
+== ENV: =
+== ENV: '1'
+== ENV: ];
+== ENV: then
+== ENV: _mlredir=1;
+== ENV: fi;
+== ENV: fi;
+== ENV: fi;
+== ENV: case
+== ENV: "
+== ENV: $@
+== ENV: "
+== ENV: in
+== ENV: *'
+== ENV: --no-redirect
+== ENV: '*)
+== ENV: _mlredir=0
+== ENV: ;;
+== ENV: *'
+== ENV: --redirect
+== ENV: '*)
+== ENV: _mlredir=1
+== ENV: ;;
+== ENV: esac;
+== ENV: if
+== ENV: [
+== ENV: $_mlredir
+== ENV: -eq
+== ENV: 0
+== ENV: ];
+== ENV: then
+== ENV: _module_raw
+== ENV: "$@";
+== ENV: else
+== ENV: _module_raw
+== ENV: "$@"
+== ENV: 2>&1;
+== ENV: fi
+== ENV: }
+== ENV: BASH_FUNC__module_raw%%=()
+== ENV: {
+== ENV: eval
+== ENV: "$(/usr/bin/tclsh
+== ENV: '/usr/share/Modules/libexec/modulecmd.tcl'
+== ENV: bash
+== ENV: "$@")";
+== ENV: _mlstatus=$?;
+== ENV: return
+== ENV: $_mlstatus
+== ENV: }
+== ENV: BASH_FUNC_cmsenv%%=()
+== ENV: {
+== ENV: eval
+== ENV: `scramv1
+== ENV: runtime
+== ENV: -sh`
+== ENV: }
+== ENV: _=/usr/bin/env
+======== Current environment dump FINISHING ========
+======== Tarball initialization STARTING at Thu Mar 20 22:54:10 GMT 2025 ========
++ [[ X == \X ]]
++ [[ local == \l\o\c\a\l ]]
++ tar xmf CMSRunAnalysis.tar.gz
+++ pwd
++ export PYTHONPATH=/srv/WMCore.zip:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/py3-future/0.18.2-d6a34b02a270da4bceeb32adc20d6f15/lib/python3.9/site-packages
++ PYTHONPATH=/srv/WMCore.zip:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/py3-future/0.18.2-d6a34b02a270da4bceeb32adc20d6f15/lib/python3.9/site-packages
++ set +x
+======== Tarball initialization FINISHING at Thu Mar 20 22:54:10 GMT 2025 ========
+==== Local directory contents dump STARTING ====
+PWD: /srv
+== DIR: CMSRunAnalysis.py
+== DIR: CMSRunAnalysis.sh
+== DIR: CMSRunAnalysis.tar.gz
+== DIR: TweakPSet.py
+== DIR: WMCore.zip
+== DIR: _condor_stderr
+== DIR: _condor_stdout
+== DIR: bcad16b12b0625f29d14d85dca26b9b13dce2f85
+== DIR: cmscp.py
+== DIR: cmscp.sh
+== DIR: gWMS-CMSRunAnalysis.sh
+== DIR: input_args.json
+== DIR: input_files.tar.gz
+== DIR: jobReport.json
+== DIR: jobReport.json.1
+== DIR: run_and_lumis.tar.gz
+== DIR: sandbox.tar.gz
+== DIR: startup_environment.sh
+== DIR: submit_env.sh
+==== Local directory contents dump FINISHING ====
+======== CMSRunAnalysis.py STARTING at Thu Mar 20 22:54:10 GMT 2025 ========
+Now running the CMSRunAnalysis.py job in /srv...
++ python3 CMSRunAnalysis.py --jobId=1 --oneEventMode=0
+==== CMSRunAnalysis.py STARTING at Thu Mar 20 22:54:11 2025 UTC ====
+Local time : Thu Mar 20 22:54:11 2025
+==== Parameters Dump at Thu Mar 20 22:54:11 2025 UTC ===
+userSandbox:    sandbox.tar.gz
+jobNumber:      1
+cmsswVersion:   CMSSW_14_0_18_patch1
+scramArch:      el9_amd64_gcc12
+inputFileList   job_input_file_list_1.txt
+runAndLumis:    job_lumis_1.json
+lheInputFiles:  False
+firstEvent:     None
+firstLumi:      None
+eventsPerLumi:  None
+lastEvent:      None
+firstRun:       None
+seeding:        AutomaticSeeding
+userFiles:      None
+oneEventMode:   0
+scriptExe:      None
+scriptArgs:     []
+maxRuntime:     -60
+===================
+==== CMSSW Stack Execution STARTING at Thu Mar 20 22:54:11 2025 UTC ====
+==== SCRAM Obj CREATED at Thu Mar 20 22:54:11 2025 UTC ====
+==== CMSSW_14_0_18_patch1 release directory created ====
+==== SCRAM Obj INITIALIZED at Thu Mar 20 22:54:16 2025 UTC ====
+==== Extract user sandbox in top and CMSSW directory ====
+==== Sandbox untarring STARTING at Thu Mar 20 22:54:16 2025 UTC ====
+expanding sandbox.tar.gz in /srv
+
+==== Sandbox untarring FINISHED at Thu Mar 20 22:54:16 2025 UTC ====
+==== SCRAM runtime environment CREATED at Thu Mar 20 22:54:16 2025 UTC ====
+==== Tweak PSet at Thu Mar 20 22:54:23 2025 UTC ====
+Adding 1 files to 'fileNames' attr
+Adding 0 files to 'secondaryFileNames' attr
+skipEvents set to 0
+Executing sh tweakThePset.sh in Scram env
+tweakThePset.sh output:
+
+        Scram Command Diagnostic:
+        Command : scramv1
+        Architecture: el9_amd64_gcc12
+        Executed: sh tweakThePset.sh
+        Exit Status: 0
+        Stdout: will execute: edm_pset_tweak.py --input_pkl PSet.pkl --output_pkl PSet.pkl-tweaked --json PSetTweak.json --create_untracked_psets
+Set attribute process.CPU to CPU
+Set attribute process.Timing to Timing
+Set attribute process.SimpleMemoryCheck to SimpleMemoryCheck
+Set attribute process.source.fileNames to cms.untracked.vstring('/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/000e726a-ca68-420b-b531-23f6733ba1e4.root')
+Set attribute process.source.skipEvents to cms.untracked.uint32(0)
+Set attribute process.maxEvents.input to cms.untracked.int32(-1)
+Set attribute process.maxSecondsUntilRampdown.input to cms.untracked.int32(-60)
+will execute: cmssw_handle_random_seeds.py --input_pkl PSet.pkl --output_pkl PSet.pkl-seeds --seeding dummy
+
+        Stderr: None 
+==== Tweak PSet Done at Thu Mar 20 22:54:26 2025 UTC ====
+==== CMSSW JOB Execution started at Thu Mar 20 22:54:26 2025 UTC ====
+==== Will execute stdbuf -oL -eL cmsRun -j FrameworkJobReport.xml PSet.py > cmsRun-stdout.log.tmp 2>&1
+Error executing application in CMSSW environment.
+	See stdout log
+==== Execution FAILED at Thu Mar 20 22:55:19 2025 UTC ====
+==== CMSSW JOB Execution completed at Thu Mar 20 22:55:19 2025 UTC ====
+Application exit code: 5
+==== Execution FINISHED at Thu Mar 20 22:55:19 2025 UTC ====
+======== CMSSW OUTPUT STARTING ========
+NOTICE: lines longer than 3000 characters will be truncated
+== CMSSW: Dcap Version 2.47.12 Oct 12 2023 16:02:36
+== CMSSW: Allocated message queues 0, used 0
+== CMSSW:
+== CMSSW: Allocated message queues 1, used 1
+== CMSSW:
+== CMSSW: Creating a new control connection to dcache-cms-dcap.desy.de.
+== CMSSW: Sending control message: 0 0 client hello 0 0 2 47 12 "" -uid=40901 -pid=541 -gid=4090 (len=62)
+== CMSSW: Server reply: welcome.
+== CMSSW: Connected to dcache-cms-dcap.desy.de:22125
+== CMSSW: Setting hostname to batch1322.desy.de.
+== CMSSW: Sending control message: 1 0 client stage "dcap://dcache-cms-dcap.desy.de/pnfs/desy.de/cms/tier2/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/000e726a-ca68-420b-b531-23f6733ba1e4.root" -stagetime=0 -location=batch1322.desy.de -uid=40901 (len=315)
+== CMSSW: Server reply: ok destination [1].
+== CMSSW: [-1] unpluging node
+== CMSSW: Removing unneeded queue [1]
+== CMSSW: [-1] destroing node
+== CMSSW: 20-Mar-2025 22:54:45 UTC  Initiating request to open file dcap://dcache-cms-dcap.desy.de/pnfs/desy.de/cms/tier2/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/000e726a-ca68-420b-b531-23f6733ba1e4.root
+== CMSSW: Allocated message queues 2, used 1
+== CMSSW:
+== CMSSW: Using existing control connection to dcache-cms-dcap.desy.de.
+== CMSSW: Client mode: ACTIVE
+== CMSSW: Sending control message: 2 0 client open "dcap://dcache-cms-dcap.desy.de/pnfs/desy.de/cms/tier2/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/000e726a-ca68-420b-b531-23f6733ba1e4.root" r batch1322.desy.de 50965 -timeout=-1 -onerror=default -passive -uid=40901 (len=337)
+== CMSSW: 'connect to dcache-cms248.desy.de:33118' received for [2]
+== CMSSW: door in passive mode [2].
+== CMSSW: Connected to dcache-cms248.desy.de:33118
+== CMSSW: Switching on read ahead.
+== CMSSW: [15] Allocating 64000 bytes as Read-ahead buffer.
+== CMSSW: 20-Mar-2025 22:54:48 UTC  Successfully opened file dcap://dcache-cms-dcap.desy.de/pnfs/desy.de/cms/tier2/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/000e726a-ca68-420b-b531-23f6733ba1e4.root
+== CMSSW: ----- Begin Fatal Exception 20-Mar-2025 22:55:06 UTC-----------------------
+== CMSSW: An exception of category 'FileOpenError' occurred while
+== CMSSW:    [0] Calling StorageFactory::open()
+== CMSSW:    [1] Calling File::sysopen()
+== CMSSW: Exception Message:
+== CMSSW: Failed to open the file '///eos/user/a/amalhotr/BeamGeo/HLTUnpackerOutput.root'
+== CMSSW:    Additional Info:
+== CMSSW:       [a] open() failed with system error 'No such file or directory' (error code 2)
+== CMSSW: ----- End Fatal Exception -------------------------------------------------
+== CMSSW:
+== CMSSW: [15] unpluging node
+== CMSSW: Server reply: ok destination [2].
+== CMSSW: Removing unneeded queue [2]
+== CMSSW: [15] destroing node
+== CMSSW: 20-Mar-2025 22:55:06 UTC  Closed file dcap://dcache-cms-dcap.desy.de/pnfs/desy.de/cms/tier2/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/000e726a-ca68-420b-b531-23f6733ba1e4.root
+== CMSSW: TimeReport> Time report complete in 52.7949 seconds
+== CMSSW:  Time Summary:
+== CMSSW:  - Min event:   1e+06
+== CMSSW:  - Max event:   0
+== CMSSW:  - Avg event:   0
+== CMSSW:  - Total loop:  0.0108113
+== CMSSW:  - Total init:  39.9525
+== CMSSW:  - Total job:   52.7949
+== CMSSW:  - Total EventSetup: 0
+== CMSSW:  - Total non-module: 0
+== CMSSW:  Event Throughput: 0 ev/s
+== CMSSW:  CPU Summary:
+== CMSSW:  - Total loop:     0.004838
+== CMSSW:  - Total init:     27.6034
+== CMSSW:  - Total extra:    0
+== CMSSW:  - Total children: 26.5908
+== CMSSW:  - Total job:      35.8965
+== CMSSW:  Processing Summary:
+== CMSSW:  - Number of Events:  0
+== CMSSW:  - Number of Global Begin Lumi Calls:  0
+== CMSSW:  - Number of Global Begin Run Calls: 0
+== CMSSW:
+== CMSSW:
+== CMSSW:         Scram Command Diagnostic:
+== CMSSW:         Command : scramv1
+== CMSSW:         Architecture: el9_amd64_gcc12
+== CMSSW:         Executed: stdbuf -oL -eL cmsRun -j FrameworkJobReport.xml PSet.py > cmsRun-stdout.log.tmp 2>&1
+== CMSSW:         Exit Status: 5
+== CMSSW:         Stdout:
+== CMSSW:         Stderr: None
+======== CMSSW OUTPUT FINISHING ========
+==== Report file creation STARTING at Thu Mar 20 22:55:19 2025 UTC ====
+Sanitize FJR
+
+Job Exit Code from FrameworkJobReport.xml: 8020 
+CONDITION FOR REPORTING READ BRANCHES WAS FALSE
+==== Job Exit Code from FrameworkJobReport.xml and Application exit code: 8020 ====
+== Execution site from site-local-config.xml: T2_DE_DESY
+==== Report file creation FINISHED at Thu Mar 20 22:55:19 2025 UTC ====
+==== CMSRunAnalysis.py FINISHED at Thu Mar 20 22:55:19 2025 UTC ====
+Local time : Thu Mar 20 22:55:19 2025
++ jobrc=84
++ set +x
+== The job had an exit code of 84 
+======== CMSRunAnalysis.py FINISHING at Thu Mar 20 22:55:19 GMT 2025 ========
+
+real	1m8.892s
+user	0m35.020s
+sys	0m10.746s
+CMSRunAnalysis.sh complete at Thu Mar 20 22:55:19 GMT 2025 with (short) exit status 84
+======== CMSRunAnalysis.sh at Thu Mar 20 22:55:19 GMT 2025 FINISHING ========
+======== User Application failed (exit code =  84) No stageout will be done
+======== gWMS-CMSRunAnalysis.sh FINISHING at Thu Mar 20 22:55:19 GMT 2025 on batch1322.desy.de with (short) status 84 ========
+Local time: Thu Mar 20 22:55:19 UTC 2025
+Short exit status: 84
+======== Figuring out long exit code of the job for condor_chirp at Thu Mar 20 22:55:19 GMT 2025========
+==== Long exit code of the job is 8020 ====
+======== Finished condor_chirp -ing the exit code of the job. Exit code of condor_chirp: 0 ========
+======== Checking execution of user application (cmsRun and scriptExe) Thu Mar 20 22:55:19 GMT 2025========
+the file cmsRun-stdout.log.tmp does **NOT** exist
+the file cmsRun-stdout.log exists
+the file cmsRun-stdout.log is non-empty. wc (newlines, words, bytes):  71 337 3789 cmsRun-stdout.log
+======== Checking execution of cmsRun Thu Mar 20 22:55:19 GMT 2025========
+the file FrameworkJobReport.xml exists
+the file FrameworkJobReport.xml is non-empty. wc (newlines, words, bytes):  398 863 23413 FrameworkJobReport.xml
+the file jobReport.json.1 exists
+the file jobReport.json.1 is non-empty. wc (newlines, words, bytes):  0 649 10362 jobReport.json.1
+the file jobReport.exitCode.txt exists
+the file jobReport.exitCode.txt is non-empty. wc (newlines, words, bytes):  0 1 4 jobReport.exitCode.txt
+======== Finished - Checking execution of user application Thu Mar 20 22:55:19 GMT 2025========
+Job started:   1742511250 ,  Thu Mar 20 22:54:10 GMT 2025
+Job finished:  1742511319 ,  Thu Mar 20 22:55:19 GMT 2025
+Job Running time in seconds:  69

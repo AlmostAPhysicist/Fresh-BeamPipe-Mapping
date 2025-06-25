@@ -1,0 +1,1963 @@
+DEBUG 2025-01-23 01:09:43.873 UTC: 	 CRAB Client version: v3.241125
+DEBUG 2025-01-23 01:09:43.873 UTC: 	 Running on: Linux lxplus915.cern.ch 5.14.0-503.15.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Thu Nov 14 15:45:31 EST 2024 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-01-23 01:09:43.873 UTC: 	 Not using Singularity
+DEBUG 2025-01-23 01:09:43.873 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-01-23 01:09:43.873 UTC: 	 Executing command: 'resubmit'
+DEBUG 2025-01-23 01:09:43.885 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-01-23 01:09:43.902 UTC: 	 Error: CRABDIR is not a valid CRAB project directory.
+ERROR 2025-01-23 01:09:43.903 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/resubmit.py", line 30, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: CRABDIR is not a valid CRAB project directory.
+INFO 2025-01-23 01:09:43.905 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-19 04:23:14.212 UTC: 	 CRAB Client version: v3.250217
+DEBUG 2025-03-19 04:23:14.212 UTC: 	 Running on: Linux lxplus929.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-19 04:23:14.213 UTC: 	 Not using Singularity
+DEBUG 2025-03-19 04:23:14.213 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-19 04:23:14.213 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-19 04:23:14.213 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-19 04:23:14.213 UTC: 	 Checking credentials
+DEBUG 2025-03-19 04:23:14.213 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:23:14.213 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-19 04:23:14.213 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:23:14.533 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:23:14.533 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-19 04:23:14.533 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:23:14.896 UTC: 	 output : 42804
+42804
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:23:14.896 UTC: 	 Proxy valid for 11:53:24 hours
+DEBUG 2025-03-19 04:23:14.896 UTC: 	 Retrieving username ...
+DEBUG 2025-03-19 04:23:14.896 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-19 04:23:15.632 UTC: 	 username is amalhotr
+INFO 2025-03-19 04:23:16.200 UTC: 	 Rucio client intialized for account amalhotr
+ERROR 2025-03-19 04:23:16.200 UTC: 	 Error: Please specify the site where to check the write permissions. Use the --site option.
+ERROR 2025-03-19 04:23:16.200 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/Commands/checkwrite.py", line 22, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/Commands/SubCommand.py", line 403, in __init__
+    self.validateOptions()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/Commands/checkwrite.py", line 356, in validateOptions
+    raise ex
+CRABClient.ClientExceptions.MissingOptionException: [91mError[0m: Please specify the site where to check the write permissions. Use the --site option.
+INFO 2025-03-19 04:23:16.223 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-19 04:23:25.307 UTC: 	 CRAB Client version: v3.250217
+DEBUG 2025-03-19 04:23:25.308 UTC: 	 Running on: Linux lxplus929.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-19 04:23:25.308 UTC: 	 Not using Singularity
+DEBUG 2025-03-19 04:23:25.308 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-19 04:23:25.308 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-19 04:23:25.308 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-19 04:23:42.465 UTC: 	 CRAB Client version: v3.250217
+DEBUG 2025-03-19 04:23:42.466 UTC: 	 Running on: Linux lxplus929.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-19 04:23:42.466 UTC: 	 Not using Singularity
+DEBUG 2025-03-19 04:23:42.466 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-19 04:23:42.466 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-19 04:23:42.466 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-19 04:23:42.466 UTC: 	 Checking credentials
+DEBUG 2025-03-19 04:23:42.466 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:23:42.466 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-19 04:23:42.466 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:23:42.831 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:23:42.831 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-19 04:23:42.831 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:23:43.209 UTC: 	 output : 42775
+42775
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:23:43.210 UTC: 	 Proxy valid for 11:52:55 hours
+DEBUG 2025-03-19 04:23:43.210 UTC: 	 Retrieving username ...
+DEBUG 2025-03-19 04:23:43.210 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-19 04:23:43.907 UTC: 	 username is amalhotr
+INFO 2025-03-19 04:23:44.343 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-19 04:23:44.343 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-19 04:23:44.343 UTC: 	 Options use: ['--site', 'list']
+DEBUG 2025-03-19 04:23:44.343 UTC: 	 Instance is None
+DEBUG 2025-03-19 04:23:44.343 UTC: 	 Server base url is None
+DEBUG 2025-03-19 04:23:44.343 UTC: 	 Retrieving username ...
+DEBUG 2025-03-19 04:23:44.343 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-19 04:23:45.049 UTC: 	 username is amalhotr
+INFO 2025-03-19 04:23:45.049 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-19 04:23:45.050 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-19 04:23:45.050 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-19 04:23:45.063 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-19 04:23:45.063 UTC: 	 Will check write permission in /store/user/amalhotr on site list
+ERROR 2025-03-19 04:23:45.078 UTC: 	 RSE does not exist.
+Details: RSE 'list' cannot be found in vo 'def'
+WARNING 2025-03-19 04:23:45.078 UTC: 	 Command checkwrite failed
+ERROR 2025-03-19 04:23:45.078 UTC: 	 Caught CommandFailedException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 144, in __call__
+    raise CommandFailedException("Command %s failed" % str(args[0]))
+CRABClient.ClientExceptions.CommandFailedException: Command checkwrite failed
+DEBUG 2025-03-19 04:24:20.594 UTC: 	 CRAB Client version: v3.250217
+DEBUG 2025-03-19 04:24:20.594 UTC: 	 Running on: Linux lxplus929.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-19 04:24:20.594 UTC: 	 Not using Singularity
+DEBUG 2025-03-19 04:24:20.594 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-19 04:24:20.594 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-19 04:24:20.594 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+WARNING 2025-03-19 04:24:20.595 UTC: 	 Warning: 'crab checkwrite' command takes no arguments, 1 given. Ignoring arguments ['T2_CH_CERN'].
+DEBUG 2025-03-19 04:24:20.595 UTC: 	 Checking credentials
+DEBUG 2025-03-19 04:24:20.595 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:24:20.595 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-19 04:24:20.595 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:24:20.944 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:24:20.945 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-19 04:24:20.945 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:24:21.292 UTC: 	 output : 42737
+42737
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:24:21.292 UTC: 	 Proxy valid for 11:52:17 hours
+DEBUG 2025-03-19 04:24:21.292 UTC: 	 Retrieving username ...
+DEBUG 2025-03-19 04:24:21.292 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-19 04:24:21.981 UTC: 	 username is amalhotr
+INFO 2025-03-19 04:24:22.471 UTC: 	 Rucio client intialized for account amalhotr
+ERROR 2025-03-19 04:24:22.471 UTC: 	 Error: Please specify the site where to check the write permissions. Use the --site option.
+ERROR 2025-03-19 04:24:22.471 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/Commands/checkwrite.py", line 22, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/Commands/SubCommand.py", line 403, in __init__
+    self.validateOptions()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/Commands/checkwrite.py", line 356, in validateOptions
+    raise ex
+CRABClient.ClientExceptions.MissingOptionException: [91mError[0m: Please specify the site where to check the write permissions. Use the --site option.
+INFO 2025-03-19 04:24:22.473 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-19 04:24:30.856 UTC: 	 CRAB Client version: v3.250217
+DEBUG 2025-03-19 04:24:30.856 UTC: 	 Running on: Linux lxplus929.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-19 04:24:30.856 UTC: 	 Not using Singularity
+DEBUG 2025-03-19 04:24:30.856 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-19 04:24:30.856 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-19 04:24:30.856 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-19 04:24:30.856 UTC: 	 Checking credentials
+DEBUG 2025-03-19 04:24:30.856 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:24:30.856 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-19 04:24:30.856 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:24:31.191 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:24:31.191 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-19 04:24:31.191 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:24:31.550 UTC: 	 output : 42727
+42727
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:24:31.551 UTC: 	 Proxy valid for 11:52:07 hours
+DEBUG 2025-03-19 04:24:31.551 UTC: 	 Retrieving username ...
+DEBUG 2025-03-19 04:24:31.551 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-19 04:24:32.154 UTC: 	 username is amalhotr
+INFO 2025-03-19 04:24:32.634 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-19 04:24:32.634 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-19 04:24:32.634 UTC: 	 Options use: ['--site', 'T2_CH_CERN']
+DEBUG 2025-03-19 04:24:32.634 UTC: 	 Instance is None
+DEBUG 2025-03-19 04:24:32.634 UTC: 	 Server base url is None
+DEBUG 2025-03-19 04:24:32.634 UTC: 	 Retrieving username ...
+DEBUG 2025-03-19 04:24:32.634 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-19 04:24:33.252 UTC: 	 username is amalhotr
+INFO 2025-03-19 04:24:33.252 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-19 04:24:33.253 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-19 04:24:33.253 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-19 04:24:33.266 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-19 04:24:33.266 UTC: 	 Will check write permission in /store/user/amalhotr on site T2_CH_CERN
+INFO 2025-03-19 04:24:33.280 UTC: 	 Will use PFN: davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250319_052433_82aea8b4-09ec-4a76-90df-c45aefdff444/82aea8b4-09ec-4a76-90df-c45aefdff444.tmp
+INFO 2025-03-19 04:24:33.280 UTC: 	 
+Attempting to create (dummy) directory crab3checkwrite_20250319_052433_82aea8b4-09ec-4a76-90df-c45aefdff444 and copy (dummy) file 82aea8b4-09ec-4a76-90df-c45aefdff444.tmp to /store/user/amalhotr
+
+INFO 2025-03-19 04:24:33.286 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-copy -p -v -t 180 file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/82aea8b4-09ec-4a76-90df-c45aefdff444.tmp 'davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250319_052433_82aea8b4-09ec-4a76-90df-c45aefdff444/82aea8b4-09ec-4a76-90df-c45aefdff444.tmp'
+INFO 2025-03-19 04:24:33.286 UTC: 	 Please wait...
+INFO 2025-03-19 04:24:34.122 UTC: 	 Failed running copy command
+INFO 2025-03-19 04:24:34.123 UTC: 	   Stdout:
+    Copying 85 bytes file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/82aea8b4-09ec-4a76-90df-c45aefdff444.tmp => davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250319_052433_82aea8b4-09ec-4a76-90df-c45aefdff444/82aea8b4-09ec-4a76-90df-c45aefdff444.tmp
+    event: [1742358274053] BOTH   GFAL2:CORE:COPY	LIST:ENTER	
+    event: [1742358274053] BOTH   GFAL2:CORE:COPY	LIST:ITEM	file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/82aea8b4-09ec-4a76-90df-c45aefdff444.tmp => davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250319_052433_82aea8b4-09ec-4a76-90df-c45aefdff444/82aea8b4-09ec-4a76-90df-c45aefdff444.tmp
+    event: [1742358274053] BOTH   GFAL2:CORE:COPY	LIST:EXIT	
+    event: [1742358274053] BOTH   http_plugin	PREPARE:ENTER	file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/82aea8b4-09ec-4a76-90df-c45aefdff444.tmp => davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250319_052433_82aea8b4-09ec-4a76-90df-c45aefdff444/82aea8b4-09ec-4a76-90df-c45aefdff444.tmp
+    
+INFO 2025-03-19 04:24:34.123 UTC: 	   Stderr:
+    gfal-copy error: 1 (Operation not permitted) - DESTINATION MAKE_PARENT HTTP 403 : Permission refused 
+    
+INFO 2025-03-19 04:24:34.128 UTC: 	 
+Checkwrite Result:
+INFO 2025-03-19 04:24:34.128 UTC: 	 Unable to check write permission in /store/user/amalhotr on site T2_CH_CERN
+Please try again later or contact the site administrators sending them the 'crab checkwrite' output as printed above.
+INFO 2025-03-19 04:24:34.128 UTC: 	 Note: You cannot write to a site if you did not ask permission.
+INFO 2025-03-19 04:24:34.541 UTC: 	 Additional diagnostic info for CERN EOS
+== id ==>:
+uid=180451(amalhotr) gid=1399(zh) groups=1399(zh),1103711105 context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+== voms-proxy-info -all ==>:
+subject   : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra/CN=906204872
+issuer    : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+identity  : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+type      : RFC3820 compliant impersonation proxy
+strength  : 2048
+path      : /tmp/x509up_u180451
+timeleft  : 11:52:04
+key usage : Digital Signature, Key Encipherment
+=== VO cms extension information ===
+VO        : cms
+subject   : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+issuer    : /DC=ch/DC=cern/OU=computers/CN=cms-auth.cern.ch
+attribute : /cms/Role=NULL/Capability=NULL
+attribute : /cms/uscms/Role=NULL/Capability=NULL
+timeleft  : 11:52:04
+uri       : voms-cms-auth.cern.ch:15000
+
+== uberftp eoscmsftp.cern.ch pwd ==>:
+
+WARNING 2025-03-19 04:24:34.542 UTC: 	 Command checkwrite failed
+ERROR 2025-03-19 04:24:34.542 UTC: 	 Caught CommandFailedException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 144, in __call__
+    raise CommandFailedException("Command %s failed" % str(args[0]))
+CRABClient.ClientExceptions.CommandFailedException: Command checkwrite failed
+DEBUG 2025-03-19 04:26:43.093 UTC: 	 CRAB Client version: v3.250217
+DEBUG 2025-03-19 04:26:43.094 UTC: 	 Running on: Linux lxplus929.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-19 04:26:43.094 UTC: 	 Not using Singularity
+DEBUG 2025-03-19 04:26:43.094 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-19 04:26:43.094 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-19 04:26:43.094 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-19 04:26:43.094 UTC: 	 Checking credentials
+DEBUG 2025-03-19 04:26:43.094 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:26:43.094 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-19 04:26:43.094 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:26:43.441 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:26:43.441 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-19 04:26:43.441 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:26:43.756 UTC: 	 output : 42595
+42595
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:26:43.757 UTC: 	 Proxy valid for 11:49:55 hours
+DEBUG 2025-03-19 04:26:43.757 UTC: 	 Retrieving username ...
+DEBUG 2025-03-19 04:26:43.757 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-19 04:26:44.407 UTC: 	 username is amalhotr
+INFO 2025-03-19 04:26:44.833 UTC: 	 Rucio client intialized for account amalhotr
+ERROR 2025-03-19 04:26:44.833 UTC: 	 Error: Please specify the site where to check the write permissions. Use the --site option.
+ERROR 2025-03-19 04:26:44.833 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/Commands/checkwrite.py", line 22, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/Commands/SubCommand.py", line 403, in __init__
+    self.validateOptions()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/Commands/checkwrite.py", line 356, in validateOptions
+    raise ex
+CRABClient.ClientExceptions.MissingOptionException: [91mError[0m: Please specify the site where to check the write permissions. Use the --site option.
+INFO 2025-03-19 04:26:44.834 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-19 04:27:28.024 UTC: 	 CRAB Client version: v3.250217
+DEBUG 2025-03-19 04:27:28.024 UTC: 	 Running on: Linux lxplus929.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-19 04:27:28.024 UTC: 	 Not using Singularity
+DEBUG 2025-03-19 04:27:28.024 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-19 04:27:28.024 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-19 04:27:28.024 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-19 04:27:28.025 UTC: 	 Checking credentials
+DEBUG 2025-03-19 04:27:28.025 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:27:28.025 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-19 04:27:28.025 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:27:28.384 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:27:28.384 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-19 04:27:28.384 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:27:28.725 UTC: 	 output : 42550
+42550
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:27:28.725 UTC: 	 Proxy valid for 11:49:10 hours
+DEBUG 2025-03-19 04:27:28.725 UTC: 	 Retrieving username ...
+DEBUG 2025-03-19 04:27:28.725 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-19 04:27:29.532 UTC: 	 username is amalhotr
+INFO 2025-03-19 04:27:29.987 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-19 04:27:29.987 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-19 04:27:29.987 UTC: 	 Options use: ['--site', 'T2_US_FNAL']
+DEBUG 2025-03-19 04:27:29.987 UTC: 	 Instance is None
+DEBUG 2025-03-19 04:27:29.987 UTC: 	 Server base url is None
+DEBUG 2025-03-19 04:27:29.987 UTC: 	 Retrieving username ...
+DEBUG 2025-03-19 04:27:29.987 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-19 04:27:30.643 UTC: 	 username is amalhotr
+INFO 2025-03-19 04:27:30.644 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-19 04:27:30.644 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-19 04:27:30.644 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-19 04:27:30.658 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-19 04:27:30.659 UTC: 	 Will check write permission in /store/user/amalhotr on site T2_US_FNAL
+ERROR 2025-03-19 04:27:30.669 UTC: 	 RSE does not exist.
+Details: RSE 'T2_US_FNAL' cannot be found in vo 'def'
+WARNING 2025-03-19 04:27:30.669 UTC: 	 Command checkwrite failed
+ERROR 2025-03-19 04:27:30.669 UTC: 	 Caught CommandFailedException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 144, in __call__
+    raise CommandFailedException("Command %s failed" % str(args[0]))
+CRABClient.ClientExceptions.CommandFailedException: Command checkwrite failed
+DEBUG 2025-03-19 04:27:45.094 UTC: 	 CRAB Client version: v3.250217
+DEBUG 2025-03-19 04:27:45.094 UTC: 	 Running on: Linux lxplus929.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-19 04:27:45.094 UTC: 	 Not using Singularity
+DEBUG 2025-03-19 04:27:45.095 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-19 04:27:45.095 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-19 04:27:45.095 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-19 04:27:45.095 UTC: 	 Checking credentials
+DEBUG 2025-03-19 04:27:45.095 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:27:45.095 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-19 04:27:45.095 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:27:45.430 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:27:45.430 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-19 04:27:45.430 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:27:45.752 UTC: 	 output : 42533
+42533
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:27:45.752 UTC: 	 Proxy valid for 11:48:53 hours
+DEBUG 2025-03-19 04:27:45.752 UTC: 	 Retrieving username ...
+DEBUG 2025-03-19 04:27:45.752 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-19 04:27:46.386 UTC: 	 username is amalhotr
+INFO 2025-03-19 04:27:46.829 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-19 04:27:46.830 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-19 04:27:46.830 UTC: 	 Options use: ['--site', 'T2_DE_DESY']
+DEBUG 2025-03-19 04:27:46.830 UTC: 	 Instance is None
+DEBUG 2025-03-19 04:27:46.830 UTC: 	 Server base url is None
+DEBUG 2025-03-19 04:27:46.830 UTC: 	 Retrieving username ...
+DEBUG 2025-03-19 04:27:46.830 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-19 04:27:47.546 UTC: 	 username is amalhotr
+INFO 2025-03-19 04:27:47.546 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-19 04:27:47.546 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-19 04:27:47.546 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-19 04:27:47.558 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-19 04:27:47.559 UTC: 	 Will check write permission in /store/user/amalhotr on site T2_DE_DESY
+INFO 2025-03-19 04:27:47.578 UTC: 	 Will use PFN: davs://dcache-cms-webdav.desy.de:2880/pnfs/desy.de/cms/tier2/store/user/amalhotr/crab3checkwrite_20250319_052747_e8c5407f-8e49-4021-bda3-e86550588e48/e8c5407f-8e49-4021-bda3-e86550588e48.tmp
+INFO 2025-03-19 04:27:47.578 UTC: 	 
+Attempting to create (dummy) directory crab3checkwrite_20250319_052747_e8c5407f-8e49-4021-bda3-e86550588e48 and copy (dummy) file e8c5407f-8e49-4021-bda3-e86550588e48.tmp to /store/user/amalhotr
+
+INFO 2025-03-19 04:27:47.584 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-copy -p -v -t 180 file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/e8c5407f-8e49-4021-bda3-e86550588e48.tmp 'davs://dcache-cms-webdav.desy.de:2880/pnfs/desy.de/cms/tier2/store/user/amalhotr/crab3checkwrite_20250319_052747_e8c5407f-8e49-4021-bda3-e86550588e48/e8c5407f-8e49-4021-bda3-e86550588e48.tmp'
+INFO 2025-03-19 04:27:47.584 UTC: 	 Please wait...
+INFO 2025-03-19 04:27:48.866 UTC: 	 Failed running copy command
+INFO 2025-03-19 04:27:48.866 UTC: 	   Stdout:
+    Copying 85 bytes file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/e8c5407f-8e49-4021-bda3-e86550588e48.tmp => davs://dcache-cms-webdav.desy.de:2880/pnfs/desy.de/cms/tier2/store/user/amalhotr/crab3checkwrite_20250319_052747_e8c5407f-8e49-4021-bda3-e86550588e48/e8c5407f-8e49-4021-bda3-e86550588e48.tmp
+    event: [1742358468516] BOTH   GFAL2:CORE:COPY	LIST:ENTER	
+    event: [1742358468516] BOTH   GFAL2:CORE:COPY	LIST:ITEM	file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/e8c5407f-8e49-4021-bda3-e86550588e48.tmp => davs://dcache-cms-webdav.desy.de:2880/pnfs/desy.de/cms/tier2/store/user/amalhotr/crab3checkwrite_20250319_052747_e8c5407f-8e49-4021-bda3-e86550588e48/e8c5407f-8e49-4021-bda3-e86550588e48.tmp
+    event: [1742358468517] BOTH   GFAL2:CORE:COPY	LIST:EXIT	
+    event: [1742358468517] BOTH   http_plugin	PREPARE:ENTER	file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/e8c5407f-8e49-4021-bda3-e86550588e48.tmp => davs://dcache-cms-webdav.desy.de:2880/pnfs/desy.de/cms/tier2/store/user/amalhotr/crab3checkwrite_20250319_052747_e8c5407f-8e49-4021-bda3-e86550588e48/e8c5407f-8e49-4021-bda3-e86550588e48.tmp
+    
+INFO 2025-03-19 04:27:48.866 UTC: 	   Stderr:
+    gfal-copy error: 1 (Operation not permitted) - DESTINATION MAKE_PARENT HTTP 403 : Permission refused 
+    
+INFO 2025-03-19 04:27:48.870 UTC: 	 
+Checkwrite Result:
+INFO 2025-03-19 04:27:48.870 UTC: 	 Unable to check write permission in /store/user/amalhotr on site T2_DE_DESY
+Please try again later or contact the site administrators sending them the 'crab checkwrite' output as printed above.
+INFO 2025-03-19 04:27:48.870 UTC: 	 Note: You cannot write to a site if you did not ask permission.
+WARNING 2025-03-19 04:27:48.870 UTC: 	 Command checkwrite failed
+ERROR 2025-03-19 04:27:48.870 UTC: 	 Caught CommandFailedException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 144, in __call__
+    raise CommandFailedException("Command %s failed" % str(args[0]))
+CRABClient.ClientExceptions.CommandFailedException: Command checkwrite failed
+DEBUG 2025-03-19 04:28:05.264 UTC: 	 CRAB Client version: v3.250217
+DEBUG 2025-03-19 04:28:05.265 UTC: 	 Running on: Linux lxplus929.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-19 04:28:05.265 UTC: 	 Not using Singularity
+DEBUG 2025-03-19 04:28:05.265 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-19 04:28:05.265 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-19 04:28:05.265 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-19 04:28:05.265 UTC: 	 Checking credentials
+DEBUG 2025-03-19 04:28:05.265 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:28:05.265 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-19 04:28:05.265 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:28:05.631 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:28:05.631 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-19 04:28:05.631 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:28:05.992 UTC: 	 output : 42513
+42513
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:28:05.992 UTC: 	 Proxy valid for 11:48:33 hours
+DEBUG 2025-03-19 04:28:05.992 UTC: 	 Retrieving username ...
+DEBUG 2025-03-19 04:28:05.992 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-19 04:28:06.636 UTC: 	 username is amalhotr
+INFO 2025-03-19 04:28:07.097 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-19 04:28:07.097 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-19 04:28:07.097 UTC: 	 Options use: ['--site', 'T2_BR_SPRACE']
+DEBUG 2025-03-19 04:28:07.097 UTC: 	 Instance is None
+DEBUG 2025-03-19 04:28:07.097 UTC: 	 Server base url is None
+DEBUG 2025-03-19 04:28:07.097 UTC: 	 Retrieving username ...
+DEBUG 2025-03-19 04:28:07.097 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-19 04:28:07.805 UTC: 	 username is amalhotr
+INFO 2025-03-19 04:28:07.806 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-19 04:28:07.806 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-19 04:28:07.806 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-19 04:28:07.819 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-19 04:28:07.819 UTC: 	 Will check write permission in /store/user/amalhotr on site T2_BR_SPRACE
+INFO 2025-03-19 04:28:07.833 UTC: 	 Will use PFN: davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250319_052807_2b8573bd-d7d8-4977-a85c-90d164d69300/2b8573bd-d7d8-4977-a85c-90d164d69300.tmp
+INFO 2025-03-19 04:28:07.833 UTC: 	 
+Attempting to create (dummy) directory crab3checkwrite_20250319_052807_2b8573bd-d7d8-4977-a85c-90d164d69300 and copy (dummy) file 2b8573bd-d7d8-4977-a85c-90d164d69300.tmp to /store/user/amalhotr
+
+INFO 2025-03-19 04:28:07.839 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-copy -p -v -t 180 file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/2b8573bd-d7d8-4977-a85c-90d164d69300.tmp 'davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250319_052807_2b8573bd-d7d8-4977-a85c-90d164d69300/2b8573bd-d7d8-4977-a85c-90d164d69300.tmp'
+INFO 2025-03-19 04:28:07.839 UTC: 	 Please wait...
+INFO 2025-03-19 04:28:18.380 UTC: 	 
+Successfully created directory crab3checkwrite_20250319_052807_2b8573bd-d7d8-4977-a85c-90d164d69300 and copied file 2b8573bd-d7d8-4977-a85c-90d164d69300.tmp to /store/user/amalhotr
+INFO 2025-03-19 04:28:18.381 UTC: 	 
+Attempting to delete file davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250319_052807_2b8573bd-d7d8-4977-a85c-90d164d69300/2b8573bd-d7d8-4977-a85c-90d164d69300.tmp
+
+INFO 2025-03-19 04:28:18.381 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -v -t 180 'davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250319_052807_2b8573bd-d7d8-4977-a85c-90d164d69300/2b8573bd-d7d8-4977-a85c-90d164d69300.tmp'
+INFO 2025-03-19 04:28:18.381 UTC: 	 Please wait...
+INFO 2025-03-19 04:28:23.349 UTC: 	 
+Successfully deleted file davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250319_052807_2b8573bd-d7d8-4977-a85c-90d164d69300/2b8573bd-d7d8-4977-a85c-90d164d69300.tmp
+INFO 2025-03-19 04:28:23.349 UTC: 	 
+Attempting to delete directory davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250319_052807_2b8573bd-d7d8-4977-a85c-90d164d69300/
+
+INFO 2025-03-19 04:28:23.349 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -r -v -t 180 'davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250319_052807_2b8573bd-d7d8-4977-a85c-90d164d69300/'
+INFO 2025-03-19 04:28:23.349 UTC: 	 Please wait...
+INFO 2025-03-19 04:28:28.778 UTC: 	 
+Successfully deleted directory davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250319_052807_2b8573bd-d7d8-4977-a85c-90d164d69300/
+INFO 2025-03-19 04:28:28.780 UTC: 	 
+Checkwrite Result:
+INFO 2025-03-19 04:28:28.780 UTC: 	 Success: Able to write in /store/user/amalhotr on site T2_BR_SPRACE
+DEBUG 2025-03-19 04:35:46.899 UTC: 	 CRAB Client version: v3.250217
+DEBUG 2025-03-19 04:35:46.899 UTC: 	 Running on: Linux lxplus929.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-19 04:35:46.899 UTC: 	 Not using Singularity
+DEBUG 2025-03-19 04:35:46.899 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-19 04:35:46.899 UTC: 	 Executing command: 'submit'
+DEBUG 2025-03-19 04:35:46.899 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-03-19 04:35:46.900 UTC: 	 Will use CRAB configuration file Vertexer_CRAB.py
+DEBUG 2025-03-19 04:35:46.900 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-03-19 04:35:46.904 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+ERROR 2025-03-19 04:35:46.904 UTC: 	 Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_projects/crab_DYto2Mu4Jets_Vertexer_Mar2025' already exists 
+Please change the requestName in the config file
+ERROR 2025-03-19 04:35:46.905 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/Commands/SubCommand.py", line 328, in __init__
+    self.requestarea, self.requestname, self.logfile = createWorkArea(
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/ClientUtilities.py", line 392, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+CRABClient.ClientExceptions.ConfigException: Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_projects/crab_DYto2Mu4Jets_Vertexer_Mar2025' already exists 
+Please change the requestName in the config file
+INFO 2025-03-19 04:35:46.906 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-20 20:49:30.983 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-20 20:49:30.983 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-20 20:49:30.983 UTC: 	 Not using Singularity
+DEBUG 2025-03-20 20:49:30.983 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-20 20:49:30.983 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-20 20:49:30.983 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-20 20:49:30.999 UTC: 	 Checking credentials
+DEBUG 2025-03-20 20:49:30.999 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-20 20:49:30.999 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-20 20:49:30.999 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-20 20:49:31.509 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-20 20:49:31.510 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-20 20:49:31.510 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-20 20:49:31.878 UTC: 	 output : 681411
+681411
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-20 20:49:31.878 UTC: 	 Proxy valid for 189:16:51 hours
+DEBUG 2025-03-20 20:49:31.878 UTC: 	 Retrieving username ...
+DEBUG 2025-03-20 20:49:31.878 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-20 20:49:32.536 UTC: 	 username is amalhotr
+INFO 2025-03-20 20:49:33.227 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-20 20:49:33.228 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-20 20:49:33.228 UTC: 	 Options use: ['--site=T3_CH_CERNBOX\n']
+DEBUG 2025-03-20 20:49:33.228 UTC: 	 Instance is None
+DEBUG 2025-03-20 20:49:33.228 UTC: 	 Server base url is None
+DEBUG 2025-03-20 20:49:33.228 UTC: 	 Retrieving username ...
+DEBUG 2025-03-20 20:49:33.228 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-20 20:49:33.955 UTC: 	 username is amalhotr
+INFO 2025-03-20 20:49:33.955 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-20 20:49:33.955 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-20 20:49:33.955 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-20 20:49:33.970 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-20 20:49:33.971 UTC: 	 Will check write permission in /store/user/amalhotr on site T3_CH_CERNBOX
+
+ERROR 2025-03-20 20:49:33.989 UTC: 	 An unknown exception occurred.
+Details: no error information passed (http status code: 500)
+WARNING 2025-03-20 20:49:33.989 UTC: 	 Command checkwrite failed
+ERROR 2025-03-20 20:49:33.989 UTC: 	 Caught CommandFailedException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 144, in __call__
+    raise CommandFailedException("Command %s failed" % str(args[0]))
+CRABClient.ClientExceptions.CommandFailedException: Command checkwrite failed
+DEBUG 2025-03-20 20:50:20.799 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-20 20:50:20.799 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-20 20:50:20.799 UTC: 	 Not using Singularity
+DEBUG 2025-03-20 20:50:20.799 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-20 20:50:20.799 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-20 20:50:20.799 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-20 20:50:20.800 UTC: 	 Checking credentials
+DEBUG 2025-03-20 20:50:20.800 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-20 20:50:20.800 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-20 20:50:20.800 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-20 20:50:21.190 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-20 20:50:21.190 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-20 20:50:21.190 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-20 20:50:21.576 UTC: 	 output : 681361
+681361
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-20 20:50:21.576 UTC: 	 Proxy valid for 189:16:01 hours
+DEBUG 2025-03-20 20:50:21.576 UTC: 	 Retrieving username ...
+DEBUG 2025-03-20 20:50:21.576 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-20 20:50:22.283 UTC: 	 username is amalhotr
+INFO 2025-03-20 20:50:22.755 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-20 20:50:22.756 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-20 20:50:22.756 UTC: 	 Options use: ['--site=T3_CH_CERNBOX']
+DEBUG 2025-03-20 20:50:22.756 UTC: 	 Instance is None
+DEBUG 2025-03-20 20:50:22.756 UTC: 	 Server base url is None
+DEBUG 2025-03-20 20:50:22.756 UTC: 	 Retrieving username ...
+DEBUG 2025-03-20 20:50:22.756 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-20 20:50:23.416 UTC: 	 username is amalhotr
+INFO 2025-03-20 20:50:23.416 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-20 20:50:23.416 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-20 20:50:23.416 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-20 20:50:23.429 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-20 20:50:23.429 UTC: 	 Will check write permission in /store/user/amalhotr on site T3_CH_CERNBOX
+INFO 2025-03-20 20:50:23.448 UTC: 	 Will use PFN: davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250320_215023_fcf9fad6-086f-4d73-be17-72836b889c41/fcf9fad6-086f-4d73-be17-72836b889c41.tmp
+INFO 2025-03-20 20:50:23.448 UTC: 	 
+Attempting to create (dummy) directory crab3checkwrite_20250320_215023_fcf9fad6-086f-4d73-be17-72836b889c41 and copy (dummy) file fcf9fad6-086f-4d73-be17-72836b889c41.tmp to /store/user/amalhotr
+
+INFO 2025-03-20 20:50:23.453 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-copy -p -v -t 180 file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/fcf9fad6-086f-4d73-be17-72836b889c41.tmp 'davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250320_215023_fcf9fad6-086f-4d73-be17-72836b889c41/fcf9fad6-086f-4d73-be17-72836b889c41.tmp'
+INFO 2025-03-20 20:50:23.454 UTC: 	 Please wait...
+INFO 2025-03-20 20:50:24.862 UTC: 	 
+Successfully created directory crab3checkwrite_20250320_215023_fcf9fad6-086f-4d73-be17-72836b889c41 and copied file fcf9fad6-086f-4d73-be17-72836b889c41.tmp to /store/user/amalhotr
+INFO 2025-03-20 20:50:24.862 UTC: 	 
+Attempting to delete file davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250320_215023_fcf9fad6-086f-4d73-be17-72836b889c41/fcf9fad6-086f-4d73-be17-72836b889c41.tmp
+
+INFO 2025-03-20 20:50:24.862 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -v -t 180 'davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250320_215023_fcf9fad6-086f-4d73-be17-72836b889c41/fcf9fad6-086f-4d73-be17-72836b889c41.tmp'
+INFO 2025-03-20 20:50:24.862 UTC: 	 Please wait...
+INFO 2025-03-20 20:50:25.728 UTC: 	 
+Successfully deleted file davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250320_215023_fcf9fad6-086f-4d73-be17-72836b889c41/fcf9fad6-086f-4d73-be17-72836b889c41.tmp
+INFO 2025-03-20 20:50:25.728 UTC: 	 
+Attempting to delete directory davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250320_215023_fcf9fad6-086f-4d73-be17-72836b889c41/
+
+INFO 2025-03-20 20:50:25.728 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -r -v -t 180 'davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250320_215023_fcf9fad6-086f-4d73-be17-72836b889c41/'
+INFO 2025-03-20 20:50:25.728 UTC: 	 Please wait...
+INFO 2025-03-20 20:50:26.723 UTC: 	 
+Successfully deleted directory davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250320_215023_fcf9fad6-086f-4d73-be17-72836b889c41/
+INFO 2025-03-20 20:50:26.780 UTC: 	 
+Checkwrite Result:
+INFO 2025-03-20 20:50:26.780 UTC: 	 Success: Able to write in /store/user/amalhotr on site T3_CH_CERNBOX
+DEBUG 2025-03-20 22:28:16.276 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-20 22:28:16.277 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-20 22:28:16.277 UTC: 	 Not using Singularity
+DEBUG 2025-03-20 22:28:16.277 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-20 22:28:16.277 UTC: 	 Executing command: 'submit'
+DEBUG 2025-03-20 22:28:16.277 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-03-20 22:28:16.292 UTC: 	 CRAB configuration file crabConfig.py not found.
+ERROR 2025-03-20 22:28:16.293 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 326, in __init__
+    self.loadConfig(self.options.config, self.args)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 52, in loadConfig
+    raise ConfigurationException("CRAB configuration file %s not found." % (configname))
+CRABClient.ClientExceptions.ConfigurationException: CRAB configuration file crabConfig.py not found.
+INFO 2025-03-20 22:28:16.308 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-20 22:28:41.139 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-20 22:28:41.139 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-20 22:28:41.139 UTC: 	 Not using Singularity
+DEBUG 2025-03-20 22:28:41.139 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-20 22:28:41.139 UTC: 	 Executing command: 'submit'
+DEBUG 2025-03-20 22:28:41.139 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-03-20 22:28:41.140 UTC: 	 Will use CRAB configuration file Vertexer_CRAB.py
+DEBUG 2025-03-20 22:28:41.140 UTC: 	 Loading CRAB configuration file.
+ERROR 2025-03-20 22:28:41.163 UTC: 	 Error while loading CRAB configuration:
+'ConfigSection' object has no attribute 'input'
+Please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3FAQ
+See the ./crab.log file for more details.
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+ERROR 2025-03-20 22:28:41.163 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/WMCore/Configuration.py", line 339, in loadConfigurationFile
+    modRef = load_module(cfgBaseName, modPath)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/__init__.py", line 38, in load_module
+    return imp.load_module(moduleName, moduleObj[0],
+  File "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/python3/3.9.14-8e02587b42992e07ed46b00eca9dfc3a/lib/python3.9/imp.py", line 234, in load_module
+    return load_source(name, filename, file)
+  File "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/python3/3.9.14-8e02587b42992e07ed46b00eca9dfc3a/lib/python3.9/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 711, in _load
+  File "<frozen importlib._bootstrap>", line 680, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 850, in exec_module
+  File "<frozen importlib._bootstrap>", line 228, in _call_with_frames_removed
+  File "/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/Vertexer_CRAB.py", line 124, in <module>
+    config.Data.input
+AttributeError: 'ConfigSection' object has no attribute 'input'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 56, in loadConfig
+    self.configuration = loadConfigurationFile(os.path.abspath(configname))
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/WMCore/Configuration.py", line 346, in loadConfigurationFile
+    raise RuntimeError(msg)
+RuntimeError: Unable to load Configuration File:
+/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/Vertexer_CRAB.py
+Due to error:
+'ConfigSection' object has no attribute 'input'Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/WMCore/Configuration.py", line 339, in loadConfigurationFile
+    modRef = load_module(cfgBaseName, modPath)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/__init__.py", line 38, in load_module
+    return imp.load_module(moduleName, moduleObj[0],
+  File "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/python3/3.9.14-8e02587b42992e07ed46b00eca9dfc3a/lib/python3.9/imp.py", line 234, in load_module
+    return load_source(name, filename, file)
+  File "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/python3/3.9.14-8e02587b42992e07ed46b00eca9dfc3a/lib/python3.9/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 711, in _load
+  File "<frozen importlib._bootstrap>", line 680, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 850, in exec_module
+  File "<frozen importlib._bootstrap>", line 228, in _call_with_frames_removed
+  File "/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/Vertexer_CRAB.py", line 124, in <module>
+    config.Data.input
+AttributeError: 'ConfigSection' object has no attribute 'input'
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 326, in __init__
+    self.loadConfig(self.options.config, self.args)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 90, in loadConfig
+    raise ConfigurationException(configmsg)
+CRABClient.ClientExceptions.ConfigurationException: Error while loading CRAB configuration:
+'ConfigSection' object has no attribute 'input'
+Please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3FAQ
+See the ./crab.log file for more details.
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+INFO 2025-03-20 22:28:41.165 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-20 22:31:30.425 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-20 22:31:30.425 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-20 22:31:30.425 UTC: 	 Not using Singularity
+DEBUG 2025-03-20 22:31:30.425 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-20 22:31:30.425 UTC: 	 Executing command: 'status'
+DEBUG 2025-03-20 22:31:30.425 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-03-20 22:31:30.426 UTC: 	 Error: crab_projects/DYto2Mu4Jets_Vertexer_OfflineReconstructed is not a valid CRAB project directory.
+ERROR 2025-03-20 22:31:30.426 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/status.py", line 48, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: crab_projects/DYto2Mu4Jets_Vertexer_OfflineReconstructed is not a valid CRAB project directory.
+INFO 2025-03-20 22:31:30.428 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-20 22:32:38.793 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-20 22:32:38.793 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-20 22:32:38.793 UTC: 	 Not using Singularity
+DEBUG 2025-03-20 22:32:38.793 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-20 22:32:38.793 UTC: 	 Executing command: 'status'
+DEBUG 2025-03-20 22:32:38.793 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-03-20 22:32:38.793 UTC: 	 Error: DYto2Mu4Jets_Vertexer_OfflineReconstructed is not a valid CRAB project directory.
+ERROR 2025-03-20 22:32:38.794 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/status.py", line 48, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: DYto2Mu4Jets_Vertexer_OfflineReconstructed is not a valid CRAB project directory.
+INFO 2025-03-20 22:32:38.795 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-20 23:21:06.893 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-20 23:21:06.893 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-20 23:21:06.893 UTC: 	 Not using Singularity
+DEBUG 2025-03-20 23:21:06.893 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-20 23:21:06.893 UTC: 	 Executing command: 'submit'
+DEBUG 2025-03-20 23:21:06.893 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-03-20 23:21:06.894 UTC: 	 Will use CRAB configuration file Vertexer_CRAB.py
+DEBUG 2025-03-20 23:21:06.894 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-03-20 23:21:06.916 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+ERROR 2025-03-20 23:21:06.916 UTC: 	 Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_projects/crab_DYto2Mu4Jets_Vertexer_OfflineReconstructed' already exists 
+Please change the requestName in the config file
+ERROR 2025-03-20 23:21:06.916 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 328, in __init__
+    self.requestarea, self.requestname, self.logfile = createWorkArea(
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/ClientUtilities.py", line 392, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+CRABClient.ClientExceptions.ConfigException: Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_projects/crab_DYto2Mu4Jets_Vertexer_OfflineReconstructed' already exists 
+Please change the requestName in the config file
+INFO 2025-03-20 23:21:06.941 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-20 23:22:33.707 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-20 23:22:33.707 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-20 23:22:33.707 UTC: 	 Not using Singularity
+DEBUG 2025-03-20 23:22:33.707 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-20 23:22:33.707 UTC: 	 Executing command: 'submit'
+DEBUG 2025-03-20 23:22:33.707 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-03-20 23:22:33.708 UTC: 	 Will use CRAB configuration file Vertexer_CRAB.py
+DEBUG 2025-03-20 23:22:33.708 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-03-20 23:22:33.709 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+ERROR 2025-03-20 23:22:33.709 UTC: 	 Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_projects/crab_DYto2Mu4Jets_Vertexer_OfflineReconstructed' already exists 
+Please change the requestName in the config file
+ERROR 2025-03-20 23:22:33.709 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 328, in __init__
+    self.requestarea, self.requestname, self.logfile = createWorkArea(
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/ClientUtilities.py", line 392, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+CRABClient.ClientExceptions.ConfigException: Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_projects/crab_DYto2Mu4Jets_Vertexer_OfflineReconstructed' already exists 
+Please change the requestName in the config file
+INFO 2025-03-20 23:22:33.711 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-20 23:30:42.010 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-20 23:30:42.010 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-20 23:30:42.010 UTC: 	 Not using Singularity
+DEBUG 2025-03-20 23:30:42.010 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-20 23:30:42.011 UTC: 	 Executing command: 'getlog'
+DEBUG 2025-03-20 23:30:42.011 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-03-20 23:30:42.011 UTC: 	 Error: ./crab_DYto2Mu4Jets_UnpackerOuput is not a valid CRAB project directory.
+ERROR 2025-03-20 23:30:42.011 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: ./crab_DYto2Mu4Jets_UnpackerOuput is not a valid CRAB project directory.
+INFO 2025-03-20 23:30:42.012 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-21 01:18:12.888 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-21 01:18:12.889 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-21 01:18:12.889 UTC: 	 Not using Singularity
+DEBUG 2025-03-21 01:18:12.889 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-21 01:18:12.889 UTC: 	 Executing command: 'submit'
+DEBUG 2025-03-21 01:18:12.889 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-03-21 01:18:12.889 UTC: 	 Will use CRAB configuration file HLTScoutingUnpackProducer_CRAB.py
+DEBUG 2025-03-21 01:18:12.889 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-03-21 01:18:12.893 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+ERROR 2025-03-21 01:18:12.893 UTC: 	 Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_DYto2Mu4Jets_UnpackerOutputSpecified' already exists 
+Please change the requestName in the config file
+ERROR 2025-03-21 01:18:12.893 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 328, in __init__
+    self.requestarea, self.requestname, self.logfile = createWorkArea(
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/ClientUtilities.py", line 392, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+CRABClient.ClientExceptions.ConfigException: Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_DYto2Mu4Jets_UnpackerOutputSpecified' already exists 
+Please change the requestName in the config file
+INFO 2025-03-21 01:18:12.900 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-23 06:02:48.255 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-23 06:02:48.255 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-23 06:02:48.255 UTC: 	 Not using Singularity
+DEBUG 2025-03-23 06:02:48.255 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-23 06:02:48.255 UTC: 	 Executing command: 'status'
+DEBUG 2025-03-23 06:02:48.255 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-03-23 06:02:48.256 UTC: 	 Error: ./crab_DYto2Mu4Jets_Unpacker_Large is not a valid CRAB project directory.
+ERROR 2025-03-23 06:02:48.256 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/status.py", line 48, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: ./crab_DYto2Mu4Jets_Unpacker_Large is not a valid CRAB project directory.
+INFO 2025-03-23 06:02:48.257 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-03-23 16:42:54.363 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-23 16:42:54.363 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-23 16:42:54.363 UTC: 	 Not using Singularity
+DEBUG 2025-03-23 16:42:54.363 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-23 16:42:54.363 UTC: 	 Executing command: 'submit'
+DEBUG 2025-03-23 16:42:54.363 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-23 17:39:35.371 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-23 17:39:35.371 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-23 17:39:35.371 UTC: 	 Not using Singularity
+DEBUG 2025-03-23 17:39:35.371 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-23 17:39:35.371 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-23 17:39:35.371 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-23 17:39:35.372 UTC: 	 Checking credentials
+DEBUG 2025-03-23 17:39:35.372 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:39:35.372 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-23 17:39:35.372 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:39:35.794 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:39:35.794 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-23 17:39:35.794 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:39:36.163 UTC: 	 output : 687839
+687839
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:39:36.164 UTC: 	 Proxy valid for 191:03:59 hours
+DEBUG 2025-03-23 17:39:36.164 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:39:36.164 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:39:36.907 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:39:37.651 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-23 17:39:37.651 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-23 17:39:37.651 UTC: 	 Options use: ['--site=T2_CH_CERN']
+DEBUG 2025-03-23 17:39:37.651 UTC: 	 Instance is None
+DEBUG 2025-03-23 17:39:37.651 UTC: 	 Server base url is None
+DEBUG 2025-03-23 17:39:37.651 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:39:37.651 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:39:38.298 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:39:38.298 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-23 17:39:38.298 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-23 17:39:38.298 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-23 17:39:38.335 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-23 17:39:38.335 UTC: 	 Will check write permission in /store/user/amalhotr on site T2_CH_CERN
+INFO 2025-03-23 17:39:38.666 UTC: 	 Will use PFN: davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250323_183938_77a8e1e5-3bc7-4f4e-9397-acc3e7190f28/77a8e1e5-3bc7-4f4e-9397-acc3e7190f28.tmp
+INFO 2025-03-23 17:39:38.667 UTC: 	 
+Attempting to create (dummy) directory crab3checkwrite_20250323_183938_77a8e1e5-3bc7-4f4e-9397-acc3e7190f28 and copy (dummy) file 77a8e1e5-3bc7-4f4e-9397-acc3e7190f28.tmp to /store/user/amalhotr
+
+INFO 2025-03-23 17:39:38.672 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-copy -p -v -t 180 file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/77a8e1e5-3bc7-4f4e-9397-acc3e7190f28.tmp 'davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250323_183938_77a8e1e5-3bc7-4f4e-9397-acc3e7190f28/77a8e1e5-3bc7-4f4e-9397-acc3e7190f28.tmp'
+INFO 2025-03-23 17:39:38.672 UTC: 	 Please wait...
+INFO 2025-03-23 17:39:39.465 UTC: 	 Failed running copy command
+INFO 2025-03-23 17:39:39.465 UTC: 	   Stdout:
+    Copying 85 bytes file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/77a8e1e5-3bc7-4f4e-9397-acc3e7190f28.tmp => davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250323_183938_77a8e1e5-3bc7-4f4e-9397-acc3e7190f28/77a8e1e5-3bc7-4f4e-9397-acc3e7190f28.tmp
+    event: [1742751579397] BOTH   GFAL2:CORE:COPY	LIST:ENTER	
+    event: [1742751579397] BOTH   GFAL2:CORE:COPY	LIST:ITEM	file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/77a8e1e5-3bc7-4f4e-9397-acc3e7190f28.tmp => davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250323_183938_77a8e1e5-3bc7-4f4e-9397-acc3e7190f28/77a8e1e5-3bc7-4f4e-9397-acc3e7190f28.tmp
+    event: [1742751579397] BOTH   GFAL2:CORE:COPY	LIST:EXIT	
+    event: [1742751579397] BOTH   http_plugin	PREPARE:ENTER	file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/77a8e1e5-3bc7-4f4e-9397-acc3e7190f28.tmp => davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250323_183938_77a8e1e5-3bc7-4f4e-9397-acc3e7190f28/77a8e1e5-3bc7-4f4e-9397-acc3e7190f28.tmp
+    
+INFO 2025-03-23 17:39:39.465 UTC: 	   Stderr:
+    gfal-copy error: 1 (Operation not permitted) - DESTINATION MAKE_PARENT HTTP 403 : Permission refused 
+    
+INFO 2025-03-23 17:39:39.779 UTC: 	 
+Checkwrite Result:
+INFO 2025-03-23 17:39:39.779 UTC: 	 Unable to check write permission in /store/user/amalhotr on site T2_CH_CERN
+Please try again later or contact the site administrators sending them the 'crab checkwrite' output as printed above.
+INFO 2025-03-23 17:39:39.779 UTC: 	 Note: You cannot write to a site if you did not ask permission.
+INFO 2025-03-23 17:39:40.217 UTC: 	 Additional diagnostic info for CERN EOS
+== id ==>:
+uid=180451(amalhotr) gid=1399(zh) groups=1399(zh) context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+== voms-proxy-info -all ==>:
+subject   : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra/CN=1823267519
+issuer    : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+identity  : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+type      : RFC3820 compliant impersonation proxy
+strength  : 2048
+path      : /tmp/x509up_u180451
+timeleft  : 191:03:55
+key usage : Digital Signature, Key Encipherment
+=== VO cms extension information ===
+VO        : cms
+subject   : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+issuer    : /DC=ch/DC=cern/OU=computers/CN=cms-auth.cern.ch
+attribute : /cms/Role=NULL/Capability=NULL
+attribute : /cms/uscms/Role=NULL/Capability=NULL
+timeleft  : 191:03:55
+uri       : voms-cms-auth.cern.ch:15000
+
+== uberftp eoscmsftp.cern.ch pwd ==>:
+
+WARNING 2025-03-23 17:39:40.218 UTC: 	 Command checkwrite failed
+ERROR 2025-03-23 17:39:40.219 UTC: 	 Caught CommandFailedException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 144, in __call__
+    raise CommandFailedException("Command %s failed" % str(args[0]))
+CRABClient.ClientExceptions.CommandFailedException: Command checkwrite failed
+DEBUG 2025-03-23 17:40:39.718 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-23 17:40:39.719 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-23 17:40:39.719 UTC: 	 Not using Singularity
+DEBUG 2025-03-23 17:40:39.719 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-23 17:40:39.719 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-23 17:40:39.719 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-23 17:40:39.719 UTC: 	 Checking credentials
+DEBUG 2025-03-23 17:40:39.719 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:40:39.719 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-23 17:40:39.719 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:40:40.103 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:40:40.103 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-23 17:40:40.103 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:40:40.501 UTC: 	 output : 687775
+687775
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:40:40.502 UTC: 	 Proxy valid for 191:02:55 hours
+DEBUG 2025-03-23 17:40:40.502 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:40:40.502 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:40:41.188 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:40:41.726 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-23 17:40:41.727 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-23 17:40:41.727 UTC: 	 Options use: ['--site=T3_CH_CERN']
+DEBUG 2025-03-23 17:40:41.727 UTC: 	 Instance is None
+DEBUG 2025-03-23 17:40:41.727 UTC: 	 Server base url is None
+DEBUG 2025-03-23 17:40:41.727 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:40:41.727 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:40:42.366 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:40:42.366 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-23 17:40:42.366 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-23 17:40:42.366 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-23 17:40:42.380 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-23 17:40:42.380 UTC: 	 Will check write permission in /store/user/amalhotr on site T3_CH_CERN
+ERROR 2025-03-23 17:40:42.390 UTC: 	 RSE does not exist.
+Details: RSE 'T3_CH_CERN' cannot be found in vo 'def'
+WARNING 2025-03-23 17:40:42.390 UTC: 	 Command checkwrite failed
+ERROR 2025-03-23 17:40:42.390 UTC: 	 Caught CommandFailedException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 144, in __call__
+    raise CommandFailedException("Command %s failed" % str(args[0]))
+CRABClient.ClientExceptions.CommandFailedException: Command checkwrite failed
+DEBUG 2025-03-23 17:41:03.617 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-23 17:41:03.618 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-23 17:41:03.618 UTC: 	 Not using Singularity
+DEBUG 2025-03-23 17:41:03.618 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-23 17:41:03.618 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-23 17:41:03.618 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-23 17:41:03.618 UTC: 	 Checking credentials
+DEBUG 2025-03-23 17:41:03.618 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:41:03.618 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-23 17:41:03.618 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:41:04.000 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:41:04.001 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-23 17:41:04.001 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:41:04.441 UTC: 	 output : 687751
+687751
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:41:04.441 UTC: 	 Proxy valid for 191:02:31 hours
+DEBUG 2025-03-23 17:41:04.441 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:41:04.441 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:41:05.167 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:41:05.588 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-23 17:41:05.588 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-23 17:41:05.588 UTC: 	 Options use: ['--site=T3_CH_CERN']
+DEBUG 2025-03-23 17:41:05.588 UTC: 	 Instance is None
+DEBUG 2025-03-23 17:41:05.588 UTC: 	 Server base url is None
+DEBUG 2025-03-23 17:41:05.588 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:41:05.588 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:41:06.318 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:41:06.318 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-23 17:41:06.318 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-23 17:41:06.318 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-23 17:41:06.334 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-23 17:41:06.335 UTC: 	 Will check write permission in /store/user/amalhotr on site T3_CH_CERN
+ERROR 2025-03-23 17:41:06.347 UTC: 	 RSE does not exist.
+Details: RSE 'T3_CH_CERN' cannot be found in vo 'def'
+WARNING 2025-03-23 17:41:06.347 UTC: 	 Command checkwrite failed
+ERROR 2025-03-23 17:41:06.347 UTC: 	 Caught CommandFailedException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 144, in __call__
+    raise CommandFailedException("Command %s failed" % str(args[0]))
+CRABClient.ClientExceptions.CommandFailedException: Command checkwrite failed
+DEBUG 2025-03-23 17:42:44.772 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-23 17:42:44.772 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-23 17:42:44.772 UTC: 	 Not using Singularity
+DEBUG 2025-03-23 17:42:44.772 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-23 17:42:44.772 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-23 17:42:44.772 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-23 17:42:44.773 UTC: 	 Checking credentials
+DEBUG 2025-03-23 17:42:44.773 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:42:44.773 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-23 17:42:44.773 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:42:45.178 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:42:45.178 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-23 17:42:45.178 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:42:45.527 UTC: 	 output : 687650
+687650
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:42:45.527 UTC: 	 Proxy valid for 191:00:50 hours
+DEBUG 2025-03-23 17:42:45.527 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:42:45.527 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:42:46.181 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:42:46.676 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-23 17:42:46.676 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-23 17:42:46.676 UTC: 	 Options use: ['--site=T3_CH_CERN']
+DEBUG 2025-03-23 17:42:46.676 UTC: 	 Instance is None
+DEBUG 2025-03-23 17:42:46.676 UTC: 	 Server base url is None
+DEBUG 2025-03-23 17:42:46.676 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:42:46.676 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:42:47.373 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:42:47.373 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-23 17:42:47.373 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-23 17:42:47.373 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-23 17:42:47.390 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-23 17:42:47.390 UTC: 	 Will check write permission in /store/user/amalhotr on site T3_CH_CERN
+ERROR 2025-03-23 17:42:47.403 UTC: 	 RSE does not exist.
+Details: RSE 'T3_CH_CERN' cannot be found in vo 'def'
+WARNING 2025-03-23 17:42:47.403 UTC: 	 Command checkwrite failed
+ERROR 2025-03-23 17:42:47.403 UTC: 	 Caught CommandFailedException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 144, in __call__
+    raise CommandFailedException("Command %s failed" % str(args[0]))
+CRABClient.ClientExceptions.CommandFailedException: Command checkwrite failed
+DEBUG 2025-03-23 17:43:59.237 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-23 17:43:59.237 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-23 17:43:59.237 UTC: 	 Not using Singularity
+DEBUG 2025-03-23 17:43:59.237 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-23 17:43:59.237 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-23 17:43:59.237 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-23 17:43:59.238 UTC: 	 Checking credentials
+DEBUG 2025-03-23 17:43:59.238 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:43:59.238 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-23 17:43:59.238 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:43:59.641 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:43:59.641 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-23 17:43:59.641 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:44:00.013 UTC: 	 output : 687575
+687575
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:44:00.013 UTC: 	 Proxy valid for 190:59:35 hours
+DEBUG 2025-03-23 17:44:00.013 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:44:00.013 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:44:00.758 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:44:01.311 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-23 17:44:01.312 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-23 17:44:01.312 UTC: 	 Options use: ['--site=T3_CH_CERNBOX']
+DEBUG 2025-03-23 17:44:01.312 UTC: 	 Instance is None
+DEBUG 2025-03-23 17:44:01.312 UTC: 	 Server base url is None
+DEBUG 2025-03-23 17:44:01.312 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:44:01.312 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:44:02.107 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:44:02.108 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-23 17:44:02.108 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-23 17:44:02.108 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-23 17:44:02.122 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-23 17:44:02.123 UTC: 	 Will check write permission in /store/user/amalhotr on site T3_CH_CERNBOX
+INFO 2025-03-23 17:44:02.184 UTC: 	 Will use PFN: davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250323_184402_1a858903-3509-4c17-8362-876b9210ed4b/1a858903-3509-4c17-8362-876b9210ed4b.tmp
+INFO 2025-03-23 17:44:02.184 UTC: 	 
+Attempting to create (dummy) directory crab3checkwrite_20250323_184402_1a858903-3509-4c17-8362-876b9210ed4b and copy (dummy) file 1a858903-3509-4c17-8362-876b9210ed4b.tmp to /store/user/amalhotr
+
+INFO 2025-03-23 17:44:02.190 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-copy -p -v -t 180 file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/1a858903-3509-4c17-8362-876b9210ed4b.tmp 'davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250323_184402_1a858903-3509-4c17-8362-876b9210ed4b/1a858903-3509-4c17-8362-876b9210ed4b.tmp'
+INFO 2025-03-23 17:44:02.191 UTC: 	 Please wait...
+INFO 2025-03-23 17:44:03.528 UTC: 	 
+Successfully created directory crab3checkwrite_20250323_184402_1a858903-3509-4c17-8362-876b9210ed4b and copied file 1a858903-3509-4c17-8362-876b9210ed4b.tmp to /store/user/amalhotr
+INFO 2025-03-23 17:44:03.528 UTC: 	 
+Attempting to delete file davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250323_184402_1a858903-3509-4c17-8362-876b9210ed4b/1a858903-3509-4c17-8362-876b9210ed4b.tmp
+
+INFO 2025-03-23 17:44:03.528 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -v -t 180 'davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250323_184402_1a858903-3509-4c17-8362-876b9210ed4b/1a858903-3509-4c17-8362-876b9210ed4b.tmp'
+INFO 2025-03-23 17:44:03.528 UTC: 	 Please wait...
+INFO 2025-03-23 17:44:04.445 UTC: 	 
+Successfully deleted file davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250323_184402_1a858903-3509-4c17-8362-876b9210ed4b/1a858903-3509-4c17-8362-876b9210ed4b.tmp
+INFO 2025-03-23 17:44:04.445 UTC: 	 
+Attempting to delete directory davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250323_184402_1a858903-3509-4c17-8362-876b9210ed4b/
+
+INFO 2025-03-23 17:44:04.445 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -r -v -t 180 'davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250323_184402_1a858903-3509-4c17-8362-876b9210ed4b/'
+INFO 2025-03-23 17:44:04.445 UTC: 	 Please wait...
+INFO 2025-03-23 17:44:05.425 UTC: 	 
+Successfully deleted directory davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250323_184402_1a858903-3509-4c17-8362-876b9210ed4b/
+INFO 2025-03-23 17:44:05.647 UTC: 	 
+Checkwrite Result:
+INFO 2025-03-23 17:44:05.647 UTC: 	 Success: Able to write in /store/user/amalhotr on site T3_CH_CERNBOX
+DEBUG 2025-03-23 17:44:20.083 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-23 17:44:20.083 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-23 17:44:20.083 UTC: 	 Not using Singularity
+DEBUG 2025-03-23 17:44:20.083 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-23 17:44:20.083 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-23 17:44:20.083 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-23 17:44:20.084 UTC: 	 Checking credentials
+DEBUG 2025-03-23 17:44:20.084 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:44:20.084 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-23 17:44:20.084 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:44:20.479 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:44:20.479 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-23 17:44:20.479 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:44:20.850 UTC: 	 output : 687555
+687555
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:44:20.850 UTC: 	 Proxy valid for 190:59:15 hours
+DEBUG 2025-03-23 17:44:20.850 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:44:20.850 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:44:21.516 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:44:21.971 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-23 17:44:21.971 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-23 17:44:21.971 UTC: 	 Options use: ['--site=T2_CH_CERN']
+DEBUG 2025-03-23 17:44:21.971 UTC: 	 Instance is None
+DEBUG 2025-03-23 17:44:21.971 UTC: 	 Server base url is None
+DEBUG 2025-03-23 17:44:21.971 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:44:21.971 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:44:22.627 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:44:22.628 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-23 17:44:22.628 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-23 17:44:22.628 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-23 17:44:22.644 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-23 17:44:22.645 UTC: 	 Will check write permission in /store/user/amalhotr on site T2_CH_CERN
+INFO 2025-03-23 17:44:22.670 UTC: 	 Will use PFN: davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250323_184422_d4dfa097-1ac4-4bde-a9df-01a2764f5919/d4dfa097-1ac4-4bde-a9df-01a2764f5919.tmp
+INFO 2025-03-23 17:44:22.670 UTC: 	 
+Attempting to create (dummy) directory crab3checkwrite_20250323_184422_d4dfa097-1ac4-4bde-a9df-01a2764f5919 and copy (dummy) file d4dfa097-1ac4-4bde-a9df-01a2764f5919.tmp to /store/user/amalhotr
+
+INFO 2025-03-23 17:44:22.676 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-copy -p -v -t 180 file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/d4dfa097-1ac4-4bde-a9df-01a2764f5919.tmp 'davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250323_184422_d4dfa097-1ac4-4bde-a9df-01a2764f5919/d4dfa097-1ac4-4bde-a9df-01a2764f5919.tmp'
+INFO 2025-03-23 17:44:22.677 UTC: 	 Please wait...
+INFO 2025-03-23 17:44:23.464 UTC: 	 Failed running copy command
+INFO 2025-03-23 17:44:23.464 UTC: 	   Stdout:
+    Copying 85 bytes file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/d4dfa097-1ac4-4bde-a9df-01a2764f5919.tmp => davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250323_184422_d4dfa097-1ac4-4bde-a9df-01a2764f5919/d4dfa097-1ac4-4bde-a9df-01a2764f5919.tmp
+    event: [1742751863377] BOTH   GFAL2:CORE:COPY	LIST:ENTER	
+    event: [1742751863377] BOTH   GFAL2:CORE:COPY	LIST:ITEM	file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/d4dfa097-1ac4-4bde-a9df-01a2764f5919.tmp => davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250323_184422_d4dfa097-1ac4-4bde-a9df-01a2764f5919/d4dfa097-1ac4-4bde-a9df-01a2764f5919.tmp
+    event: [1742751863377] BOTH   GFAL2:CORE:COPY	LIST:EXIT	
+    event: [1742751863377] BOTH   http_plugin	PREPARE:ENTER	file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/d4dfa097-1ac4-4bde-a9df-01a2764f5919.tmp => davs://eoscms.cern.ch:443/eos/cms/store/user/amalhotr/crab3checkwrite_20250323_184422_d4dfa097-1ac4-4bde-a9df-01a2764f5919/d4dfa097-1ac4-4bde-a9df-01a2764f5919.tmp
+    
+INFO 2025-03-23 17:44:23.464 UTC: 	   Stderr:
+    gfal-copy error: 1 (Operation not permitted) - DESTINATION MAKE_PARENT HTTP 403 : Permission refused 
+    
+INFO 2025-03-23 17:44:23.477 UTC: 	 
+Checkwrite Result:
+INFO 2025-03-23 17:44:23.477 UTC: 	 Unable to check write permission in /store/user/amalhotr on site T2_CH_CERN
+Please try again later or contact the site administrators sending them the 'crab checkwrite' output as printed above.
+INFO 2025-03-23 17:44:23.477 UTC: 	 Note: You cannot write to a site if you did not ask permission.
+INFO 2025-03-23 17:44:23.883 UTC: 	 Additional diagnostic info for CERN EOS
+== id ==>:
+uid=180451(amalhotr) gid=1399(zh) groups=1399(zh) context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+== voms-proxy-info -all ==>:
+subject   : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra/CN=1823267519
+issuer    : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+identity  : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+type      : RFC3820 compliant impersonation proxy
+strength  : 2048
+path      : /tmp/x509up_u180451
+timeleft  : 190:59:12
+key usage : Digital Signature, Key Encipherment
+=== VO cms extension information ===
+VO        : cms
+subject   : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+issuer    : /DC=ch/DC=cern/OU=computers/CN=cms-auth.cern.ch
+attribute : /cms/Role=NULL/Capability=NULL
+attribute : /cms/uscms/Role=NULL/Capability=NULL
+timeleft  : 190:59:12
+uri       : voms-cms-auth.cern.ch:15000
+
+== uberftp eoscmsftp.cern.ch pwd ==>:
+
+WARNING 2025-03-23 17:44:23.884 UTC: 	 Command checkwrite failed
+ERROR 2025-03-23 17:44:23.884 UTC: 	 Caught CommandFailedException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 144, in __call__
+    raise CommandFailedException("Command %s failed" % str(args[0]))
+CRABClient.ClientExceptions.CommandFailedException: Command checkwrite failed
+DEBUG 2025-03-23 17:46:08.924 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-23 17:46:08.924 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-23 17:46:08.925 UTC: 	 Not using Singularity
+DEBUG 2025-03-23 17:46:08.925 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-23 17:46:08.925 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-03-23 17:46:08.925 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-03-23 17:46:08.926 UTC: 	 Checking credentials
+DEBUG 2025-03-23 17:46:08.926 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:46:08.927 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-23 17:46:08.927 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:46:09.329 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:46:09.330 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-23 17:46:09.330 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-23 17:46:09.690 UTC: 	 output : 687446
+687446
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-23 17:46:09.690 UTC: 	 Proxy valid for 190:57:26 hours
+DEBUG 2025-03-23 17:46:09.690 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:46:09.690 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:46:10.329 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:46:10.946 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-03-23 17:46:10.947 UTC: 	 Command use: checkwrite
+DEBUG 2025-03-23 17:46:10.947 UTC: 	 Options use: ['--site=T2_BR_SPRACE']
+DEBUG 2025-03-23 17:46:10.947 UTC: 	 Instance is None
+DEBUG 2025-03-23 17:46:10.947 UTC: 	 Server base url is None
+DEBUG 2025-03-23 17:46:10.947 UTC: 	 Retrieving username ...
+DEBUG 2025-03-23 17:46:10.947 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-03-23 17:46:11.673 UTC: 	 username is amalhotr
+INFO 2025-03-23 17:46:11.673 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-03-23 17:46:11.674 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-03-23 17:46:11.674 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-03-23 17:46:11.690 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-03-23 17:46:11.691 UTC: 	 Will check write permission in /store/user/amalhotr on site T2_BR_SPRACE
+INFO 2025-03-23 17:46:11.733 UTC: 	 Will use PFN: davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250323_184611_8157bd11-0be4-446c-b19b-04eaa7ac0dc3/8157bd11-0be4-446c-b19b-04eaa7ac0dc3.tmp
+INFO 2025-03-23 17:46:11.733 UTC: 	 
+Attempting to create (dummy) directory crab3checkwrite_20250323_184611_8157bd11-0be4-446c-b19b-04eaa7ac0dc3 and copy (dummy) file 8157bd11-0be4-446c-b19b-04eaa7ac0dc3.tmp to /store/user/amalhotr
+
+INFO 2025-03-23 17:46:11.739 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-copy -p -v -t 180 file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/8157bd11-0be4-446c-b19b-04eaa7ac0dc3.tmp 'davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250323_184611_8157bd11-0be4-446c-b19b-04eaa7ac0dc3/8157bd11-0be4-446c-b19b-04eaa7ac0dc3.tmp'
+INFO 2025-03-23 17:46:11.739 UTC: 	 Please wait...
+INFO 2025-03-23 17:46:21.551 UTC: 	 
+Successfully created directory crab3checkwrite_20250323_184611_8157bd11-0be4-446c-b19b-04eaa7ac0dc3 and copied file 8157bd11-0be4-446c-b19b-04eaa7ac0dc3.tmp to /store/user/amalhotr
+INFO 2025-03-23 17:46:21.552 UTC: 	 
+Attempting to delete file davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250323_184611_8157bd11-0be4-446c-b19b-04eaa7ac0dc3/8157bd11-0be4-446c-b19b-04eaa7ac0dc3.tmp
+
+INFO 2025-03-23 17:46:21.552 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -v -t 180 'davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250323_184611_8157bd11-0be4-446c-b19b-04eaa7ac0dc3/8157bd11-0be4-446c-b19b-04eaa7ac0dc3.tmp'
+INFO 2025-03-23 17:46:21.552 UTC: 	 Please wait...
+INFO 2025-03-23 17:46:26.818 UTC: 	 
+Successfully deleted file davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250323_184611_8157bd11-0be4-446c-b19b-04eaa7ac0dc3/8157bd11-0be4-446c-b19b-04eaa7ac0dc3.tmp
+INFO 2025-03-23 17:46:26.818 UTC: 	 
+Attempting to delete directory davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250323_184611_8157bd11-0be4-446c-b19b-04eaa7ac0dc3/
+
+INFO 2025-03-23 17:46:26.818 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -r -v -t 180 'davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250323_184611_8157bd11-0be4-446c-b19b-04eaa7ac0dc3/'
+INFO 2025-03-23 17:46:26.818 UTC: 	 Please wait...
+INFO 2025-03-23 17:46:32.061 UTC: 	 
+Successfully deleted directory davs://osg-se.sprace.org.br:1094/store/user/amalhotr/crab3checkwrite_20250323_184611_8157bd11-0be4-446c-b19b-04eaa7ac0dc3/
+INFO 2025-03-23 17:46:32.067 UTC: 	 
+Checkwrite Result:
+INFO 2025-03-23 17:46:32.067 UTC: 	 Success: Able to write in /store/user/amalhotr on site T2_BR_SPRACE
+DEBUG 2025-03-26 14:24:51.670 UTC: 	 CRAB Client version: v3.250318
+DEBUG 2025-03-26 14:24:51.670 UTC: 	 Running on: Linux lxplus940.cern.ch 5.14.0-503.22.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Wed Jan 15 08:02:15 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-26 14:24:51.670 UTC: 	 Not using Singularity
+DEBUG 2025-03-26 14:24:51.670 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-26 14:24:51.670 UTC: 	 Executing command: 'getlog'
+DEBUG 2025-03-26 14:24:51.670 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-03-26 14:24:51.677 UTC: 	 Error: ./crab_DYto2Mu4Jets_Vertexer_100 is not a valid CRAB project directory.
+ERROR 2025-03-26 14:24:51.677 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250318.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: ./crab_DYto2Mu4Jets_Vertexer_100 is not a valid CRAB project directory.
+INFO 2025-03-26 14:24:51.700 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-04-26 17:30:41.670 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-04-26 17:30:41.670 UTC: 	 Running on: Linux lxplus901.cern.ch 5.14.0-503.34.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 17 21:49:47 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-04-26 17:30:41.670 UTC: 	 Not using Singularity
+DEBUG 2025-04-26 17:30:41.670 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-04-26 17:30:41.670 UTC: 	 Executing command: 'submit'
+DEBUG 2025-04-26 17:30:41.670 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-04-26 17:30:41.685 UTC: 	 Will use CRAB configuration file crabConfig.py
+DEBUG 2025-04-26 17:30:41.685 UTC: 	 Loading CRAB configuration file.
+ERROR 2025-04-26 17:30:41.773 UTC: 	 Error while loading CRAB configuration:
+name 'Data' is not defined
+Please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3FAQ
+See the ./crab.log file for more details.
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+ERROR 2025-04-26 17:30:41.773 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/WMCore/Configuration.py", line 339, in loadConfigurationFile
+    modRef = load_module(cfgBaseName, modPath)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/__init__.py", line 38, in load_module
+    return imp.load_module(moduleName, moduleObj[0],
+  File "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/python3/3.9.14-8e02587b42992e07ed46b00eca9dfc3a/lib/python3.9/imp.py", line 234, in load_module
+    return load_source(name, filename, file)
+  File "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/python3/3.9.14-8e02587b42992e07ed46b00eca9dfc3a/lib/python3.9/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 711, in _load
+  File "<frozen importlib._bootstrap>", line 680, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 850, in exec_module
+  File "<frozen importlib._bootstrap>", line 228, in _call_with_frames_removed
+  File "/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crabConfig.py", line 31, in <module>
+    Data.allowNonValidInputDataset = True
+NameError: name 'Data' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 56, in loadConfig
+    self.configuration = loadConfigurationFile(os.path.abspath(configname))
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/WMCore/Configuration.py", line 346, in loadConfigurationFile
+    raise RuntimeError(msg)
+RuntimeError: Unable to load Configuration File:
+/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crabConfig.py
+Due to error:
+name 'Data' is not definedTraceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/WMCore/Configuration.py", line 339, in loadConfigurationFile
+    modRef = load_module(cfgBaseName, modPath)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/__init__.py", line 38, in load_module
+    return imp.load_module(moduleName, moduleObj[0],
+  File "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/python3/3.9.14-8e02587b42992e07ed46b00eca9dfc3a/lib/python3.9/imp.py", line 234, in load_module
+    return load_source(name, filename, file)
+  File "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/python3/3.9.14-8e02587b42992e07ed46b00eca9dfc3a/lib/python3.9/imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 711, in _load
+  File "<frozen importlib._bootstrap>", line 680, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 850, in exec_module
+  File "<frozen importlib._bootstrap>", line 228, in _call_with_frames_removed
+  File "/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crabConfig.py", line 31, in <module>
+    Data.allowNonValidInputDataset = True
+NameError: name 'Data' is not defined
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 326, in __init__
+    self.loadConfig(self.options.config, self.args)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 90, in loadConfig
+    raise ConfigurationException(configmsg)
+CRABClient.ClientExceptions.ConfigurationException: Error while loading CRAB configuration:
+name 'Data' is not defined
+Please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3FAQ
+See the ./crab.log file for more details.
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+INFO 2025-04-26 17:30:41.809 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-04-27 04:28:15.002 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-04-27 04:28:15.002 UTC: 	 Running on: Linux lxplus919.cern.ch 5.14.0-503.35.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 24 11:15:27 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-04-27 04:28:15.002 UTC: 	 Not using Singularity
+DEBUG 2025-04-27 04:28:15.002 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-04-27 04:28:15.002 UTC: 	 Executing command: 'submit'
+DEBUG 2025-04-27 04:28:15.002 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-04-27 04:28:15.014 UTC: 	 Will use CRAB configuration file chainedCrabConfig.py
+DEBUG 2025-04-27 04:28:15.014 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-04-27 04:28:15.037 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+ERROR 2025-04-27 04:28:15.037 UTC: 	 Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_DY2Mu4Jets_ScoutingTree_CombinedChain' already exists 
+Please change the requestName in the config file
+ERROR 2025-04-27 04:28:15.037 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 328, in __init__
+    self.requestarea, self.requestname, self.logfile = createWorkArea(
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/ClientUtilities.py", line 392, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+CRABClient.ClientExceptions.ConfigException: Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_DY2Mu4Jets_ScoutingTree_CombinedChain' already exists 
+Please change the requestName in the config file
+INFO 2025-04-27 04:28:15.077 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-04-27 04:29:38.714 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-04-27 04:29:38.714 UTC: 	 Running on: Linux lxplus919.cern.ch 5.14.0-503.35.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 24 11:15:27 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-04-27 04:29:38.715 UTC: 	 Not using Singularity
+DEBUG 2025-04-27 04:29:38.715 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-04-27 04:29:38.715 UTC: 	 Executing command: 'getlog'
+DEBUG 2025-04-27 04:29:38.715 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-04-27 04:30:24.796 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-04-27 04:30:24.796 UTC: 	 Running on: Linux lxplus919.cern.ch 5.14.0-503.35.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 24 11:15:27 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-04-27 04:30:24.796 UTC: 	 Not using Singularity
+DEBUG 2025-04-27 04:30:24.796 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-04-27 04:30:24.796 UTC: 	 Executing command: 'getlog'
+DEBUG 2025-04-27 04:30:24.797 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-04-27 05:32:41.327 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-04-27 05:32:41.327 UTC: 	 Running on: Linux lxplus919.cern.ch 5.14.0-503.35.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 24 11:15:27 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-04-27 05:32:41.327 UTC: 	 Not using Singularity
+DEBUG 2025-04-27 05:32:41.327 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-04-27 05:32:41.327 UTC: 	 Executing command: 'submit'
+DEBUG 2025-04-27 05:32:41.327 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-04-27 05:32:41.328 UTC: 	 Will use CRAB configuration file crabConfig_lines_1_to_2.py
+DEBUG 2025-04-27 05:32:41.328 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-04-27 05:32:41.331 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+ERROR 2025-04-27 05:32:41.332 UTC: 	 Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_projects/crab_DYto2Mu4Jets_ScoutingTree_2025_lines_1_to_2' already exists 
+Please change the requestName in the config file
+ERROR 2025-04-27 05:32:41.332 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 328, in __init__
+    self.requestarea, self.requestname, self.logfile = createWorkArea(
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/ClientUtilities.py", line 392, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+CRABClient.ClientExceptions.ConfigException: Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_projects/crab_DYto2Mu4Jets_ScoutingTree_2025_lines_1_to_2' already exists 
+Please change the requestName in the config file
+INFO 2025-04-27 05:32:41.342 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-04-27 16:20:34.789 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-04-27 16:20:34.789 UTC: 	 Running on: Linux lxplus981.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-04-27 16:20:34.789 UTC: 	 Not using Singularity
+DEBUG 2025-04-27 16:20:34.789 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-04-27 16:20:34.789 UTC: 	 Executing command: 'status'
+DEBUG 2025-04-27 16:20:34.789 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-04-27 16:20:34.789 UTC: 	 Cannot find .requestcache file in CRAB project directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_projects/crab_DYto2Mu4Jets_ScoutingTree_2025_lines_1_to_2
+ERROR 2025-04-27 16:20:34.790 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/status.py", line 48, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 695, in validateOptions
+    self.loadLocalCache()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 537, in loadLocalCache
+    raise ex
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 531, in loadLocalCache
+    self.cachedinfo, self.logfile = loadCache(self.requestarea, self.logger)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/ClientUtilities.py", line 445, in loadCache
+    raise CachefileNotFoundException(msg)
+CRABClient.ClientExceptions.CachefileNotFoundException: Cannot find .requestcache file in CRAB project directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_projects/crab_DYto2Mu4Jets_ScoutingTree_2025_lines_1_to_2
+INFO 2025-04-27 16:20:34.824 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-04-27 16:20:57.631 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-04-27 16:20:57.631 UTC: 	 Running on: Linux lxplus981.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-04-27 16:20:57.631 UTC: 	 Not using Singularity
+DEBUG 2025-04-27 16:20:57.631 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-04-27 16:20:57.631 UTC: 	 Executing command: 'status'
+DEBUG 2025-04-27 16:20:57.631 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-04-27 16:20:57.632 UTC: 	 Error: ./crab_DYto2Mu4Jets_ScoutingTree_2025_lines_1_to_2 is not a valid CRAB project directory.
+ERROR 2025-04-27 16:20:57.632 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/status.py", line 48, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: ./crab_DYto2Mu4Jets_ScoutingTree_2025_lines_1_to_2 is not a valid CRAB project directory.
+INFO 2025-04-27 16:20:57.633 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-04-27 16:21:06.203 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-04-27 16:21:06.204 UTC: 	 Running on: Linux lxplus981.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-04-27 16:21:06.204 UTC: 	 Not using Singularity
+DEBUG 2025-04-27 16:21:06.204 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-04-27 16:21:06.204 UTC: 	 Executing command: 'status'
+DEBUG 2025-04-27 16:21:06.204 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-04-27 16:21:06.204 UTC: 	 Cannot find .requestcache file in CRAB project directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_projects/crab_DYto2Mu4Jets_ScoutingTree_2025_lines_1_to_2
+ERROR 2025-04-27 16:21:06.205 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/status.py", line 48, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 695, in validateOptions
+    self.loadLocalCache()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 537, in loadLocalCache
+    raise ex
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 531, in loadLocalCache
+    self.cachedinfo, self.logfile = loadCache(self.requestarea, self.logger)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/ClientUtilities.py", line 445, in loadCache
+    raise CachefileNotFoundException(msg)
+CRABClient.ClientExceptions.CachefileNotFoundException: Cannot find .requestcache file in CRAB project directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_projects/crab_DYto2Mu4Jets_ScoutingTree_2025_lines_1_to_2
+INFO 2025-04-27 16:21:06.206 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-05-21 00:51:00.276 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-05-21 00:51:00.277 UTC: 	 Running on: Linux lxplus978.cern.ch 5.14.0-503.34.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 17 21:49:47 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-05-21 00:51:00.277 UTC: 	 Not using Singularity
+DEBUG 2025-05-21 00:51:00.277 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-05-21 00:51:00.277 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-05-21 00:51:00.277 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-05-21 00:51:00.277 UTC: 	 Checking credentials
+DEBUG 2025-05-21 00:51:00.278 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-05-21 00:51:00.278 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-05-21 00:51:00.278 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-05-21 00:51:00.716 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-05-21 00:51:00.716 UTC: 	 Getting proxy life time left
+DEBUG 2025-05-21 00:51:00.716 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-05-21 00:51:01.103 UTC: 	 output : 678185
+678185
+
+ error: 
+ retcode : 0
+DEBUG 2025-05-21 00:51:01.103 UTC: 	 Proxy valid for 188:23:05 hours
+DEBUG 2025-05-21 00:51:01.103 UTC: 	 Retrieving username ...
+DEBUG 2025-05-21 00:51:01.103 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-05-21 00:51:01.918 UTC: 	 username is amalhotr
+INFO 2025-05-21 00:51:02.512 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-05-21 00:51:02.513 UTC: 	 Command use: checkwrite
+DEBUG 2025-05-21 00:51:02.513 UTC: 	 Options use: ['--site=T3_CH_CERNBOX']
+DEBUG 2025-05-21 00:51:02.513 UTC: 	 Instance is None
+DEBUG 2025-05-21 00:51:02.513 UTC: 	 Server base url is None
+DEBUG 2025-05-21 00:51:02.513 UTC: 	 Retrieving username ...
+DEBUG 2025-05-21 00:51:02.513 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-05-21 00:51:03.270 UTC: 	 username is amalhotr
+INFO 2025-05-21 00:51:03.270 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-05-21 00:51:03.270 UTC: 	 Validating LFN /store/user/amalhotr...
+INFO 2025-05-21 00:51:03.270 UTC: 	 LFN /store/user/amalhotr is valid.
+INFO 2025-05-21 00:51:03.286 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-05-21 00:51:03.286 UTC: 	 Will check write permission in /store/user/amalhotr on site T3_CH_CERNBOX
+INFO 2025-05-21 00:51:03.370 UTC: 	 Will use PFN: davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250521_025103_e8475a44-ae72-4993-8db7-e2efdeed3bd4/e8475a44-ae72-4993-8db7-e2efdeed3bd4.tmp
+INFO 2025-05-21 00:51:03.370 UTC: 	 
+Attempting to create (dummy) directory crab3checkwrite_20250521_025103_e8475a44-ae72-4993-8db7-e2efdeed3bd4 and copy (dummy) file e8475a44-ae72-4993-8db7-e2efdeed3bd4.tmp to /store/user/amalhotr
+
+INFO 2025-05-21 00:51:03.376 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-copy -p -v -t 180 file:///afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/e8475a44-ae72-4993-8db7-e2efdeed3bd4.tmp 'davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250521_025103_e8475a44-ae72-4993-8db7-e2efdeed3bd4/e8475a44-ae72-4993-8db7-e2efdeed3bd4.tmp'
+INFO 2025-05-21 00:51:03.377 UTC: 	 Please wait...
+INFO 2025-05-21 00:51:04.741 UTC: 	 
+Successfully created directory crab3checkwrite_20250521_025103_e8475a44-ae72-4993-8db7-e2efdeed3bd4 and copied file e8475a44-ae72-4993-8db7-e2efdeed3bd4.tmp to /store/user/amalhotr
+INFO 2025-05-21 00:51:04.741 UTC: 	 
+Attempting to delete file davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250521_025103_e8475a44-ae72-4993-8db7-e2efdeed3bd4/e8475a44-ae72-4993-8db7-e2efdeed3bd4.tmp
+
+INFO 2025-05-21 00:51:04.741 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -v -t 180 'davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250521_025103_e8475a44-ae72-4993-8db7-e2efdeed3bd4/e8475a44-ae72-4993-8db7-e2efdeed3bd4.tmp'
+INFO 2025-05-21 00:51:04.741 UTC: 	 Please wait...
+INFO 2025-05-21 00:51:05.566 UTC: 	 
+Successfully deleted file davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250521_025103_e8475a44-ae72-4993-8db7-e2efdeed3bd4/e8475a44-ae72-4993-8db7-e2efdeed3bd4.tmp
+INFO 2025-05-21 00:51:05.566 UTC: 	 
+Attempting to delete directory davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250521_025103_e8475a44-ae72-4993-8db7-e2efdeed3bd4/
+
+INFO 2025-05-21 00:51:05.566 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -r -v -t 180 'davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250521_025103_e8475a44-ae72-4993-8db7-e2efdeed3bd4/'
+INFO 2025-05-21 00:51:05.566 UTC: 	 Please wait...
+INFO 2025-05-21 00:51:06.617 UTC: 	 
+Successfully deleted directory davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/crab3checkwrite_20250521_025103_e8475a44-ae72-4993-8db7-e2efdeed3bd4/
+INFO 2025-05-21 00:51:06.622 UTC: 	 
+Checkwrite Result:
+INFO 2025-05-21 00:51:06.622 UTC: 	 Success: Able to write in /store/user/amalhotr on site T3_CH_CERNBOX
+DEBUG 2025-05-21 01:05:07.388 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-05-21 01:05:07.389 UTC: 	 Running on: Linux lxplus978.cern.ch 5.14.0-503.34.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 17 21:49:47 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-05-21 01:05:07.389 UTC: 	 Not using Singularity
+DEBUG 2025-05-21 01:05:07.389 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-05-21 01:05:07.389 UTC: 	 Executing command: 'submit'
+DEBUG 2025-05-21 01:05:07.389 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-05-21 01:05:07.391 UTC: 	 Will use CRAB configuration file chainedCrabConfig.py
+DEBUG 2025-05-21 01:05:07.391 UTC: 	 Loading CRAB configuration file.
+ERROR 2025-05-21 01:05:07.462 UTC: 	 Invalid CRAB configuration: Parameter Data.directStageOut is not known.
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+ERROR 2025-05-21 01:05:07.462 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 326, in __init__
+    self.loadConfig(self.options.config, self.args)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 95, in loadConfig
+    raise ConfigurationException(configmsg)
+CRABClient.ClientExceptions.ConfigurationException: Invalid CRAB configuration: Parameter Data.directStageOut is not known.
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+INFO 2025-05-21 01:05:07.471 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-05-21 01:27:48.182 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-05-21 01:27:48.183 UTC: 	 Running on: Linux lxplus978.cern.ch 5.14.0-503.34.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 17 21:49:47 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-05-21 01:27:48.183 UTC: 	 Not using Singularity
+DEBUG 2025-05-21 01:27:48.183 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-05-21 01:27:48.183 UTC: 	 Executing command: 'submit'
+DEBUG 2025-05-21 01:27:48.183 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-05-21 01:27:48.183 UTC: 	 Will use CRAB configuration file chainedCrabConfig.py
+DEBUG 2025-05-21 01:27:48.183 UTC: 	 Loading CRAB configuration file.
+ERROR 2025-05-21 01:27:48.191 UTC: 	 Invalid CRAB configuration: Parameter Data.direct_stageout is not known.
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+ERROR 2025-05-21 01:27:48.191 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 326, in __init__
+    self.loadConfig(self.options.config, self.args)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 95, in loadConfig
+    raise ConfigurationException(configmsg)
+CRABClient.ClientExceptions.ConfigurationException: Invalid CRAB configuration: Parameter Data.direct_stageout is not known.
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+INFO 2025-05-21 01:27:48.193 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-05-21 03:01:25.613 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-05-21 03:01:25.613 UTC: 	 Running on: Linux lxplus978.cern.ch 5.14.0-503.34.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 17 21:49:47 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-05-21 03:01:25.613 UTC: 	 Not using Singularity
+DEBUG 2025-05-21 03:01:25.613 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-05-21 03:01:25.613 UTC: 	 Executing command: 'submit'
+DEBUG 2025-05-21 03:01:25.613 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-05-21 03:01:25.614 UTC: 	 Will use CRAB configuration file chainedCrabConfig.py
+DEBUG 2025-05-21 03:01:25.614 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-05-21 03:01:25.618 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+ERROR 2025-05-21 03:01:25.618 UTC: 	 Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_RealData_noLFNDirectory_v2' already exists 
+Please change the requestName in the config file
+ERROR 2025-05-21 03:01:25.618 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 328, in __init__
+    self.requestarea, self.requestname, self.logfile = createWorkArea(
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/ClientUtilities.py", line 392, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+CRABClient.ClientExceptions.ConfigException: Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_RealData_noLFNDirectory_v2' already exists 
+Please change the requestName in the config file
+INFO 2025-05-21 03:01:25.680 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-05-21 03:02:47.424 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-05-21 03:02:47.424 UTC: 	 Running on: Linux lxplus978.cern.ch 5.14.0-503.34.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 17 21:49:47 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-05-21 03:02:47.424 UTC: 	 Not using Singularity
+DEBUG 2025-05-21 03:02:47.424 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-05-21 03:02:47.424 UTC: 	 Executing command: 'submit'
+DEBUG 2025-05-21 03:02:47.424 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-05-21 03:02:47.425 UTC: 	 Will use CRAB configuration file chainedCrabConfig.py
+DEBUG 2025-05-21 03:02:47.425 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-05-21 03:02:47.428 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+ERROR 2025-05-21 03:02:47.428 UTC: 	 Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_RealData_noLFNDirectory_All_v1' already exists 
+Please change the requestName in the config file
+ERROR 2025-05-21 03:02:47.429 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 328, in __init__
+    self.requestarea, self.requestname, self.logfile = createWorkArea(
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/ClientUtilities.py", line 392, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+CRABClient.ClientExceptions.ConfigException: Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_RealData_noLFNDirectory_All_v1' already exists 
+Please change the requestName in the config file
+INFO 2025-05-21 03:02:47.431 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-05-21 03:04:07.762 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-05-21 03:04:07.763 UTC: 	 Running on: Linux lxplus978.cern.ch 5.14.0-503.34.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 17 21:49:47 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-05-21 03:04:07.763 UTC: 	 Not using Singularity
+DEBUG 2025-05-21 03:04:07.763 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-05-21 03:04:07.763 UTC: 	 Executing command: 'status'
+DEBUG 2025-05-21 03:04:07.763 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-05-21 03:04:07.763 UTC: 	 Error: ./crab_RealData_noLFNDirectory is not a valid CRAB project directory.
+ERROR 2025-05-21 03:04:07.764 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/status.py", line 48, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: ./crab_RealData_noLFNDirectory is not a valid CRAB project directory.
+INFO 2025-05-21 03:04:07.766 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-05-21 19:48:56.330 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-05-21 19:48:56.330 UTC: 	 Running on: Linux lxplus978.cern.ch 5.14.0-503.34.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 17 21:49:47 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-05-21 19:48:56.330 UTC: 	 Not using Singularity
+DEBUG 2025-05-21 19:48:56.330 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-05-21 19:48:56.330 UTC: 	 Executing command: 'submit'
+DEBUG 2025-05-21 19:48:56.330 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-05-21 19:48:56.370 UTC: 	 Will use CRAB configuration file chainedCrabConfig.py
+DEBUG 2025-05-21 19:48:56.370 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-05-21 19:48:56.412 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+ERROR 2025-05-21 19:48:56.412 UTC: 	 Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_RealData_noLFNDirectory_All_v0' already exists 
+Please change the requestName in the config file
+ERROR 2025-05-21 19:48:56.412 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 328, in __init__
+    self.requestarea, self.requestname, self.logfile = createWorkArea(
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/ClientUtilities.py", line 392, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+CRABClient.ClientExceptions.ConfigException: Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_RealData_noLFNDirectory_All_v0' already exists 
+Please change the requestName in the config file
+INFO 2025-05-21 19:48:56.451 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-05-21 21:55:42.868 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-05-21 21:55:42.869 UTC: 	 Running on: Linux lxplus978.cern.ch 5.14.0-503.34.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 17 21:49:47 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-05-21 21:55:42.869 UTC: 	 Not using Singularity
+DEBUG 2025-05-21 21:55:42.869 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-05-21 21:55:42.869 UTC: 	 Executing command: 'submit'
+DEBUG 2025-05-21 21:55:42.869 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-05-21 21:55:42.870 UTC: 	 Will use CRAB configuration file chainedCrabConfig.py
+DEBUG 2025-05-21 21:55:42.870 UTC: 	 Loading CRAB configuration file.
+ERROR 2025-05-21 21:55:42.881 UTC: 	 The 'maxJobRuntimeMin' parameter is not compatible with the 'Automatic' splitting mode (default).
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+ERROR 2025-05-21 21:55:42.881 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 326, in __init__
+    self.loadConfig(self.options.config, self.args)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 95, in loadConfig
+    raise ConfigurationException(configmsg)
+CRABClient.ClientExceptions.ConfigurationException: The 'maxJobRuntimeMin' parameter is not compatible with the 'Automatic' splitting mode (default).
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+INFO 2025-05-21 21:55:42.991 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-05-21 22:00:06.339 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-05-21 22:00:06.339 UTC: 	 Running on: Linux lxplus978.cern.ch 5.14.0-503.34.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 17 21:49:47 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-05-21 22:00:06.339 UTC: 	 Not using Singularity
+DEBUG 2025-05-21 22:00:06.339 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-05-21 22:00:06.339 UTC: 	 Executing command: 'submit'
+DEBUG 2025-05-21 22:00:06.339 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-05-21 22:00:06.340 UTC: 	 Will use CRAB configuration file chainedCrabConfig.py
+DEBUG 2025-05-21 22:00:06.340 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-05-21 22:00:06.341 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+ERROR 2025-05-21 22:00:06.341 UTC: 	 Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_RealData_noLFNDirectory_All_Automatic_v1' already exists 
+Please change the requestName in the config file
+ERROR 2025-05-21 22:00:06.341 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 328, in __init__
+    self.requestarea, self.requestname, self.logfile = createWorkArea(
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/ClientUtilities.py", line 392, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+CRABClient.ClientExceptions.ConfigException: Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_RealData_noLFNDirectory_All_Automatic_v1' already exists 
+Please change the requestName in the config file
+INFO 2025-05-21 22:00:06.352 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-05-22 19:19:20.753 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-05-22 19:19:20.753 UTC: 	 Running on: Linux lxplus978.cern.ch 5.14.0-503.34.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 17 21:49:47 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-05-22 19:19:20.753 UTC: 	 Not using Singularity
+DEBUG 2025-05-22 19:19:20.753 UTC: 	 Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+DEBUG 2025-05-22 19:19:20.753 UTC: 	 Executing command: 'submit'
+DEBUG 2025-05-22 19:19:20.753 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-05-22 19:19:20.754 UTC: 	 Will use CRAB configuration file chainedCrabConfig.py
+DEBUG 2025-05-22 19:19:20.754 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-05-22 19:19:20.808 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+ERROR 2025-05-22 19:19:20.808 UTC: 	 Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_RealData_noLFNDirectory_All_EventAwareLumiBased_10k_50M' already exists 
+Please change the requestName in the config file
+ERROR 2025-05-22 19:19:20.808 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 328, in __init__
+    self.requestarea, self.requestname, self.logfile = createWorkArea(
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/ClientUtilities.py", line 392, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+CRABClient.ClientExceptions.ConfigException: Working area '/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_RealData_noLFNDirectory_All_EventAwareLumiBased_10k_50M' already exists 
+Please change the requestName in the config file
+INFO 2025-05-22 19:19:20.888 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-05-22 19:31:48.154 UTC: 	 CRAB Client version: v3.250409
+DEBUG 2025-05-22 19:31:48.154 UTC: 	 Running on: Linux lxplus978.cern.ch 5.14.0-503.34.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Mar 17 21:49:47 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-05-22 19:31:48.154 UTC: 	 Not using Singularity
+DEBUG 2025-05-22 19:31:48.154 UTC: 	 Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+DEBUG 2025-05-22 19:31:48.154 UTC: 	 Executing command: 'status'
+DEBUG 2025-05-22 19:31:48.154 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-05-22 19:31:48.155 UTC: 	 Error: ./crab_RealData_noLFNDirectory_All_EventAwareLumiBased_5k_10M is not a valid CRAB project directory.
+ERROR 2025-05-22 19:31:48.155 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/status.py", line 48, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250409.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: ./crab_RealData_noLFNDirectory_All_EventAwareLumiBased_5k_10M is not a valid CRAB project directory.
+INFO 2025-05-22 19:31:48.157 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-06-25 18:30:21.832 UTC: 	 CRAB Client version: v3.250522
+DEBUG 2025-06-25 18:30:21.832 UTC: 	 Running on: Linux lxplus909.cern.ch 5.14.0-503.40.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Thu Apr 24 08:27:29 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-06-25 18:30:21.832 UTC: 	 Not using Singularity
+DEBUG 2025-06-25 18:30:21.832 UTC: 	 Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+DEBUG 2025-06-25 18:30:21.832 UTC: 	 Executing command: 'getlog'
+DEBUG 2025-06-25 18:30:21.833 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-06-25 18:30:21.929 UTC: 	 Error: crab_projects/RealData_noLFNDirectory_All_LumiBased_2_boost_v1 is not a valid CRAB project directory.
+ERROR 2025-06-25 18:30:21.930 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250522.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250522.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250522.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250522.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: crab_projects/RealData_noLFNDirectory_All_LumiBased_2_boost_v1 is not a valid CRAB project directory.
+INFO 2025-06-25 18:30:21.989 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-06-25 18:30:46.492 UTC: 	 CRAB Client version: v3.250522
+DEBUG 2025-06-25 18:30:46.492 UTC: 	 Running on: Linux lxplus909.cern.ch 5.14.0-503.40.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Thu Apr 24 08:27:29 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-06-25 18:30:46.492 UTC: 	 Not using Singularity
+DEBUG 2025-06-25 18:30:46.492 UTC: 	 Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+DEBUG 2025-06-25 18:30:46.492 UTC: 	 Executing command: 'getlog'
+DEBUG 2025-06-25 18:30:46.493 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-06-25 18:30:46.493 UTC: 	 Error: ./RealData_noLFNDirectory_All_LumiBased_2_boost_v1 is not a valid CRAB project directory.
+ERROR 2025-06-25 18:30:46.493 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250522.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250522.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250522.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250522.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: ./RealData_noLFNDirectory_All_LumiBased_2_boost_v1 is not a valid CRAB project directory.
+INFO 2025-06-25 18:30:46.495 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-06-25 18:31:41.385 UTC: 	 CRAB Client version: v3.250522
+DEBUG 2025-06-25 18:31:41.385 UTC: 	 Running on: Linux lxplus909.cern.ch 5.14.0-503.40.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Thu Apr 24 08:27:29 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-06-25 18:31:41.385 UTC: 	 Not using Singularity
+DEBUG 2025-06-25 18:31:41.385 UTC: 	 Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+DEBUG 2025-06-25 18:31:41.385 UTC: 	 Executing command: 'getlog'
+DEBUG 2025-06-25 18:31:41.385 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-06-25 18:31:41.386 UTC: 	 Error: CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_RealData_noLFNDirectory_All_LumiBased_2_boost_v1 is not a valid CRAB project directory.
+ERROR 2025-06-25 18:31:41.386 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250522.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250522.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250522.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250522.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_RealData_noLFNDirectory_All_LumiBased_2_boost_v1 is not a valid CRAB project directory.
+INFO 2025-06-25 18:31:41.387 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log

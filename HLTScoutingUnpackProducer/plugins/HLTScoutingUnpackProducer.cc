@@ -48,6 +48,7 @@ public:
     //using Run3ScoutingPhotonCollection = std::vector<Run3ScoutingPhoton>;
     using Run3ScoutingTrackCollection = std::vector<Run3ScoutingTrack>;
     using Run3ScoutingVertexCollection = std::vector<Run3ScoutingVertex>;
+    using PFCandCollection = std::vector<pat::PackedCandidate>;
     
     template <typename T> using RefCollection = std::vector<edm::Ref<std::vector<T>>>;
     template <typename T> using RefMap = edm::ValueMap<edm::Ref<std::vector<T>>>;
@@ -80,25 +81,35 @@ private:
 
     edm::EDGetTokenT<Run3ScoutingTrackCollection> scoutingTrack_collection_token_;
     edm::EDGetTokenT<Run3ScoutingVertexCollection> scoutingPrimaryVertex_collection_token_;
-
+    edm::EDGetTokenT<PFCandCollection> pfCand_collection_token_;
+    edm::EDGetTokenT<PFCandCollection> lostTrack_collection_token_;
+    bool isScouting_;
     bool produce_PFCandidate_;
     bool produce_PFCandidateMatchTrack_;
     bool produce_PFCHSCandidate_; // CHS = charged hadron subtraction
     bool produce_PFSKCandidate_; // SK = soft killer
     HepPDT::ParticleDataTable const *particle_data_table_;
 
-    inline static const std::string REF_TO_SCOUTING_LABEL_SUFFIX_ = "-RefToScouting"; 
+    inline static const std::string REF_TO_SCOUTING_LABEL_SUFFIX_ = "-RefToOriginal"; 
 };
 
 // constructor
 HLTScoutingUnpackProducer::HLTScoutingUnpackProducer(edm::ParameterSet const& params)
   :   scoutingTrack_collection_token_(consumes(params.getParameter<edm::InputTag>("scoutingTrack"))),
       scoutingPrimaryVertex_collection_token_(consumes(params.getParameter<edm::InputTag>("scoutingPrimaryVertex"))),
+      pfCand_collection_token_(consumes(params.getParameter<edm::InputTag>("pfCand"))),
+      lostTrack_collection_token_(consumes(params.getParameter<edm::InputTag>("lostTrack"))),
+      isScouting_(params.getParameter<bool>("isScouting")),
       produce_PFCHSCandidate_(params.getParameter<bool>("producePFCHSCandidate")){
       //produce_PFSKCandidate_(params.getParameter<bool>("producePFSKCandidate"))
     
-    produceWithRef<reco::Track, Run3ScoutingTrack>("Track");
-    produceWithRef<reco::Vertex, Run3ScoutingVertex>("PrimaryVertex");
+    if(isScouting_){
+      produceWithRef<reco::Track, Run3ScoutingTrack>("Track");
+      produceWithRef<reco::Vertex, Run3ScoutingVertex>("PrimaryVertex");
+    }
+    else{
+      produces<std::vector<reco::Track>>("Track");
+    }
     
     if (produce_PFCandidate_){
         produceWithRef<reco::PFCandidate, Run3ScoutingParticle>("PFCandidate");
@@ -124,12 +135,12 @@ void HLTScoutingUnpackProducer::produceWithRef(std::string const& name) {
 }
 
 void HLTScoutingUnpackProducer::produce(edm::Event& iEvent, edm::EventSetup const& iSetup) {
-
     // produce reco::Vertex
     edm::Handle<Run3ScoutingVertexCollection> scoutingPrimaryVertex_collection_handle = iEvent.getHandle(scoutingPrimaryVertex_collection_token_);
     auto recoPrimaryVertex_collection_ptr = std::make_unique<reco::VertexCollection>();
     auto scoutingPrimaryVertexRef_collection_ptr = std::make_unique<RefCollection<Run3ScoutingVertex>>();
     if (scoutingPrimaryVertex_collection_handle.isValid()) {
+      //std::cout<<"number of scouting vertices: "<<scoutingPrimaryVertex_collection_handle->size()<<std::endl;
         for (size_t scoutingPrimaryVertex_index = 0; scoutingPrimaryVertex_index < scoutingPrimaryVertex_collection_handle->size(); scoutingPrimaryVertex_index++) {
             auto &scoutingPrimaryVertex = scoutingPrimaryVertex_collection_handle->at(scoutingPrimaryVertex_index);
             recoPrimaryVertex_collection_ptr->push_back(createVertex(scoutingPrimaryVertex));
@@ -149,17 +160,42 @@ void HLTScoutingUnpackProducer::produce(edm::Event& iEvent, edm::EventSetup cons
         }
     }
 
+    edm::Handle<PFCandCollection> pfCand_collection_handle = iEvent.getHandle(pfCand_collection_token_);
+    auto pfRecoTrack_collection_ptr = std::make_unique<reco::TrackCollection>();
+    if (pfCand_collection_handle.isValid()) {
+      for (size_t pfCand_index = 0; pfCand_index < pfCand_collection_handle->size(); pfCand_index++) {
+	auto &pfCand = pfCand_collection_handle->at(pfCand_index);
+	const reco::Track* pfTrack = pfCand.bestTrack();
+	if(pfTrack!=nullptr) pfRecoTrack_collection_ptr->push_back(*pfTrack);
+      }
+    }
+
+    edm::Handle<PFCandCollection> lostTrack_collection_handle = iEvent.getHandle(lostTrack_collection_token_);
+    if (lostTrack_collection_handle.isValid()) {
+      for (size_t lostTrack_index = 0; lostTrack_index < lostTrack_collection_handle->size(); lostTrack_index++) {
+	auto &lostTrackPF = lostTrack_collection_handle->at(lostTrack_index);
+	const reco::Track* lostTrack = lostTrackPF.bestTrack();
+	if(lostTrack!= nullptr) pfRecoTrack_collection_ptr->push_back(*lostTrack);
+      }
+    }
+
     // build fake HitPattern for ScoutingTracks which are not matched with ScoutingPFCandidate
     // this might be needed if perform vertexing with all tracks 
 
     // put products in Event
-    putWithRef<reco::Vertex, Run3ScoutingVertex>(iEvent, "PrimaryVertex", recoPrimaryVertex_collection_ptr, scoutingPrimaryVertexRef_collection_ptr);
-    putWithRef<reco::Track, Run3ScoutingTrack>(iEvent, "Track", recoTrack_collection_ptr, scoutingTrackRef_collection_ptr);
-    
+    if(isScouting_){
+      putWithRef<reco::Vertex, Run3ScoutingVertex>(iEvent, "PrimaryVertex", recoPrimaryVertex_collection_ptr, scoutingPrimaryVertexRef_collection_ptr);
+      putWithRef<reco::Track, Run3ScoutingTrack>(iEvent, "Track", recoTrack_collection_ptr, scoutingTrackRef_collection_ptr);
+    }
+    else{
+      iEvent.put(std::move(pfRecoTrack_collection_ptr), "Track");
+    }
+
 }
 
 reco::Vertex HLTScoutingUnpackProducer::createVertex(Run3ScoutingVertex const& scoutingVertex) {
     // fill point coordinate
+    //std::cout<<"scouting vertex position:"<<scoutingVertex.x()<<" "<<scoutingVertex.y()<<" "<<scoutingVertex.z()<<std::endl;
     reco::Vertex::Point point(scoutingVertex.x(), scoutingVertex.y(), scoutingVertex.z());
     
     // fill error
@@ -218,6 +254,8 @@ reco::Track HLTScoutingUnpackProducer::createTrack(Run3ScoutingTrack const& scou
     cov_vec[14] = scoutingTrack.tk_dsz_Error() * scoutingTrack.tk_dsz_Error(); // cov(4, 4)
     reco::TrackBase::CovarianceMatrix cov(cov_vec.begin(), cov_vec.end());
 
+    //std::cout<<"scouting track vertex index: "<<scoutingTrack.tk_vtxInd()<<" track dz: "<<scoutingTrack.tk_dz()<<std::endl;
+    //std::cout<<"track reference point: "<<scoutingTrack.tk_vx()<<" "<<scoutingTrack.tk_vy()<<" "<<scoutingTrack.tk_vz()<<std::endl;
     reco::TrackBase::TrackAlgorithm algo(reco::TrackBase::undefAlgorithm); // undefined
     reco::TrackBase::TrackQuality quality(reco::TrackBase::confirmed); // confirmed
     
@@ -394,6 +432,9 @@ void HLTScoutingUnpackProducer::fillDescriptions(edm::ConfigurationDescriptions&
 
     desc.add<edm::InputTag>("scoutingTrack", edm::InputTag("hltScoutingTrack"));
     desc.add<edm::InputTag>("scoutingPrimaryVertex", edm::InputTag("hltScoutingPrimaryVertex"));
+    desc.add<edm::InputTag>("pfCand", edm::InputTag(""));
+    desc.add<edm::InputTag>("lostTrack", edm::InputTag(""));
+    desc.add<bool>("isScouting", true);
     
     desc.add<bool>("producePFCHSCandidate", false);
     //desc.add<bool>("producePFSKCandidate", false);

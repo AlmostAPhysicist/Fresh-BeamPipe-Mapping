@@ -1,0 +1,128 @@
+DEBUG 2025-03-19 04:20:11.953 UTC: 	 CRAB Client version: v3.250217
+DEBUG 2025-03-19 04:20:11.953 UTC: 	 Running on: Linux lxplus929.cern.ch 5.14.0-503.26.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Feb 10 05:23:56 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-03-19 04:20:11.953 UTC: 	 Not using Singularity
+DEBUG 2025-03-19 04:20:11.953 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-03-19 04:20:11.953 UTC: 	 Executing command: 'submit'
+DEBUG 2025-03-19 04:20:11.953 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-03-19 04:20:11.973 UTC: 	 Will use CRAB configuration file Vertexer_CRAB.py
+DEBUG 2025-03-19 04:20:11.974 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-03-19 04:20:11.979 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+DEBUG 2025-03-19 04:20:11.984 UTC: 	 Checking credentials
+DEBUG 2025-03-19 04:20:11.984 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:20:11.984 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-03-19 04:20:11.984 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:20:12.326 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:20:12.326 UTC: 	 Getting proxy life time left
+DEBUG 2025-03-19 04:20:12.326 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:20:12.673 UTC: 	 output : 42986
+42986
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:20:12.673 UTC: 	 Proxy valid for 11:56:26 hours
+DEBUG 2025-03-19 04:20:12.674 UTC: 	 Encoded data for curl request: subresource=delegatedn
+DEBUG 2025-03-19 04:20:12.725 UTC: 	 Registering user credentials on myproxy for /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+DEBUG 2025-03-19 04:20:12.725 UTC: 	 Executing command :
+ voms-proxy-info --identity --file /tmp/x509up_u180451
+DEBUG 2025-03-19 04:20:13.091 UTC: 	 output : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:20:13.092 UTC: 	 Getting myproxy life time left for 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-03-19 04:20:13.092 UTC: 	 Executing command :
+ myproxy-info -s myproxy.cern.ch -l 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-03-19 04:20:13.378 UTC: 	 output : 
+ error: ERROR from myproxy-server:
+no credentials found for user 2382a3cf28fdeacb1de9b039908761ea517a5ed6, owner "/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra" 
+
+ retcode : 1
+ERROR 2025-03-19 04:20:13.378 UTC: 	 
+ERROR from myproxy-server:
+no credentials found for user 2382a3cf28fdeacb1de9b039908761ea517a5ed6, owner "/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra" 
+
+DEBUG 2025-03-19 04:20:13.378 UTC: 	 Myproxy is valid: 0
+DEBUG 2025-03-19 04:20:13.378 UTC: 	 Executing command :
+ openssl x509 -noout -dates -in ~/.globus/usercert.pem
+DEBUG 2025-03-19 04:20:13.396 UTC: 	 output : notBefore=Dec 27 04:31:14 2024 GMT
+notAfter=Jan 31 04:31:14 2026 GMT
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:20:13.405 UTC: 	 Delegating a myproxy for 720:00 hours
+DEBUG 2025-03-19 04:20:13.405 UTC: 	 Executing command :
+ export GT_PROXY_MODE=rfc ; myproxy-init -d -n -s myproxy.cern.ch -C ~/.globus/usercert.pem -y ~/.globus/userkey.pem -x -R '/DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1' -x -Z '/DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1' -l 2382a3cf28fdeacb1de9b039908761ea517a5ed6 -t 168 -c 720:00
+DEBUG 2025-03-19 04:20:19.528 UTC: 	 output : Your identity: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+Creating proxy ............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................. Done
+Proxy Verify OK
+Your proxy is valid until: Fri Apr 18 06:20:18 2025
+A proxy valid for 720 hours (30.0 days) for user 2382a3cf28fdeacb1de9b039908761ea517a5ed6 now exists on myproxy.cern.ch.
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:20:19.528 UTC: 	 Executing command :
+ myproxy-info -s myproxy.cern.ch -l 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-03-19 04:20:19.796 UTC: 	 output : username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  timeleft: 719:59:59  (30.0 days)
+
+ error: 
+ retcode : 0
+DEBUG 2025-03-19 04:20:19.797 UTC: 	 My-proxy delegated.
+DEBUG 2025-03-19 04:20:19.797 UTC: 	 Result of myproxy credential check:
+  Credential exists on myproxy: username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6  - validity: 29 days, 23:59:00
+DEBUG 2025-03-19 04:20:19.797 UTC: 	 Command use: submit
+DEBUG 2025-03-19 04:20:19.797 UTC: 	 Options use: ['-c', 'Vertexer_CRAB.py']
+DEBUG 2025-03-19 04:20:19.797 UTC: 	 Encoded data for curl request: subresource=version
+DEBUG 2025-03-19 04:20:19.882 UTC: 	 CRABClient version: v3.250217
+DEBUG 2025-03-19 04:20:19.882 UTC: 	 Instance is prod
+DEBUG 2025-03-19 04:20:19.882 UTC: 	 Server base url is cmsweb.cern.ch
+DEBUG 2025-03-19 04:20:19.882 UTC: 	 Command api workflow
+DEBUG 2025-03-19 04:20:19.882 UTC: 	 Started submission
+DEBUG 2025-03-19 04:20:19.882 UTC: 	 Working on /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_WithVertex_v1
+DEBUG 2025-03-19 04:20:19.882 UTC: 	 Encoded data for curl request: subresource=backendurls
+DEBUG 2025-03-19 04:20:19.948 UTC: 	 Loading required information from the environment
+DEBUG 2025-03-19 04:20:19.948 UTC: 	 Found CMSSW_14_0_18_patch1 for el9_amd64_gcc12 with base /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1
+DEBUG 2025-03-19 04:20:19.948 UTC: 	 Loading required information from the environment
+DEBUG 2025-03-19 04:20:19.948 UTC: 	 Found CMSSW_14_0_18_patch1 for el9_amd64_gcc12 with base /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1
+DEBUG 2025-03-19 04:20:19.948 UTC: 	 UNIQUE NAME: tarUUID 3472576d-259b-4bb3-ae07-83530ceef5f6 
+DEBUG 2025-03-19 04:20:19.948 UTC: 	 self.config: from WMCore.Configuration import Configuration
+config = Configuration()
+config.section_('General')
+config.General.requestName = 'StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_WithVertex_v1'
+config.section_('JobType')
+config.JobType.pluginName = 'Analysis'
+config.JobType.psetName = 'Vertexer.py'
+config.JobType.maxMemoryMB = 5000
+config.section_('Data')
+config.Data.publication = True
+config.Data.splitting = 'Automatic'
+config.Data.inputDataset = '/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_v1/brlopesd-StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_InputToVertexer_v1-5aba6c30b99a0b6779fca57b7c186350/USER'
+config.Data.inputDBS = 'phys03'
+config.Data.outputDatasetTag = 'StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_WithVertex_v1'
+config.section_('Site')
+config.Site.storageSite = 'T2_BR_SPRACE'
+config.section_('User')
+config.section_('Debug')
+
+DEBUG 2025-03-19 04:20:19.948 UTC: 	 self.config.JobType.psetName: Vertexer.py
+INFO 2025-03-19 04:20:19.948 UTC: 	 Importing CMSSW configuration Vertexer.py
+INFO 2025-03-19 04:20:19.952 UTC: 	 Finished importing CMSSW configuration Vertexer.py
+ERROR 2025-03-19 04:20:19.952 UTC: 	 Invalid CMSSW configuration: 'process' object is missing or is wrongly defined.
+ERROR 2025-03-19 04:20:19.952 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/bin/crab.py", line 142, in __call__
+    returnDict = self.cmd()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/Commands/submit.py", line 108, in __call__
+    dummy_inputfiles, jobconfig = plugjobtype.run(filecacheurl)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250217.00/lib/CRABClient/JobType/Analysis.py", line 99, in run
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: Invalid CMSSW configuration: 'process' object is missing or is wrongly defined.

@@ -1,1259 +1,343 @@
 // -*- C++ -*-
-//
-// Package:    Run3ScoutingAnalysisTools/ScoutingTreeMakerRun3
+// Package:    Vertexing/ScoutingTreeMakerRun3
 // Class:      ScoutingTreeMakerRun3
-//
-/**\class ScoutingTreeMakerRun3 ScoutingTreeMakerRun3.cc Run3ScoutingAnalysisTools/ScoutingTreeMakerRun3/plugins/ScoutingTreeMakerRun3.cc
-
- Description: [one line class summary]
-
- Implementation:
-     [Notes on implementation]
-*/
-//
+// 
 // Original Author:  David Sperka
-//         Created:  Sat, 11 Feb 2023 14:15:08 GMT
-//
-//
+//         Created:  Tue, 14 May 2024 14:23:11 GMT
 
-// system include files
 #include <memory>
-#include <TTree.h>
-#include <TLorentzVector.h>
-#include <algorithm>
-#include "TMath.h"
-#include <valarray>
-
-// user include files
+#include "TFile.h"
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TTree.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
-
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/Utilities/interface/InputTag.h"
-
-#include "FWCore/Common/interface/TriggerNames.h"
-#include "DataFormats/Common/interface/TriggerResults.h"
-#include "DataFormats/HLTReco/interface/TriggerEvent.h"
-
-#include "DataFormats/Common/interface/Handle.h"
-#include "DataFormats/TrackReco/interface/Track.h"
-#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
-#include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
-#include "SimDataFormats/TrackingAnalysis/interface/TrackingVertex.h"
-#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenRunInfoProduct.h"
-
-#include "DataFormats/Scouting/interface/Run3ScoutingElectron.h"
-#include "DataFormats/Scouting/interface/Run3ScoutingPhoton.h"
-#include "DataFormats/Scouting/interface/Run3ScoutingPFJet.h"
-#include "DataFormats/Scouting/interface/Run3ScoutingVertex.h"
-#include "DataFormats/Scouting/interface/Run3ScoutingTrack.h"
-#include "DataFormats/Scouting/interface/Run3ScoutingMuon.h"
-#include "DataFormats/Scouting/interface/Run3ScoutingParticle.h"
-
-#include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/Math/interface/deltaR.h"
+#include "DataFormats/Math/interface/deltaPhi.h"
+#include "DataFormats/BeamSpot/interface/BeamSpot.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
-#include "TrackingTools/IPTools/interface/IPTools.h"
-
-#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
-#include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
-#include "L1Trigger/L1TGlobal/interface/L1TGlobalUtil.h"
-#include "DataFormats/L1TGlobal/interface/GlobalAlgBlk.h"
-#include "HLTrigger/HLTcore/interface/TriggerExpressionData.h"
-#include "HLTrigger/HLTcore/interface/TriggerExpressionEvaluator.h"
-#include "HLTrigger/HLTcore/interface/TriggerExpressionParser.h"
-
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-
-#include "FWCore/ServiceRegistry/interface/Service.h"
-#include "CommonTools/UtilAlgos/interface/TFileService.h" 
-#include "TH2.h"
-//
-// class declaration
-//
-
-// If the analyzer does not use TFileService, please remove
-// the template argument to the base class so the class inherits
-// from  edm::one::EDAnalyzer<>
-// This will improve performance in multithreaded jobs.
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "TLorentzVector.h"
+#include "TMath.h"
+#include <vector>
+#include <set>
+#include <string>
+#include <fstream>
 
 class ScoutingTreeMakerRun3 : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 public:
+    explicit ScoutingTreeMakerRun3(const edm::ParameterSet&);
+    ~ScoutingTreeMakerRun3() override;
 
-  explicit ScoutingTreeMakerRun3(const edm::ParameterSet&);
-  ~ScoutingTreeMakerRun3() override;
-
-  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+    static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
 private:
-  void beginJob() override;
-  void analyze(const edm::Event&, const edm::EventSetup&) override;
-  void endJob() override;
-  //void beginRun(edm::Run const&, edm::EventSetup const&) override;
-  //void endRun(edm::Run const&, edm::EventSetup const&) override;
-  //void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
-  //void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;   
+    void beginJob() override;
+    void analyze(const edm::Event&, const edm::EventSetup&) override;
+    void endJob() override;
 
-  const int required_ntk;
-  
-  const edm::InputTag triggerResultsTag;
-  const edm::EDGetTokenT<edm::TriggerResults>             triggerResultsToken;
-  const edm::EDGetTokenT<std::vector<Run3ScoutingMuon> >      muonsToken;
-  const edm::EDGetTokenT<std::vector<Run3ScoutingElectron> >  electronsToken;
-  const edm::EDGetTokenT<std::vector<Run3ScoutingVertex> >    primaryVerticesToken;
-  //const edm::EDGetTokenT<std::vector<Run3ScoutingVertex> >    verticesToken;
-  const edm::EDGetTokenT<double>                          rhoToken;
-  const edm::EDGetTokenT<std::vector<Run3ScoutingPhoton> >  photonsToken;
-  const edm::EDGetTokenT<std::vector<Run3ScoutingParticle> >  pfcandsToken;
-  const edm::EDGetTokenT<std::vector<Run3ScoutingPFJet> >  pfjetsToken;
-  //const edm::EDGetTokenT<std::vector<Run3ScoutingTrack> >  tracksToken;
+    // Parameter declarations with cut values
+    const int required_ntk_min;         // minimum number of tracks required in vertex (if not -1)
+    const int required_ntk_max;         // maximum number of tracks allowed in vertex (if not -1)
+    const double required_invmass;      // minimum invariant mass of vertex (if not -1)
+    const double required_chi2;         // vertex.normalizedChi2() must be below this value
+    const double required_dBV_min;      // vertex dBV must be >= this value (if not -1)
+    const double required_dBV_max;      // vertex dBV must be <= this value (if not -1)
+    const double required_dxy_min;      // average track dxy must be >= this value (if not -1)
+    const double required_dxy_max;      // average track dxy must be <= this value (if not -1)
+    const double required_dBV_error;    // vertex dBV error must be <= this value (if not -1)
+    const double required_dxy_error;    // average track dxy error must be <= this value (if not -1)
 
-  const edm::EDGetTokenT<std::vector<reco::Track> >  tracksToken;
-  const edm::EDGetTokenT<std::vector<reco::Vertex> >  verticesToken;
-
-  const edm::EDGetTokenT<reco::BeamSpot> beamspot_token;
-  const edm::EDGetTokenT<std::vector<reco::GenParticle>> GenParticleToken_;
-  const edm::EDGetTokenT<std::vector<TrackingParticle>> TrackingParticleToken_;
-  const edm::EDGetTokenT<GenEventInfoProduct> GeneratorToken_;
-  
-  std::vector<std::string> triggerPathsVector;
-  std::map<std::string, int> triggerPathsMap;
-
-  bool doL1;
-  bool doPhiCorrection;
-  double luminosity;
-  double crossSection;
-  triggerExpression::Data triggerCache_;
-
-  bool L1_HTT200er;
-  bool L1_HTT255er;
-  bool L1_HTT280er;
-  bool L1_HTT320er;
-  bool L1_HTT360er;
-  bool L1_HTT400er;
-  bool L1_HTT450er;
-  bool L1_ETT2000;
-  bool L1_SingleJet180;
-  bool L1_SingleJet200;
-  bool L1_DoubleJet30er2p5_Mass_Min250_dEta_Max1p5;
-  bool L1_DoubleJet30er2p5_Mass_Min300_dEta_Max1p5;
-  bool L1_DoubleJet30er2p5_Mass_Min330_dEta_Max1p5;
-  
-  edm::InputTag                algInputTag_;
-  edm::InputTag                extInputTag_;
-  edm::EDGetToken              algToken_;
-  std::unique_ptr<l1t::L1TGlobalUtil> l1GtUtils_;
-  std::vector<std::string>     l1Seeds_;
-  std::vector<bool>            l1Result_;
-
-  TTree* tree;
-  TTree* objectTree;
-
-  int nPFJets;
-
-  float HT;
-  
-  float ptjet1;
-  float ptjet2;
-  float ptjet3;
-  float ptjet4;
-
-  float etajet1;
-  float etajet2;
-  float etajet3;
-  float etajet4;
-
-  float phijet1;
-  float phijet2;
-  float phijet3;
-  float phijet4; 
-  
-  int nVertices;
-  
-  int ntk_1;
-  int ntk_2;
-  
-  float bs2derr_1;
-  float bs2derr_2;
-
-  float dBV_1;
-  float dBV_2;
-
-  float genVert_x_1 = -999;
-  float genVert_y_1 = -999;
-  float genVert_z_1 = -999;
-  float genVert_dBV_1 = -999;
-  float genVert_3d_1 = -999;
-  float genVert_motherEta = -999;
-  float genVert_motherPhi = -999;
-  float genVert_motherPt = -999;
-  float genVert_motherDistTraveled = -999;
-  float genVert_dVV_2 = -999;
-  float genVert_dPhi_2 = -999;
-  int genScout_nMatches = -999;
-  int genScoutVert_nMatches = -999;
-
-  std::vector<float>* match_ptRatio;
-  std::vector<float>* match_deltaR;
-  std::vector<float>* match_diffPt;
-  std::vector<float>* match_diffEta;
-  std::vector<float>* match_diffPhi;
-  std::vector<float>* match_diffPhiCorrected;
-  std::vector<float>* match_gen_dxy;
-  std::vector<float>* match_gen_dxyCorrected;
-  std::vector<float>* match_diffDxy;
-  std::vector<float>* match_diffDxyCorrected;
-  std::vector<float>* gen_dxy;
-  std::vector<float>* gen_dxyCorrected;
-  std::vector<float>* match_vert_x;
-  std::vector<float>* match_vert_y;
-  std::vector<float>* match_genVert_x;
-  std::vector<float>* match_genVert_y;
-  std::vector<float>* match_genVert_dBV;
-  std::vector<float>* genVert_dBV;
-  std::vector<float>* genVert_phi;
-  std::vector<float>* genVert_z;
-  std::vector<float>* genVert_x;
-  std::vector<float>* genVert_y;
-  std::vector<float>* genVert_nParticles;
-  std::vector<float>* genVert_dPhi;
-  std::vector<float>* genVert_dVV;
-  int genVert_nVertices;
-  std::vector<float>* resVert_x;
-  std::vector<float>* resVert_y;
-  std::vector<float>* resVert_z;
-  std::vector<float>* scoutVert_dBV;
-  std::vector<float>* scoutVert_phi;
-  std::vector<float>* scoutVert_z;
-  std::vector<float>* scoutVert_x;
-  std::vector<float>* scoutVert_y;
-  std::vector<float>* scoutVert_nTracks;
-  std::vector<float>* scoutVert_dPhi;
-  std::vector<float>* scoutVert_dVV;
-  int scoutVert_nVertices;
-  double weight;
-
-  TH1F* h_match_gen_dxy = new TH1F("match_gen_dxy",";Gen particle d_{xy} [cm]; Gen particles / 0.01 cm", 100, 0, 1);
-  TH1F* h_gen_dxy = new TH1F("gen_dxy",";Gen particle d_{xy} [cm]; Gen particles / 0.01 cm", 100, 0, 1);
-  TH2F* h_match_vert_x_y = new TH2F("match_vert_x_y","Vertex Position; X Position [cm] / 0.02 cm; Y Position [cm] / 0.02 cm", 100, -1, 1, 100, -1, 1);
-  TH2F* h_match_genVert_x_y = new TH2F("match_genVert_x_y","Gen Vertex Position; X Position [cm] / 0.02 cm; Y Position [cm] / 0.02 cm", 100, -1, 1, 100, -1, 1);
-  TH1F* h_match_genVert_dBV = new TH1F("match_genVert_dBV",";Gen Vertex d_{BV} [cm]; Gen Vertices / 0.01 cm", 100, 0, 1);
-  TH1F* h_genVert_dBV = new TH1F("genVert_dBV",";Gen Vertex d_{BV} [cm]; Gen Vertices / 0.01 cm", 100, 0, 1);
-  TH1F* h_genVert_phi = new TH1F("genVert_phi",";Gen Vertex #phi; Gen Vertices / 0.06284", 100, -3.142, 3.142);
-  TH1F* h_genVert_z = new TH1F("genVert_z",";Gen Vertex z [cm]; Gen Vertices / 0.4 cm", 100, -20, 20);
-  TH2F* h_genVert_x_y = new TH2F("genVert_x_y","Gen Vertex Position; X Position [cm] / 0.02 cm; Y Position [cm] / 0.02 cm", 100, -1, 1, 100, -1, 1);
-  TH1F* h_genVert_nParticles = new TH1F("genVert_nParticles",";Gen Vertex Number of Particles; Gen Vertices / 1", 100, 0, 100);
-  TH1F* h_genVert_dPhi = new TH1F("genVert_dPhi",";Gen Vertex d#phi; Occurrences / 0.03142", 100, 0, 3.142);
-  TH1F* h_genVert_dVV = new TH1F("genVert_dVV",";Gen Vertex d_{VV} [cm]; Occurrences / 0.015 cm", 1000, 0, 15);
-  TH1F* h_genVert_nVertices = new TH1F("genVert_nVertices",";Number of Gen Vertices; Occurrences / 1", 5, 0, 5);
-  TH1F* h_resVert_x = new TH1F("resVert_x",";Gen X Position - Scout X Position [cm]; Gen Vertices / 0.02 cm", 100, -1, 1);
-  TH1F* h_resVert_y = new TH1F("resVert_y",";Gen Y Position - Scout Y Position [cm]; Gen Vertices / 0.02 cm", 100, -1, 1);
-  TH1F* h_resVert_z = new TH1F("resVert_z",";Gen Z Position - Scout Z Position [cm]; Gen Vertices / 0.02 cm", 100, -1, 1);
-  TH1F* h_scoutVert_dBV = new TH1F("scoutVert_dBV",";Scout Vertex d_{BV} [cm]; Scout Vertices / 0.01 cm", 100, 0, 1);
-  TH1F* h_scoutVert_phi = new TH1F("scoutVert_phi",";Scout Vertex #phi; Scout Vertices / 0.06284", 100, -3.142, 3.142);
-  TH1F* h_scoutVert_z = new TH1F("scoutVert_z",";Scout Vertex z [cm]; Scout Vertices / 0.4 cm", 100, -20, 20);
-  TH2F* h_scoutVert_x_y = new TH2F("scoutVert_x_y","Scout Vertex Position; X Position [cm] / 0.02 cm; Y Position [cm] / 0.02 cm", 100, -1, 1, 100, -1, 1);
-  TH1F* h_scoutVert_nTracks = new TH1F("scoutVert_nTracks",";Scout Vertex Number of Particles; Scout Vertices / 1", 100, 0, 100);
-  TH1F* h_scoutVert_dPhi = new TH1F("scoutVert_dPhi",";Scout Vertex d#phi; Occurrences / 0.03142", 100, 0, 3.142);
-  TH1F* h_scoutVert_dVV = new TH1F("scoutVert_dVV",";Scout Vertex d_{VV} [cm]; Occurrences / 0.015 cm", 1000, 0, 15);
-  TH1F* h_scoutVert_nVertices = new TH1F("scoutVert_nVertices",";Number of Scout Vertices; Occurrences / 1", 10, 0, 10);
-  TH1F* h_genWeights = new TH1F("genWeights",";Cut Applied; Sum of Gen Weights",3,0,3);
-  TH1F* h_weightsSquared = new TH1F("weightsSquared",";Cut Applied; Sum of Squared Weights",3,0,3);
-  
-  typedef std::set<reco::TrackRef> track_set;
-  typedef std::vector<reco::TrackRef> track_vec;
-
-  static bool CompareDeltaR(std::vector<float> a, std::vector<float> b) { return a[2] < b[2]; }
-  
-  std::pair<bool,GlobalPoint> isStopDecay(const reco::Candidate* part){
-    if(fabs(part->pdgId())==1000006 && part->numberOfDaughters()==2){
-      int daughterId = part->daughter(0)->pdgId();
-      bool sameDaughters = (daughterId==part->daughter(1)->pdgId());
-      if(sameDaughters && fabs(daughterId)==1){
-	return std::make_pair(true, GlobalPoint(part->daughter(0)->vx(),part->daughter(0)->vy(),part->daughter(0)->vz()));
-      }
-    }
-    return std::make_pair(false, GlobalPoint(-999,-999,-999));
-  }
-
-  std::pair<bool,GlobalPoint> isStopDecay(std::vector<reco::GenParticle>::const_iterator part){
-    if(fabs(part->pdgId())==1000006 && part->numberOfDaughters()==2){
-      int daughterId = part->daughter(0)->pdgId();
-      bool sameDaughters = (daughterId==part->daughter(1)->pdgId());
-      if(sameDaughters && fabs(daughterId)==1){
-	return std::make_pair(true, GlobalPoint(part->daughter(0)->vx(),part->daughter(0)->vy(),part->daughter(0)->vz()));
-      }
-    }
-    return std::make_pair(false, GlobalPoint(-999,-999,-999));
-  }
-
-  std::pair<bool,GlobalPoint> isChargedStopDecayProductStatusOne(std::vector<reco::GenParticle>::const_iterator part){
-    if(part->status()!=1 || part->charge()==0 || part->numberOfMothers()==0) return std::make_pair(false,GlobalPoint(-999,-999,-999));
-    const reco::Candidate* candidate = part->mother(0);
-    std::pair<bool,GlobalPoint> isStopProduct = std::make_pair(false,GlobalPoint(-999,-999,-999));
-    while(!isStopProduct.first){
-      isStopProduct = isStopDecay(candidate);
-      if(candidate->numberOfMothers()==0) break;
-      candidate = candidate->mother(0);
-    }
-    return isStopProduct;
-  }
-  
-  const reco::Candidate* getFinalCopy(std::vector<reco::GenParticle>::const_iterator part){
-    const reco::Candidate* candidate = part->clone();
-    if(part->numberOfDaughters()==0) return candidate;
-    bool foundLast = false;
-    while(!foundLast){
-      int selfIndex = -1;
-      for(uint i=0; i<candidate->numberOfDaughters(); i++){
-	if(candidate->daughter(i)->pdgId()==candidate->pdgId()) selfIndex = i;
-      }
-      if(selfIndex==-1){
-	foundLast=true;
-      }
-      else{
-	candidate = candidate->daughter(selfIndex);
-      }
-    }
-    return candidate;
+    const edm::EDGetTokenT<std::vector<reco::Vertex>> verticesToken;
+    const edm::EDGetTokenT<reco::BeamSpot> beamspot_token;
+    const edm::EDGetTokenT<std::vector<reco::Track>> tracksToken;
     
-  }
+    // Histogram declarations for vertices and tracks.
+    TH2F* h_vertex_xy_global;          // vertex XY positions in global coordinates (x vs y)
+    TH2F* h_vertex_xy_beamspot;        // vertex XY positions relative to the beamspot (x-bs.x0 vs y-bs.y0)
+    TH1F* h_ntracks_global;            // number of tracks per vertex (after selection)
+    TH1F* h_track_momenta_global;      // momentum magnitude (p) of all tracks in selected vertices
+    TH1F* h_radial_distance_global;    // radial distance of vertices from the origin (sqrt(x^2 + y^2)), global
+    TH1F* h_radial_distance_beamspot;  // radial distance of vertices from the beamspot (sqrt((x-bs.x0)^2 + (y-bs.y0)^2))
+    TH1F* h_eta_distribution_global;   // pseudorapidity (eta) of all tracks in selected vertices (eta = -ln(tan(theta/2)), 0 at track perpendicular to beam and -inf,+inf at beamline. theta=0 when particle moving along the positive beam axis, theta=pi when moving along the negative beam axis, theta=pi/2 when moving perpendicular to the beam axis)
+    TH1F* h_phi_distribution_global;   // azimuthal angle (phi) of all tracks in selected vertices (the angle in the transverse plane, 0 at the positive x-axis, pi/2 at the positive y-axis, pi at the negative x-axis, and 3pi/2 at the negative y-axis)
+    TH2F* h_beamspot_global;           // beamspot position in global coordinates (x0 vs y0)
+    TH1F* h_vertex_pt;                 // transverse momentum (pT) of the vertex (sum of track 4-vectors)
+    TH1F* h_vertex_eta;                // pseudorapidity (eta) of the vertex (sum of track 4-vectors)
+    TH1F* h_vertex_phi;                // azimuthal angle (phi) of the vertex (sum of track 4-vectors)
+    TH1F* h_vertex_mass;               // invariant mass of the vertex (sum of track 4-vectors, pion mass hypothesis)
+    TH1F* h_vertex_eta_barrel;         // vertex eta for vertices in the barrel region (|eta| < 1.0)
+    TH1F* h_vertex_eta_endcap;         // vertex eta for vertices in the endcap region (|eta| >= 1.0)
+    TH1F* h_vertex_dBV_barrel;         // d_{BV} (transverse distance from beamspot) for barrel vertices
+    TH1F* h_vertex_dBV_endcap;         // d_{BV} (transverse distance from beamspot) for endcap vertices
+    TH1F* h_vertex_mass_barrel;        // vertex invariant mass for barrel vertices
+    TH1F* h_vertex_mass_endcap;        // vertex invariant mass for endcap vertices
+    TH2F* h_vertex_xy_barrel_global;   // vertex XY positions for barrel vertices (global coordinates)
+    TH2F* h_vertex_xy_endcap_global;   // vertex XY positions for endcap vertices (global coordinates)
+    TH2F* h_vertex_xy_barrel_beamspot; // vertex XY positions for barrel vertices (beamspot-centered)
+    TH2F* h_vertex_xy_endcap_beamspot; // vertex XY positions for endcap vertices (beamspot-centered)
+    TH1F* h_vertex_dBV;                // d_{BV} (transverse distance from beamspot) for all selected vertices
+    TH1F* h_vertex_dBV_error;          // uncertainty (error) on d_{BV} for all selected vertices
+    TH1F* h_nvertices_ntk;             // number of candidate vertices per event (after ntk cut)
+    TH1F* h_track_dxy_barrel;          // track d_{xy} in the barrel (signed distance of closest approach to beamspot in transverse plane)
+    TH1F* h_track_dxy_endcap;          // track d_{xy} in the endcap (signed distance of closest approach to beamspot in transverse plane)
+    TH1F* h_track_dxyError_barrel;     // uncertainty (error) on track d_{xy} in the barrel
+    TH1F* h_track_dxyError_endcap;     // uncertainty (error) on track d_{xy} in the endcap
 
-  std::pair<double,double> gen_dxy_correction(std::vector<reco::GenParticle>::const_iterator gtk, const edm::Handle<reco::BeamSpot> refpoint){
-    // calculate dxy for gen track
-    double r = 88.*gtk->pt();
-    double cx = gtk->vx() + gtk->charge() * r * sin(gtk->phi());
-    double cy = gtk->vy() - gtk->charge() * r * cos(gtk->phi());
-    double dxy = fabs(r-sqrt(pow((cx-( refpoint->x0() )), 2) + pow((cy-( refpoint->y0() )), 2)));
+    // Output file stream for track method diagnostics (if used)
+    std::ofstream trackMethodsFile_;
+    // Counter for tracks processed (if used)
+    int trackCounter_;
+    // Added overall track dxy histograms
+    TH1F* h_track_dxy;
+    TH1F* h_track_dxyError;
 
-    double vX = refpoint->x0() - cx;
-    double vY = refpoint->y0() - cy;
-    double magV = sqrt(vX*vX + vY*vY);
-    double aX = cx + (vX / magV) * r;
-    double aY = cy + (vY / magV) * r;
-    
-    std::valarray<double> r_vec = {aX-cx,aY-cy};
-    std::valarray<double> p_vec = {-r_vec[1], r_vec[0]};
-    if(gtk->charge()>0){
-      p_vec *= -1;
+    typedef std::set<reco::TrackRef> track_set;
+    typedef std::vector<reco::TrackRef> track_vec;
+    track_set vertex_track_set(const reco::Vertex & v, const double min_weight = 0.5) const {
+        track_set result;
+        for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
+            const double w = v.trackWeight(*it);
+            const bool use = w >= min_weight;
+            assert(use);
+            if (use) result.insert(it->castTo<reco::TrackRef>());
+        }
+        return result;
     }
-    p_vec /= TMath::Sqrt(pow(p_vec[0],2)+pow(p_vec[1],2));
-    p_vec *= gtk->pt();
-    double phi = atan2(p_vec[1],p_vec[0]);
-    return {dxy,phi};
-  }
-  
-  track_set vertex_track_set(const reco::Vertex & v, const double min_weight = 0.5) const {
-    track_set result;
-    
-    for (auto it = v.tracks_begin(), ite = v.tracks_end(); it != ite; ++it) {
-      const double w = v.trackWeight(*it);
-      const bool use = w >= min_weight;
-      assert(use);
-      if (use)
-	result.insert(it->castTo<reco::TrackRef>());
+    track_vec vertex_track_vec(const reco::Vertex & v, const double min_weight = 0.5) const {
+        track_set s = vertex_track_set(v, min_weight);
+        return track_vec(s.begin(), s.end());
     }
-    
-    return result;
-  }
-  
-  track_vec vertex_track_vec(const reco::Vertex & v, const double min_weight = 0.5) const {
-    track_set s = vertex_track_set(v, min_weight);
-    return track_vec(s.begin(), s.end());
-  }
-
-
-  std::pair<size_t, size_t> findTwoLargestIndices(const std::vector<double>& vec) {
-    int firstIndex = -1, secondIndex = -1;
-    float firstMax = -std::numeric_limits<float>::infinity();
-    float secondMax = -std::numeric_limits<float>::infinity();
-
-    for (size_t i = 0; i < vec.size(); ++i) {
-      if (vec[i] > firstMax) {
-	secondMax = firstMax;
-	secondIndex = firstIndex;
-	firstMax = vec[i];
-	firstIndex = i;
-      } else if (vec[i] > secondMax) {
-	secondMax = vec[i];
-	secondIndex = i;
-      }
-    }
-    
-    return {firstIndex, secondIndex};
-  }
-
-  void removeFlows(TH1F* h) {
-    int nbins = h->GetNbinsX();
-    double underflow = h->GetBinContent(0);
-    double overflow = h->GetBinContent(nbins+1);
-    h->AddBinContent(1,underflow);
-    h->AddBinContent(nbins,overflow);
-    h->SetBinContent(0,0);
-    h->SetBinContent(nbins+1,0);
-  }
-  
 };
 
 ScoutingTreeMakerRun3::ScoutingTreeMakerRun3(const edm::ParameterSet& iConfig):
-  required_ntk             (iConfig.getParameter<int>("required_ntk")),
-  triggerResultsTag        (iConfig.getParameter<edm::InputTag>("triggerresults")),
-  triggerResultsToken      (consumes<edm::TriggerResults>                    (triggerResultsTag)),
-  muonsToken               (consumes<std::vector<Run3ScoutingMuon> >             (iConfig.getParameter<edm::InputTag>("muons"))),
-  electronsToken           (consumes<std::vector<Run3ScoutingElectron> >         (iConfig.getParameter<edm::InputTag>("electrons"))),
-  primaryVerticesToken     (consumes<std::vector<Run3ScoutingVertex> >           (iConfig.getParameter<edm::InputTag>("primaryVertices"))),
-  //verticesToken            (consumes<std::vector<Run3ScoutingVertex> >           (iConfig.getParameter<edm::InputTag>("displacedVertices"))),
-  rhoToken                 (consumes<double>                                 (iConfig.getParameter<edm::InputTag>("rho"))), 
-  photonsToken             (consumes<std::vector<Run3ScoutingPhoton> >         (iConfig.getParameter<edm::InputTag>("photons"))),
-  pfcandsToken             (consumes<std::vector<Run3ScoutingParticle> >         (iConfig.getParameter<edm::InputTag>("pfcands"))),
-  pfjetsToken              (consumes<std::vector<Run3ScoutingPFJet> >            (iConfig.getParameter<edm::InputTag>("pfjets"))),
-  //tracksToken              (consumes<std::vector<Run3ScoutingTrack> >            (iConfig.getParameter<edm::InputTag>("tracks"))),
-  tracksToken              (consumes<std::vector<reco::Track> >            (iConfig.getParameter<edm::InputTag>("tracks"))),    
-  verticesToken            (consumes<std::vector<reco::Vertex> >           (iConfig.getParameter<edm::InputTag>("displacedVertices"))),
-  
-  beamspot_token(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot_src"))),
-  GenParticleToken_(consumes(iConfig.getParameter<edm::InputTag>("genParticle_src"))),
-  TrackingParticleToken_(consumes(iConfig.getParameter<edm::InputTag>("trackingParticle_src"))),
-  GeneratorToken_(consumes(iConfig.getParameter<edm::InputTag>("generatorName"))),
-  doL1                     (iConfig.existsAs<bool>("doL1")               ?    iConfig.getParameter<bool>  ("doL1")            : false),
-  doPhiCorrection          (iConfig.existsAs<bool>("doPhiCorrection")    ?    iConfig.getParameter<bool>  ("doPhiCorrection") : false),
-  luminosity          (iConfig.existsAs<double>("luminosity")    ?    iConfig.getParameter<double>  ("luminosity") : 1.0),
-  crossSection        (iConfig.existsAs<double>("crossSection")    ?    iConfig.getParameter<double>  ("crossSection") : 1.0)
+    required_ntk_min(iConfig.getParameter<int>("required_ntk_min")),
+    required_ntk_max(iConfig.getParameter<int>("required_ntk_max")),
+    required_invmass(iConfig.getParameter<double>("required_invmass")),
+    required_chi2(iConfig.getParameter<double>("required_chi2")),
+    required_dBV_min(iConfig.getParameter<double>("required_dBV_min")),
+    required_dBV_max(iConfig.getParameter<double>("required_dBV_max")),
+    required_dxy_min(iConfig.getParameter<double>("required_dxy_min")),
+    required_dxy_max(iConfig.getParameter<double>("required_dxy_max")),
+    required_dBV_error(iConfig.getParameter<double>("required_dBV_error")),
+    required_dxy_error(iConfig.getParameter<double>("required_dxy_error")),
+    verticesToken(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("displacedVertices"))),
+    beamspot_token(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot_src"))),
+    tracksToken(consumes<std::vector<reco::Track>>(iConfig.getParameter<edm::InputTag>("tracks")))
 {
     usesResource("TFileService");
-    if (doL1) {
-        algInputTag_ = iConfig.getParameter<edm::InputTag>("AlgInputTag");
-        extInputTag_ = iConfig.getParameter<edm::InputTag>("l1tExtBlkInputTag");
-        algToken_ = consumes<BXVector<GlobalAlgBlk>>(algInputTag_);
-        l1Seeds_ = iConfig.getParameter<std::vector<std::string> >("l1Seeds");
-        l1GtUtils_ = std::make_unique<l1t::L1TGlobalUtil>(iConfig, consumesCollector(), *this, algInputTag_, extInputTag_, l1t::UseEventSetupIn::Event);
-    }
-    else {
-        l1Seeds_ = std::vector<std::string>();
-        l1GtUtils_ = 0;
-    }
 }
 
 ScoutingTreeMakerRun3::~ScoutingTreeMakerRun3() {
-  // do anything here that needs to be done at desctruction time
-  // (e.g. close files, deallocate resources etc.)
-  //
-  // please remove this method altogether if it would be left empty
+    // ...existing cleanup if necessary...
 }
 
-//
-// member functions
-//
-
-
-// ------------ method called for each event  ------------
-void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
-  using namespace edm;
-  using namespace std;
-  using namespace reco;
-
-  match_deltaR->clear();
-  match_ptRatio->clear();
-  match_diffPt->clear();
-  match_diffEta->clear();
-  match_diffPhi->clear();
-  match_diffPhiCorrected->clear();
-  match_gen_dxy->clear();
-  match_gen_dxyCorrected->clear();
-  match_diffDxy->clear();
-  match_diffDxyCorrected->clear();
-  gen_dxy->clear();
-  gen_dxyCorrected->clear();
-  match_vert_x->clear();
-  match_vert_y->clear();
-  match_genVert_x->clear();
-  match_genVert_y->clear();
-  match_genVert_dBV->clear();
-  genVert_dBV->clear();
-  genVert_phi->clear();
-  genVert_z->clear();
-  genVert_x->clear();
-  genVert_y->clear();
-  genVert_nParticles->clear();
-  genVert_dPhi->clear();
-  genVert_dVV->clear();
-  resVert_x->clear();
-  resVert_y->clear();
-  resVert_z->clear();
-  scoutVert_dBV->clear();
-  scoutVert_phi->clear();
-  scoutVert_z->clear();
-  scoutVert_x->clear();
-  scoutVert_y->clear();
-  scoutVert_nTracks->clear();
-  scoutVert_dPhi->clear();
-  scoutVert_dVV->clear();
-
-  //Get tracking particles
-  edm::Handle<GenEventInfoProduct> generatorHandle;
-  iEvent.getByToken(GeneratorToken_, generatorHandle);
-  double genWeight = generatorHandle->weight();
-  h_genWeights->Fill("None",genWeight);
-  double theWeight = genWeight*luminosity*crossSection;
-  weight = theWeight;
-  h_weightsSquared->Fill("None",pow(theWeight,2));
-  
-  //Get the jets
-  Handle<vector<Run3ScoutingPFJet> > pfjetsH;
-  iEvent.getByToken(pfjetsToken, pfjetsH);
-
-  //Require 4 PF Jets 
-  nPFJets = pfjetsH->size();
-  if (nPFJets<4) return;
-
-  h_genWeights->Fill("nJets",genWeight);
-  h_weightsSquared->Fill("nJets",pow(theWeight,2));
-  
-  HT = 0;
-  int t = 0;
-  for (auto jets_iter = pfjetsH->begin(); jets_iter != pfjetsH->end(); ++jets_iter) {
-    HT = HT + pfjetsH->at(t).pt();
-    t++;
-  }
-  
-  //Get the beamspot
-  edm::Handle<reco::BeamSpot> beamspot;
-  iEvent.getByToken(beamspot_token, beamspot);
-  const reco::Vertex fake_bs_vtx(beamspot->position(), beamspot->covariance3D());
-
-  //Get the vertices
-  Handle<vector<Vertex> > verticesH;
-  iEvent.getByToken(verticesToken, verticesH);
-
-  t=0;
-  Vertex v;
-  int ntk_t=0;
-  vector<TrackRef> tks_t;
-
-  vector<Vertex> vertices_ntk;
-  
-  for (auto vertex_iter = verticesH->begin(); vertex_iter != verticesH->end(); ++vertex_iter) {
-    v = verticesH->at(t);
-    tks_t = vertex_track_vec(v);
-    ntk_t = tks_t.size();
-
-    if (ntk_t > required_ntk - 1) vertices_ntk.push_back(v);
-    t++;
-  }
-  
-  nVertices = vertices_ntk.size();
-
-  if (nVertices<2) return;
-
-  h_genWeights->Fill("nVertices",genWeight);
-  h_weightsSquared->Fill("nVertices",pow(theWeight,2));
-  
-  h_scoutVert_nVertices->Fill(vertices_ntk.size());
-  scoutVert_nVertices = vertices_ntk.size();
-  
-  //Get gen particles for truth-level vertices
-  edm::Handle<std::vector<reco::GenParticle>> genParticle_handle;
-  iEvent.getByToken(GenParticleToken_,genParticle_handle);
-  std::vector<GlobalPoint> genVertices;
-  
-  std::vector<reco::GenParticle>::const_iterator genParticleIter;
-  float maxDist = 0;
-  for(genParticleIter = genParticle_handle->begin(); genParticleIter != genParticle_handle->end(); ++genParticleIter){
-    if(genParticleIter->numberOfMothers()<1) continue;
-    if(isStopDecay(genParticleIter->mother(0)).first){
-      //std::cout<<"isStop block"<<std::endl;
-      //std::cout<<"pdgid: "<<genParticleIter->pdgId()<<" vertex xyz: "<<genParticleIter->vx()<<" "<<genParticleIter->vy()<<" "<<genParticleIter->vz()<<" status: "<<genParticleIter->status()<<" parent id: "<<genParticleIter->mother(0)->pdgId()<<" parent vertex: "<<genParticleIter->mother(0)->vx()<<" "<<genParticleIter->mother(0)->vy()<<" "<<genParticleIter->mother(0)->vz()<<" parent status: "<<genParticleIter->mother(0)->status()<<std::endl;
-      float dist = TMath::Sqrt(pow(genParticleIter->vx()-beamspot->x0(),2)+pow(genParticleIter->vy()-beamspot->y0(),2));
-      const reco::Candidate* mother = genParticleIter->mother(0);
-      while(mother->mother(0)->pdgId()==mother->pdgId()){
-	mother = mother->mother(0);
-      }
-      
-      bool isDupe = false;
-      GlobalPoint genVertex = GlobalPoint(genParticleIter->vx(),genParticleIter->vy(),genParticleIter->vz());
-      for(auto vertex: genVertices){
-	if((vertex.x()==genVertex.x()) && (vertex.y()==genVertex.y()) && (vertex.z()==genVertex.z())) isDupe = true;
-      }
-      if(!isDupe){
-	genVertices.push_back(genVertex);
-	h_genVert_dBV->Fill(dist);
-	genVert_dBV->push_back(dist);
-	h_genVert_phi->Fill(atan2(genVertex.y()-beamspot->y0(),genVertex.x()-beamspot->x0()));
-	genVert_phi->push_back(atan2(genVertex.y()-beamspot->y0(),genVertex.x()-beamspot->x0()));
-	h_genVert_z->Fill(genVertex.z()-beamspot->z0());
-	genVert_z->push_back(genVertex.z()-beamspot->z0());
-	h_genVert_x_y->Fill(genVertex.x()-beamspot->x0(),genVertex.y()-beamspot->y0());
-	genVert_x->push_back(genVertex.x()-beamspot->x0());
-	genVert_y->push_back(genVertex.y()-beamspot->y0());
-      }
-      //std::cout<<"first mother id: "<<mother->pdgId()<<" status: "<<mother->status()<<" vertex: "<<mother->vx()<<" "<<mother->vy()<<" "<<mother->vz()<<" parent id: "<<mother->mother(0)->pdgId()<<" parent status: "<<mother->mother(0)->status()<<" mother vertex: "<<mother->mother(0)->vx()<<" "<<mother->mother(0)->vy()<<" "<<mother->mother(0)->vz()<<std::endl;
-      if(dist>maxDist){
-	maxDist = dist;
-	genVert_x_1 = genParticleIter->vx()-beamspot->x0();
-	genVert_y_1 = genParticleIter->vy()-beamspot->y0();
-	genVert_z_1 = genParticleIter->vz()-beamspot->z0();
-	genVert_dBV_1 = dist;
-	genVert_3d_1 = TMath::Sqrt(pow(genParticleIter->vx()-beamspot->x0(),2)+pow(genParticleIter->vy()-beamspot->y0(),2)+pow(genParticleIter->vz()-beamspot->z0(),2));
-	genVert_motherEta = mother->eta();
-	genVert_motherPhi = mother->phi();
-	genVert_motherPt = mother->pt();
-	genVert_motherDistTraveled = TMath::Sqrt(pow(genParticleIter->vx()-mother->mother(0)->vx(),2)+pow(genParticleIter->vy()-mother->mother(0)->vy(),2)+pow(genParticleIter->vz()-mother->mother(0)->vz(),2));
-      }
-    } //isStopDecay
-    std::pair<bool,GlobalPoint> isChargedStopDecayProduct = isChargedStopDecayProductStatusOne(genParticleIter);
-    if(isChargedStopDecayProduct.first){
-      //std::cout<<"pdgid: "<<genParticleIter->pdgId()<<" vertex xyz: "<<genParticleIter->vx()<<" "<<genParticleIter->vy()<<" "<<genParticleIter->vz()<<" status: "<<genParticleIter->status()<<" parent id: "<<genParticleIter->mother(0)->pdgId()<<" parent vertex: "<<genParticleIter->mother(0)->vx()<<" "<<genParticleIter->mother(0)->vy()<<" "<<genParticleIter->mother(0)->vz()<<" parent status: "<<genParticleIter->mother(0)->status()<<std::endl;
-
-      float dxy = TMath::Sqrt(pow(genParticleIter->vx()-beamspot->x0(),2)+pow(genParticleIter->vy()-beamspot->y0(),2));
-      h_gen_dxy->Fill(dxy);
-      gen_dxy->push_back(dxy);
-      std::pair<double,double> correction = gen_dxy_correction(genParticleIter,beamspot);
-      float dxy_corrected = correction.first;
-      gen_dxyCorrected->push_back(dxy_corrected);
-    }
-  } //loop over gen particles
-
-  h_genVert_nVertices->Fill(genVertices.size());
-  genVert_nVertices = genVertices.size();
-  //count number of gen particles from same vertex
-  std::vector<int> nMatches(genVertices.size(),0);
-  for(genParticleIter = genParticle_handle->begin(); genParticleIter != genParticle_handle->end(); ++genParticleIter){
-    std::pair<bool,GlobalPoint> isChargedStopDecayProduct = isChargedStopDecayProductStatusOne(genParticleIter);
-    if(!isChargedStopDecayProduct.first) continue;
-    uint i = -1;
-    for(auto vertex: genVertices){
-      i++;
-      if((vertex.x()==isChargedStopDecayProduct.second.x()) && (vertex.y()==isChargedStopDecayProduct.second.y()) && (vertex.z()==isChargedStopDecayProduct.second.z())) nMatches[i]++;
-    }
-  }
-  for(uint i=0; i<nMatches.size(); i++){
-    h_genVert_nParticles->Fill(nMatches[i]);
-    genVert_nParticles->push_back(nMatches[i]);
-  }
-
-  if(genVertices.size()==2){
-    genVert_dVV_2 = TMath::Sqrt(pow(genVertices[0].x()-genVertices[1].x(),2)+pow(genVertices[0].y()-genVertices[1].y(),2)+pow(genVertices[0].z()-genVertices[1].z(),2));
-    float dPhi = fabs(atan2(genVertices[0].y()-beamspot->y0(),genVertices[0].x()-beamspot->x0())-atan2(genVertices[1].y()-beamspot->y0(),genVertices[1].x()-beamspot->x0()));
-    if(dPhi>TMath::Pi()) dPhi = 2*TMath::Pi() - dPhi;
-    genVert_dPhi_2 = dPhi;
-  }
-
-  if(genVertices.size()>1){
-    for(uint i=0; i<(genVertices.size()-1); i++){
-      for(uint j=i+1; j<genVertices.size(); j++){
-	float dPhi = fabs(atan2(genVertices[i].y()-beamspot->y0(),genVertices[i].x()-beamspot->x0())-atan2(genVertices[j].y()-beamspot->y0(),genVertices[j].x()-beamspot->x0()));
-	if(dPhi>TMath::Pi()) dPhi = 2*TMath::Pi() - dPhi;
-	h_genVert_dPhi->Fill(dPhi);
-	genVert_dPhi->push_back(dPhi);
-	h_genVert_dVV->Fill(TMath::Sqrt(pow(genVertices[i].x()-genVertices[j].x(),2)+pow(genVertices[i].y()-genVertices[j].y(),2)+pow(genVertices[i].z()-genVertices[j].z(),2)));
-	genVert_dVV->push_back(TMath::Sqrt(pow(genVertices[i].x()-genVertices[j].x(),2)+pow(genVertices[i].y()-genVertices[j].y(),2)+pow(genVertices[i].z()-genVertices[j].z(),2)));
-      }
-    }
-  }
-  
-  //Get tracking particles
-  edm::Handle<std::vector<TrackingParticle>> TrackingParticleHandle;
-  iEvent.getByToken(TrackingParticleToken_, TrackingParticleHandle);
-
-  //Get scouting tracks
-  //edm::Handle<std::vector<Run3ScoutingTrack>> ScoutingTrackHandle;
-  edm::Handle<std::vector<reco::Track>> ScoutingTrackHandle;
-  iEvent.getByToken(tracksToken, ScoutingTrackHandle);
-  std::vector<reco::Track>::const_iterator scoutingTrackIter;
-  int i_track = -1;
-  std::vector<std::vector<float>> deltaRVec;
-  for(scoutingTrackIter = ScoutingTrackHandle->begin(); scoutingTrackIter != ScoutingTrackHandle->end(); ++scoutingTrackIter){
-    i_track++;
-    //std::cout<<"scouting track pt: "<<scoutingTrackIter->tk_pt()<<" eta: "<<scoutingTrackIter->tk_eta()<<" phi: "<<scoutingTrackIter->tk_phi()<<" vertex: "<<scoutingTrackIter->tk_vx()<<" "<<scoutingTrackIter->tk_vy()<<" "<<scoutingTrackIter->tk_vz()<<std::endl;
-    int i_gen = -1;
-    for(genParticleIter = genParticle_handle->begin(); genParticleIter != genParticle_handle->end(); ++genParticleIter){
-      i_gen++;
-      if(!isChargedStopDecayProductStatusOne(genParticleIter).first) continue;
-      float dPhi = 0;
-      if(doPhiCorrection){
-	std::pair<double,double> correction = gen_dxy_correction(genParticleIter,beamspot);
-	dPhi = fabs(scoutingTrackIter->phi()-correction.second);
-      }
-      else{
-	dPhi = fabs(scoutingTrackIter->phi()-genParticleIter->phi());
-      }
-      if(dPhi>TMath::Pi()) dPhi = 2*TMath::Pi() - dPhi;
-      float dEta = fabs(scoutingTrackIter->eta()-genParticleIter->eta());
-      float deltaR = TMath::Sqrt(pow(dPhi,2)+pow(dEta,2));
-      float ptRatio = fabs(scoutingTrackIter->pt()-genParticleIter->pt())/(scoutingTrackIter->pt()+genParticleIter->pt());
-      if(deltaR<0.05 && ptRatio<0.1){
-	deltaRVec.push_back({float(i_gen),float(i_track),deltaR});
-      }
-    }
-  }
-  
-  sort(deltaRVec.begin(), deltaRVec.end(), CompareDeltaR); //sort matches by deltaR smallest to largest
-  std::vector<std::vector<float>> finalMatches;
-  while(deltaRVec.size()>0){
-    finalMatches.push_back(deltaRVec[0]);
-    int i_genMatch = deltaRVec[0][0];
-    int i_trackMatch = deltaRVec[0][1];
-    deltaRVec.erase(std::remove_if( deltaRVec.begin(), deltaRVec.end(), [i_genMatch](std::vector<float> x){return x[0]==i_genMatch;}), deltaRVec.end());
-    deltaRVec.erase(std::remove_if( deltaRVec.begin(), deltaRVec.end(), [i_trackMatch](std::vector<float> x){return x[1]==i_trackMatch;}), deltaRVec.end());
-  }
-  for(auto match: finalMatches){
-    float pt_gen = (genParticle_handle->begin()+match[0])->pt();
-    float pt_track = (ScoutingTrackHandle->begin()+match[1])->pt();
-    float eta_gen = (genParticle_handle->begin()+match[0])->eta();
-    float eta_track = (ScoutingTrackHandle->begin()+match[1])->eta();
-    float phi_gen = (genParticle_handle->begin()+match[0])->phi();
-    float phi_track = (ScoutingTrackHandle->begin()+match[1])->phi();
-    match_ptRatio->push_back(fabs(pt_track-pt_gen)/(pt_track+pt_gen));
-    match_deltaR->push_back(match[2]);
-    match_diffPt->push_back(fabs(pt_gen-pt_track));
-    match_diffEta->push_back(fabs(eta_gen-eta_track));
-    float diffPhi = fabs(phi_gen-phi_track);
-    if(diffPhi>TMath::Pi()) diffPhi = 2*TMath::Pi() - diffPhi;
-    match_diffPhi->push_back(diffPhi);
-    
-    float dxy = TMath::Sqrt(pow((genParticle_handle->begin()+match[0])->vx()-beamspot->x0(),2)+pow((genParticle_handle->begin()+match[0])->vy()-beamspot->y0(),2));
-    h_match_gen_dxy->Fill(dxy);
-    match_gen_dxy->push_back(dxy);
-    float dxy_track = TMath::Sqrt(pow((ScoutingTrackHandle->begin()+match[1])->vx()-beamspot->x0(),2)+pow((ScoutingTrackHandle->begin()+match[1])->vy()-beamspot->y0(),2));
-    match_diffDxy->push_back(dxy-dxy_track);
-    std::pair<double,double> correction = gen_dxy_correction((genParticle_handle->begin()+match[0]),beamspot);
-    float dxy_corrected = correction.first;
-    match_gen_dxy->push_back(dxy_corrected);
-    match_diffDxyCorrected->push_back(dxy_corrected-dxy_track);
-    float diffPhiCorrected = fabs(correction.second-phi_track);
-    if(diffPhiCorrected>TMath::Pi()) diffPhiCorrected = 2*TMath::Pi() - diffPhiCorrected;
-    match_diffPhiCorrected->push_back(diffPhiCorrected);
-    //std::cout<<"phi gen: "<<phi_gen<<" phi corrected: "<<correction.second<<std::endl;
-    //std::cout<<"dxy gen: "<<dxy<<" dxy corrected: "<<dxy_corrected<<std::endl;
-  }
-  genScout_nMatches = finalMatches.size();
-
-  //Two leading vertices
-  vector<double> dBVs;
-  VertexDistanceXY vertex_dist_2d;
-  t=0;
-  float dBV_t;
-
-  std::vector<std::vector<float>> deltaRVecVertices;
-  for (auto vertex_iter = vertices_ntk.begin(); vertex_iter != vertices_ntk.end(); ++vertex_iter) {
-    v = vertices_ntk.at(t);
-    dBV_t = vertex_dist_2d.distance(v, fake_bs_vtx).value();
-    dBVs.push_back(dBV_t);
-
-    std::vector<TrackRef> trks = vertex_track_vec(v);
-    //std::cout<<"vertex number of tracks: "<<trks.size()<<std::endl;
-
-    h_scoutVert_dBV->Fill(dBV_t);
-    scoutVert_dBV->push_back(dBV_t);
-    h_scoutVert_phi->Fill(atan2(v.y()-beamspot->y0(),v.x()-beamspot->x0()));
-    scoutVert_phi->push_back(atan2(v.y()-beamspot->y0(),v.x()-beamspot->x0()));
-    h_scoutVert_z->Fill(v.z()-beamspot->z0());
-    scoutVert_z->push_back(v.z()-beamspot->z0());
-    h_scoutVert_x_y->Fill(v.x()-beamspot->x0(),v.y()-beamspot->y0());
-    scoutVert_x->push_back(v.x()-beamspot->x0());
-    scoutVert_y->push_back(v.y()-beamspot->y0());
-    h_scoutVert_nTracks->Fill(trks.size());
-    scoutVert_nTracks->push_back(trks.size());
-    
-    int i_trk = -1;
-    for(auto trk: trks){
-      i_trk++;
-      int i_gen = -1;
-      for(genParticleIter = genParticle_handle->begin(); genParticleIter != genParticle_handle->end(); ++genParticleIter){
-	i_gen++;
-	std::pair<bool,GlobalPoint> isDecayProduct = isChargedStopDecayProductStatusOne(genParticleIter);
-	if(!isDecayProduct.first) continue;
-	float dPhi = 0;
-	if(doPhiCorrection){
-	  std::pair<double,double> correction = gen_dxy_correction(genParticleIter,beamspot);
-	  dPhi = fabs(trk->phi()-correction.second);
-	}
-	else{
-	  dPhi = fabs(trk->phi()-genParticleIter->phi());
-	}
-	if(dPhi>TMath::Pi()) dPhi = 2*TMath::Pi() - dPhi;
-	float dEta = fabs(trk->eta()-genParticleIter->eta());
-	float deltaR = TMath::Sqrt(pow(dPhi,2)+pow(dEta,2));
-	float ptRatio = fabs(trk->pt()-genParticleIter->pt())/(trk->pt()+genParticleIter->pt());
-	if(deltaR<0.05 && ptRatio<0.1){
-	  deltaRVecVertices.push_back({float(i_gen),float(i_trk),deltaR,float(t),isDecayProduct.second.x(),isDecayProduct.second.y(),isDecayProduct.second.z()});
-	}
-      } // loop over gen particles
-    } // loop over vertex tracks
-    t++;
-  } //loop over vertices
-  
-  sort(deltaRVecVertices.begin(), deltaRVecVertices.end(), CompareDeltaR); //sort matches by deltaR smallest to largest
-  std::vector<std::vector<float>> finalMatchesVertices;
-  while(deltaRVecVertices.size()>0){
-    finalMatchesVertices.push_back(deltaRVecVertices[0]);
-    int i_genMatch = deltaRVecVertices[0][0];
-    int i_trackMatch = deltaRVecVertices[0][1];
-    int i_vtx = deltaRVecVertices[0][3];
-    deltaRVecVertices.erase(std::remove_if( deltaRVecVertices.begin(), deltaRVecVertices.end(), [i_genMatch](std::vector<float> x){return x[0]==i_genMatch;}), deltaRVecVertices.end());
-    deltaRVecVertices.erase(std::remove_if( deltaRVecVertices.begin(), deltaRVecVertices.end(), [i_trackMatch,i_vtx](std::vector<float> x){return ((x[1]==i_trackMatch)&&(x[3]==i_vtx));}), deltaRVecVertices.end());
-  }
-  std::vector<int> vectorNumMatches(t,0);
-  for(auto match: finalMatchesVertices){
-    vectorNumMatches[match[3]]++;
-    if(vectorNumMatches[match[3]]==2){
-      Vertex vert = vertices_ntk.at(match[3]);
-      h_match_vert_x_y->Fill(vert.x()-beamspot->x0(),vert.y()-beamspot->y0());
-      match_vert_x->push_back(vert.x()-beamspot->x0());
-      match_vert_y->push_back(vert.y()-beamspot->y0());
-    }
-  }
-  int nVertMatches = 0;
-  for(auto numMatches: vectorNumMatches){
-    if(numMatches>1) nVertMatches++;
-  }
-  genScoutVert_nMatches = nVertMatches;
-
-  //gen vertex matching
-  for(auto vertex: genVertices){
-    std::vector<int> numMatches(t,0);
-    for(auto match: finalMatchesVertices){
-      if((vertex.x()==match[4]) && (vertex.y()==match[5]) && (vertex.z()==match[6])){
-	numMatches[match[3]]++;
-      }
-    }
-    //std::cout<<"gen vertex num matches: ";
-    for(uint i=0; i<numMatches.size(); i++){
-      //std::cout<<numMatches[i]<<" ";
-    }
-    //std::cout<<std::endl;
-    bool isMatched = false;
-    uint i_match=0;
-    int maxMatches = 1;
-    for(uint i=0; i<numMatches.size(); i++){
-      if(numMatches[i]>maxMatches){
-	isMatched = true;
-	maxMatches = numMatches[i];
-	i_match = i;
-      }
-    }
-    if(isMatched){
-      h_match_genVert_x_y->Fill(vertex.x()-beamspot->x0(),vertex.y()-beamspot->y0());
-      match_genVert_x->push_back(vertex.x()-beamspot->x0());
-      match_genVert_y->push_back(vertex.y()-beamspot->y0());
-      h_match_genVert_dBV->Fill(TMath::Sqrt(pow(vertex.x()-beamspot->x0(),2)+pow(vertex.y()-beamspot->y0(),2)));
-      match_genVert_dBV->push_back(TMath::Sqrt(pow(vertex.x()-beamspot->x0(),2)+pow(vertex.y()-beamspot->y0(),2)));
-      Vertex scoutVert = vertices_ntk.at(i_match);
-      h_resVert_x->Fill(vertex.x()-scoutVert.x());
-      resVert_x->push_back(vertex.x()-scoutVert.x());
-      h_resVert_y->Fill(vertex.y()-scoutVert.y());
-      resVert_y->push_back(vertex.y()-scoutVert.y());
-      h_resVert_z->Fill(vertex.z()-scoutVert.z());
-      resVert_z->push_back(vertex.z()-scoutVert.z());
-    }
-  }
-
-  if(vertices_ntk.size()>1){
-    for (uint i=0; i<(vertices_ntk.size()-1); i++){
-      for(uint j=i+1; j<vertices_ntk.size(); j++){
-	float dPhi = fabs(atan2(vertices_ntk[i].y()-beamspot->y0(),vertices_ntk[i].x()-beamspot->x0())-atan2(vertices_ntk[j].y()-beamspot->y0(),vertices_ntk[j].x()-beamspot->x0()));
-	if(dPhi>TMath::Pi()) dPhi = 2*TMath::Pi() - dPhi;
-	h_scoutVert_dPhi->Fill(dPhi);
-	scoutVert_dPhi->push_back(dPhi);
-	h_scoutVert_dVV->Fill(TMath::Sqrt(pow(vertices_ntk[i].x()-vertices_ntk[j].x(),2)+pow(vertices_ntk[i].y()-vertices_ntk[j].y(),2)+pow(vertices_ntk[i].z()-vertices_ntk[j].z(),2)));
-	scoutVert_dVV->push_back(TMath::Sqrt(pow(vertices_ntk[i].x()-vertices_ntk[j].x(),2)+pow(vertices_ntk[i].y()-vertices_ntk[j].y(),2)+pow(vertices_ntk[i].z()-vertices_ntk[j].z(),2)));
-      }
-    }
-  }
-  
-  auto largest_dBV = findTwoLargestIndices(dBVs);
-  
-  Vertex v1 = vertices_ntk.at(largest_dBV.first);
-  Vertex v2 = vertices_ntk.at(largest_dBV.second);
-
-  //Get the jets distributions
-  ptjet1 = pfjetsH->at(0).pt();
-  ptjet2 = pfjetsH->at(1).pt();
-  ptjet3 = pfjetsH->at(2).pt();
-  ptjet4 = pfjetsH->at(3).pt();
-  
-  etajet1 = pfjetsH->at(0).eta();
-  etajet2 = pfjetsH->at(1).eta();
-  etajet3 = pfjetsH->at(2).eta();
-  etajet4 = pfjetsH->at(3).eta();
-  
-  phijet1 = pfjetsH->at(0).phi();
-  phijet2 = pfjetsH->at(1).phi();
-  phijet3 = pfjetsH->at(2).phi();
-  phijet4 = pfjetsH->at(3).phi();
-
-  //Calculate the vertex distributions
-  
-  Measurement1D dBV_Meas1D_1 = vertex_dist_2d.distance(v1, fake_bs_vtx);
-  Measurement1D dBV_Meas1D_2 = vertex_dist_2d.distance(v2, fake_bs_vtx);
-  
-  dBV_1 = dBV_Meas1D_1.value();
-  bs2derr_1 = dBV_Meas1D_1.error();
-
-  dBV_2 = dBV_Meas1D_2.value();
-  bs2derr_2 = dBV_Meas1D_2.error();
-
-  //printf("First dBV = %f, second dBV = %f\n", dBV_1, dBV_2);
-
-  vector<TrackRef> tks_1 = vertex_track_vec(v1);
-  ntk_1 = tks_1.size();
-
-  vector<TrackRef> tks_2 = vertex_track_vec(v2);
-  ntk_2 = tks_2.size();
-  
-  //L1 results
-  l1Result_.clear();
-  if (doL1) {
-    l1GtUtils_->retrieveL1(iEvent,iSetup,algToken_);
-    for( unsigned int iseed = 0; iseed < l1Seeds_.size(); iseed++ ) {
-      bool l1htbit = 0;
-      l1GtUtils_->getFinalDecisionByName(string(l1Seeds_[iseed]), l1htbit);
-      l1Result_.push_back( l1htbit );
-    }
-      
-    l1GtUtils_->getFinalDecisionByName(string("L1_HTT200er"), L1_HTT200er);
-    l1GtUtils_->getFinalDecisionByName(string("L1_HTT255er"), L1_HTT255er);
-    l1GtUtils_->getFinalDecisionByName(string("L1_HTT280er"), L1_HTT280er);
-    l1GtUtils_->getFinalDecisionByName(string("L1_HTT320er"), L1_HTT320er);
-    l1GtUtils_->getFinalDecisionByName(string("L1_HTT360er"), L1_HTT360er);
-    l1GtUtils_->getFinalDecisionByName(string("L1_HTT400er"), L1_HTT400er);
-    l1GtUtils_->getFinalDecisionByName(string("L1_HTT450er"), L1_HTT450er);
-    l1GtUtils_->getFinalDecisionByName(string("L1_ETT2000"), L1_ETT2000);
-    l1GtUtils_->getFinalDecisionByName(string("L1_SingleJet180"), L1_SingleJet180);
-    l1GtUtils_->getFinalDecisionByName(string("L1_SingleJet200"), L1_SingleJet200);
-    l1GtUtils_->getFinalDecisionByName(string("L1_DoubleJet30er2p5_Mass_Min250_dEta_Max1p5"), L1_DoubleJet30er2p5_Mass_Min250_dEta_Max1p5);
-    l1GtUtils_->getFinalDecisionByName(string("L1_DoubleJet30er2p5_Mass_Min300_dEta_Max1p5"), L1_DoubleJet30er2p5_Mass_Min300_dEta_Max1p5);
-    l1GtUtils_->getFinalDecisionByName(string("L1_DoubleJet30er2p5_Mass_Min330_dEta_Max1p5"), L1_DoubleJet30er2p5_Mass_Min330_dEta_Max1p5);
-    
-  }
-  
-  tree->Fill();
-  objectTree->Fill();
-}
-
-//Fill the tree with the variables retrieved above
 void ScoutingTreeMakerRun3::beginJob() {
     edm::Service<TFileService> fs;
-    tree = fs->make<TTree>("tree"      , "tree");
-
-    //tree->Branch("nPFJets"             , &nPFJets                     , "nPFJets/F"     );
-
-    tree->Branch("ptjet1"              , &ptjet1                      , "ptjet1/F"      );
-    tree->Branch("ptjet2"              , &ptjet2                      , "ptjet2/F"      ); 
-    tree->Branch("ptjet3"              , &ptjet3                      , "ptjet3/F"      );
-    tree->Branch("ptjet4"              , &ptjet4                      , "ptjet4/F"      );    
-
-    tree->Branch("etajet1"             , &etajet1                     , "etajet1/F"     );
-    tree->Branch("etajet2"             , &etajet2                     , "etajet2/F"     );
-    tree->Branch("etajet3"             , &etajet3                     , "etajet3/F"     );
-    tree->Branch("etajet4"             , &etajet4                     , "etajet4/F"     );
-
-    tree->Branch("phijet1"             , &phijet1                     , "phijet1/F"     );
-    tree->Branch("phijet2"             , &phijet2                     , "phijet2/F"     );
-    tree->Branch("phijet3"             , &phijet3                     , "phijet3/F"     );
-    tree->Branch("phijet4"             , &phijet4                     , "phijet4/F"     );
-
-    //Add the missing distributions
-    tree->Branch("dBV_1"               , &dBV_1                       , "dBV_1/F"       );
-    tree->Branch("dBV_2"               , &dBV_2                       , "dBV_2/F"       );
-
-    tree->Branch("bs2derr_1"           , &bs2derr_1                   , "bs2derr_1/F"   );
-    tree->Branch("bs2derr_2"           , &bs2derr_2                   , "bs2derr_2/F"   );
-    
-    tree->Branch("ntk_1"               , &ntk_1                       , "ntk_1/I"       );
-    tree->Branch("ntk_2"               , &ntk_2                       , "ntk_2/I"       );
-
-    tree->Branch("nVertices"               , &nVertices                       , "nVertices/I"       );
-    
-    tree->Branch("HT"                  , &HT                          , "HT/F"          );
-    
-    tree->Branch("l1Result", "std::vector<bool>"             ,&l1Result_, 32000, 0  );
-
-    //the L1 results also in separeated branches  
-    tree->Branch("L1_HTT200er"           , &L1_HTT200er                   , "L1_HTT200er/O"  );
-    tree->Branch("L1_HTT255er"           , &L1_HTT255er                   , "L1_HTT255er/O"  );
-    tree->Branch("L1_HTT280er"           , &L1_HTT280er                   , "L1_HTT280er/O"  );
-    tree->Branch("L1_HTT320er"           , &L1_HTT320er                   , "L1_HTT320er/O"  );
-    tree->Branch("L1_HTT360er"           , &L1_HTT360er                   , "L1_HTT360er/O"  );
-    tree->Branch("L1_HTT400er"           , &L1_HTT400er                   , "L1_HTT400er/O"  );
-    tree->Branch("L1_HTT450er"           , &L1_HTT450er                   , "L1_HTT450er/O"  );
-    tree->Branch("L1_ETT2000"           , &L1_ETT2000                   , "L1_ETT2000/O"  );
-    tree->Branch("L1_SingleJet180"           , &L1_SingleJet180                   , "L1_SingleJet180/O"  );
-    tree->Branch("L1_SingleJet200"           , &L1_SingleJet200                   , "L1_SingleJet200/O"  );
-    tree->Branch("L1_DoubleJet30er2p5_Mass_Min250_dEta_Max1p5", &L1_DoubleJet30er2p5_Mass_Min250_dEta_Max1p5, "L1_DoubleJet30er2p5_Mass_Min250_dEta_Max1p5/O"  );
-    tree->Branch("L1_DoubleJet30er2p5_Mass_Min250_dEta_Max1p5", &L1_DoubleJet30er2p5_Mass_Min300_dEta_Max1p5, "L1_DoubleJet30er2p5_Mass_Min300_dEta_Max1p5/O"  );
-    tree->Branch("L1_DoubleJet30er2p5_Mass_Min250_dEta_Max1p5", &L1_DoubleJet30er2p5_Mass_Min330_dEta_Max1p5, "L1_DoubleJet30er2p5_Mass_Min330_dEta_Max1p5/O"  );
-    
-    tree->Branch("genVert_x_1"              , &genVert_x_1                      , "genVert_x_1/F"      );
-    tree->Branch("genVert_y_1"              , &genVert_y_1                      , "genVert_y_1/F"      );
-    tree->Branch("genVert_z_1"              , &genVert_z_1                      , "genVert_z_1/F"      );
-    tree->Branch("genVert_dBV_1"              , &genVert_dBV_1                      , "genVert_dBV_1/F"      );
-    tree->Branch("genVert_3d_1"              , &genVert_3d_1                      , "genVert_3d_1/F"      );
-    tree->Branch("genVert_motherEta_1"       , &genVert_motherEta               , "genVert_motherEta_1/F"      );
-    tree->Branch("genVert_motherPhi_1"       , &genVert_motherPhi               , "genVert_motherPhi_1/F"      );
-    tree->Branch("genVert_motherPt_1"       , &genVert_motherPt               , "genVert_motherPt_1/F"      );
-    tree->Branch("genVert_motherDistTraveled_1"       , &genVert_motherDistTraveled               , "genVert_motherDistTraveled_1/F"      );
-    tree->Branch("genVert_dVV"              , &genVert_dVV_2                      , "genVert_dVV/F"      );
-    tree->Branch("genVert_dPhi"              , &genVert_dPhi_2                      , "genVert_dPhi/F"      );
-    tree->Branch("genScout_nMatches"              , &genScout_nMatches                      , "genScout_nMatches/I"      );
-    tree->Branch("genScoutVert_nMatches"              , &genScoutVert_nMatches                      , "genScoutVert_nMatches/I"      );
-    tree->Branch("genVert_nVertices", &genVert_nVertices, "genVert_nVertices/I");
-    tree->Branch("scoutVert_nVertices", &scoutVert_nVertices, "scoutVert_nVertices/I");
-    tree->Branch("weight", &weight, "weight/D");
-
-    match_ptRatio = new std::vector<float>;
-    match_deltaR = new std::vector<float>;
-    match_diffPt = new std::vector<float>;
-    match_diffEta = new std::vector<float>;
-    match_diffPhi = new std::vector<float>;
-    match_diffPhiCorrected = new std::vector<float>;
-    match_gen_dxy = new std::vector<float>;
-    match_gen_dxyCorrected = new std::vector<float>;
-    match_diffDxy = new std::vector<float>;
-    match_diffDxyCorrected = new std::vector<float>;
-    gen_dxy = new std::vector<float>;
-    gen_dxyCorrected = new std::vector<float>;
-    match_vert_x = new std::vector<float>;
-    match_vert_y = new std::vector<float>;
-    match_genVert_x = new std::vector<float>;
-    match_genVert_y = new std::vector<float>;
-    match_genVert_dBV = new std::vector<float>;
-    genVert_dBV = new std::vector<float>;
-    genVert_phi = new std::vector<float>;
-    genVert_z = new std::vector<float>;
-    genVert_x = new std::vector<float>;
-    genVert_y = new std::vector<float>;
-    genVert_nParticles = new std::vector<float>;
-    genVert_dPhi = new std::vector<float>;
-    genVert_dVV = new std::vector<float>;
-    resVert_x = new std::vector<float>;
-    resVert_y = new std::vector<float>;
-    resVert_z = new std::vector<float>;
-    scoutVert_dBV = new std::vector<float>;
-    scoutVert_phi = new std::vector<float>;
-    scoutVert_z = new std::vector<float>;
-    scoutVert_x = new std::vector<float>;
-    scoutVert_y = new std::vector<float>;
-    scoutVert_nTracks = new std::vector<float>;
-    scoutVert_dPhi = new std::vector<float>;
-    scoutVert_dVV = new std::vector<float>;
-    
-    objectTree = fs->make<TTree>("objectTree","objectTree");
-    objectTree->Branch("match_ptRatio",&match_ptRatio);
-    objectTree->Branch("match_deltaR",&match_deltaR);
-    objectTree->Branch("match_diffPt",&match_diffPt);
-    objectTree->Branch("match_diffEta",&match_diffEta);
-    objectTree->Branch("match_diffPhi",&match_diffPhi);
-    objectTree->Branch("match_diffPhiCorrected",&match_diffPhiCorrected);
-    objectTree->Branch("match_gen_dxy",&match_gen_dxy);
-    objectTree->Branch("match_gen_dxyCorrected",&match_gen_dxyCorrected);
-    objectTree->Branch("match_diffDxy",&match_diffDxy);
-    objectTree->Branch("match_diffDxyCorrected",&match_diffDxyCorrected);
-    objectTree->Branch("gen_dxy",&gen_dxy);
-    objectTree->Branch("gen_dxyCorrected",&gen_dxyCorrected);
-    objectTree->Branch("match_vert_x",&match_vert_x);
-    objectTree->Branch("match_vert_y",&match_vert_y);
-    objectTree->Branch("match_genVert_x",&match_genVert_x);
-    objectTree->Branch("match_genVert_y",&match_genVert_y);
-    objectTree->Branch("match_genVert_dBV",&match_genVert_dBV);
-    objectTree->Branch("genVert_dBV",&genVert_dBV);
-    objectTree->Branch("genVert_phi",&genVert_phi);
-    objectTree->Branch("genVert_z",&genVert_z);
-    objectTree->Branch("genVert_x",&genVert_x);
-    objectTree->Branch("genVert_y",&genVert_y);
-    objectTree->Branch("genVert_nParticles",&genVert_nParticles);
-    objectTree->Branch("genVert_dPhi",&genVert_dPhi);
-    objectTree->Branch("genVert_dVV",&genVert_dVV);
-    objectTree->Branch("resVert_x",&resVert_x);
-    objectTree->Branch("resVert_y",&resVert_y);
-    objectTree->Branch("resVert_z",&resVert_z);
-    objectTree->Branch("scoutVert_dBV",&scoutVert_dBV);
-    objectTree->Branch("scoutVert_phi",&scoutVert_phi);
-    objectTree->Branch("scoutVert_z",&scoutVert_z);
-    objectTree->Branch("scoutVert_x",&scoutVert_x);
-    objectTree->Branch("scoutVert_y",&scoutVert_y);
-    objectTree->Branch("scoutVert_nTracks",&scoutVert_nTracks);
-    objectTree->Branch("scoutVert_dPhi",&scoutVert_dPhi);
-    objectTree->Branch("scoutVert_dVV",&scoutVert_dVV);
-
-    h_genWeights->GetXaxis()->SetBinLabel(1,"None");
-    h_genWeights->GetXaxis()->SetBinLabel(2,"nJets");
-    h_genWeights->GetXaxis()->SetBinLabel(3,"nVertices");
-    h_weightsSquared->GetXaxis()->SetBinLabel(1,"None");
-    h_weightsSquared->GetXaxis()->SetBinLabel(2,"nJets");
-    h_weightsSquared->GetXaxis()->SetBinLabel(3,"nVertices");
+    // Overall histograms
+    h_vertex_xy_global        = fs->make<TH2F>("vertex_xy_global", "Vertex XY Position (Global); X [cm]; Y [cm]", 2000, -10, 10, 2000, -10, 10);
+    h_vertex_xy_beamspot      = fs->make<TH2F>("vertex_xy_beamspot", "Vertex XY Position (Beamspot); X [cm]; Y [cm]", 2000, -10, 10, 2000, -10, 10);
+    h_ntracks_global          = fs->make<TH1F>("ntracks_global", "Number of Tracks; Number of Tracks; Vertices", 200, 0, 100);
+    h_track_momenta_global    = fs->make<TH1F>("track_momenta_global", "Track Momenta; Momentum [GeV/c]; Tracks", 400, 0, 100);
+    h_radial_distance_global  = fs->make<TH1F>("radial_distance_global", "Radial Distance (Global); Distance [cm]; Vertices", 700, 0, 7);
+    h_radial_distance_beamspot= fs->make<TH1F>("radial_distance_beamspot", "Radial Distance (Beamspot); Distance [cm]; Vertices", 700, 0, 7);
+    h_eta_distribution_global = fs->make<TH1F>("eta_distribution_global", "Eta Distribution; Eta; Tracks", 400, -3, 3);
+    h_phi_distribution_global   = fs->make<TH1F>("phi_distribution_global", "Phi Distribution; Phi; Tracks", 400, -3.142, 3.142);
+    h_beamspot_global         = fs->make<TH2F>("beamspot_global", "Beamspot Position (Global); X [cm]; Y [cm]", 400, -1, 1, 400, -1, 1);
+    h_vertex_pt               = fs->make<TH1F>("vertex_pt", "Vertex pT; pT [GeV/c]; Vertices", 200, 0., 100.);
+    h_vertex_eta              = fs->make<TH1F>("vertex_eta", "Vertex eta; eta; Vertices", 200, -5., 5.);
+    h_vertex_phi              = fs->make<TH1F>("vertex_phi", "Vertex phi; phi; Vertices", 200, -3.14, 3.14);
+    h_vertex_mass             = fs->make<TH1F>("vertex_mass", "Vertex mass; mass [GeV/c^2]; Vertices", 200, 0., 10.);
+    h_vertex_dBV              = fs->make<TH1F>("vertex_dBV", "Vertex d_{BV} [cm]; Vertices / 0.05 cm", 200, 0, 10);
+    h_vertex_dBV_error        = fs->make<TH1F>("vertex_dBV_error", "Vertex d_{BV} Uncertainty; d_{BV} Uncertainty [cm]; Entries", 1000, 0, 0.1);
+    h_nvertices_ntk           = fs->make<TH1F>("nvertices_ntk", "Number of Candidate Vertices (ntk within cut); Number of Vertices; Events", 1000, 0, 1000);
+    h_track_dxy               = fs->make<TH1F>("track_dxy", "Track dxy; dxy [cm]; Tracks", 1000, -5, 5);
+    h_track_dxyError          = fs->make<TH1F>("track_dxyError", "Track dxy Error; dxy Error [cm]; Tracks", 1000, 0, 0.1);
+    // Barrel histograms
+    h_vertex_eta_barrel       = fs->make<TH1F>("vertex_eta_barrel", "Vertex Eta (Barrel); eta; Vertices", 200, -3.0, 3.0);
+    h_vertex_dBV_barrel       = fs->make<TH1F>("vertex_dBV_barrel", "Vertex d_{BV} (Barrel); d_{BV} [cm]; Vertices", 200, 0, 10);
+    h_vertex_mass_barrel      = fs->make<TH1F>("vertex_mass_barrel", "Vertex Mass (Barrel); mass [GeV/c^{2}]; Vertices", 200, 0, 10);
+    h_vertex_xy_barrel_global = fs->make<TH2F>("vertex_xy_barrel_global", "Vertex XY (Barrel, Global); X [cm]; Y [cm]", 2000, -10, 10, 2000, -10, 10);
+    h_vertex_xy_barrel_beamspot = fs->make<TH2F>("vertex_xy_barrel_beamspot", "Vertex XY (Barrel, Beamspot-Centered); X [cm]; Y [cm]", 2000, -10, 10, 2000, -10, 10);
+    h_track_dxy_barrel        = fs->make<TH1F>("track_dxy_barrel", "Track d_{xy} (Barrel); d_{xy} [cm]; Tracks", 1000, -5, 5);
+    h_track_dxyError_barrel   = fs->make<TH1F>("track_dxyError_barrel", "Track d_{xy} Error (Barrel); d_{xy} Error [cm]; Tracks", 1000, 0, 0.1);
+    // Endcap histograms
+    h_vertex_eta_endcap       = fs->make<TH1F>("vertex_eta_endcap", "Vertex Eta (Endcap); eta; Vertices", 200, -3.0, 3.0);
+    h_vertex_dBV_endcap       = fs->make<TH1F>("vertex_dBV_endcap", "Vertex d_{BV} (Endcap); d_{BV} [cm]; Vertices", 200, 0, 10);
+    h_vertex_mass_endcap      = fs->make<TH1F>("vertex_mass_endcap", "Vertex Mass (Endcap); mass [GeV/c^{2}]; Vertices", 200, 0, 10);
+    h_vertex_xy_endcap_global = fs->make<TH2F>("vertex_xy_endcap_global", "Vertex XY (Endcap, Global); X [cm]; Y [cm]", 2000, -10, 10, 2000, -10, 10);
+    h_vertex_xy_endcap_beamspot = fs->make<TH2F>("vertex_xy_endcap_beamspot", "Vertex XY (Endcap, Beamspot-Centered); X [cm]; Y [cm]", 2000, -10, 10, 2000, -10, 10);
+    h_track_dxy_endcap        = fs->make<TH1F>("track_dxy_endcap", "Track d_{xy} (Endcap); d_{xy} [cm]; Tracks", 1000, -5, 5);
+    h_track_dxyError_endcap   = fs->make<TH1F>("track_dxyError_endcap", "Track d_{xy} Error (Endcap); d_{xy} Error [cm]; Tracks", 1000, 0, 0.1);
 }
 
-// ------------ method called once each job just after ending the event loop  ------------
+void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+    using namespace edm; using namespace std; using namespace reco;
+    Handle<BeamSpot> beamspot;
+    iEvent.getByToken(beamspot_token, beamspot);
+    if(!beamspot.isValid()){
+        LogError("ScoutingTreeMakerRun3") << "Beamspot handle invalid!";
+        return;
+    }
+    const Vertex fake_bs_vtx(beamspot->position(), beamspot->covariance3D());
+    
+    Handle<vector<Vertex>> verticesH;
+    iEvent.getByToken(verticesToken, verticesH);
+    if(!verticesH.isValid()){
+        LogError("ScoutingTreeMakerRun3") << "Vertex handle invalid!";
+        return;
+    }
+    
+    vector<Vertex> selVertices;
+    VertexDistanceXY vertex_dist_2d;
+    
+    for (unsigned int t = 0; t < verticesH->size(); t++) {
+        Vertex v = verticesH->at(t);
+        vector<TrackRef> tks = vertex_track_vec(v);
+        int ntk = tks.size();
+        
+        TLorentzVector sumVec(0,0,0,0);
+        double sum_dxy = 0.0, sum_dxyErr = 0.0;
+        for(auto track : tks) {
+            if(!track.isNonnull()) continue; // Safety: skip null track references
+            TLorentzVector trackVec;
+            trackVec.SetPtEtaPhiM(track->pt(), track->eta(), track->phi(), 0.13957);
+            sumVec += trackVec;
+            sum_dxy += track->dxy(beamspot->position());
+            sum_dxyErr += track->dxyError();
+        }
+        double invMass = sumVec.M();
+        double avg_dxy = (ntk > 0 ? sum_dxy/ntk : 0);
+        double avg_dxyErr = (ntk > 0 ? sum_dxyErr/ntk : 0);
+        double dBV = vertex_dist_2d.distance(v, fake_bs_vtx).value();
+        double dBV_err = vertex_dist_2d.distance(v, fake_bs_vtx).error();
+        
+        // Apply cuts (skip cut if parameter is -1)
+        if(required_ntk_min != -1 && ntk < required_ntk_min) continue;
+        if(required_ntk_max != -1 && ntk > required_ntk_max) continue;
+        if(required_invmass != -1 && invMass < required_invmass) continue;
+        if(required_chi2 != -1 && v.normalizedChi2() > required_chi2) continue;
+        if(required_dBV_min != -1 && dBV < required_dBV_min) continue;
+        if(required_dBV_max != -1 && dBV > required_dBV_max) continue;
+        if(required_dxy_min != -1 && avg_dxy < required_dxy_min) continue;
+        if(required_dxy_max != -1 && avg_dxy > required_dxy_max) continue;
+        if(required_dBV_error != -1 && dBV_err > required_dBV_error) continue;
+        if(required_dxy_error != -1 && avg_dxyErr > required_dxy_error) continue;
+        
+    // Vertex passed selection:
+    
+        selVertices.push_back(v);
+
+        // Fill missing histograms for vertices that pass cuts:
+        h_beamspot_global->Fill(beamspot->x0(), beamspot->y0());
+
+        h_ntracks_global->Fill(ntk);
+        h_vertex_xy_global->Fill(v.x(), v.y());
+        h_vertex_xy_beamspot->Fill(v.x() - beamspot->x0(), v.y() - beamspot->y0());
+        
+        h_vertex_dBV->Fill(dBV);
+        h_vertex_dBV_error->Fill(dBV_err);
+        // Compute radial distances and fill:
+        double rad_global = TMath::Sqrt(v.x()*v.x() + v.y()*v.y());
+        double rad_beam = TMath::Sqrt(pow(v.x()-beamspot->x0(),2) + pow(v.y()-beamspot->y0(),2));
+        h_radial_distance_global->Fill(rad_global);
+        h_radial_distance_beamspot->Fill(rad_beam);
+        
+        if(fabs(sumVec.Eta()) < 1.0) {
+            h_vertex_eta_barrel->Fill(sumVec.Eta());
+            h_vertex_dBV_barrel->Fill(dBV);
+            h_vertex_mass_barrel->Fill(invMass);
+            h_vertex_xy_barrel_global->Fill(v.x(), v.y());
+            h_vertex_xy_barrel_beamspot->Fill(v.x() - beamspot->x0(), v.y() - beamspot->y0());
+        } else {
+            h_vertex_eta_endcap->Fill(sumVec.Eta());
+            h_vertex_dBV_endcap->Fill(dBV);
+            h_vertex_mass_endcap->Fill(invMass);
+            h_vertex_xy_endcap_global->Fill(v.x(), v.y());
+            h_vertex_xy_endcap_beamspot->Fill(v.x() - beamspot->x0(), v.y() - beamspot->y0());
+        }
+        h_vertex_pt->Fill(sumVec.Pt());
+        h_vertex_phi->Fill(sumVec.Phi());
+        
+        for(auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
+            reco::TrackRef track = it->castTo<reco::TrackRef>();
+            if(!track.isNonnull()){
+                LogWarning("ScoutingTreeMakerRun3") << "Null track reference in vertex " << t;
+                continue;
+            }
+            h_track_momenta_global->Fill(track->p());
+            h_eta_distribution_global->Fill(track->eta());
+            h_phi_distribution_global->Fill(track->phi());
+            if(fabs(track->eta()) < 1.0) {
+                h_track_dxy_barrel->Fill(track->dxy(beamspot->position()));
+                h_track_dxyError_barrel->Fill(track->dxyError());
+            } else {
+                h_track_dxy_endcap->Fill(track->dxy(beamspot->position()));
+                h_track_dxyError_endcap->Fill(track->dxyError());
+            }
+            h_track_dxy->Fill(track->dxy(beamspot->position()));
+            h_track_dxyError->Fill(track->dxyError());
+        }
+    }
+    h_nvertices_ntk->Fill(selVertices.size());
+    // ...existing code for inter-vertex quantities if needed...
+}
+
 void ScoutingTreeMakerRun3::endJob() {
-  // please remove this method if not needed
-  removeFlows(h_match_gen_dxy);
-  removeFlows(h_gen_dxy);
-  h_match_gen_dxy->Sumw2();
-  h_gen_dxy->Sumw2();
-  TH1F* h_matchEff_dxy = (TH1F*)h_match_gen_dxy->Clone();
-  h_matchEff_dxy->SetName("matchEff_dxy");
-  h_matchEff_dxy->GetYaxis()->SetTitle("Match Efficiency");
-  h_matchEff_dxy->Divide(h_match_gen_dxy, h_gen_dxy, 1.0, 1.0, "B");
-  h_matchEff_dxy->SetAxisRange(0, 1.1, "Y");
-  h_matchEff_dxy->Draw();
-  h_matchEff_dxy->Write();
+    // Overall histograms
+    h_vertex_xy_global->Draw();        h_vertex_xy_global->Write();
+    h_vertex_xy_beamspot->Draw();      h_vertex_xy_beamspot->Write();
+    h_ntracks_global->Draw();          h_ntracks_global->Write();
+    h_track_momenta_global->Draw();    h_track_momenta_global->Write();
+    h_radial_distance_global->Draw();  h_radial_distance_global->Write();
+    h_radial_distance_beamspot->Draw();h_radial_distance_beamspot->Write();
+    h_eta_distribution_global->Draw(); h_eta_distribution_global->Write();
+    h_phi_distribution_global->Draw(); h_phi_distribution_global->Write();
+    h_beamspot_global->Draw();         h_beamspot_global->Write();
+    h_vertex_pt->Draw();               h_vertex_pt->Write();
+    h_vertex_eta->Draw();              h_vertex_eta->Write();
+    h_vertex_phi->Draw();              h_vertex_phi->Write();
+    h_vertex_mass->Draw();             h_vertex_mass->Write();
+    h_vertex_dBV->Draw();              h_vertex_dBV->Write();
+    h_vertex_dBV_error->Draw();        h_vertex_dBV_error->Write();
+    h_nvertices_ntk->Draw();           h_nvertices_ntk->Write();
+    h_track_dxy->Draw();               h_track_dxy->Write();
+    h_track_dxyError->Draw();          h_track_dxyError->Write();
 
-  removeFlows(h_match_genVert_dBV);
-  removeFlows(h_genVert_dBV);
-  h_match_genVert_dBV->Sumw2();
-  h_genVert_dBV->Sumw2();
-  TH1F* h_vertMatchEff_dBV = (TH1F*)h_match_genVert_dBV->Clone();
-  h_vertMatchEff_dBV->SetName("vertMatchEff_dBV");
-  h_vertMatchEff_dBV->GetYaxis()->SetTitle("Match Efficiency");
-  h_vertMatchEff_dBV->Divide(h_match_genVert_dBV, h_genVert_dBV, 1.0, 1.0, "B");
-  h_vertMatchEff_dBV->SetAxisRange(0, 1.1, "Y");
-  h_vertMatchEff_dBV->Draw();
-  h_vertMatchEff_dBV->Write();
-  
-  h_match_vert_x_y->Draw();
-  h_match_vert_x_y->Write();
+    // Barrel histograms
+    h_vertex_eta_barrel->Draw();       h_vertex_eta_barrel->Write();
+    h_vertex_dBV_barrel->Draw();       h_vertex_dBV_barrel->Write();
+    h_vertex_mass_barrel->Draw();      h_vertex_mass_barrel->Write();
+    h_vertex_xy_barrel_global->Draw(); h_vertex_xy_barrel_global->Write();
+    h_vertex_xy_barrel_beamspot->Draw(); h_vertex_xy_barrel_beamspot->Write();
+    h_track_dxy_barrel->Draw();        h_track_dxy_barrel->Write();
+    h_track_dxyError_barrel->Draw();   h_track_dxyError_barrel->Write();
 
-  h_match_genVert_x_y->Draw();
-  h_match_genVert_x_y->Write();
-
-  h_match_genVert_dBV->Draw();
-  h_match_genVert_dBV->Write();
-
-  h_genWeights->Draw();
-  h_genWeights->Write();
-
-  h_weightsSquared->Draw();
-  h_weightsSquared->Write();
-  
-  removeFlows(h_genVert_phi);
-  h_genVert_phi->Draw();
-  h_genVert_phi->Write();
-
-  removeFlows(h_genVert_z);
-  h_genVert_z->Draw();
-  h_genVert_z->Write();
-
-  removeFlows(h_genVert_nParticles);
-  h_genVert_nParticles->Draw();
-  h_genVert_nParticles->Write();
-
-  removeFlows(h_genVert_dPhi);
-  h_genVert_dPhi->Draw();
-  h_genVert_dPhi->Write();
-
-  removeFlows(h_genVert_dVV);
-  h_genVert_dVV->Draw();
-  h_genVert_dVV->Write();
-
-  removeFlows(h_genVert_nVertices);
-  h_genVert_nVertices->Draw();
-  h_genVert_nVertices->Write();
-  
-  h_genVert_x_y->Draw();
-  h_genVert_x_y->Write();
-  
-  removeFlows(h_resVert_x);
-  h_resVert_x->Draw();
-  h_resVert_x->Write();
-
-  removeFlows(h_resVert_y);
-  h_resVert_y->Draw();
-  h_resVert_y->Write();
-
-  removeFlows(h_resVert_z);
-  h_resVert_z->Draw();
-  h_resVert_z->Write();
-
-  removeFlows(h_scoutVert_dBV);
-  h_scoutVert_dBV->Draw();
-  h_scoutVert_dBV->Write();
-
-  removeFlows(h_scoutVert_phi);
-  h_scoutVert_phi->Draw();
-  h_scoutVert_phi->Write();
-
-  removeFlows(h_scoutVert_z);
-  h_scoutVert_z->Draw();
-  h_scoutVert_z->Write();
-
-  h_scoutVert_x_y->Draw();
-  h_scoutVert_x_y->Write();
-
-  removeFlows(h_scoutVert_nTracks);
-  h_scoutVert_nTracks->Draw();
-  h_scoutVert_nTracks->Write();
-
-  removeFlows(h_scoutVert_dPhi);
-  h_scoutVert_dPhi->Draw();
-  h_scoutVert_dPhi->Write();
-
-  removeFlows(h_scoutVert_dVV);
-  h_scoutVert_dVV->Draw();
-  h_scoutVert_dVV->Write();
-
-  removeFlows(h_scoutVert_nVertices);
-  h_scoutVert_nVertices->Draw();
-  h_scoutVert_nVertices->Write();
-  
-  delete match_ptRatio;
-  delete match_deltaR;
-  delete match_diffPt;
-  delete match_diffEta;
-  delete match_diffPhi;
-  delete match_diffPhiCorrected;
-  delete match_gen_dxy;
-  delete match_gen_dxyCorrected;
-  delete match_diffDxy;
-  delete match_diffDxyCorrected;
-  delete gen_dxy;
-  delete gen_dxyCorrected;
-  delete match_vert_x;
-  delete match_vert_y;
-  delete match_genVert_x;
-  delete match_genVert_y;
-  delete match_genVert_dBV;
-  delete genVert_dBV;
-  delete genVert_phi;
-  delete genVert_z;
-  delete genVert_x;
-  delete genVert_y;
-  delete genVert_nParticles;
-  delete genVert_dPhi;
-  delete genVert_dVV;
-  delete resVert_x;
-  delete resVert_y;
-  delete resVert_z;
-  delete scoutVert_dBV;
-  delete scoutVert_phi;
-  delete scoutVert_z;
-  delete scoutVert_x;
-  delete scoutVert_y;
-  delete scoutVert_nTracks;
-  delete scoutVert_dPhi;
-  delete scoutVert_dVV;
+    // Endcap histograms
+    h_vertex_eta_endcap->Draw();       h_vertex_eta_endcap->Write();
+    h_vertex_dBV_endcap->Draw();       h_vertex_dBV_endcap->Write();
+    h_vertex_mass_endcap->Draw();      h_vertex_mass_endcap->Write();
+    h_vertex_xy_endcap_global->Draw(); h_vertex_xy_endcap_global->Write();
+    h_vertex_xy_endcap_beamspot->Draw(); h_vertex_xy_endcap_beamspot->Write();
+    h_track_dxy_endcap->Draw();        h_track_dxy_endcap->Write();
+    h_track_dxyError_endcap->Draw();   h_track_dxyError_endcap->Write();
 }
 
-// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void ScoutingTreeMakerRun3::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
-  //The following says we do not know what parameters are allowed so do no validation
-  // Please change this to state exactly what you do use, even if it is no parameters
-  edm::ParameterSetDescription desc;
-  desc.setUnknown();
-  descriptions.addDefault(desc);
-
-  //Specify that only 'tracks' is allowed
-  //To use, remove the default given above and uncomment below
-  //ParameterSetDescription desc;
-  //desc.addUntracked<edm::InputTag>("tracks","ctfWithMaterialTracks");
-  //descriptions.addWithDefaultLabel(desc);
+    edm::ParameterSetDescription desc;
+    desc.setUnknown();
+    descriptions.addDefault(desc);
 }
 
-//define this as a plug-in
 DEFINE_FWK_MODULE(ScoutingTreeMakerRun3);

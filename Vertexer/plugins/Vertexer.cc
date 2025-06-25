@@ -272,7 +272,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     reco::TransientTrack ttk = tt_builder.build(tk_ref);
     std::pair<bool, Measurement1D> ttk_dist = track_dist(ttk, fake_bs_vtx);
     float IP_sig = ttk_dist.second.significance();
-    if (IP_sig > 4) seed_track_refs.push_back(tk_ref);
+    if ((IP_sig > 4) && (tk_ref->pt()>0.9)) seed_track_refs.push_back(tk_ref);
     if (verbose) printf("Build track references. IP_sig = %f\n", IP_sig);
   }
   
@@ -301,7 +301,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     return;
   }  
 
-
+  
   std::vector<size_t> itks(n_tracks_per_seed_vertex, 0);
 
   auto try_seed_vertex = [&]() {
@@ -360,7 +360,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // as one vertex. If the vertices are not close, keep the track in
   // the vertex to which it is "closer".
   //////////////////////////////////////////////////////////////////////
-
+  
   //printf("entering the track sharing part\n");
   
   track_set discarded_tracks;
@@ -559,7 +559,6 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   }
 
 //checkpoint
-
   
   //////////////////////////////////////////////////////////////////////////////////////////////
   // Merge vertices that are still "close" in 2D, aka "loose" merging (typically off by default)
@@ -633,7 +632,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //////////////////////////////////////////////////////////////////////
   // Drop tracks that "move" the vertex too much by refitting without each track.
   //////////////////////////////////////////////////////////////////////
-
+  
   if (max_nm1_refit_dist3 > 0 || max_nm1_refit_distz > 0) {
     std::vector<int> refit_count(vertices->size(), 0);
 
@@ -686,7 +685,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //   - svdist2d < 300 um
   // Note that the merged vertex must pass chi2/dof < 5
   ////////////////////////////////////////////////////////////////////////////////////////////////////
-
+  
   if (resolve_split_vertices_tight) {
     reco::VertexCollection potential_merged_vertices;
 
@@ -764,7 +763,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   //Save the vertices
   iEvent.emplace(putToken_, std::move(*vertices));
-  
+
 }
 
 // ------------ method called once each stream before processing any runs, lumis or events  ------------

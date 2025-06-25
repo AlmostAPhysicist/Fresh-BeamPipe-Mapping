@@ -1,0 +1,1389 @@
+======== gWMS-CMSRunAnalysis.sh STARTING at Sun May 25 13:56:17 GMT 2025 on cmsgli-548817-0-cmswn7030.fnal.gov ========
+User id:    uid=44702(cmsgli) gid=5063(us_cms) groups=5063(us_cms)
+Local time: Sun May 25 13:56:17 UTC 2025
+Hostname:   cmsgli-548817-0-cmswn7030.fnal.gov
+System:     Linux cmsgli-548817-0-cmswn7030.fnal.gov 5.14.0-503.38.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Fri Apr 18 08:52:10 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+Arguments are --jobId=5
+======== Startup environment - STARTING ========
+======== Startup environment - FINISHING ========
+======== Auxiliary Functions - STARTING ========
+======== Auxiliary Functions - FINISHING ========
+======== gWMS-CMSRunAnalysis.sh STARTED at Sun May 25 13:56:17 GMT 2025 on cmsgli-548817-0-cmswn7030.fnal.gov ========
+======== HTCONDOR JOB SUMMARY at Sun May 25 13:56:17 GMT 2025 START ========
+CRAB ID: 5
+Execution site: T1_US_FNAL
+Current hostname: cmsgli-548817-0-cmswn7030.fnal.gov
+Output files: DY2M_ScoutingTree_Output_Renewed.root=DY2M_ScoutingTree_Output_Renewed_5.root
+==== HTCONDOR JOB AD CONTENTS START ====
+== JOB AD: AccountingGroup = "analysis.amalhotr"
+== JOB AD: AcctGroup = "analysis"
+== JOB AD: AcctGroupUser = "amalhotr"
+== JOB AD: Arguments = "--jobId=5"
+== JOB AD: CMSGroups = "/cms,/cms/uscms,T3_US_FNALLPC"
+== JOB AD: CMS_ALLOW_OVERFLOW = "True"
+== JOB AD: CMS_JobType = "Analysis"
+== JOB AD: CMS_SubmissionTool = "CRAB"
+== JOB AD: CMS_TaskType = "cmsRun"
+== JOB AD: CMS_Type = "Analysis"
+== JOB AD: CMS_WMTool = "User"
+== JOB AD: CRAB_ASOTimeout = 86400
+== JOB AD: CRAB_AdditionalOutputFiles = {  }
+== JOB AD: CRAB_AlgoArgs = "{'halt_job_on_file_boundaries': False, 'splitOnRun': False, 'lumis_per_job': 2, 'runs': [], 'lumis': [], 'algorithm': 'LumiBased', 'total_lumis': 0, 'applyLumiCorrection': True}"
+== JOB AD: CRAB_AsyncDest = "T3_CH_CERNBOX"
+== JOB AD: CRAB_DAGType = "Job"
+== JOB AD: CRAB_DBSURL = "https://cmsweb.cern.ch/dbs/prod/global/DBSReader"
+== JOB AD: CRAB_DataBlock = "/ScoutingPFRun3/Run2024H-v1/HLTSCOUT#cbb491e1-ccbc-4903-8352-f1663b70de13"
+== JOB AD: CRAB_DbInstance = "prod"
+== JOB AD: CRAB_Destination = "davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621/0000/log/cmsRun_5.log.tar.gz, davs://eosuserhttp.cern.ch:443//eos/user/a/amalhotr/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621/0000/DY2M_ScoutingTree_Output_Renewed_5.root"
+== JOB AD: CRAB_EDMOutputFiles = {  }
+== JOB AD: CRAB_ISB = "https://cmsweb.cern.ch/S3/crabcache_prod"
+== JOB AD: CRAB_Id = "5"
+== JOB AD: CRAB_JobArch = "el9_amd64_gcc12"
+== JOB AD: CRAB_JobCount = 8070
+== JOB AD: CRAB_JobLogURL = "https://cmsweb.cern.ch/scheddmon/0196/amalhotr/250523_212621:amalhotr_crab_RealData_noLFNDirectory_All_LumiBased_2_boost_v1/job_out.5.0.txt"
+== JOB AD: CRAB_JobSW = "CMSSW_14_0_18_patch1"
+== JOB AD: CRAB_NumAutomJobRetries = 2
+== JOB AD: CRAB_OutLFNDir = "/store/user/amalhotr/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621"
+== JOB AD: CRAB_OutTempLFNDir = "/store/temp/user/amalhotr.2382a3cf28fdeacb1de9b039908761ea517a5ed6/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621"
+== JOB AD: CRAB_PostJobLastUpdate = 0
+== JOB AD: CRAB_PostJobLogURL = "https://cmsweb.cern.ch/scheddmon/0196/amalhotr/250523_212621:amalhotr_crab_RealData_noLFNDirectory_All_LumiBased_2_boost_v1/postjob.5.0.txt"
+== JOB AD: CRAB_PostJobStatus = "NOT RUN"
+== JOB AD: CRAB_PrimaryDataset = "ScoutingPFRun3"
+== JOB AD: CRAB_Publish = 0
+== JOB AD: CRAB_PublishDBSURL = "https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter"
+== JOB AD: CRAB_PublishName = "RealData_noLFNDirectory_All_LumiBased_2_boost_v1-00000000000000000000000000000000"
+== JOB AD: CRAB_Reqname = "250523_212621:amalhotr_crab_RealData_noLFNDirectory_All_LumiBased_2_boost_v1"
+== JOB AD: CRAB_RequestedCores = 1
+== JOB AD: CRAB_RequestedMemory = 4000
+== JOB AD: CRAB_RestHost = "cmsweb.cern.ch:8443"
+== JOB AD: CRAB_Retry = 0
+== JOB AD: CRAB_RetryOnASOFailures = 1
+== JOB AD: CRAB_SaveLogsFlag = 1
+== JOB AD: CRAB_SiteBlacklist = {  }
+== JOB AD: CRAB_SiteWhitelist = {  }
+== JOB AD: CRAB_SplitAlgo = "LumiBased"
+== JOB AD: CRAB_StageoutPolicy = "local,remote"
+== JOB AD: CRAB_SubmitterIpAddr = "188.184.73.32"
+== JOB AD: CRAB_TFileOutputFiles = {  }
+== JOB AD: CRAB_TaskEndTime = 1750627616
+== JOB AD: CRAB_TaskLifetimeDays = 30
+== JOB AD: CRAB_TaskWorker = "crab-prod-tw01"
+== JOB AD: CRAB_TransferOutputs = 1
+== JOB AD: CRAB_UserDN = "/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra"
+== JOB AD: CRAB_UserGroup = undefined
+== JOB AD: CRAB_UserHN = "amalhotr"
+== JOB AD: CRAB_UserRole = undefined
+== JOB AD: CRAB_Workflow = "250523_212621:amalhotr_crab_RealData_noLFNDirectory_All_LumiBased_2_boost_v1"
+== JOB AD: CRAB_localOutputFiles = "DY2M_ScoutingTree_Output_Renewed.root=DY2M_ScoutingTree_Output_Renewed_5.root"
+== JOB AD: CRAB_oneEventMode = 0
+== JOB AD: ClusterId = 122424421
+== JOB AD: Cmd = "/data/srv/glidecondor/condor_local/spool/4404/0/cluster122424404.proc0.subproc0/gWMS-CMSRunAnalysis.sh"
+== JOB AD: CommittedSlotTime = 0
+== JOB AD: CommittedSuspensionTime = 0
+== JOB AD: CommittedTime = 0
+== JOB AD: CondorPlatform = "$CondorPlatform: x86_64_AlmaLinux9 $"
+== JOB AD: CondorVersion = "$CondorVersion: 24.0.6 2025-03-05 BuildID: 790851 PackageID: 24.0.6-1 $"
+== JOB AD: CoreSize = 0
+== JOB AD: CpusProvisioned = 1
+== JOB AD: CumulativeRemoteSysCpu = 0.0
+== JOB AD: CumulativeRemoteUserCpu = 0.0
+== JOB AD: CumulativeSlotTime = 0
+== JOB AD: CumulativeSuspensionTime = 0
+== JOB AD: CurrentHosts = 1
+== JOB AD: DAGManJobId = 122424404
+== JOB AD: DAGManNodesLog = "/data/srv/glidecondor/condor_local/spool/4404/0/cluster122424404.proc0.subproc0/RunJobs.dag.nodes.log"
+== JOB AD: DAGManNodesMask = "0,1,2,4,5,7,8,9,10,11,12,13,16,17,24,27,35,36"
+== JOB AD: DAGNodeName = "Job5"
+== JOB AD: DAGParentNodeNames = ""
+== JOB AD: DESIRED_CMSDataLocations = "T1_US_FNAL,T2_IT_Legnaro,T3_US_FNALLPC"
+== JOB AD: DESIRED_CMSDataset = "/ScoutingPFRun3/Run2024H-v1/HLTSCOUT"
+== JOB AD: DESIRED_Overflow_Region = strcat(ifthenelse(OVERFLOW_US =?= "True","US","none"),",",ifthenelse(OVERFLOW_IT =?= "True","IT","none"),",",ifthenelse(OVERFLOW_UK =?= "True","UK","none"))
+== JOB AD: DESIRED_SITES = "T1_US_FNAL,T2_IT_Legnaro,T3_US_FNALLPC"
+== JOB AD: DelegatedProxyExpiration = 1748267766
+== JOB AD: DiskProvisioned = 7375641
+== JOB AD: DiskUsage = 7500
+== JOB AD: DiskUsage_RAW = 7066
+== JOB AD: EnteredCurrentStatus = 1748181365
+== JOB AD: Environment = "CRAB_RUNTIME_TARBALL=local CRAB_TASKMANAGER_TARBALL=local SCRAM_ARCH="
+== JOB AD: Err = "_condor_stderr"
+== JOB AD: EstimatedWallTimeMins = 2000
+== JOB AD: ExecutableSize = 10
+== JOB AD: ExecutableSize_RAW = 10
+== JOB AD: ExitBySignal = false
+== JOB AD: ExitStatus = 0
+== JOB AD: GlobalJobId = "crab3@vocms0196.cern.ch#122424421.0#1748036003"
+== JOB AD: GpusProvisioned = 0
+== JOB AD: ImageSize = 10
+== JOB AD: ImageSize_RAW = 10
+== JOB AD: In = "/dev/null"
+== JOB AD: Iwd = "/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/execute/dir_212551"
+== JOB AD: JOBGLIDEIN_CMSSite = "T1_US_FNAL"
+== JOB AD: JOB_CMSSite = "T1_US_FNAL"
+== JOB AD: JOB_GLIDECLIENT_Name = "CMSG-v1_0.main"
+== JOB AD: JOB_GLIDEIN_CMSSite = "T1_US_FNAL"
+== JOB AD: JOB_GLIDEIN_ClusterId = "1518633"
+== JOB AD: JOB_GLIDEIN_Entry_Name = "CMSHTPC_T1_US_FNAL_condce4_whole"
+== JOB AD: JOB_GLIDEIN_Factory = "cmssi-factory01"
+== JOB AD: JOB_GLIDEIN_Job_Max_Time = "14400"
+== JOB AD: JOB_GLIDEIN_MaxMemMBs = "Unknown"
+== JOB AD: JOB_GLIDEIN_Max_Walltime = "430200"
+== JOB AD: JOB_GLIDEIN_Memory = "4096"
+== JOB AD: JOB_GLIDEIN_Name = "gfactory_instance"
+== JOB AD: JOB_GLIDEIN_ProcId = "0"
+== JOB AD: JOB_GLIDEIN_SEs = "Unknown"
+== JOB AD: JOB_GLIDEIN_Schedd = "schedd_glideins2@cmssi-factory01.fnal.gov"
+== JOB AD: JOB_GLIDEIN_Site = "FNAL"
+== JOB AD: JOB_GLIDEIN_SiteWMS = "HTCondor"
+== JOB AD: JOB_GLIDEIN_SiteWMS_JobId = "548817.0"
+== JOB AD: JOB_GLIDEIN_SiteWMS_Queue = "cmsosgce4.fnal.gov"
+== JOB AD: JOB_GLIDEIN_SiteWMS_Slot = "slot1_1@cmsgli-548817-0-cmswn7030.fnal.gov"
+== JOB AD: JOB_GLIDEIN_ToDie = "1748329986"
+== JOB AD: JOB_GLIDEIN_ToRetire = "1748315586"
+== JOB AD: JOB_Gatekeeper = ifthenelse(substr(Used_Gatekeeper,0,1) =!= "$",Used_Gatekeeper,ifthenelse(MATCH_GLIDEIN_Gatekeeper =!= undefined,MATCH_GLIDEIN_Gatekeeper,"Unknown"))
+== JOB AD: JOB_Site = "FNAL"
+== JOB AD: JobAdInformationAttrs = "MATCH_EXP_JOBGLIDEIN_CMSSite, JOBGLIDEIN_CMSSite, RemoteSysCpu, RemoteUserCpu"
+== JOB AD: JobBatchId = "122424404.0"
+== JOB AD: JobBatchName = "RunJobs.dag+122424404"
+== JOB AD: JobCurrentReconnectAttempt = undefined
+== JOB AD: JobCurrentStartDate = 1748181365
+== JOB AD: JobLeaseDuration = 2400
+== JOB AD: JobNotification = 0
+== JOB AD: JobPrio = 10
+== JOB AD: JobRunCount = 1
+== JOB AD: JobStartDate = 1748181365
+== JOB AD: JobStatus = 2
+== JOB AD: JobSubmitFile = "Job.5.submit"
+== JOB AD: JobSubmitMethod = 1
+== JOB AD: JobUniverse = 5
+== JOB AD: LastJobLeaseRenewal = 1748181366
+== JOB AD: LastJobStatus = 1
+== JOB AD: LastMatchTime = 1748181365
+== JOB AD: LastSuspensionTime = 0
+== JOB AD: LeaveJobInQueue = ifThenElse((JobStatus =?= 4 || JobStatus =?= 3) && (time() - EnteredCurrentStatus < 30 * 60 * 60),true,false)
+== JOB AD: MachineAttrArch0 = "X86_64"
+== JOB AD: MachineAttrCMSProcessingSiteName0 = "T1_US_FNAL"
+== JOB AD: MachineAttrCMSSF_ResourceType0 = "x86_64:pledged"
+== JOB AD: MachineAttrCMSSubSiteName0 = undefined
+== JOB AD: MachineAttrCUDACapability0 = undefined
+== JOB AD: MachineAttrCUDAClockMhz0 = undefined
+== JOB AD: MachineAttrCUDAComputeUnits0 = undefined
+== JOB AD: MachineAttrCUDACoresPerCU0 = undefined
+== JOB AD: MachineAttrCUDADeviceName0 = undefined
+== JOB AD: MachineAttrCUDADriverVersion0 = undefined
+== JOB AD: MachineAttrCUDAECCEnabled0 = undefined
+== JOB AD: MachineAttrCUDAGlobalMemoryMb0 = undefined
+== JOB AD: MachineAttrCpuModelName0 = "AMD_EPYC_9534_64-Core_Processor"
+== JOB AD: MachineAttrCpuModelNumber0 = 17
+== JOB AD: MachineAttrCpus0 = 1
+== JOB AD: MachineAttrDIRACBenchmark0 = 16.75465620176087
+== JOB AD: MachineAttrGLIDEIN_OVERLOAD_ENABLED0 = false
+== JOB AD: MachineAttrHAS_SINGULARITY0 = true
+== JOB AD: MachineAttrMJF_JOB_HS06_JOB0 = "Unknown"
+== JOB AD: MachineAttrMicroarch0 = "x86_64-v4"
+== JOB AD: MachineAttrSlotWeight0 = 1
+== JOB AD: MachineAttrTotalSlotCpus0 = 1
+== JOB AD: MaxHosts = 1
+== JOB AD: MaxWallTimeMins = 2000
+== JOB AD: MaxWallTimeMinsRun = 2000
+== JOB AD: MaxWallTimeMins_RAW = 2000
+== JOB AD: MemoryProvisioned = 4096
+== JOB AD: MinHosts = 1
+== JOB AD: MyAddress = "<137.138.149.207:4080?addrs=[2001-1458-d00-12--179]-4080+137.138.149.207-4080&alias=vocms0196.cern.ch&noUDP&sock=shadow_1532576_2f6b_634610>"
+== JOB AD: MyType = "Job"
+== JOB AD: NumCkpts = 0
+== JOB AD: NumCkpts_RAW = 0
+== JOB AD: NumJobCompletions = 0
+== JOB AD: NumJobMatches = 1
+== JOB AD: NumJobStarts = 0
+== JOB AD: NumRestarts = 0
+== JOB AD: NumShadowStarts = 1
+== JOB AD: NumSystemHolds = 0
+== JOB AD: OVERFLOW_CHECK = ifthenelse(MATCH_GLIDEIN_CMSSite =!= undefined,ifthenelse(stringListMember(MATCH_GLIDEIN_CMSSite,DESIRED_Sites),false,true),false)
+== JOB AD: OVERFLOW_IT = ifthenelse(regexp("T[1,2]_IT_",DESIRED_Sites),"True",undefined)
+== JOB AD: OVERFLOW_UK = ifthenelse(regexp("T2_UK_London_",DESIRED_Sites),"True",undefined)
+== JOB AD: OVERFLOW_US = ifthenelse(regexp("T[1,2]_US_",DESIRED_Sites),"True",undefined)
+== JOB AD: OrigCmd = "/data/srv/glidecondor/condor_local/spool/4404/0/cluster122424404.proc0.subproc0/gWMS-CMSRunAnalysis.sh"
+== JOB AD: OrigIwd = "/data/srv/glidecondor/condor_local/spool/4404/0/cluster122424404.proc0.subproc0"
+== JOB AD: OrigMaxHosts = 1
+== JOB AD: OriginalErr = "job_err.5"
+== JOB AD: OriginalOut = "job_out.5"
+== JOB AD: Out = "_condor_stdout"
+== JOB AD: Owner = "crabtw"
+== JOB AD: PeriodicRelease = (HoldReasonCode == 28) || (HoldReasonCode == 30) || (HoldReasonCode == 13) || (HoldReasonCode == 6)
+== JOB AD: PeriodicRemove = ((JobStatus =?= 5) && (time() - EnteredCurrentStatus > 7 * 60)) || ((JobStatus =?= 1) && (time() - EnteredCurrentStatus > 7 * 24 * 60 * 60)) || ((JobStatus =?= 2) && ((MemoryUsage =!= undefined && MemoryUsage > RequestMemory) || (MaxWallTimeMinsRun * 60 < (time() - EnteredCurrentStatus)) || (DiskUsage > 20000000))) || (time() > CRAB_TaskEndTime) || ((JobStatus =?= 1) && (time() > (x509UserProxyExpiration + 86400)))
+== JOB AD: PeriodicRemoveReason = ifThenElse(((time() - EnteredCurrentStatus) > (7 * 24 * 60 * 60)) && isUndefined(MemoryUsage),"Removed due to idle time limit",ifThenElse(time() > x509UserProxyExpiration,"Removed job due to proxy expiration",ifThenElse(MemoryUsage > RequestMemory,"Removed due to memory use",ifThenElse(MaxWallTimeMinsRun * 60 < (time() - EnteredCurrentStatus),"Removed due to wall clock limit",ifThenElse(DiskUsage > 20000000,"Removed due to disk usage",ifThenElse(time() > CRAB_TaskEndTime,"Removed due to reached CRAB_TaskEndTime","Removed due to job being held"))))))
+== JOB AD: PostJobPrio1 = 1748035932
+== JOB AD: PostJobPrio2 = 0
+== JOB AD: PreJobPrio1 = 0
+== JOB AD: ProcId = 0
+== JOB AD: ProvisionedResources = "Cpus Memory Disk Swap GPUs"
+== JOB AD: PublicClaimId = "<131.225.191.167:41433?CCBID=128.142.196.160:9618%3faddrs%3d[2001-1458-301-4f--100-74]-9618+128.142.196.160-9618%26alias%3dvocms0815.cern.ch%26noUDP%26sock%3dcollector9704#4654800%20131.225.189.165:9618%3faddrs%3d[2620-6a-0-8421-f0-0-189-165]-9618+131.225.189.165-9618%26alias%3dcmssrv2314.fnal.gov%26noUDP%26sock%3dcollector9652#1159967&PrivNet=cmsgli-548817-0-cmswn7030.fnal.gov&addrs=[2620-6a-0-8421-f0-0-191-167]-41433+131.225.191.167-41433&alias=cmsgli-548817-0-cmswn7030.fnal.gov&noUDP>#1747902798#1967#..."
+== JOB AD: QDate = 1748036003
+== JOB AD: REQUIRED_ARCH = "X86_64"
+== JOB AD: REQUIRED_MINIMUM_MICROARCH = 0
+== JOB AD: REQUIRED_OS = "rhel9"
+== JOB AD: Rank = 0.0
+== JOB AD: RemoteHost = "slot1_45@glidein_8_912110290@cmsgli-548817-0-cmswn7030.fnal.gov"
+== JOB AD: RemoteSlotID = 1
+== JOB AD: RemoteSysCpu = 0.0
+== JOB AD: RemoteUserCpu = 0.0
+== JOB AD: RemoteWallClockTime = 0.0
+== JOB AD: RequestCpus = 1
+== JOB AD: RequestDisk = 100000
+== JOB AD: RequestDisk_RAW = 1
+== JOB AD: RequestMemory = 4000
+== JOB AD: RequestMemory_RAW = 4000
+== JOB AD: Requirements = (stringListMember(TARGET.Arch,REQUIRED_ARCH)) && (TARGET.OpSys == "LINUX") && (TARGET.Disk >= RequestDisk) && (TARGET.Memory >= RequestMemory) && (TARGET.HasFileTransfer)
+== JOB AD: ShadowBday = 1748181365
+== JOB AD: ShadowIpAddr = "<137.138.149.207:4080?addrs=[2001-1458-d00-12--179]-4080+137.138.149.207-4080&alias=vocms0196.cern.ch&noUDP&sock=shadow_1532576_2f6b_634610>"
+== JOB AD: ShadowVersion = "$CondorVersion: 24.0.6 2025-03-05 BuildID: 790851 PackageID: 24.0.6-1 $"
+== JOB AD: ShouldTransferFiles = "YES"
+== JOB AD: StartdIpAddr = "<131.225.191.167:41433?CCBID=128.142.196.160:9618%3faddrs%3d[2001-1458-301-4f--100-74]-9618+128.142.196.160-9618%26alias%3dvocms0815.cern.ch%26noUDP%26sock%3dcollector9704#4654800%20131.225.189.165:9618%3faddrs%3d[2620-6a-0-8421-f0-0-189-165]-9618+131.225.189.165-9618%26alias%3dcmssrv2314.fnal.gov%26noUDP%26sock%3dcollector9652#1159967&PrivNet=cmsgli-548817-0-cmswn7030.fnal.gov&addrs=[2620-6a-0-8421-f0-0-191-167]-41433+131.225.191.167-41433&alias=cmsgli-548817-0-cmswn7030.fnal.gov&noUDP>"
+== JOB AD: StartdPrincipal = "execute-side@matchsession/2620:6a:0:8421:f0:0:191:167"
+== JOB AD: StreamErr = false
+== JOB AD: StreamOut = false
+== JOB AD: SubmitEventNotes = "DAG Node: Job5"
+== JOB AD: TargetType = "Machine"
+== JOB AD: TotalSubmitProcs = 1
+== JOB AD: TotalSuspensions = 0
+== JOB AD: TransferIn = false
+== JOB AD: TransferInput = "CMSRunAnalysis.sh,cmscp.py,CMSRunAnalysis.tar.gz,sandbox.tar.gz,input_args.json,run_and_lumis.tar.gz,input_files.tar.gz,submit_env.sh,cmscp.sh"
+== JOB AD: TransferInputSizeMB = 6
+== JOB AD: TransferOutput = "jobReport.json.5"
+== JOB AD: TransferSocket = "<137.138.149.207:4080?addrs=[2001-1458-d00-12--179]-4080+137.138.149.207-4080&alias=vocms0196.cern.ch&noUDP&sock=shadow_1532576_2f6b_634610>"
+== JOB AD: UidDomain = "cms"
+== JOB AD: Used_Gatekeeper = "cmsosgce4.fnal.gov cmsosgce4.fnal.gov:9619"
+== JOB AD: User = "crabtw@cms"
+== JOB AD: UserLog = "/data/srv/glidecondor/condor_local/spool/4404/0/cluster122424404.proc0.subproc0/job_log"
+== JOB AD: WhenToTransferOutput = "ON_EXIT_OR_EVICT"
+== JOB AD: accounting_group = analysis
+== JOB AD: use_x509userproxy = true
+== JOB AD: x509UserProxyEmail = "aryan.malhotra@cern.ch"
+== JOB AD: x509UserProxyExpiration = 1748639759
+== JOB AD: x509userproxy = "/data/srv/glidecondor/condor_local/spool/4404/0/cluster122424404.proc0.subproc0/bcad16b12b0625f29d14d85dca26b9b13dce2f85"
+== JOB AD: x509userproxysubject = "/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra"
+==== HTCONDOR JOB AD CONTENTS FINISH ====
+======== HTCONDOR JOB SUMMARY at Sun May 25 13:56:17 GMT 2025 FINISH ========
+======== PROXY INFORMATION START at Sun May 25 13:56:17 GMT 2025 ========
+subject   : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra/CN=117075680/CN=1626158934/CN=1657242792/CN=272811541/CN=1986770955/CN=1605410314
+issuer    : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra/CN=117075680/CN=1626158934/CN=1657242792/CN=272811541/CN=1986770955
+identity  : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra/CN=117075680/CN=1626158934/CN=1657242792/CN=272811541/CN=1986770955
+type      : RFC compliant proxy
+strength  : 2048 bits
+path      : /srv/bcad16b12b0625f29d14d85dca26b9b13dce2f85
+timeleft  : 23:59:51
+key usage : Digital Signature, Key Encipherment
+=== VO cms extension information ===
+VO        : cms
+subject   : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+issuer    : /DC=ch/DC=cern/OU=computers/CN=cms-auth.cern.ch
+attribute : /cms/Role=NULL/Capability=NULL
+attribute : /cms/uscms/Role=NULL/Capability=NULL
+timeleft  : 127:19:42
+uri       : voms-cms-auth.cern.ch:15000
+======== PROXY INFORMATION FINISH at Sun May 25 13:56:17 GMT 2025 ========
+======== CMSRunAnalysis.sh at Sun May 25 13:56:17 GMT 2025 STARTING ========
+======== CMSRunAnalysis.sh STARTING at Sun May 25 13:56:17 GMT 2025 ========
+Local time : Sun May 25 13:56:17 UTC 2025
+Current system : Linux cmsgli-548817-0-cmswn7030.fnal.gov 5.14.0-503.38.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Fri Apr 18 08:52:10 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+Current processor: model name	: AMD EPYC 9534 64-Core Processor
+======== CMS environment load starting at Sun May 25 13:56:17 GMT 2025 ========
+WN missing VO_CMS_SW_DIR/OSG_APP/CVMFS environment variable, forcing it to CVMFS=/cvmfs/cms.cern.ch
+CRAB job bootstrap: thinks it found the correct CMSSW setup script
+======== CMS environment load finished at Sun May 25 13:56:17 GMT 2025 ========
+
+======== python bootstrap for stageout at Sun May 25 13:56:17 GMT 2025 STARTING ========
+Job requires OS: rhel9, thus setting ScramArch to: rhel9_x86_64
+WMAgent bootstrap: COMP Python path is: /cvmfs/cms.cern.ch/COMP/rhel9_x86_64/external
+WMAgent bootstrap: latest python3 release is: 3.9.6
+Sourcing python future library from: /cvmfs/cms.cern.ch/COMP/rhel9_x86_64/external/py3-future/0.18.2/etc/profile.d/init.sh
+WMAgent bootstrap: found python3 at..
+/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/python3/3.9.6-2c93591d796451daeaf67dc8130bfa35/bin/python3
+======== python bootstrap for stageout at Sun May 25 13:56:17 GMT 2025 FINISHED ========
+==== Make sure $HOME is defined ====
+======== Current environment dump STARTING ========
+== ENV: IDTOKENS_FILE=/var/lib/gwms-factory/client-proxies/user_cmsglobal_1/glidein_gfactory_instance/credential_CMSG-v1_0.main_CMSHTPC_T1_US_FNAL_condce4_whole.idtoken
+== ENV: NVIDIA_VISIBLE_DEVICES=none
+== ENV: GWMS_SINGULARITY_IMAGE_HUMAN=/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel9-x86_64
+== ENV: GLIDEIN_CPUS=256
+== ENV: GLIDEIN_Monitoring_Enabled=False
+== ENV: _CONDOR_CHIRP_CONFIG=/srv/.chirp.config
+== ENV: _CONDOR_JOB_IWD=/srv
+== ENV: GWMS_SINGULARITY_REEXEC=1
+== ENV: CVSROOT=:gserver:cmssw.cvs.cern.ch:/local/reps/CMSSW
+== ENV: _CONDOR_WRAPPER_ERROR_FILE=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/execute/dir_212551/.job_wrapper_failure
+== ENV: GLIDEIN_Schedd=schedd_glideins2@cmssi-factory01.fnal.gov
+== ENV: GLIDEIN_BLACKHOLE=False
+== ENV: CMSSF_ResourceType=x86_64:pledged
+== ENV: GWMS_SINGULARITY_IMAGE_RESTRICTIONS=cvmfs
+== ENV: _CONDOR_MACHINE_AD=/srv/.machine.ad
+== ENV: CONDORCE_COLLECTOR_HOST=cmsosgce4.fnal.gov:9619
+== ENV: CVMFS=/cvmfs/cms.cern.ch
+== ENV: SOURCED_ADD_CONFIG_LINE=1
+== ENV: ROOT_MAX_THREADS=1
+== ENV: HOSTNAME=cmsgli-548817-0-cmswn7030.fnal.gov
+== ENV: HOLD_GRACE_TIME=0
+== ENV: SINGULARITY_NAME=3bb191e958f5e0ea536c35b35fa91bf408a09a66659e5f9e3cfc533694ddc8
+== ENV: OSG_DATA=UNAVAILABLE
+== ENV: GLIDEIN_NODES=1
+== ENV: NUMEXPR_NUM_THREADS=1
+== ENV: GLIDEIN_Max_Tail=600
+== ENV: GLIDEIN_GridType=condor
+== ENV: GLIDEIN_Name=gfactory_instance
+== ENV: CUBACORES=1
+== ENV: GWMS_SINGULARITY_BIND_CVMFS=1
+== ENV: _CHIRP_DELAYED_UPDATE_PREFIX=Chirp*
+== ENV: OMP_THREAD_LIMIT=1
+== ENV: GLIDEIN_CONDOR_TOKEN=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/cred.d/idtokens/credential_CMSG-v1_0.main_CMSHTPC_T1_US_FNAL_condce4_whole.idtoken
+== ENV: GWMS_CONTAINERSW_VERSION=1.2.5-1.el7
+== ENV: CVMFS_REPOS_LIST=
+== ENV: OSG_MACHINE_GPUS=0
+== ENV: CRAB_RUNTIME_TARBALL=local
+== ENV: java_options=-Xms128m
+== ENV: -Xmx512m
+== ENV: GWMS_SINGULARITY_PATH=/cvmfs/oasis.opensciencegrid.org/mis/apptainer/1.2.5/bin/apptainer
+== ENV: CRAB_ReqName=
+== ENV: CRAB_Retry=0
+== ENV: CONTAINERSW_PATH=/cvmfs/oasis.opensciencegrid.org/mis/apptainer/1.2.5/bin/apptainer
+== ENV: SINGULARITY_ENVIRONMENT=/.singularity.d/env/91-environment.sh
+== ENV: GWMS_CONTAINERSW_MODE=unprivileged
+== ENV: GWMS_SINGULARITY_OUTSIDE_PWD=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/execute/dir_212551
+== ENV: CHIRP_DELAYED_UPDATE_MAX_ATTRS=200
+== ENV: GLIDEIN_REQUIRE_VOMS=False
+== ENV: PWD=/srv
+== ENV: _CONDOR_JOB_AD=/srv/.job.ad
+== ENV: MANPATH=/cvmfs/cms.cern.ch/share/man:
+== ENV: USE_PSS=True
+== ENV: JOB_TOKENS=/var/lib/gwms-factory/server-credentials/entry_CMSHTPC_T1_US_FNAL_condce4_whole/tokens.tgz
+== ENV: GLIDEIN_ProcId=0
+== ENV: GLIDECLIENT_Group=main
+== ENV: GLIDEIN_Max_Idle=600
+== ENV: CONTAINERSW_VERSION=1.2.5-1.el7
+== ENV: GLIDECLIENT_Group_Signature=8958e88209a0912b3e15df99baf195f96d4630c3
+== ENV: GLIDEIN_Factory=cmssi-factory01
+== ENV: PYTHON_CPU_COUNT=256
+== ENV: GLIDEIN_ResourceName=USCMS-FNAL-WC1
+== ENV: TZ=UTC
+== ENV: FERMIHTC_APPTAINER_ARGS=--pid
+== ENV: --ipc
+== ENV: --contain
+== ENV: OPENBLAS_NUM_THREADS=1
+== ENV: _CONDOR_BIN=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/main/condor/bin
+== ENV: GLIDEIN_Job_Max_Time=14400
+== ENV: GWMS_SINGULARITY_OUTSIDE_PWD_LIST=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/execute/dir_212551
+== ENV: GLIDEIN_CMSSite=T1_US_FNAL
+== ENV: OSG_SQUID_LOCATION=squid.fnal.gov:3128
+== ENV: USER_PATH=/cvmfs/oasis.opensciencegrid.org/mis/apptainer/1.2.5/x86_64/utils/bin:/usr/bin:/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+== ENV: APPTAINER_ENVIRONMENT=/.singularity.d/env/91-environment.sh
+== ENV: APPTAINER_APPNAME=
+== ENV: GLIDEIN_Site=FNAL
+== ENV: HOME=/srv
+== ENV: GWMS_CONTAINERSW_PATH=/cvmfs/oasis.opensciencegrid.org/mis/apptainer/1.2.5/bin/apptainer
+== ENV: LANG=C
+== ENV: OSG_SITE_NAME=USCMS-FNAL-WC1-CE4
+== ENV: TRUST_DOMAIN=cmssrv2313.fnal.gov:9618?sock=collectorRANDOM
+== ENV: FERMIHTC_APPTAINER_PWD=/srv
+== ENV: APPTAINER_COMMAND=exec
+== ENV: _CONDOR_EXECUTE=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/execute
+== ENV: FERMIHTC_APPTAINER_BIND=/cvmfs
+== ENV: /etc/hosts
+== ENV: /etc/grid-security
+== ENV: SINGULARITY_CONTAINER=/cvmfs/singularity.opensciencegrid.org/.images/ac/3bb191e958f5e0ea536c35b35fa91bf408a09a66659e5f9e3cfc533694ddc8
+== ENV: GPU_USE=0
+== ENV: CMS_MATCH_MICROARCH=(Microarch
+== ENV: is
+== ENV: undefined
+== ENV: ||
+== ENV: REQUIRED_MINIMUM_MICROARCH
+== ENV: is
+== ENV: undefined
+== ENV: ||
+== ENV: int(REQUIRED_MINIMUM_MICROARCH)<=int(substr(split(Microarch,"-")[1],1)))
+== ENV: PROMPT_COMMAND=PS1="Apptainer>
+== ENV: ";
+== ENV: unset
+== ENV: PROMPT_COMMAND
+== ENV: _CONDOR_SCRATCH_DIR=/srv
+== ENV: HAS_UNPRIVILEGED_USER_NAMESPACES=enabled
+== ENV: GLIDEIN_CONTAINER_ENV_CLEARLIST=GFAL_CONFIG_DIR,GFAL_PLUGIN_DIR,PERL5LIB
+== ENV: GLIDEIN_REQUIRED_OS=any
+== ENV: OSG_SINGULARITY_BINARY=/cvmfs/oasis.opensciencegrid.org/mis/apptainer/1.2.5/bin/apptainer
+== ENV: GWMS_SINGULARITY_IMAGES_DICT=default:/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel8-x86_64,rhel6:/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel6-x86_64,rhel7:/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel7-x86_64,rhel8:/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel8-x86_64,rhel9:/cvmfs/singularity.opensciencegrid.org/cmssw/cms:rhel9-x86_64
+== ENV: SCRAM_ARCH=el9_amd64_gcc12
+== ENV: GLIDEIN_Tmp_Dir=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/tmp
+== ENV: GLIDEIN_Gatekeeper=cmsosgce4.fnal.gov
+== ENV: cmsosgce4.fnal.gov:9619
+== ENV: OSG_SITE_WRITE=
+== ENV: GLIDEIN_LOCAL_TMP_DIR=/tmp/glide_cmsgli_7sM6bJ
+== ENV: CRAB_TASKMANAGER_TARBALL=local
+== ENV: _CONDOR_ANCESTOR_212551=213861:1748181375:886235703
+== ENV: GWMS_SINGULARITY_IMAGE=/cvmfs/singularity.opensciencegrid.org/.images/ac/3bb191e958f5e0ea536c35b35fa91bf408a09a66659e5f9e3cfc533694ddc8
+== ENV: CONTAINERSW_FULL_VERSION=apptainer
+== ENV: version
+== ENV: 1.2.5-1.el7
+== ENV: InitializeModulesEnv=0
+== ENV: GWMS_CONTAINERSW_FULL_VERSION=apptainer
+== ENV: version
+== ENV: 1.2.5-1.el7
+== ENV: GWMS_PATH=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/.gwms.d/bin:
+== ENV: GWMS_SINGULARITY_LIB_VERSION=2
+== ENV: CUDA_VISIBLE_DEVICES=10000
+== ENV: JOB_WRAPPER_SINGULARITY=/srv/.gwms-user-job-wrapper.sh
+== ENV: CONDOR_PROCD_ADDRESS=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/log/procd_address
+== ENV: GLIDEIN_CLAIM_WORKLIFE_DYNAMIC=cpus*(6*3600)
+== ENV: CONDOR_PROCD_ADDRESS_BASE=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/log/procd_address
+== ENV: APPTAINER_CONTAINER=/cvmfs/singularity.opensciencegrid.org/.images/ac/3bb191e958f5e0ea536c35b35fa91bf408a09a66659e5f9e3cfc533694ddc8
+== ENV: GLIDECLIENT_Signature=3c1fcfa748a77af7ae650352c7c013f5ab2c6654
+== ENV: PYTHONPATH=/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/py3-future/0.18.2-d6a34b02a270da4bceeb32adc20d6f15/lib/python3.9/site-packages
+== ENV: GLIDEIN_DEBUG_OPTIONS=userjob
+== ENV: FERMIHTC_APPTAINER_CMD=exec
+== ENV: FRONTIER_ID=CRAB-
+== ENV: _CONDOR_ANCESTOR_15617=212551:1748181366:922448030
+== ENV: _CONDOR_ANCESTOR_15614=15617:1747902797:3612270444
+== ENV: GWMS_SINGULARITY_MODE=unprivileged
+== ENV: _CONDOR_JOB_PIDS=
+== ENV: GPU_DEVICE_ORDINAL=10000
+== ENV: OSG_SITE_READ=
+== ENV: GWMS_SINGULARITY_AUTOLOAD=1
+== ENV: GWMS_SUBDIR=.gwms.d
+== ENV: GLIDEIN_DEBUG_OUTPUT=True
+== ENV: GOMAXPROCS=1
+== ENV: HAS_SINGULARITY=1
+== ENV: SITECONFIG_PATH=/cvmfs/cms.cern.ch/SITECONF/local
+== ENV: SHLVL=1
+== ENV: OSGVO_SUBMITTER=crabtw@cms
+== ENV: CONDOR_PARENT_ID=cmsgli-548817-0-cmswn7030:212551:1748181367
+== ENV: TF_NUM_THREADS=1
+== ENV: OSG_WN_TMP=/tmp
+== ENV: GLIDEIN_ClusterId=1518633
+== ENV: OSG_APP=/cvmfs/cms.cern.ch
+== ENV: APPTAINER_NAME=3bb191e958f5e0ea536c35b35fa91bf408a09a66659e5f9e3cfc533694ddc8
+== ENV: SINGULARITY_BIND=/storage,/etc/grid-security,/etc/hosts,/etc/localtime,/cvmfs
+== ENV: GLIDEIN_ESTIMATED_CPUS=64
+== ENV: BATCH_SYSTEM=HTCondor
+== ENV: GLIDEIN_Proxy_URL=squid.fnal.gov:3128
+== ENV: CONDOR_CONFIG=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/condor_config
+== ENV: APPTAINER_BIND=/storage,/etc/grid-security,/etc/hosts,/etc/localtime,/cvmfs
+== ENV: _CONDOR_SLOT=slot1_45
+== ENV: GLIDEIN_Singularity_Use=REQUIRED
+== ENV: LD_LIBRARY_PATH=/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/python3/3.9.6-2c93591d796451daeaf67dc8130bfa35/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/python3/3.9.6-2c93591d796451daeaf67dc8130bfa35/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/xz/5.2.5-4fdf584c0d81808d2831b2beffcb3bc7/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/libffi/3.4.2-e85996f97b0d0d51c90ef791f0a0eb91/lib64:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/sqlite/3.36.0-75618d5efd993d082fe7b262e7fa9233/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/gdbm/1.10-5f2d27dcab439561d0b6183df82e89bc/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/db6/6.2.32-c47b386f7c1834d01b1862bb63c56932/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/expat/2.1.0-c35050073fa86c04d08fecf74125e2eb/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/bz2lib/1.0.6-a8795c5492b25410af2fdbfc34f86eab/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/zlib/1.2.11-31d2ceb65830b90a6cc7a5a90279f5d6/lib:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/gcc/11.2.1-f478fee2760dbd22aaabb4e3a8fe1640/lib64:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/gcc/11.2.1-f478fee2760dbd22aaabb4e3a8fe1640/lib:/.singularity.d/libs
+== ENV: LC_CTYPE=C.UTF-8
+== ENV: CMS_VALIDATION_FRONTIER=0
+== ENV: TF_LOOP_PARALLEL_ITERATIONS=1
+== ENV: GSI_AUTHZ_CONF=/dev/null
+== ENV: REQUIRED_OS=rhel9
+== ENV: STASHCACHE=0
+== ENV: GLIDEIN_Signature=f3f21cfc67fe6b3c76b83ee9c2e2dda80148aacc
+== ENV: GLIDEIN_SINGULARITY_BINDPATH=/storage,/lfs_roots,/cms,/etc/cvmfs/SITECONF,/cvmfs/grid.cern.ch/etc/grid-security:/etc/grid-security
+== ENV: OMP_NUM_THREADS=1
+== ENV: GWMS_SINGULARITY_BIND_GPU_LIBS=1
+== ENV: GLIDEIN_OVERLOAD_ENABLED=False
+== ENV: GLIDEIN_Entry_Name=CMSHTPC_T1_US_FNAL_condce4_whole
+== ENV: STASHCACHE_WRITABLE=0
+== ENV: GLIDECLIENT_Name=CMSG-v1_0.main
+== ENV: CMS_PATH=/cvmfs/cms.cern.ch
+== ENV: PATH=/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/py3-future/0.18.2-d6a34b02a270da4bceeb32adc20d6f15/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/python3/3.9.6-2c93591d796451daeaf67dc8130bfa35/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/python3/3.9.6-2c93591d796451daeaf67dc8130bfa35/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/xz/5.2.5-4fdf584c0d81808d2831b2beffcb3bc7/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/sqlite/3.36.0-75618d5efd993d082fe7b262e7fa9233/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/gdbm/1.10-5f2d27dcab439561d0b6183df82e89bc/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/db6/6.2.32-c47b386f7c1834d01b1862bb63c56932/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/expat/2.1.0-c35050073fa86c04d08fecf74125e2eb/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/bz2lib/1.0.6-a8795c5492b25410af2fdbfc34f86eab/bin:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/gcc/11.2.1-f478fee2760dbd22aaabb4e3a8fe1640/bin:/cvmfs/cms.cern.ch/common:/srv/.gwms.d/bin:/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/main/condor/libexec:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+== ENV: CMS_GLIDEIN_VERSION=32
+== ENV: GLIDEIN_Expose_Grid_Env=True
+== ENV: CRAB_Id=5
+== ENV: GLIDEIN_Entry_Signature=aa4b65358479de759d1b813b80b590433a547cfc
+== ENV: GLIDEIN_Country=US
+== ENV: JULIA_NUM_THREADS=1
+== ENV: add_config_line_source=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/add_config_line.source
+== ENV: MODULE_USE=0
+== ENV: MKL_NUM_THREADS=1
+== ENV: OSG_HOSTNAME=cmsosgce4.fnal.gov
+== ENV: condor_vars_file=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/main/condor_vars.lst
+== ENV: CONTAINERSW_MODE=unprivileged
+== ENV: LoadModules=
+== ENV: OSG_GRID=/etc/osg/wn-client/
+== ENV: _JAVA_OPTIONS=-Xmx1024m
+== ENV: POSIXSTASHCACHE=0
+== ENV: GWMS_SINGULARITY_VERSION=1.2.5-1.el7
+== ENV: GLIDEIN_PROVIDES=singularity/unprivileged
+== ENV: X509_USER_PROXY=/srv/bcad16b12b0625f29d14d85dca26b9b13dce2f85
+== ENV: GWMS_AUX_SUBDIR=.gwms_aux
+== ENV: GWMS_SINGULARITY_STATUS=REQUIRED
+== ENV: MEMORY_USAGE_METRIC=((ProportionalSetSizeKb
+== ENV: ?:
+== ENV: ResidentSetSize)
+== ENV: +
+== ENV: 1023)
+== ENV: /
+== ENV: 1024
+== ENV: SLOTS_LAYOUT=partitionable
+== ENV: JOBSTARTDIR=/srv
+== ENV: OLDPWD=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/.gwms.d/exec/prejob
+== ENV: FERMIHTC_APPTAINER_BIN=/cvmfs/oasis.opensciencegrid.org/mis/apptainer/current/bin/apptainer
+== ENV: GWMS_DIR=/storage/local/data1/condor/execute/dir_2336541/glide_2bd3AD/.gwms.d
+== ENV: OSGVO_PROJECT_NAME=
+== ENV: BASH_FUNC_cmsrel%%=()
+== ENV: {
+== ENV: scramv1
+== ENV: project
+== ENV: CMSSW
+== ENV: $@
+== ENV: }
+== ENV: BASH_FUNC_cmsenv%%=()
+== ENV: {
+== ENV: eval
+== ENV: `scramv1
+== ENV: runtime
+== ENV: -sh`
+== ENV: }
+== ENV: _=/usr/bin/env
+======== Current environment dump FINISHING ========
+======== Tarball initialization STARTING at Sun May 25 13:56:17 GMT 2025 ========
++ [[ X == \X ]]
++ [[ local == \l\o\c\a\l ]]
++ tar xmf CMSRunAnalysis.tar.gz
+++ pwd
++ export PYTHONPATH=/srv/WMCore.zip:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/py3-future/0.18.2-d6a34b02a270da4bceeb32adc20d6f15/lib/python3.9/site-packages
++ PYTHONPATH=/srv/WMCore.zip:/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/py3-future/0.18.2-d6a34b02a270da4bceeb32adc20d6f15/lib/python3.9/site-packages
++ set +x
+======== Tarball initialization FINISHING at Sun May 25 13:56:17 GMT 2025 ========
+==== Local directory contents dump STARTING ====
+PWD: /srv
+== DIR: CMSRunAnalysis.py
+== DIR: CMSRunAnalysis.sh
+== DIR: CMSRunAnalysis.tar.gz
+== DIR: TweakPSet.py
+== DIR: WMCore.zip
+== DIR: _condor_stderr
+== DIR: _condor_stdout
+== DIR: bcad16b12b0625f29d14d85dca26b9b13dce2f85
+== DIR: cmscp.py
+== DIR: cmscp.sh
+== DIR: gWMS-CMSRunAnalysis.sh
+== DIR: input_args.json
+== DIR: input_files.tar.gz
+== DIR: jobReport.json
+== DIR: jobReport.json.5
+== DIR: run_and_lumis.tar.gz
+== DIR: sandbox.tar.gz
+== DIR: startup_environment.sh
+== DIR: submit_env.sh
+==== Local directory contents dump FINISHING ====
+======== CMSRunAnalysis.py STARTING at Sun May 25 13:56:17 GMT 2025 ========
+Now running the CMSRunAnalysis.py job in /srv...
++ python3 CMSRunAnalysis.py --jobId=5 --oneEventMode=0
+==== CMSRunAnalysis.py STARTING at Sun May 25 13:56:18 2025 UTC ====
+Local time : Sun May 25 13:56:18 2025
+==== Parameters Dump at Sun May 25 13:56:18 2025 UTC ===
+userSandbox:    sandbox.tar.gz
+jobNumber:      5
+cmsswVersion:   CMSSW_14_0_18_patch1
+scramArch:      el9_amd64_gcc12
+inputFileList   job_input_file_list_5.txt
+runAndLumis:    job_lumis_5.json
+lheInputFiles:  False
+firstEvent:     None
+firstLumi:      None
+eventsPerLumi:  None
+lastEvent:      None
+firstRun:       None
+seeding:        AutomaticSeeding
+userFiles:      None
+oneEventMode:   0
+scriptExe:      None
+scriptArgs:     []
+maxRuntime:     -60
+===================
+==== CMSSW Stack Execution STARTING at Sun May 25 13:56:19 2025 UTC ====
+==== SCRAM Obj CREATED at Sun May 25 13:56:19 2025 UTC ====
+==== CMSSW_14_0_18_patch1 release directory created ====
+==== SCRAM Obj INITIALIZED at Sun May 25 13:56:20 2025 UTC ====
+==== Extract user sandbox in top and CMSSW directory ====
+==== Sandbox untarring STARTING at Sun May 25 13:56:20 2025 UTC ====
+expanding sandbox.tar.gz in /srv
+
+==== Sandbox untarring FINISHED at Sun May 25 13:56:21 2025 UTC ====
+==== SCRAM runtime environment CREATED at Sun May 25 13:56:21 2025 UTC ====
+==== Tweak PSet at Sun May 25 13:56:28 2025 UTC ====
+Adding 1 files to 'fileNames' attr
+Adding 0 files to 'secondaryFileNames' attr
+skipEvents set to 0
+Executing sh tweakThePset.sh in Scram env
+tweakThePset.sh output:
+
+        Scram Command Diagnostic:
+        Command : scramv1
+        Architecture: el9_amd64_gcc12
+        Executed: sh tweakThePset.sh
+        Exit Status: 0
+        Stdout: will execute: edm_pset_tweak.py --input_pkl PSet.pkl --output_pkl PSet.pkl-tweaked --json PSetTweak.json --create_untracked_psets
+Set attribute process.CPU to CPU
+Set attribute process.Timing to Timing
+Set attribute process.SimpleMemoryCheck to SimpleMemoryCheck
+Set attribute process.source.fileNames to cms.untracked.vstring('/store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root')
+Set attribute process.source.lumisToProcess to cms.untracked.VLuminosityBlockRange("385933:34-385933:35")
+Set attribute process.source.skipEvents to cms.untracked.uint32(0)
+Set attribute process.maxEvents.input to cms.untracked.int32(-1)
+Set attribute process.maxSecondsUntilRampdown.input to cms.untracked.int32(-60)
+will execute: cmssw_handle_random_seeds.py --input_pkl PSet.pkl --output_pkl PSet.pkl-seeds --seeding dummy
+
+        Stderr: None 
+==== Tweak PSet Done at Sun May 25 13:56:33 2025 UTC ====
+==== CMSSW JOB Execution started at Sun May 25 13:56:33 2025 UTC ====
+==== Will execute stdbuf -oL -eL cmsRun -j FrameworkJobReport.xml PSet.py > cmsRun-stdout.log.tmp 2>&1
+==== CMSSW JOB Execution completed at Mon May 26 06:12:38 2025 UTC ====
+Application exit code: 0
+==== Execution FINISHED at Mon May 26 06:12:38 2025 UTC ====
+======== CMSSW OUTPUT STARTING ========
+NOTICE: lines longer than 3000 characters will be truncated
+== CMSSW: 25-May-2025 13:56:54 UTC  Initiating request to open file root://cmsxrootd-site.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root
+== CMSSW: 25-May-2025 13:56:58 UTC  Successfully opened file root://cmsxrootd-site.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root
+== CMSSW: Begin processing the 1st record. Run 385933, Event 15452244, LumiSection 34 on stream 0 at 25-May-2025 13:57:24.753 UTC
+== CMSSW: Begin processing the 501st record. Run 385933, Event 15503322, LumiSection 34 on stream 0 at 25-May-2025 13:58:09.912 UTC
+== CMSSW: Begin processing the 1001st record. Run 385933, Event 15379267, LumiSection 34 on stream 0 at 25-May-2025 13:58:41.841 UTC
+== CMSSW: Begin processing the 1501st record. Run 385933, Event 15469321, LumiSection 34 on stream 0 at 25-May-2025 13:59:27.557 UTC
+== CMSSW: Begin processing the 2001st record. Run 385933, Event 15403658, LumiSection 34 on stream 0 at 25-May-2025 14:00:23.162 UTC
+== CMSSW: Begin processing the 2501st record. Run 385933, Event 15504849, LumiSection 34 on stream 0 at 25-May-2025 14:00:58.537 UTC
+== CMSSW: Begin processing the 3001st record. Run 385933, Event 15533039, LumiSection 34 on stream 0 at 25-May-2025 14:01:34.183 UTC
+== CMSSW: Begin processing the 3501st record. Run 385933, Event 15505661, LumiSection 34 on stream 0 at 25-May-2025 14:02:09.723 UTC
+== CMSSW: [2025-05-25 14:02:13.826330 +0000][Error  ][PostMaster        ] [cmsxrootd-site2.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 4001st record. Run 385933, Event 15417050, LumiSection 34 on stream 0 at 25-May-2025 14:02:40.223 UTC
+== CMSSW: Begin processing the 4501st record. Run 385933, Event 15422191, LumiSection 34 on stream 0 at 25-May-2025 14:03:29.423 UTC
+== CMSSW: Begin processing the 5001st record. Run 385933, Event 15460466, LumiSection 34 on stream 0 at 25-May-2025 14:04:01.811 UTC
+== CMSSW: Begin processing the 5501st record. Run 385933, Event 15531911, LumiSection 34 on stream 0 at 25-May-2025 14:04:35.179 UTC
+== CMSSW: Begin processing the 6001st record. Run 385933, Event 15465148, LumiSection 34 on stream 0 at 25-May-2025 14:05:16.090 UTC
+== CMSSW: Begin processing the 6501st record. Run 385933, Event 15377602, LumiSection 34 on stream 0 at 25-May-2025 14:05:51.754 UTC
+== CMSSW: Begin processing the 7001st record. Run 385933, Event 15495680, LumiSection 34 on stream 0 at 25-May-2025 14:06:39.995 UTC
+== CMSSW: Begin processing the 7501st record. Run 385933, Event 15453521, LumiSection 34 on stream 0 at 25-May-2025 14:07:14.130 UTC
+== CMSSW: Begin processing the 8001st record. Run 385933, Event 15468097, LumiSection 34 on stream 0 at 25-May-2025 14:07:52.931 UTC
+== CMSSW: Begin processing the 8501st record. Run 385933, Event 15422449, LumiSection 34 on stream 0 at 25-May-2025 14:08:28.478 UTC
+== CMSSW: Begin processing the 9001st record. Run 385933, Event 15528098, LumiSection 34 on stream 0 at 25-May-2025 14:09:05.489 UTC
+== CMSSW: Begin processing the 9501st record. Run 385933, Event 15380354, LumiSection 34 on stream 0 at 25-May-2025 14:09:54.274 UTC
+== CMSSW: Begin processing the 10001st record. Run 385933, Event 15475571, LumiSection 34 on stream 0 at 25-May-2025 14:10:30.832 UTC
+== CMSSW: Begin processing the 10501st record. Run 385933, Event 15454644, LumiSection 34 on stream 0 at 25-May-2025 14:11:08.321 UTC
+== CMSSW: Begin processing the 11001st record. Run 385933, Event 15476536, LumiSection 34 on stream 0 at 25-May-2025 14:11:42.129 UTC
+== CMSSW: Begin processing the 11501st record. Run 385933, Event 15530227, LumiSection 34 on stream 0 at 25-May-2025 14:12:33.931 UTC
+== CMSSW: Begin processing the 12001st record. Run 385933, Event 15432022, LumiSection 34 on stream 0 at 25-May-2025 14:13:10.421 UTC
+== CMSSW: Begin processing the 12501st record. Run 385933, Event 15442979, LumiSection 34 on stream 0 at 25-May-2025 14:13:43.806 UTC
+== CMSSW: Begin processing the 13001st record. Run 385933, Event 15532717, LumiSection 34 on stream 0 at 25-May-2025 14:14:18.879 UTC
+== CMSSW: Begin processing the 13501st record. Run 385933, Event 15379670, LumiSection 34 on stream 0 at 25-May-2025 14:14:56.234 UTC
+== CMSSW: Begin processing the 14001st record. Run 385933, Event 15465383, LumiSection 34 on stream 0 at 25-May-2025 14:15:45.635 UTC
+== CMSSW: Begin processing the 14501st record. Run 385933, Event 15405672, LumiSection 34 on stream 0 at 25-May-2025 14:16:23.537 UTC
+== CMSSW: [2025-05-25 14:16:59.881163 +0000][Error  ][PostMaster        ] [cmsdcadisk.fnal.gov:1095] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 15001st record. Run 385933, Event 15434998, LumiSection 34 on stream 0 at 25-May-2025 14:17:05.425 UTC
+== CMSSW: Begin processing the 15501st record. Run 385933, Event 15453246, LumiSection 34 on stream 0 at 25-May-2025 14:17:59.398 UTC
+== CMSSW: Begin processing the 16001st record. Run 385933, Event 15496437, LumiSection 34 on stream 0 at 25-May-2025 14:18:44.007 UTC
+== CMSSW: Begin processing the 16501st record. Run 385933, Event 15435555, LumiSection 34 on stream 0 at 25-May-2025 14:19:25.649 UTC
+== CMSSW: Begin processing the 17001st record. Run 385933, Event 15438976, LumiSection 34 on stream 0 at 25-May-2025 14:20:05.614 UTC
+== CMSSW: Begin processing the 17501st record. Run 385933, Event 15531989, LumiSection 34 on stream 0 at 25-May-2025 14:20:44.370 UTC
+== CMSSW: Begin processing the 18001st record. Run 385933, Event 15504131, LumiSection 34 on stream 0 at 25-May-2025 14:21:36.464 UTC
+== CMSSW: Begin processing the 18501st record. Run 385933, Event 15379462, LumiSection 34 on stream 0 at 25-May-2025 14:22:15.913 UTC
+== CMSSW: Begin processing the 19001st record. Run 385933, Event 15405007, LumiSection 34 on stream 0 at 25-May-2025 14:22:52.116 UTC
+== CMSSW: Begin processing the 19501st record. Run 385933, Event 15391276, LumiSection 34 on stream 0 at 25-May-2025 14:23:24.310 UTC
+== CMSSW: Begin processing the 20001st record. Run 385933, Event 15416030, LumiSection 34 on stream 0 at 25-May-2025 14:23:52.433 UTC
+== CMSSW: Begin processing the 20501st record. Run 385933, Event 15465280, LumiSection 34 on stream 0 at 25-May-2025 14:24:35.467 UTC
+== CMSSW: Begin processing the 21001st record. Run 385933, Event 15427463, LumiSection 34 on stream 0 at 25-May-2025 14:25:10.767 UTC
+== CMSSW: Begin processing the 21501st record. Run 385933, Event 15478188, LumiSection 34 on stream 0 at 25-May-2025 14:25:47.696 UTC
+== CMSSW: Begin processing the 22001st record. Run 385933, Event 15428936, LumiSection 34 on stream 0 at 25-May-2025 14:26:20.041 UTC
+== CMSSW: Begin processing the 22501st record. Run 385933, Event 15529148, LumiSection 34 on stream 0 at 25-May-2025 14:26:57.138 UTC
+== CMSSW: Begin processing the 23001st record. Run 385933, Event 15436051, LumiSection 34 on stream 0 at 25-May-2025 14:27:37.603 UTC
+== CMSSW: Begin processing the 23501st record. Run 385933, Event 15384990, LumiSection 34 on stream 0 at 25-May-2025 14:28:06.150 UTC
+== CMSSW: Begin processing the 24001st record. Run 385933, Event 15414816, LumiSection 34 on stream 0 at 25-May-2025 14:28:36.965 UTC
+== CMSSW: Begin processing the 24501st record. Run 385933, Event 15461432, LumiSection 34 on stream 0 at 25-May-2025 14:29:13.066 UTC
+== CMSSW: Begin processing the 25001st record. Run 385933, Event 15530754, LumiSection 34 on stream 0 at 25-May-2025 14:29:45.108 UTC
+== CMSSW: Begin processing the 25501st record. Run 385933, Event 15504034, LumiSection 34 on stream 0 at 25-May-2025 14:30:35.371 UTC
+== CMSSW: Begin processing the 26001st record. Run 385933, Event 15423760, LumiSection 34 on stream 0 at 25-May-2025 14:31:07.814 UTC
+== CMSSW: Begin processing the 26501st record. Run 385933, Event 15453144, LumiSection 34 on stream 0 at 25-May-2025 14:31:42.572 UTC
+== CMSSW: Begin processing the 27001st record. Run 385933, Event 15423962, LumiSection 34 on stream 0 at 25-May-2025 14:32:16.744 UTC
+== CMSSW: Begin processing the 27501st record. Run 385933, Event 15492431, LumiSection 34 on stream 0 at 25-May-2025 14:32:52.024 UTC
+== CMSSW: Begin processing the 28001st record. Run 385933, Event 15512216, LumiSection 34 on stream 0 at 25-May-2025 14:33:36.896 UTC
+== CMSSW: Begin processing the 28501st record. Run 385933, Event 15517713, LumiSection 34 on stream 0 at 25-May-2025 14:34:11.799 UTC
+== CMSSW: Begin processing the 29001st record. Run 385933, Event 15472931, LumiSection 34 on stream 0 at 25-May-2025 14:34:46.307 UTC
+== CMSSW: Begin processing the 29501st record. Run 385933, Event 15454847, LumiSection 34 on stream 0 at 25-May-2025 14:35:15.782 UTC
+== CMSSW: Begin processing the 30001st record. Run 385933, Event 15493158, LumiSection 34 on stream 0 at 25-May-2025 14:35:46.736 UTC
+== CMSSW: Begin processing the 30501st record. Run 385933, Event 15381061, LumiSection 34 on stream 0 at 25-May-2025 14:36:28.100 UTC
+== CMSSW: Begin processing the 31001st record. Run 385933, Event 15399274, LumiSection 34 on stream 0 at 25-May-2025 14:36:57.962 UTC
+== CMSSW: Begin processing the 31501st record. Run 385933, Event 15503230, LumiSection 34 on stream 0 at 25-May-2025 14:37:29.929 UTC
+== CMSSW: Begin processing the 32001st record. Run 385933, Event 15501984, LumiSection 34 on stream 0 at 25-May-2025 14:38:01.302 UTC
+== CMSSW: Begin processing the 32501st record. Run 385933, Event 15499991, LumiSection 34 on stream 0 at 25-May-2025 14:38:37.642 UTC
+== CMSSW: Begin processing the 33001st record. Run 385933, Event 15465343, LumiSection 34 on stream 0 at 25-May-2025 14:39:12.421 UTC
+== CMSSW: Begin processing the 33501st record. Run 385933, Event 15433279, LumiSection 34 on stream 0 at 25-May-2025 14:39:56.346 UTC
+== CMSSW: Begin processing the 34001st record. Run 385933, Event 15488495, LumiSection 34 on stream 0 at 25-May-2025 14:40:27.479 UTC
+== CMSSW: Begin processing the 34501st record. Run 385933, Event 15473902, LumiSection 34 on stream 0 at 25-May-2025 14:41:05.541 UTC
+== CMSSW: Begin processing the 35001st record. Run 385933, Event 15384300, LumiSection 34 on stream 0 at 25-May-2025 14:41:39.673 UTC
+== CMSSW: Begin processing the 35501st record. Run 385933, Event 15459412, LumiSection 34 on stream 0 at 25-May-2025 14:42:28.888 UTC
+== CMSSW: Begin processing the 36001st record. Run 385933, Event 15478960, LumiSection 34 on stream 0 at 25-May-2025 14:43:03.405 UTC
+== CMSSW: Begin processing the 36501st record. Run 385933, Event 15409635, LumiSection 34 on stream 0 at 25-May-2025 14:43:35.433 UTC
+== CMSSW: Begin processing the 37001st record. Run 385933, Event 15520197, LumiSection 34 on stream 0 at 25-May-2025 14:44:13.413 UTC
+== CMSSW: Begin processing the 37501st record. Run 385933, Event 15398493, LumiSection 34 on stream 0 at 25-May-2025 14:44:44.242 UTC
+== CMSSW: Begin processing the 38001st record. Run 385933, Event 15476930, LumiSection 34 on stream 0 at 25-May-2025 14:45:26.163 UTC
+== CMSSW: Begin processing the 38501st record. Run 385933, Event 15443679, LumiSection 34 on stream 0 at 25-May-2025 14:46:05.090 UTC
+== CMSSW: Begin processing the 39001st record. Run 385933, Event 15442934, LumiSection 34 on stream 0 at 25-May-2025 14:46:32.044 UTC
+== CMSSW: Begin processing the 39501st record. Run 385933, Event 15517741, LumiSection 34 on stream 0 at 25-May-2025 14:47:10.031 UTC
+== CMSSW: Begin processing the 40001st record. Run 385933, Event 15503441, LumiSection 34 on stream 0 at 25-May-2025 14:47:50.681 UTC
+== CMSSW: Begin processing the 40501st record. Run 385933, Event 15437261, LumiSection 34 on stream 0 at 25-May-2025 14:48:37.080 UTC
+== CMSSW: Begin processing the 41001st record. Run 385933, Event 15395283, LumiSection 34 on stream 0 at 25-May-2025 14:49:14.345 UTC
+== CMSSW: Begin processing the 41501st record. Run 385933, Event 15529997, LumiSection 34 on stream 0 at 25-May-2025 14:49:46.115 UTC
+== CMSSW: Begin processing the 42001st record. Run 385933, Event 15979160, LumiSection 35 on stream 0 at 25-May-2025 14:50:30.896 UTC
+== CMSSW: Begin processing the 42501st record. Run 385933, Event 16074028, LumiSection 35 on stream 0 at 25-May-2025 14:52:21.916 UTC
+== CMSSW: Begin processing the 43001st record. Run 385933, Event 15740217, LumiSection 35 on stream 0 at 25-May-2025 14:54:57.447 UTC
+== CMSSW: Begin processing the 43501st record. Run 385933, Event 15926285, LumiSection 35 on stream 0 at 25-May-2025 14:57:58.358 UTC
+== CMSSW: Begin processing the 44001st record. Run 385933, Event 16090440, LumiSection 35 on stream 0 at 25-May-2025 14:59:50.268 UTC
+== CMSSW: Begin processing the 44501st record. Run 385933, Event 16312969, LumiSection 35 on stream 0 at 25-May-2025 15:02:01.310 UTC
+== CMSSW: Begin processing the 45001st record. Run 385933, Event 15607062, LumiSection 35 on stream 0 at 25-May-2025 15:03:47.058 UTC
+== CMSSW: Begin processing the 45501st record. Run 385933, Event 16181641, LumiSection 35 on stream 0 at 25-May-2025 15:05:55.760 UTC
+== CMSSW: Begin processing the 46001st record. Run 385933, Event 16149802, LumiSection 35 on stream 0 at 25-May-2025 15:08:22.024 UTC
+== CMSSW: [2025-05-25 15:09:16.627028 +0000][Error  ][PostMaster        ] [cmsxrootd-site.fnal.gov:1094] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 46501st record. Run 385933, Event 15728453, LumiSection 35 on stream 0 at 25-May-2025 15:10:06.034 UTC
+== CMSSW: Begin processing the 47001st record. Run 385933, Event 15764925, LumiSection 35 on stream 0 at 25-May-2025 15:12:31.085 UTC
+== CMSSW: Begin processing the 47501st record. Run 385933, Event 15564291, LumiSection 35 on stream 0 at 25-May-2025 15:14:08.146 UTC
+== CMSSW: Begin processing the 48001st record. Run 385933, Event 15936372, LumiSection 35 on stream 0 at 25-May-2025 15:16:30.046 UTC
+== CMSSW: Begin processing the 48501st record. Run 385933, Event 15985632, LumiSection 35 on stream 0 at 25-May-2025 15:18:31.084 UTC
+== CMSSW: Begin processing the 49001st record. Run 385933, Event 15850666, LumiSection 35 on stream 0 at 25-May-2025 15:20:24.272 UTC
+== CMSSW: [2025-05-25 15:21:51.198122 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 49501st record. Run 385933, Event 16065835, LumiSection 35 on stream 0 at 25-May-2025 15:22:18.361 UTC
+== CMSSW: Begin processing the 50001st record. Run 385933, Event 15846938, LumiSection 35 on stream 0 at 25-May-2025 15:23:54.316 UTC
+== CMSSW: Begin processing the 50501st record. Run 385933, Event 15701031, LumiSection 35 on stream 0 at 25-May-2025 15:25:44.109 UTC
+== CMSSW: Begin processing the 51001st record. Run 385933, Event 16188020, LumiSection 35 on stream 0 at 25-May-2025 15:28:21.906 UTC
+== CMSSW: Begin processing the 51501st record. Run 385933, Event 16209912, LumiSection 35 on stream 0 at 25-May-2025 15:30:12.973 UTC
+== CMSSW: Begin processing the 52001st record. Run 385933, Event 15936323, LumiSection 35 on stream 0 at 25-May-2025 15:32:13.457 UTC
+== CMSSW: Begin processing the 52501st record. Run 385933, Event 15640841, LumiSection 35 on stream 0 at 25-May-2025 15:34:00.320 UTC
+== CMSSW: Begin processing the 53001st record. Run 385933, Event 15716817, LumiSection 35 on stream 0 at 25-May-2025 15:35:54.588 UTC
+== CMSSW: [2025-05-25 15:36:59.895133 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 53501st record. Run 385933, Event 15917428, LumiSection 35 on stream 0 at 25-May-2025 15:38:15.155 UTC
+== CMSSW: Begin processing the 54001st record. Run 385933, Event 16198353, LumiSection 35 on stream 0 at 25-May-2025 15:40:39.736 UTC
+== CMSSW: Begin processing the 54501st record. Run 385933, Event 15984943, LumiSection 35 on stream 0 at 25-May-2025 15:42:42.533 UTC
+== CMSSW: Begin processing the 55001st record. Run 385933, Event 15871828, LumiSection 35 on stream 0 at 25-May-2025 15:45:38.833 UTC
+== CMSSW: Begin processing the 55501st record. Run 385933, Event 16331491, LumiSection 35 on stream 0 at 25-May-2025 15:47:27.577 UTC
+== CMSSW: Begin processing the 56001st record. Run 385933, Event 16196509, LumiSection 35 on stream 0 at 25-May-2025 15:49:29.557 UTC
+== CMSSW: Begin processing the 56501st record. Run 385933, Event 15946816, LumiSection 35 on stream 0 at 25-May-2025 15:50:53.535 UTC
+== CMSSW: [2025-05-25 15:53:22.266166 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 57001st record. Run 385933, Event 16317086, LumiSection 35 on stream 0 at 25-May-2025 15:53:58.677 UTC
+== CMSSW: Begin processing the 57501st record. Run 385933, Event 15844672, LumiSection 35 on stream 0 at 25-May-2025 15:56:05.507 UTC
+== CMSSW: Begin processing the 58001st record. Run 385933, Event 16189403, LumiSection 35 on stream 0 at 25-May-2025 15:58:11.204 UTC
+== CMSSW: Begin processing the 58501st record. Run 385933, Event 15675051, LumiSection 35 on stream 0 at 25-May-2025 16:00:25.748 UTC
+== CMSSW: Begin processing the 59001st record. Run 385933, Event 15899408, LumiSection 35 on stream 0 at 25-May-2025 16:03:03.402 UTC
+== CMSSW: Begin processing the 59501st record. Run 385933, Event 16278782, LumiSection 35 on stream 0 at 25-May-2025 16:05:01.049 UTC
+== CMSSW: Begin processing the 60001st record. Run 385933, Event 15578375, LumiSection 35 on stream 0 at 25-May-2025 16:07:04.209 UTC
+== CMSSW: Begin processing the 60501st record. Run 385933, Event 15866910, LumiSection 35 on stream 0 at 25-May-2025 16:08:58.985 UTC
+== CMSSW: [2025-05-25 16:10:04.356125 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 61001st record. Run 385933, Event 15699097, LumiSection 35 on stream 0 at 25-May-2025 16:10:56.288 UTC
+== CMSSW: Begin processing the 61501st record. Run 385933, Event 16342973, LumiSection 35 on stream 0 at 25-May-2025 16:13:59.629 UTC
+== CMSSW: Begin processing the 62001st record. Run 385933, Event 15578706, LumiSection 35 on stream 0 at 25-May-2025 16:16:41.405 UTC
+== CMSSW: Begin processing the 62501st record. Run 385933, Event 15549522, LumiSection 35 on stream 0 at 25-May-2025 16:18:10.925 UTC
+== CMSSW: Begin processing the 63001st record. Run 385933, Event 16065716, LumiSection 35 on stream 0 at 25-May-2025 16:21:38.139 UTC
+== CMSSW: Begin processing the 63501st record. Run 385933, Event 15766603, LumiSection 35 on stream 0 at 25-May-2025 16:23:15.753 UTC
+== CMSSW: Begin processing the 64001st record. Run 385933, Event 16304553, LumiSection 35 on stream 0 at 25-May-2025 16:26:01.471 UTC
+== CMSSW: [2025-05-25 16:28:18.925161 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 64501st record. Run 385933, Event 15618710, LumiSection 35 on stream 0 at 25-May-2025 16:28:36.228 UTC
+== CMSSW: Begin processing the 65001st record. Run 385933, Event 16246193, LumiSection 35 on stream 0 at 25-May-2025 16:31:28.924 UTC
+== CMSSW: Begin processing the 65501st record. Run 385933, Event 15947051, LumiSection 35 on stream 0 at 25-May-2025 16:32:43.049 UTC
+== CMSSW: Begin processing the 66001st record. Run 385933, Event 15770127, LumiSection 35 on stream 0 at 25-May-2025 16:34:27.273 UTC
+== CMSSW: Begin processing the 66501st record. Run 385933, Event 16191458, LumiSection 35 on stream 0 at 25-May-2025 16:36:40.450 UTC
+== CMSSW: Begin processing the 67001st record. Run 385933, Event 16350156, LumiSection 35 on stream 0 at 25-May-2025 16:39:29.159 UTC
+== CMSSW: Begin processing the 67501st record. Run 385933, Event 15657624, LumiSection 35 on stream 0 at 25-May-2025 16:42:05.684 UTC
+== CMSSW: Begin processing the 68001st record. Run 385933, Event 16146474, LumiSection 35 on stream 0 at 25-May-2025 16:43:55.760 UTC
+== CMSSW: [2025-05-25 16:44:15.961215 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 68501st record. Run 385933, Event 16268664, LumiSection 35 on stream 0 at 25-May-2025 16:46:17.363 UTC
+== CMSSW: Begin processing the 69001st record. Run 385933, Event 16037038, LumiSection 35 on stream 0 at 25-May-2025 16:48:38.749 UTC
+== CMSSW: Begin processing the 69501st record. Run 385933, Event 15544545, LumiSection 35 on stream 0 at 25-May-2025 16:50:48.299 UTC
+== CMSSW: Begin processing the 70001st record. Run 385933, Event 16062572, LumiSection 35 on stream 0 at 25-May-2025 16:53:04.273 UTC
+== CMSSW: Begin processing the 70501st record. Run 385933, Event 16091740, LumiSection 35 on stream 0 at 25-May-2025 16:55:33.844 UTC
+== CMSSW: Begin processing the 71001st record. Run 385933, Event 16014357, LumiSection 35 on stream 0 at 25-May-2025 16:57:16.349 UTC
+== CMSSW: Begin processing the 71501st record. Run 385933, Event 16300732, LumiSection 35 on stream 0 at 25-May-2025 16:59:29.401 UTC
+== CMSSW: [2025-05-25 17:01:53.544644 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 72001st record. Run 385933, Event 16291627, LumiSection 35 on stream 0 at 25-May-2025 17:02:05.531 UTC
+== CMSSW: Begin processing the 72501st record. Run 385933, Event 15977880, LumiSection 35 on stream 0 at 25-May-2025 17:03:56.072 UTC
+== CMSSW: Begin processing the 73001st record. Run 385933, Event 16266094, LumiSection 35 on stream 0 at 25-May-2025 17:06:25.834 UTC
+== CMSSW: Begin processing the 73501st record. Run 385933, Event 15988827, LumiSection 35 on stream 0 at 25-May-2025 17:09:11.683 UTC
+== CMSSW: Begin processing the 74001st record. Run 385933, Event 15676914, LumiSection 35 on stream 0 at 25-May-2025 17:12:19.750 UTC
+== CMSSW: Begin processing the 74501st record. Run 385933, Event 16267325, LumiSection 35 on stream 0 at 25-May-2025 17:14:01.633 UTC
+== CMSSW: Begin processing the 75001st record. Run 385933, Event 15614330, LumiSection 35 on stream 0 at 25-May-2025 17:16:22.698 UTC
+== CMSSW: Begin processing the 75501st record. Run 385933, Event 16336630, LumiSection 35 on stream 0 at 25-May-2025 17:18:25.678 UTC
+== CMSSW: [2025-05-25 17:19:07.587152 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 76001st record. Run 385933, Event 15789442, LumiSection 35 on stream 0 at 25-May-2025 17:21:08.103 UTC
+== CMSSW: Begin processing the 76501st record. Run 385933, Event 15980976, LumiSection 35 on stream 0 at 25-May-2025 17:23:15.363 UTC
+== CMSSW: Begin processing the 77001st record. Run 385933, Event 15749322, LumiSection 35 on stream 0 at 25-May-2025 17:25:26.647 UTC
+== CMSSW: Begin processing the 77501st record. Run 385933, Event 16316578, LumiSection 35 on stream 0 at 25-May-2025 17:27:33.407 UTC
+== CMSSW: Begin processing the 78001st record. Run 385933, Event 16121405, LumiSection 35 on stream 0 at 25-May-2025 17:29:41.883 UTC
+== CMSSW: Begin processing the 78501st record. Run 385933, Event 16065566, LumiSection 35 on stream 0 at 25-May-2025 17:32:15.376 UTC
+== CMSSW: Begin processing the 79001st record. Run 385933, Event 15775549, LumiSection 35 on stream 0 at 25-May-2025 17:34:01.539 UTC
+== CMSSW: [2025-05-25 17:36:19.028129 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 79501st record. Run 385933, Event 16023608, LumiSection 35 on stream 0 at 25-May-2025 17:36:37.043 UTC
+== CMSSW: Begin processing the 80001st record. Run 385933, Event 15850336, LumiSection 35 on stream 0 at 25-May-2025 17:38:55.126 UTC
+== CMSSW: Begin processing the 80501st record. Run 385933, Event 15542077, LumiSection 35 on stream 0 at 25-May-2025 17:40:57.172 UTC
+== CMSSW: Begin processing the 81001st record. Run 385933, Event 16151301, LumiSection 35 on stream 0 at 25-May-2025 17:42:40.561 UTC
+== CMSSW: Begin processing the 81501st record. Run 385933, Event 16226084, LumiSection 35 on stream 0 at 25-May-2025 17:45:02.048 UTC
+== CMSSW: Begin processing the 82001st record. Run 385933, Event 16011374, LumiSection 35 on stream 0 at 25-May-2025 17:46:50.804 UTC
+== CMSSW: Begin processing the 82501st record. Run 385933, Event 15672101, LumiSection 35 on stream 0 at 25-May-2025 17:48:55.973 UTC
+== CMSSW: Begin processing the 83001st record. Run 385933, Event 16033249, LumiSection 35 on stream 0 at 25-May-2025 17:51:32.217 UTC
+== CMSSW: [2025-05-25 17:51:51.616143 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 83501st record. Run 385933, Event 15816181, LumiSection 35 on stream 0 at 25-May-2025 17:54:06.295 UTC
+== CMSSW: Begin processing the 84001st record. Run 385933, Event 15768757, LumiSection 35 on stream 0 at 25-May-2025 17:56:29.946 UTC
+== CMSSW: Begin processing the 84501st record. Run 385933, Event 15898273, LumiSection 35 on stream 0 at 25-May-2025 17:58:25.058 UTC
+== CMSSW: %MSG-w TwoTrackMinimumDistance:  Vertexer:Vertexer 25-May-2025 17:59:49 UTC  Run: 385933 Event: 15861795
+== CMSSW: comparing track with itself!
+== CMSSW: %MSG
+== CMSSW: %MSG-w TwoTrackMinimumDistance:  Vertexer:Vertexer 25-May-2025 17:59:49 UTC  Run: 385933 Event: 15861795
+== CMSSW: Computation HelixHelix::CAIR failed.
+== CMSSW: %MSG
+== CMSSW: Begin processing the 85001st record. Run 385933, Event 16241199, LumiSection 35 on stream 0 at 25-May-2025 18:00:51.553 UTC
+== CMSSW: Begin processing the 85501st record. Run 385933, Event 16179374, LumiSection 35 on stream 0 at 25-May-2025 18:03:14.934 UTC
+== CMSSW: Begin processing the 86001st record. Run 385933, Event 16285158, LumiSection 35 on stream 0 at 25-May-2025 18:06:08.651 UTC
+== CMSSW: Begin processing the 86501st record. Run 385933, Event 16040730, LumiSection 35 on stream 0 at 25-May-2025 18:07:56.187 UTC
+== CMSSW: Begin processing the 87001st record. Run 385933, Event 15789037, LumiSection 35 on stream 0 at 25-May-2025 18:09:59.440 UTC
+== CMSSW: [2025-05-25 18:10:16.881432 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 87501st record. Run 385933, Event 16323451, LumiSection 35 on stream 0 at 25-May-2025 18:11:54.430 UTC
+== CMSSW: Begin processing the 88001st record. Run 385933, Event 16044394, LumiSection 35 on stream 0 at 25-May-2025 18:14:28.743 UTC
+== CMSSW: Begin processing the 88501st record. Run 385933, Event 15845562, LumiSection 35 on stream 0 at 25-May-2025 18:16:27.436 UTC
+== CMSSW: Begin processing the 89001st record. Run 385933, Event 15768952, LumiSection 35 on stream 0 at 25-May-2025 18:18:30.440 UTC
+== CMSSW: Begin processing the 89501st record. Run 385933, Event 16234689, LumiSection 35 on stream 0 at 25-May-2025 18:21:10.622 UTC
+== CMSSW: Begin processing the 90001st record. Run 385933, Event 16004858, LumiSection 35 on stream 0 at 25-May-2025 18:24:25.094 UTC
+== CMSSW: [2025-05-25 18:26:03.187172 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 90501st record. Run 385933, Event 15953809, LumiSection 35 on stream 0 at 25-May-2025 18:26:35.801 UTC
+== CMSSW: Begin processing the 91001st record. Run 385933, Event 15711192, LumiSection 35 on stream 0 at 25-May-2025 18:28:49.505 UTC
+== CMSSW: Begin processing the 91501st record. Run 385933, Event 15915486, LumiSection 35 on stream 0 at 25-May-2025 18:30:31.634 UTC
+== CMSSW: Begin processing the 92001st record. Run 385933, Event 15944672, LumiSection 35 on stream 0 at 25-May-2025 18:33:03.757 UTC
+== CMSSW: Begin processing the 92501st record. Run 385933, Event 16156259, LumiSection 35 on stream 0 at 25-May-2025 18:35:35.045 UTC
+== CMSSW: Begin processing the 93001st record. Run 385933, Event 15952702, LumiSection 35 on stream 0 at 25-May-2025 18:37:37.254 UTC
+== CMSSW: Begin processing the 93501st record. Run 385933, Event 15697342, LumiSection 35 on stream 0 at 25-May-2025 18:39:36.082 UTC
+== CMSSW: Begin processing the 94001st record. Run 385933, Event 15969129, LumiSection 35 on stream 0 at 25-May-2025 18:41:30.576 UTC
+== CMSSW: Begin processing the 94501st record. Run 385933, Event 15866993, LumiSection 35 on stream 0 at 25-May-2025 18:43:23.206 UTC
+== CMSSW: [2025-05-25 18:44:09.616161 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 95001st record. Run 385933, Event 16224491, LumiSection 35 on stream 0 at 25-May-2025 18:45:54.786 UTC
+== CMSSW: Begin processing the 95501st record. Run 385933, Event 15752051, LumiSection 35 on stream 0 at 25-May-2025 18:48:22.221 UTC
+== CMSSW: Begin processing the 96001st record. Run 385933, Event 15680926, LumiSection 35 on stream 0 at 25-May-2025 18:50:56.232 UTC
+== CMSSW: Begin processing the 96501st record. Run 385933, Event 15999736, LumiSection 35 on stream 0 at 25-May-2025 18:52:55.675 UTC
+== CMSSW: Begin processing the 97001st record. Run 385933, Event 16225920, LumiSection 35 on stream 0 at 25-May-2025 18:55:49.582 UTC
+== CMSSW: Begin processing the 97501st record. Run 385933, Event 16087294, LumiSection 35 on stream 0 at 25-May-2025 18:58:02.742 UTC
+== CMSSW: Begin processing the 98001st record. Run 385933, Event 16346291, LumiSection 35 on stream 0 at 25-May-2025 19:00:04.588 UTC
+== CMSSW: [2025-05-25 19:00:44.658090 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 98501st record. Run 385933, Event 16220442, LumiSection 35 on stream 0 at 25-May-2025 19:02:08.554 UTC
+== CMSSW: Begin processing the 99001st record. Run 385933, Event 16069054, LumiSection 35 on stream 0 at 25-May-2025 19:03:53.700 UTC
+== CMSSW: Begin processing the 99501st record. Run 385933, Event 16322582, LumiSection 35 on stream 0 at 25-May-2025 19:06:04.262 UTC
+== CMSSW: Begin processing the 100001st record. Run 385933, Event 16167811, LumiSection 35 on stream 0 at 25-May-2025 19:09:19.227 UTC
+== CMSSW: Begin processing the 100501st record. Run 385933, Event 16269965, LumiSection 35 on stream 0 at 25-May-2025 19:12:02.987 UTC
+== CMSSW: Begin processing the 101001st record. Run 385933, Event 15589600, LumiSection 35 on stream 0 at 25-May-2025 19:14:43.522 UTC
+== CMSSW: Begin processing the 101501st record. Run 385933, Event 15554946, LumiSection 35 on stream 0 at 25-May-2025 19:16:06.121 UTC
+== CMSSW: Begin processing the 102001st record. Run 385933, Event 16107617, LumiSection 35 on stream 0 at 25-May-2025 19:18:19.140 UTC
+== CMSSW: [2025-05-25 19:18:25.188133 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 102501st record. Run 385933, Event 15894219, LumiSection 35 on stream 0 at 25-May-2025 19:21:18.899 UTC
+== CMSSW: Begin processing the 103001st record. Run 385933, Event 16120372, LumiSection 35 on stream 0 at 25-May-2025 19:23:56.204 UTC
+== CMSSW: Begin processing the 103501st record. Run 385933, Event 15978128, LumiSection 35 on stream 0 at 25-May-2025 19:25:36.206 UTC
+== CMSSW: Begin processing the 104001st record. Run 385933, Event 16332768, LumiSection 35 on stream 0 at 25-May-2025 19:28:08.275 UTC
+== CMSSW: Begin processing the 104501st record. Run 385933, Event 15665201, LumiSection 35 on stream 0 at 25-May-2025 19:30:08.079 UTC
+== CMSSW: Begin processing the 105001st record. Run 385933, Event 15853072, LumiSection 35 on stream 0 at 25-May-2025 19:32:12.610 UTC
+== CMSSW: Begin processing the 105501st record. Run 385933, Event 16141256, LumiSection 35 on stream 0 at 25-May-2025 19:34:21.344 UTC
+== CMSSW: [2025-05-25 19:35:24.802139 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 106001st record. Run 385933, Event 15862177, LumiSection 35 on stream 0 at 25-May-2025 19:36:29.338 UTC
+== CMSSW: Begin processing the 106501st record. Run 385933, Event 16119349, LumiSection 35 on stream 0 at 25-May-2025 19:38:33.898 UTC
+== CMSSW: Begin processing the 107001st record. Run 385933, Event 15705318, LumiSection 35 on stream 0 at 25-May-2025 19:40:33.956 UTC
+== CMSSW: Begin processing the 107501st record. Run 385933, Event 15555811, LumiSection 35 on stream 0 at 25-May-2025 19:42:37.612 UTC
+== CMSSW: Begin processing the 108001st record. Run 385933, Event 15628771, LumiSection 35 on stream 0 at 25-May-2025 19:45:08.454 UTC
+== CMSSW: Begin processing the 108501st record. Run 385933, Event 15891415, LumiSection 35 on stream 0 at 25-May-2025 19:47:27.528 UTC
+== CMSSW: Begin processing the 109001st record. Run 385933, Event 15991752, LumiSection 35 on stream 0 at 25-May-2025 19:49:16.803 UTC
+== CMSSW: Begin processing the 109501st record. Run 385933, Event 16329181, LumiSection 35 on stream 0 at 25-May-2025 19:51:50.367 UTC
+== CMSSW: [2025-05-25 19:51:51.910148 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 110001st record. Run 385933, Event 16290880, LumiSection 35 on stream 0 at 25-May-2025 19:53:59.424 UTC
+== CMSSW: Begin processing the 110501st record. Run 385933, Event 16349241, LumiSection 35 on stream 0 at 25-May-2025 19:56:23.894 UTC
+== CMSSW: Begin processing the 111001st record. Run 385933, Event 16090764, LumiSection 35 on stream 0 at 25-May-2025 19:58:28.750 UTC
+== CMSSW: Begin processing the 111501st record. Run 385933, Event 15680352, LumiSection 35 on stream 0 at 25-May-2025 20:01:01.908 UTC
+== CMSSW: Begin processing the 112001st record. Run 385933, Event 16300517, LumiSection 35 on stream 0 at 25-May-2025 20:03:17.640 UTC
+== CMSSW: Begin processing the 112501st record. Run 385933, Event 15999538, LumiSection 35 on stream 0 at 25-May-2025 20:05:39.179 UTC
+== CMSSW: Begin processing the 113001st record. Run 385933, Event 15844498, LumiSection 35 on stream 0 at 25-May-2025 20:07:32.136 UTC
+== CMSSW: [2025-05-25 20:08:20.283124 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 113501st record. Run 385933, Event 15598283, LumiSection 35 on stream 0 at 25-May-2025 20:10:49.290 UTC
+== CMSSW: Begin processing the 114001st record. Run 385933, Event 15539919, LumiSection 35 on stream 0 at 25-May-2025 20:13:03.505 UTC
+== CMSSW: Begin processing the 114501st record. Run 385933, Event 16281229, LumiSection 35 on stream 0 at 25-May-2025 20:15:40.223 UTC
+== CMSSW: Begin processing the 115001st record. Run 385933, Event 15630064, LumiSection 35 on stream 0 at 25-May-2025 20:17:16.432 UTC
+== CMSSW: Begin processing the 115501st record. Run 385933, Event 15661051, LumiSection 35 on stream 0 at 25-May-2025 20:18:50.991 UTC
+== CMSSW: Begin processing the 116001st record. Run 385933, Event 15568039, LumiSection 35 on stream 0 at 25-May-2025 20:21:00.408 UTC
+== CMSSW: Begin processing the 116501st record. Run 385933, Event 16299459, LumiSection 35 on stream 0 at 25-May-2025 20:22:36.037 UTC
+== CMSSW: Begin processing the 117001st record. Run 385933, Event 15642808, LumiSection 35 on stream 0 at 25-May-2025 20:24:23.569 UTC
+== CMSSW: [2025-05-25 20:25:38.378141 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 117501st record. Run 385933, Event 16000310, LumiSection 35 on stream 0 at 25-May-2025 20:26:57.505 UTC
+== CMSSW: Begin processing the 118001st record. Run 385933, Event 15995704, LumiSection 35 on stream 0 at 25-May-2025 20:29:46.195 UTC
+== CMSSW: Begin processing the 118501st record. Run 385933, Event 16280244, LumiSection 35 on stream 0 at 25-May-2025 20:31:53.837 UTC
+== CMSSW: Begin processing the 119001st record. Run 385933, Event 16032183, LumiSection 35 on stream 0 at 25-May-2025 20:34:04.085 UTC
+== CMSSW: Begin processing the 119501st record. Run 385933, Event 15698410, LumiSection 35 on stream 0 at 25-May-2025 20:36:13.044 UTC
+== CMSSW: Begin processing the 120001st record. Run 385933, Event 16083279, LumiSection 35 on stream 0 at 25-May-2025 20:38:30.758 UTC
+== CMSSW: Begin processing the 120501st record. Run 385933, Event 16123398, LumiSection 35 on stream 0 at 25-May-2025 20:41:19.941 UTC
+== CMSSW: [2025-05-25 20:41:39.429139 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 121001st record. Run 385933, Event 15818771, LumiSection 35 on stream 0 at 25-May-2025 20:43:02.223 UTC
+== CMSSW: Begin processing the 121501st record. Run 385933, Event 15999358, LumiSection 35 on stream 0 at 25-May-2025 20:44:56.810 UTC
+== CMSSW: Begin processing the 122001st record. Run 385933, Event 15632709, LumiSection 35 on stream 0 at 25-May-2025 20:46:29.445 UTC
+== CMSSW: Begin processing the 122501st record. Run 385933, Event 16125172, LumiSection 35 on stream 0 at 25-May-2025 20:48:22.490 UTC
+== CMSSW: Begin processing the 123001st record. Run 385933, Event 16256515, LumiSection 35 on stream 0 at 25-May-2025 20:50:34.009 UTC
+== CMSSW: Begin processing the 123501st record. Run 385933, Event 16132491, LumiSection 35 on stream 0 at 25-May-2025 20:52:16.667 UTC
+== CMSSW: Begin processing the 124001st record. Run 385933, Event 16081415, LumiSection 35 on stream 0 at 25-May-2025 20:54:15.705 UTC
+== CMSSW: Begin processing the 124501st record. Run 385933, Event 16112430, LumiSection 35 on stream 0 at 25-May-2025 20:55:58.146 UTC
+== CMSSW: [2025-05-25 20:56:58.597160 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 125001st record. Run 385933, Event 16345881, LumiSection 35 on stream 0 at 25-May-2025 20:57:51.416 UTC
+== CMSSW: Begin processing the 125501st record. Run 385933, Event 16088115, LumiSection 35 on stream 0 at 25-May-2025 20:59:54.521 UTC
+== CMSSW: Begin processing the 126001st record. Run 385933, Event 16024282, LumiSection 35 on stream 0 at 25-May-2025 21:01:35.003 UTC
+== CMSSW: Begin processing the 126501st record. Run 385933, Event 15710568, LumiSection 35 on stream 0 at 25-May-2025 21:03:33.448 UTC
+== CMSSW: Begin processing the 127001st record. Run 385933, Event 15666791, LumiSection 35 on stream 0 at 25-May-2025 21:05:26.708 UTC
+== CMSSW: Begin processing the 127501st record. Run 385933, Event 15734279, LumiSection 35 on stream 0 at 25-May-2025 21:07:12.791 UTC
+== CMSSW: Begin processing the 128001st record. Run 385933, Event 16089944, LumiSection 35 on stream 0 at 25-May-2025 21:09:51.353 UTC
+== CMSSW: [2025-05-25 21:10:32.106197 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 128501st record. Run 385933, Event 15602943, LumiSection 35 on stream 0 at 25-May-2025 21:11:53.560 UTC
+== CMSSW: Begin processing the 129001st record. Run 385933, Event 16176890, LumiSection 35 on stream 0 at 25-May-2025 21:13:51.243 UTC
+== CMSSW: Begin processing the 129501st record. Run 385933, Event 15987198, LumiSection 35 on stream 0 at 25-May-2025 21:16:14.120 UTC
+== CMSSW: Begin processing the 130001st record. Run 385933, Event 15678952, LumiSection 35 on stream 0 at 25-May-2025 21:18:50.436 UTC
+== CMSSW: Begin processing the 130501st record. Run 385933, Event 15852212, LumiSection 35 on stream 0 at 25-May-2025 21:20:57.549 UTC
+== CMSSW: Begin processing the 131001st record. Run 385933, Event 16207894, LumiSection 35 on stream 0 at 25-May-2025 21:22:42.609 UTC
+== CMSSW: Begin processing the 131501st record. Run 385933, Event 15861355, LumiSection 35 on stream 0 at 25-May-2025 21:24:47.746 UTC
+== CMSSW: Begin processing the 132001st record. Run 385933, Event 15788374, LumiSection 35 on stream 0 at 25-May-2025 21:27:01.194 UTC
+== CMSSW: [2025-05-25 21:27:33.249300 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 132501st record. Run 385933, Event 15949032, LumiSection 35 on stream 0 at 25-May-2025 21:29:50.776 UTC
+== CMSSW: Begin processing the 133001st record. Run 385933, Event 15985498, LumiSection 35 on stream 0 at 25-May-2025 21:31:53.168 UTC
+== CMSSW: Begin processing the 133501st record. Run 385933, Event 15637127, LumiSection 35 on stream 0 at 25-May-2025 21:34:15.674 UTC
+== CMSSW: Begin processing the 134001st record. Run 385933, Event 16231741, LumiSection 35 on stream 0 at 25-May-2025 21:36:39.432 UTC
+== CMSSW: Begin processing the 134501st record. Run 385933, Event 16135075, LumiSection 35 on stream 0 at 25-May-2025 21:39:00.781 UTC
+== CMSSW: Begin processing the 135001st record. Run 385933, Event 15852355, LumiSection 35 on stream 0 at 25-May-2025 21:41:08.478 UTC
+== CMSSW: Begin processing the 135501st record. Run 385933, Event 16076721, LumiSection 35 on stream 0 at 25-May-2025 21:43:07.671 UTC
+== CMSSW: [2025-05-25 21:44:32.846216 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 136001st record. Run 385933, Event 15765662, LumiSection 35 on stream 0 at 25-May-2025 21:44:50.162 UTC
+== CMSSW: Begin processing the 136501st record. Run 385933, Event 16159651, LumiSection 35 on stream 0 at 25-May-2025 21:46:47.071 UTC
+== CMSSW: Begin processing the 137001st record. Run 385933, Event 16187016, LumiSection 35 on stream 0 at 25-May-2025 21:49:25.753 UTC
+== CMSSW: Begin processing the 137501st record. Run 385933, Event 16059338, LumiSection 35 on stream 0 at 25-May-2025 21:51:51.072 UTC
+== CMSSW: Begin processing the 138001st record. Run 385933, Event 16272732, LumiSection 35 on stream 0 at 25-May-2025 21:53:43.984 UTC
+== CMSSW: Begin processing the 138501st record. Run 385933, Event 16199777, LumiSection 35 on stream 0 at 25-May-2025 21:56:06.988 UTC
+== CMSSW: Begin processing the 139001st record. Run 385933, Event 16052032, LumiSection 35 on stream 0 at 25-May-2025 21:58:26.393 UTC
+== CMSSW: Begin processing the 139501st record. Run 385933, Event 16088527, LumiSection 35 on stream 0 at 25-May-2025 22:00:49.873 UTC
+== CMSSW: [2025-05-25 22:00:55.964959 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 140001st record. Run 385933, Event 15799703, LumiSection 35 on stream 0 at 25-May-2025 22:02:38.237 UTC
+== CMSSW: Begin processing the 140501st record. Run 385933, Event 15900032, LumiSection 35 on stream 0 at 25-May-2025 22:04:37.213 UTC
+== CMSSW: Begin processing the 141001st record. Run 385933, Event 16335972, LumiSection 35 on stream 0 at 25-May-2025 22:07:10.754 UTC
+== CMSSW: Begin processing the 141501st record. Run 385933, Event 15651969, LumiSection 35 on stream 0 at 25-May-2025 22:09:49.095 UTC
+== CMSSW: Begin processing the 142001st record. Run 385933, Event 15630087, LumiSection 35 on stream 0 at 25-May-2025 22:11:11.557 UTC
+== CMSSW: Begin processing the 142501st record. Run 385933, Event 16217412, LumiSection 35 on stream 0 at 25-May-2025 22:14:38.342 UTC
+== CMSSW: [2025-05-25 22:16:59.386145 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 143001st record. Run 385933, Event 16323204, LumiSection 35 on stream 0 at 25-May-2025 22:17:16.524 UTC
+== CMSSW: Begin processing the 143501st record. Run 385933, Event 15553163, LumiSection 35 on stream 0 at 25-May-2025 22:19:45.890 UTC
+== CMSSW: Begin processing the 144001st record. Run 385933, Event 16025565, LumiSection 35 on stream 0 at 25-May-2025 22:21:24.661 UTC
+== CMSSW: Begin processing the 144501st record. Run 385933, Event 16145948, LumiSection 35 on stream 0 at 25-May-2025 22:23:59.185 UTC
+== CMSSW: Begin processing the 145001st record. Run 385933, Event 16171476, LumiSection 35 on stream 0 at 25-May-2025 22:26:58.523 UTC
+== CMSSW: Begin processing the 145501st record. Run 385933, Event 15700897, LumiSection 35 on stream 0 at 25-May-2025 22:28:50.299 UTC
+== CMSSW: Begin processing the 146001st record. Run 385933, Event 16085755, LumiSection 35 on stream 0 at 25-May-2025 22:31:19.577 UTC
+== CMSSW: Begin processing the 146501st record. Run 385933, Event 15846816, LumiSection 35 on stream 0 at 25-May-2025 22:33:52.746 UTC
+== CMSSW: Begin processing the 147001st record. Run 385933, Event 15769624, LumiSection 35 on stream 0 at 25-May-2025 22:35:58.035 UTC
+== CMSSW: [2025-05-25 22:36:21.621179 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 147501st record. Run 385933, Event 15795158, LumiSection 35 on stream 0 at 25-May-2025 22:38:10.011 UTC
+== CMSSW: Begin processing the 148001st record. Run 385933, Event 16284003, LumiSection 35 on stream 0 at 25-May-2025 22:40:36.858 UTC
+== CMSSW: Begin processing the 148501st record. Run 385933, Event 15942923, LumiSection 35 on stream 0 at 25-May-2025 22:42:53.502 UTC
+== CMSSW: Begin processing the 149001st record. Run 385933, Event 16023174, LumiSection 35 on stream 0 at 25-May-2025 22:44:51.401 UTC
+== CMSSW: Begin processing the 149501st record. Run 385933, Event 16207402, LumiSection 35 on stream 0 at 25-May-2025 22:46:54.387 UTC
+== CMSSW: Begin processing the 150001st record. Run 385933, Event 15992159, LumiSection 35 on stream 0 at 25-May-2025 22:49:37.219 UTC
+== CMSSW: Begin processing the 150501st record. Run 385933, Event 15957459, LumiSection 35 on stream 0 at 25-May-2025 22:51:26.268 UTC
+== CMSSW: [2025-05-25 22:52:28.440140 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 151001st record. Run 385933, Event 16108871, LumiSection 35 on stream 0 at 25-May-2025 22:53:18.865 UTC
+== CMSSW: Begin processing the 151501st record. Run 385933, Event 16088799, LumiSection 35 on stream 0 at 25-May-2025 22:56:08.031 UTC
+== CMSSW: Begin processing the 152001st record. Run 385933, Event 15640098, LumiSection 35 on stream 0 at 25-May-2025 22:58:16.848 UTC
+== CMSSW: Begin processing the 152501st record. Run 385933, Event 15933770, LumiSection 35 on stream 0 at 25-May-2025 22:59:58.739 UTC
+== CMSSW: Begin processing the 153001st record. Run 385933, Event 16072384, LumiSection 35 on stream 0 at 25-May-2025 23:02:09.132 UTC
+== CMSSW: Begin processing the 153501st record. Run 385933, Event 15827973, LumiSection 35 on stream 0 at 25-May-2025 23:04:40.874 UTC
+== CMSSW: Begin processing the 154001st record. Run 385933, Event 16221616, LumiSection 35 on stream 0 at 25-May-2025 23:07:38.981 UTC
+== CMSSW: [2025-05-25 23:09:47.319141 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 154501st record. Run 385933, Event 15725462, LumiSection 35 on stream 0 at 25-May-2025 23:09:53.048 UTC
+== CMSSW: Begin processing the 155001st record. Run 385933, Event 16208823, LumiSection 35 on stream 0 at 25-May-2025 23:12:13.575 UTC
+== CMSSW: Begin processing the 155501st record. Run 385933, Event 15796623, LumiSection 35 on stream 0 at 25-May-2025 23:14:06.640 UTC
+== CMSSW: Begin processing the 156001st record. Run 385933, Event 16157762, LumiSection 35 on stream 0 at 25-May-2025 23:16:18.411 UTC
+== CMSSW: Begin processing the 156501st record. Run 385933, Event 15581372, LumiSection 35 on stream 0 at 25-May-2025 23:18:50.574 UTC
+== CMSSW: Begin processing the 157001st record. Run 385933, Event 16008202, LumiSection 35 on stream 0 at 25-May-2025 23:20:20.136 UTC
+== CMSSW: Begin processing the 157501st record. Run 385933, Event 15637711, LumiSection 35 on stream 0 at 25-May-2025 23:23:20.801 UTC
+== CMSSW: Begin processing the 158001st record. Run 385933, Event 15575671, LumiSection 35 on stream 0 at 25-May-2025 23:25:18.866 UTC
+== CMSSW: [2025-05-25 23:26:06.145129 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 158501st record. Run 385933, Event 16254209, LumiSection 35 on stream 0 at 25-May-2025 23:27:51.434 UTC
+== CMSSW: Begin processing the 159001st record. Run 385933, Event 16013451, LumiSection 35 on stream 0 at 25-May-2025 23:30:42.495 UTC
+== CMSSW: Begin processing the 159501st record. Run 385933, Event 15730719, LumiSection 35 on stream 0 at 25-May-2025 23:32:44.738 UTC
+== CMSSW: Begin processing the 160001st record. Run 385933, Event 15657777, LumiSection 35 on stream 0 at 25-May-2025 23:34:38.571 UTC
+== CMSSW: Begin processing the 160501st record. Run 385933, Event 15993374, LumiSection 35 on stream 0 at 25-May-2025 23:37:20.801 UTC
+== CMSSW: Begin processing the 161001st record. Run 385933, Event 15816453, LumiSection 35 on stream 0 at 25-May-2025 23:39:26.273 UTC
+== CMSSW: Begin processing the 161501st record. Run 385933, Event 15608363, LumiSection 35 on stream 0 at 25-May-2025 23:41:35.329 UTC
+== CMSSW: Begin processing the 162001st record. Run 385933, Event 16122727, LumiSection 35 on stream 0 at 25-May-2025 23:43:18.600 UTC
+== CMSSW: [2025-05-25 23:44:35.086115 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 162501st record. Run 385933, Event 16177450, LumiSection 35 on stream 0 at 25-May-2025 23:45:39.275 UTC
+== CMSSW: Begin processing the 163001st record. Run 385933, Event 15580988, LumiSection 35 on stream 0 at 25-May-2025 23:48:01.217 UTC
+== CMSSW: Begin processing the 163501st record. Run 385933, Event 15792564, LumiSection 35 on stream 0 at 25-May-2025 23:49:53.624 UTC
+== CMSSW: Begin processing the 164001st record. Run 385933, Event 16281422, LumiSection 35 on stream 0 at 25-May-2025 23:52:24.857 UTC
+== CMSSW: Begin processing the 164501st record. Run 385933, Event 15954902, LumiSection 35 on stream 0 at 25-May-2025 23:54:54.886 UTC
+== CMSSW: Begin processing the 165001st record. Run 385933, Event 16010057, LumiSection 35 on stream 0 at 25-May-2025 23:56:21.017 UTC
+== CMSSW: Begin processing the 165501st record. Run 385933, Event 15887841, LumiSection 35 on stream 0 at 25-May-2025 23:58:32.911 UTC
+== CMSSW: [2025-05-26 00:00:45.971135 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 166001st record. Run 385933, Event 15736459, LumiSection 35 on stream 0 at 26-May-2025 00:01:33.527 UTC
+== CMSSW: Begin processing the 166501st record. Run 385933, Event 16278165, LumiSection 35 on stream 0 at 26-May-2025 00:04:23.459 UTC
+== CMSSW: Begin processing the 167001st record. Run 385933, Event 16258106, LumiSection 35 on stream 0 at 26-May-2025 00:06:47.761 UTC
+== CMSSW: Begin processing the 167501st record. Run 385933, Event 15747388, LumiSection 35 on stream 0 at 26-May-2025 00:08:33.024 UTC
+== CMSSW: Begin processing the 168001st record. Run 385933, Event 15968107, LumiSection 35 on stream 0 at 26-May-2025 00:11:30.201 UTC
+== CMSSW: Begin processing the 168501st record. Run 385933, Event 15701255, LumiSection 35 on stream 0 at 26-May-2025 00:13:43.290 UTC
+== CMSSW: Begin processing the 169001st record. Run 385933, Event 15630115, LumiSection 35 on stream 0 at 26-May-2025 00:15:34.993 UTC
+== CMSSW: Begin processing the 169501st record. Run 385933, Event 15615537, LumiSection 35 on stream 0 at 26-May-2025 00:18:27.770 UTC
+== CMSSW: [2025-05-26 00:19:00.916147 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 170001st record. Run 385933, Event 15593618, LumiSection 35 on stream 0 at 26-May-2025 00:19:43.358 UTC
+== CMSSW: Begin processing the 170501st record. Run 385933, Event 16139023, LumiSection 35 on stream 0 at 26-May-2025 00:21:54.671 UTC
+== CMSSW: Begin processing the 171001st record. Run 385933, Event 16182775, LumiSection 35 on stream 0 at 26-May-2025 00:24:54.920 UTC
+== CMSSW: Begin processing the 171501st record. Run 385933, Event 16104344, LumiSection 35 on stream 0 at 26-May-2025 00:28:03.929 UTC
+== CMSSW: Begin processing the 172001st record. Run 385933, Event 15595535, LumiSection 35 on stream 0 at 26-May-2025 00:30:32.452 UTC
+== CMSSW: Begin processing the 172501st record. Run 385933, Event 16202915, LumiSection 35 on stream 0 at 26-May-2025 00:32:21.720 UTC
+== CMSSW: Begin processing the 173001st record. Run 385933, Event 16297777, LumiSection 35 on stream 0 at 26-May-2025 00:35:01.793 UTC
+== CMSSW: [2025-05-26 00:35:59.573142 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 173501st record. Run 385933, Event 16042386, LumiSection 35 on stream 0 at 26-May-2025 00:37:33.455 UTC
+== CMSSW: Begin processing the 174001st record. Run 385933, Event 15998641, LumiSection 35 on stream 0 at 26-May-2025 00:40:26.378 UTC
+== CMSSW: Begin processing the 174501st record. Run 385933, Event 15641124, LumiSection 35 on stream 0 at 26-May-2025 00:43:20.160 UTC
+== CMSSW: Begin processing the 175001st record. Run 385933, Event 15870946, LumiSection 35 on stream 0 at 26-May-2025 00:46:22.052 UTC
+== CMSSW: Begin processing the 175501st record. Run 385933, Event 16129183, LumiSection 35 on stream 0 at 26-May-2025 00:48:38.369 UTC
+== CMSSW: Begin processing the 176001st record. Run 385933, Event 16163835, LumiSection 35 on stream 0 at 26-May-2025 00:50:36.926 UTC
+== CMSSW: Begin processing the 176501st record. Run 385933, Event 15921241, LumiSection 35 on stream 0 at 26-May-2025 00:53:01.449 UTC
+== CMSSW: [2025-05-26 00:55:21.721294 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 177001st record. Run 385933, Event 15826386, LumiSection 35 on stream 0 at 26-May-2025 00:55:32.321 UTC
+== CMSSW: Begin processing the 177501st record. Run 385933, Event 15855585, LumiSection 35 on stream 0 at 26-May-2025 00:57:37.239 UTC
+== CMSSW: Begin processing the 178001st record. Run 385933, Event 16016108, LumiSection 35 on stream 0 at 26-May-2025 00:59:46.101 UTC
+== CMSSW: Begin processing the 178501st record. Run 385933, Event 16001497, LumiSection 35 on stream 0 at 26-May-2025 01:01:49.328 UTC
+== CMSSW: Begin processing the 179001st record. Run 385933, Event 15913186, LumiSection 35 on stream 0 at 26-May-2025 01:04:57.831 UTC
+== CMSSW: Begin processing the 179501st record. Run 385933, Event 15869405, LumiSection 35 on stream 0 at 26-May-2025 01:07:19.853 UTC
+== CMSSW: Begin processing the 180001st record. Run 385933, Event 16330897, LumiSection 35 on stream 0 at 26-May-2025 01:09:57.357 UTC
+== CMSSW: Begin processing the 180501st record. Run 385933, Event 16064586, LumiSection 35 on stream 0 at 26-May-2025 01:12:36.372 UTC
+== CMSSW: [2025-05-26 01:13:42.746275 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 181001st record. Run 385933, Event 16276153, LumiSection 35 on stream 0 at 26-May-2025 01:14:32.557 UTC
+== CMSSW: Begin processing the 181501st record. Run 385933, Event 15674255, LumiSection 35 on stream 0 at 26-May-2025 01:17:15.880 UTC
+== CMSSW: Begin processing the 182001st record. Run 385933, Event 15566624, LumiSection 35 on stream 0 at 26-May-2025 01:19:27.165 UTC
+== CMSSW: Begin processing the 182501st record. Run 385933, Event 16106535, LumiSection 35 on stream 0 at 26-May-2025 01:21:48.953 UTC
+== CMSSW: Begin processing the 183001st record. Run 385933, Event 16039722, LumiSection 35 on stream 0 at 26-May-2025 01:23:33.399 UTC
+== CMSSW: Begin processing the 183501st record. Run 385933, Event 16112674, LumiSection 35 on stream 0 at 26-May-2025 01:25:58.591 UTC
+== CMSSW: Begin processing the 184001st record. Run 385933, Event 16216645, LumiSection 35 on stream 0 at 26-May-2025 01:28:34.218 UTC
+== CMSSW: Begin processing the 184501st record. Run 385933, Event 15864625, LumiSection 35 on stream 0 at 26-May-2025 01:30:03.734 UTC
+== CMSSW: [2025-05-26 01:30:25.248145 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 185001st record. Run 385933, Event 15913842, LumiSection 35 on stream 0 at 26-May-2025 01:33:33.368 UTC
+== CMSSW: Begin processing the 185501st record. Run 385933, Event 15753342, LumiSection 35 on stream 0 at 26-May-2025 01:35:39.339 UTC
+== CMSSW: Begin processing the 186001st record. Run 385933, Event 15552692, LumiSection 35 on stream 0 at 26-May-2025 01:37:17.462 UTC
+== CMSSW: Begin processing the 186501st record. Run 385933, Event 15775900, LumiSection 35 on stream 0 at 26-May-2025 01:39:00.127 UTC
+== CMSSW: Begin processing the 187001st record. Run 385933, Event 16344979, LumiSection 35 on stream 0 at 26-May-2025 01:41:19.924 UTC
+== CMSSW: Begin processing the 187501st record. Run 385933, Event 16228266, LumiSection 35 on stream 0 at 26-May-2025 01:43:36.890 UTC
+== CMSSW: Begin processing the 188001st record. Run 385933, Event 16162595, LumiSection 35 on stream 0 at 26-May-2025 01:45:54.026 UTC
+== CMSSW: [2025-05-26 01:47:16.596144 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 188501st record. Run 385933, Event 16038559, LumiSection 35 on stream 0 at 26-May-2025 01:48:11.352 UTC
+== CMSSW: Begin processing the 189001st record. Run 385933, Event 15748543, LumiSection 35 on stream 0 at 26-May-2025 01:50:13.732 UTC
+== CMSSW: Begin processing the 189501st record. Run 385933, Event 15544268, LumiSection 35 on stream 0 at 26-May-2025 01:52:23.880 UTC
+== CMSSW: Begin processing the 190001st record. Run 385933, Event 15910917, LumiSection 35 on stream 0 at 26-May-2025 01:53:53.983 UTC
+== CMSSW: Begin processing the 190501st record. Run 385933, Event 16253836, LumiSection 35 on stream 0 at 26-May-2025 01:56:14.160 UTC
+== CMSSW: Begin processing the 191001st record. Run 385933, Event 16315834, LumiSection 35 on stream 0 at 26-May-2025 01:58:41.177 UTC
+== CMSSW: Begin processing the 191501st record. Run 385933, Event 16104263, LumiSection 35 on stream 0 at 26-May-2025 02:01:15.517 UTC
+== CMSSW: [2025-05-26 02:03:43.146157 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 192001st record. Run 385933, Event 15961988, LumiSection 35 on stream 0 at 26-May-2025 02:03:47.407 UTC
+== CMSSW: Begin processing the 192501st record. Run 385933, Event 16157142, LumiSection 35 on stream 0 at 26-May-2025 02:06:09.576 UTC
+== CMSSW: Begin processing the 193001st record. Run 385933, Event 16324956, LumiSection 35 on stream 0 at 26-May-2025 02:08:41.379 UTC
+== CMSSW: Begin processing the 193501st record. Run 385933, Event 15631359, LumiSection 35 on stream 0 at 26-May-2025 02:10:18.480 UTC
+== CMSSW: Begin processing the 194001st record. Run 385933, Event 15680613, LumiSection 35 on stream 0 at 26-May-2025 02:12:43.507 UTC
+== CMSSW: Begin processing the 194501st record. Run 385933, Event 15757221, LumiSection 35 on stream 0 at 26-May-2025 02:14:49.024 UTC
+== CMSSW: Begin processing the 195001st record. Run 385933, Event 16295303, LumiSection 35 on stream 0 at 26-May-2025 02:17:05.312 UTC
+== CMSSW: Begin processing the 195501st record. Run 385933, Event 16149373, LumiSection 35 on stream 0 at 26-May-2025 02:19:39.683 UTC
+== CMSSW: [2025-05-26 02:21:02.900289 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 196001st record. Run 385933, Event 16063643, LumiSection 35 on stream 0 at 26-May-2025 02:21:47.341 UTC
+== CMSSW: Begin processing the 196501st record. Run 385933, Event 16118358, LumiSection 35 on stream 0 at 26-May-2025 02:24:03.213 UTC
+== CMSSW: Begin processing the 197001st record. Run 385933, Event 15588771, LumiSection 35 on stream 0 at 26-May-2025 02:25:56.909 UTC
+== CMSSW: Begin processing the 197501st record. Run 385933, Event 15650800, LumiSection 35 on stream 0 at 26-May-2025 02:28:01.695 UTC
+== CMSSW: Begin processing the 198001st record. Run 385933, Event 15964510, LumiSection 35 on stream 0 at 26-May-2025 02:29:56.073 UTC
+== CMSSW: Begin processing the 198501st record. Run 385933, Event 16030179, LumiSection 35 on stream 0 at 26-May-2025 02:31:45.184 UTC
+== CMSSW: Begin processing the 199001st record. Run 385933, Event 16338432, LumiSection 35 on stream 0 at 26-May-2025 02:34:02.587 UTC
+== CMSSW: Begin processing the 199501st record. Run 385933, Event 15800339, LumiSection 35 on stream 0 at 26-May-2025 02:36:37.642 UTC
+== CMSSW: [2025-05-26 02:36:47.619134 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 200001st record. Run 385933, Event 15678134, LumiSection 35 on stream 0 at 26-May-2025 02:38:35.749 UTC
+== CMSSW: Begin processing the 200501st record. Run 385933, Event 15723219, LumiSection 35 on stream 0 at 26-May-2025 02:40:27.441 UTC
+== CMSSW: Begin processing the 201001st record. Run 385933, Event 15737829, LumiSection 35 on stream 0 at 26-May-2025 02:42:22.768 UTC
+== CMSSW: Begin processing the 201501st record. Run 385933, Event 15539009, LumiSection 35 on stream 0 at 26-May-2025 02:44:22.784 UTC
+== CMSSW: Begin processing the 202001st record. Run 385933, Event 16323344, LumiSection 35 on stream 0 at 26-May-2025 02:46:29.848 UTC
+== CMSSW: Begin processing the 202501st record. Run 385933, Event 15763376, LumiSection 35 on stream 0 at 26-May-2025 02:49:08.637 UTC
+== CMSSW: Begin processing the 203001st record. Run 385933, Event 15907464, LumiSection 35 on stream 0 at 26-May-2025 02:52:00.203 UTC
+== CMSSW: [2025-05-26 02:53:01.778165 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 203501st record. Run 385933, Event 16168286, LumiSection 35 on stream 0 at 26-May-2025 02:54:12.776 UTC
+== CMSSW: Begin processing the 204001st record. Run 385933, Event 16031656, LumiSection 35 on stream 0 at 26-May-2025 02:56:12.204 UTC
+== CMSSW: Begin processing the 204501st record. Run 385933, Event 15608477, LumiSection 35 on stream 0 at 26-May-2025 02:58:04.813 UTC
+== CMSSW: Begin processing the 205001st record. Run 385933, Event 15548291, LumiSection 35 on stream 0 at 26-May-2025 02:59:52.371 UTC
+== CMSSW: Begin processing the 205501st record. Run 385933, Event 16206746, LumiSection 35 on stream 0 at 26-May-2025 03:02:02.970 UTC
+== CMSSW: Begin processing the 206001st record. Run 385933, Event 15637651, LumiSection 35 on stream 0 at 26-May-2025 03:04:04.387 UTC
+== CMSSW: Begin processing the 206501st record. Run 385933, Event 16073602, LumiSection 35 on stream 0 at 26-May-2025 03:07:15.182 UTC
+== CMSSW: [2025-05-26 03:09:03.097159 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 207001st record. Run 385933, Event 15648614, LumiSection 35 on stream 0 at 26-May-2025 03:09:57.324 UTC
+== CMSSW: Begin processing the 207501st record. Run 385933, Event 16223239, LumiSection 35 on stream 0 at 26-May-2025 03:12:06.360 UTC
+== CMSSW: Begin processing the 208001st record. Run 385933, Event 16031723, LumiSection 35 on stream 0 at 26-May-2025 03:13:53.514 UTC
+== CMSSW: Begin processing the 208501st record. Run 385933, Event 16272474, LumiSection 35 on stream 0 at 26-May-2025 03:15:59.108 UTC
+== CMSSW: Begin processing the 209001st record. Run 385933, Event 15572054, LumiSection 35 on stream 0 at 26-May-2025 03:17:44.051 UTC
+== CMSSW: Begin processing the 209501st record. Run 385933, Event 15756280, LumiSection 35 on stream 0 at 26-May-2025 03:20:03.976 UTC
+== CMSSW: Begin processing the 210001st record. Run 385933, Event 15630440, LumiSection 35 on stream 0 at 26-May-2025 03:22:27.482 UTC
+== CMSSW: Begin processing the 210501st record. Run 385933, Event 15723444, LumiSection 35 on stream 0 at 26-May-2025 03:25:08.935 UTC
+== CMSSW: [2025-05-26 03:26:13.187133 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 211001st record. Run 385933, Event 15960568, LumiSection 35 on stream 0 at 26-May-2025 03:28:04.944 UTC
+== CMSSW: Begin processing the 211501st record. Run 385933, Event 16285316, LumiSection 35 on stream 0 at 26-May-2025 03:30:24.654 UTC
+== CMSSW: Begin processing the 212001st record. Run 385933, Event 15884044, LumiSection 35 on stream 0 at 26-May-2025 03:33:07.818 UTC
+== CMSSW: Begin processing the 212501st record. Run 385933, Event 15592180, LumiSection 35 on stream 0 at 26-May-2025 03:35:43.283 UTC
+== CMSSW: Begin processing the 213001st record. Run 385933, Event 15847544, LumiSection 35 on stream 0 at 26-May-2025 03:37:49.575 UTC
+== CMSSW: Begin processing the 213501st record. Run 385933, Event 15831153, LumiSection 35 on stream 0 at 26-May-2025 03:40:55.833 UTC
+== CMSSW: Begin processing the 214001st record. Run 385933, Event 16090144, LumiSection 35 on stream 0 at 26-May-2025 03:42:50.290 UTC
+== CMSSW: Begin processing the 214501st record. Run 385933, Event 15803788, LumiSection 35 on stream 0 at 26-May-2025 03:45:25.535 UTC
+== CMSSW: [2025-05-26 03:46:01.624134 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 215001st record. Run 385933, Event 15797199, LumiSection 35 on stream 0 at 26-May-2025 03:47:38.118 UTC
+== CMSSW: Begin processing the 215501st record. Run 385933, Event 15664023, LumiSection 35 on stream 0 at 26-May-2025 03:50:08.669 UTC
+== CMSSW: Begin processing the 216001st record. Run 385933, Event 16289667, LumiSection 35 on stream 0 at 26-May-2025 03:51:59.885 UTC
+== CMSSW: Begin processing the 216501st record. Run 385933, Event 15747952, LumiSection 35 on stream 0 at 26-May-2025 03:53:56.678 UTC
+== CMSSW: Begin processing the 217001st record. Run 385933, Event 16003310, LumiSection 35 on stream 0 at 26-May-2025 03:56:07.490 UTC
+== CMSSW: Begin processing the 217501st record. Run 385933, Event 16087206, LumiSection 35 on stream 0 at 26-May-2025 03:58:44.458 UTC
+== CMSSW: Begin processing the 218001st record. Run 385933, Event 15840953, LumiSection 35 on stream 0 at 26-May-2025 04:00:35.474 UTC
+== CMSSW: [2025-05-26 04:02:21.324171 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 218501st record. Run 385933, Event 15696219, LumiSection 35 on stream 0 at 26-May-2025 04:03:02.558 UTC
+== CMSSW: Begin processing the 219001st record. Run 385933, Event 15730895, LumiSection 35 on stream 0 at 26-May-2025 04:05:03.389 UTC
+== CMSSW: Begin processing the 219501st record. Run 385933, Event 15973469, LumiSection 35 on stream 0 at 26-May-2025 04:07:51.554 UTC
+== CMSSW: Begin processing the 220001st record. Run 385933, Event 15811137, LumiSection 35 on stream 0 at 26-May-2025 04:09:45.808 UTC
+== CMSSW: Begin processing the 220501st record. Run 385933, Event 15703525, LumiSection 35 on stream 0 at 26-May-2025 04:11:59.056 UTC
+== CMSSW: Begin processing the 221001st record. Run 385933, Event 15898688, LumiSection 35 on stream 0 at 26-May-2025 04:13:57.562 UTC
+== CMSSW: Begin processing the 221501st record. Run 385933, Event 16166833, LumiSection 35 on stream 0 at 26-May-2025 04:16:03.697 UTC
+== CMSSW: Begin processing the 222001st record. Run 385933, Event 15735365, LumiSection 35 on stream 0 at 26-May-2025 04:18:07.374 UTC
+== CMSSW: [2025-05-26 04:19:12.688168 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 222501st record. Run 385933, Event 16045447, LumiSection 35 on stream 0 at 26-May-2025 04:21:25.078 UTC
+== CMSSW: Begin processing the 223001st record. Run 385933, Event 15684274, LumiSection 35 on stream 0 at 26-May-2025 04:23:37.350 UTC
+== CMSSW: Begin processing the 223501st record. Run 385933, Event 15832042, LumiSection 35 on stream 0 at 26-May-2025 04:26:02.406 UTC
+== CMSSW: Begin processing the 224001st record. Run 385933, Event 16211439, LumiSection 35 on stream 0 at 26-May-2025 04:27:39.057 UTC
+== CMSSW: Begin processing the 224501st record. Run 385933, Event 16027215, LumiSection 35 on stream 0 at 26-May-2025 04:30:30.275 UTC
+== CMSSW: Begin processing the 225001st record. Run 385933, Event 16291669, LumiSection 35 on stream 0 at 26-May-2025 04:32:57.966 UTC
+== CMSSW: Begin processing the 225501st record. Run 385933, Event 16059674, LumiSection 35 on stream 0 at 26-May-2025 04:35:25.711 UTC
+== CMSSW: [2025-05-26 04:36:59.173157 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 226001st record. Run 385933, Event 15952060, LumiSection 35 on stream 0 at 26-May-2025 04:38:03.093 UTC
+== CMSSW: Begin processing the 226501st record. Run 385933, Event 16327820, LumiSection 35 on stream 0 at 26-May-2025 04:40:03.068 UTC
+== CMSSW: Begin processing the 227001st record. Run 385933, Event 15662045, LumiSection 35 on stream 0 at 26-May-2025 04:42:31.993 UTC
+== CMSSW: Begin processing the 227501st record. Run 385933, Event 16112581, LumiSection 35 on stream 0 at 26-May-2025 04:44:26.714 UTC
+== CMSSW: Begin processing the 228001st record. Run 385933, Event 15957532, LumiSection 35 on stream 0 at 26-May-2025 04:46:27.891 UTC
+== CMSSW: Begin processing the 228501st record. Run 385933, Event 15933822, LumiSection 35 on stream 0 at 26-May-2025 04:48:43.348 UTC
+== CMSSW: Begin processing the 229001st record. Run 385933, Event 16313213, LumiSection 35 on stream 0 at 26-May-2025 04:50:39.709 UTC
+== CMSSW: Begin processing the 229501st record. Run 385933, Event 16127866, LumiSection 35 on stream 0 at 26-May-2025 04:53:04.476 UTC
+== CMSSW: [2025-05-26 04:54:00.432166 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 230001st record. Run 385933, Event 16189876, LumiSection 35 on stream 0 at 26-May-2025 04:55:22.527 UTC
+== CMSSW: Begin processing the 230501st record. Run 385933, Event 16348564, LumiSection 35 on stream 0 at 26-May-2025 04:58:18.685 UTC
+== CMSSW: Begin processing the 231001st record. Run 385933, Event 15547838, LumiSection 35 on stream 0 at 26-May-2025 05:00:36.305 UTC
+== CMSSW: Begin processing the 231501st record. Run 385933, Event 16049427, LumiSection 35 on stream 0 at 26-May-2025 05:02:37.837 UTC
+== CMSSW: Begin processing the 232001st record. Run 385933, Event 15569719, LumiSection 35 on stream 0 at 26-May-2025 05:04:29.299 UTC
+== CMSSW: Begin processing the 232501st record. Run 385933, Event 16177122, LumiSection 35 on stream 0 at 26-May-2025 05:06:47.545 UTC
+== CMSSW: Begin processing the 233001st record. Run 385933, Event 16158313, LumiSection 35 on stream 0 at 26-May-2025 05:08:55.036 UTC
+== CMSSW: [2025-05-26 05:10:51.793156 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 233501st record. Run 385933, Event 15662192, LumiSection 35 on stream 0 at 26-May-2025 05:11:15.099 UTC
+== CMSSW: Begin processing the 234001st record. Run 385933, Event 16012400, LumiSection 35 on stream 0 at 26-May-2025 05:13:37.319 UTC
+== CMSSW: Begin processing the 234501st record. Run 385933, Event 15890169, LumiSection 35 on stream 0 at 26-May-2025 05:15:35.768 UTC
+== CMSSW: Begin processing the 235001st record. Run 385933, Event 16145541, LumiSection 35 on stream 0 at 26-May-2025 05:17:55.024 UTC
+== CMSSW: Begin processing the 235501st record. Run 385933, Event 15769781, LumiSection 35 on stream 0 at 26-May-2025 05:20:21.047 UTC
+== CMSSW: Begin processing the 236001st record. Run 385933, Event 15988680, LumiSection 35 on stream 0 at 26-May-2025 05:22:33.024 UTC
+== CMSSW: Begin processing the 236501st record. Run 385933, Event 15743895, LumiSection 35 on stream 0 at 26-May-2025 05:25:31.805 UTC
+== CMSSW: Begin processing the 237001st record. Run 385933, Event 15836940, LumiSection 35 on stream 0 at 26-May-2025 05:27:08.728 UTC
+== CMSSW: [2025-05-26 05:27:55.842133 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 237501st record. Run 385933, Event 16201732, LumiSection 35 on stream 0 at 26-May-2025 05:29:44.436 UTC
+== CMSSW: Begin processing the 238001st record. Run 385933, Event 15929960, LumiSection 35 on stream 0 at 26-May-2025 05:31:19.649 UTC
+== CMSSW: Begin processing the 238501st record. Run 385933, Event 15815050, LumiSection 35 on stream 0 at 26-May-2025 05:33:52.428 UTC
+== CMSSW: Begin processing the 239001st record. Run 385933, Event 16163412, LumiSection 35 on stream 0 at 26-May-2025 05:35:56.022 UTC
+== CMSSW: Begin processing the 239501st record. Run 385933, Event 16174357, LumiSection 35 on stream 0 at 26-May-2025 05:38:40.996 UTC
+== CMSSW: Begin processing the 240001st record. Run 385933, Event 15838770, LumiSection 35 on stream 0 at 26-May-2025 05:40:28.644 UTC
+== CMSSW: Begin processing the 240501st record. Run 385933, Event 16178039, LumiSection 35 on stream 0 at 26-May-2025 05:42:30.421 UTC
+== CMSSW: [2025-05-26 05:44:58.724081 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 241001st record. Run 385933, Event 15924521, LumiSection 35 on stream 0 at 26-May-2025 05:45:42.777 UTC
+== CMSSW: Begin processing the 241501st record. Run 385933, Event 15665512, LumiSection 35 on stream 0 at 26-May-2025 05:47:43.406 UTC
+== CMSSW: Begin processing the 242001st record. Run 385933, Event 15725702, LumiSection 35 on stream 0 at 26-May-2025 05:50:35.254 UTC
+== CMSSW: Begin processing the 242501st record. Run 385933, Event 16252832, LumiSection 35 on stream 0 at 26-May-2025 05:53:20.890 UTC
+== CMSSW: Begin processing the 243001st record. Run 385933, Event 15981073, LumiSection 35 on stream 0 at 26-May-2025 05:55:52.269 UTC
+== CMSSW: Begin processing the 243501st record. Run 385933, Event 16034535, LumiSection 35 on stream 0 at 26-May-2025 05:57:54.499 UTC
+== CMSSW: Begin processing the 244001st record. Run 385933, Event 15728083, LumiSection 35 on stream 0 at 26-May-2025 05:59:57.788 UTC
+== CMSSW: Begin processing the 244501st record. Run 385933, Event 15642370, LumiSection 35 on stream 0 at 26-May-2025 06:01:36.262 UTC
+== CMSSW: [2025-05-26 06:03:20.760150 +0000][Error  ][PostMaster        ] [cmsxrootd-site1.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+== CMSSW: Begin processing the 245001st record. Run 385933, Event 16118422, LumiSection 35 on stream 0 at 26-May-2025 06:03:41.099 UTC
+== CMSSW: Begin processing the 245501st record. Run 385933, Event 15908677, LumiSection 35 on stream 0 at 26-May-2025 06:05:44.695 UTC
+== CMSSW: Begin processing the 246001st record. Run 385933, Event 15824771, LumiSection 35 on stream 0 at 26-May-2025 06:07:43.511 UTC
+== CMSSW: Begin processing the 246501st record. Run 385933, Event 16309966, LumiSection 35 on stream 0 at 26-May-2025 06:10:33.723 UTC
+== CMSSW: 26-May-2025 06:12:23 UTC  Closed file root://cmsxrootd-site.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root
+== CMSSW:
+== CMSSW: TimeReport> Time report complete in 58564.1 seconds
+== CMSSW:  Time Summary:
+== CMSSW:  - Min event:   6.7281e-05
+== CMSSW:  - Max event:   35.6014
+== CMSSW:  - Avg event:   0.236792
+== CMSSW:  - Total loop:  58500.1
+== CMSSW:  - Total init:  49.7176
+== CMSSW:  - Total job:   58564.1
+== CMSSW:  - Total EventSetup: 11.9901
+== CMSSW:  - Total non-module: 4146.58
+== CMSSW:  Event Throughput: 4.21949 ev/s
+== CMSSW:  CPU Summary:
+== CMSSW:  - Total loop:     56378.9
+== CMSSW:  - Total init:     32.17
+== CMSSW:  - Total extra:    0
+== CMSSW:  - Total children: 2685.66
+== CMSSW:  - Total job:      56420.4
+== CMSSW:  Processing Summary:
+== CMSSW:  - Number of Events:  246841
+== CMSSW:  - Number of Global Begin Lumi Calls:  2
+== CMSSW:  - Number of Global Begin Run Calls: 1
+== CMSSW:
+======== CMSSW OUTPUT FINISHING ========
+==== Report file creation STARTING at Mon May 26 06:12:38 2025 UTC ====
+Sanitize FJR
+
+Job Exit Code from FrameworkJobReport.xml: 0 
+CONDITION FOR REPORTING READ BRANCHES WAS FALSE
+==== Job Exit Code from FrameworkJobReport.xml and Application exit code: 0 ====
+==== Checksum computation STARTING at Mon May 26 06:12:38 2025 UTC ====
+==== Checksum FINISHED at Mon May 26 06:12:38 2025 UTC ====
+== FileName: /srv/DY2M_ScoutingTree_Output_Renewed.root  -  FileAdler32: 627a58d5- FileSize: 1.1552047729492188.3f MBytes
+Error: Error processing XML file: Process element not found under FrameworkJobReport
+PsetHash could not be extracted from FrameworkJobReport. Trying to extract from EdmProvDump...
+== Execution site from site-local-config.xml: T1_US_FNAL
+==== Report file creation FINISHED at Mon May 26 06:12:38 2025 UTC ====
+==== CMSRunAnalysis.py FINISHED at Mon May 26 06:12:38 2025 UTC ====
+Local time : Mon May 26 06:12:38 2025
++ jobrc=0
++ set +x
+== The job had an exit code of 0 
+======== CMSRunAnalysis.py FINISHING at Mon May 26 06:12:38 GMT 2025 ========
+
+real	976m21.252s
+user	929m46.880s
+sys	10m46.045s
+CMSRunAnalysis.sh complete at Mon May 26 06:12:38 GMT 2025 with (short) exit status 0
+======== CMSRunAnalysis.sh at Mon May 26 06:12:38 GMT 2025 FINISHING ========
+======== User application running completed. Prepare env. for stageout ===
+======== CMS environment load starting at Mon May 26 06:12:38 GMT 2025 ========
+WN missing VO_CMS_SW_DIR/OSG_APP/CVMFS environment variable, forcing it to CVMFS=/cvmfs/cms.cern.ch
+CRAB job bootstrap: thinks it found the correct CMSSW setup script
+======== CMS environment load finished at Mon May 26 06:12:38 GMT 2025 ========
+
+======== python bootstrap for stageout at Mon May 26 06:12:38 GMT 2025 STARTING ========
+Job requires OS: rhel9, thus setting ScramArch to: rhel9_x86_64
+WMAgent bootstrap: COMP Python path is: /cvmfs/cms.cern.ch/COMP/rhel9_x86_64/external
+WMAgent bootstrap: latest python3 release is: 3.9.6
+Sourcing python future library from: /cvmfs/cms.cern.ch/COMP/rhel9_x86_64/external/py3-future/0.18.2/etc/profile.d/init.sh
+WMAgent bootstrap: found python3 at..
+/cvmfs/cms.cern.ch/cs9_amd64_gcc11/external/python3/3.9.6-2c93591d796451daeaf67dc8130bfa35/bin/python3
+======== python bootstrap for stageout at Mon May 26 06:12:38 GMT 2025 FINISHED ========
+======== Stageout at Mon May 26 06:12:38 GMT 2025 STARTING ========
+====== Mon May 26 06:12:39 2025: cmscp.py STARTING.
+Stageout policy: local, remote
+SRC site T1_US_FNAL has davs ? True. Has gsiftp ? False.
+DST site T3_CH_CERNBOX has davs ? True. Has gsiftp ? False.
+====== Mon May 26 06:12:39 2025: Starting job report validation.
+Job report seems ok (it has the expected structure).
+Retrieved payload exit code ('jobExitCode') = 0 from job report.
+Retrieved job wrapper exit code ('exitCode') = 0 from job report.
+====== Mon May 26 06:12:39 2025: Finished job report validation (status 0).
+====== Mon May 26 06:12:39 2025: Starting to check if user output files exist.
+Output file DY2M_ScoutingTree_Output_Renewed.root exists.
+====== Mon May 26 06:12:39 2025: Finished to check if user output files exist (status 0).
+====== Mon May 26 06:12:39 2025: Starting to check if user output files are in job report.
+Output file DY2M_ScoutingTree_Output_Renewed.root found in job report.
+====== Mon May 26 06:12:39 2025: Finished to check if user output files are in job report (status 0).
+====== Mon May 26 06:12:39 2025: Starting creation of user logs archive file.
+Adding cmsRun-stdout.log to archive file cmsRun.log.tar.gz
+WARNING: cmsRun-stderr.log is missing.
+Adding FrameworkJobReport.xml to archive file cmsRun.log.tar.gz
+====== Mon May 26 06:12:39 2025: Finished creation of user logs archive file (status 0).
+====== Mon May 26 06:12:39 2025: Starting initialization of stageout manager for local stageouts.
+       -----> Stageout manager log start
+INFO:root:StageOutMgr::__init__()
+INFO:root:==== Stageout configuration start ====
+INFO:root:
+There are 2 stage out definitions.
+INFO:root:
+Stage out to : T1_US_FNAL_Disk using: xrdcp
+INFO:root:
+Rucio File Catalog has been loaded:
+	lfn-to-pfn: protocol=xrootd path-match-re=/(.*) result=root://cmsxrootd-site.fnal.gov//$1
+	lfn-to-pfn: protocol=XRootD path-match-re=/+store/temp/user/(.*) result=root://cmseos.fnal.gov//eos/uscms/store/temp/user/$1
+	lfn-to-pfn: protocol=XRootD path-match-re=/+store/(.*) result=root://cmsdcadisk.fnal.gov//dcache/uscmsdisk/store/$1
+	lfn-to-pfn: protocol=WebDAV path-match-re=/(.*) result=davs://cmsdcadisk.fnal.gov:2880/dcache/uscmsdisk/$1
+	pfn-to-lfn: protocol=xrootd path-match-re=root://cmsxrootd-site.fnal.gov//(.*) result=/$1
+	pfn-to-lfn: protocol=XRootD path-match-re=root://cmseos.fnal.gov//eos/uscms/store/temp/user/(.*) result=/store/temp/user/$1
+	pfn-to-lfn: protocol=XRootD path-match-re=root://cmsdcadisk.fnal.gov//dcache/uscmsdisk/store/(.*) result=/store/$1
+	pfn-to-lfn: protocol=WebDAV path-match-re=davs://cmsdcadisk.fnal.gov:2880/dcache/uscmsdisk/(.*) result=/$1
+
+INFO:root:
+Stage out to : T1_US_FNAL_Disk using: gfal2
+INFO:root:
+Rucio File Catalog has been loaded:
+	lfn-to-pfn: protocol=xrootd path-match-re=/(.*) result=root://cmsxrootd-site.fnal.gov//$1
+	lfn-to-pfn: protocol=XRootD path-match-re=/+store/temp/user/(.*) result=root://cmseos.fnal.gov//eos/uscms/store/temp/user/$1
+	lfn-to-pfn: protocol=XRootD path-match-re=/+store/(.*) result=root://cmsdcadisk.fnal.gov//dcache/uscmsdisk/store/$1
+	lfn-to-pfn: protocol=WebDAV path-match-re=/(.*) result=davs://cmsdcadisk.fnal.gov:2880/dcache/uscmsdisk/$1
+	pfn-to-lfn: protocol=xrootd path-match-re=root://cmsxrootd-site.fnal.gov//(.*) result=/$1
+	pfn-to-lfn: protocol=XRootD path-match-re=root://cmseos.fnal.gov//eos/uscms/store/temp/user/(.*) result=/store/temp/user/$1
+	pfn-to-lfn: protocol=XRootD path-match-re=root://cmsdcadisk.fnal.gov//dcache/uscmsdisk/store/(.*) result=/store/$1
+	pfn-to-lfn: protocol=WebDAV path-match-re=davs://cmsdcadisk.fnal.gov:2880/dcache/uscmsdisk/(.*) result=/$1
+
+INFO:root:==== Stageout configuration finish ====
+       <----- Stageout manager log finish
+Initialization was ok.
+====== Mon May 26 06:12:39 2025: Finished initialization of stageout manager for local stageouts (status 0).
+Will use gfal2 commands for direct stageout.
+====== Mon May 26 06:12:39 2025: Starting initialization of stageout implementation for direct stageouts.
+Initialization was ok.
+====== Mon May 26 06:12:39 2025: Finished initialization of stageout implementation for direct stageouts (status 0).
+====== Mon May 26 06:12:39 2025: Starting local stageout of user logs archive file.
+       -----> Stageout manager log start
+INFO:root:==>Working on file: /store/temp/user/amalhotr.2382a3cf28fdeacb1de9b039908761ea517a5ed6/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621/0000/log/cmsRun_5.log.tar.gz
+INFO:root:===> Attempting 2 Stage Outs
+INFO:root:LFN to PFN match made:
+LFN: /store/temp/user/amalhotr.2382a3cf28fdeacb1de9b039908761ea517a5ed6/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621/0000/log/cmsRun_5.log.tar.gz
+PFN: root://cmseos.fnal.gov//eos/uscms/store/temp/user/amalhotr.2382a3cf28fdeacb1de9b039908761ea517a5ed6/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621/0000/log/cmsRun_5.log.tar.gz
+
+INFO:root:Creating output directory...
+INFO:root:Running the stage out...
+INFO:root:Command exited with status: 0
+Output message: stdout: Local File Size is: 12804
+xrdcp exit code: 0
+Remote File Size is: 12804
+
+stderr: 
+INFO:root:attempting stageOut
+INFO:root:===> Stage Out Successful: {'LFN': '/store/temp/user/amalhotr.2382a3cf28fdeacb1de9b039908761ea517a5ed6/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621/0000/log/cmsRun_5.log.tar.gz', 'PFN': 'root://cmseos.fnal.gov//eos/uscms/store/temp/user/amalhotr.2382a3cf28fdeacb1de9b039908761ea517a5ed6/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621/0000/log/cmsRun_5.log.tar.gz', 'StageOutReport': [], 'PNN': 'T1_US_FNAL_Disk', 'StageOutCommand': 'xrdcp'}
+       <----- Stageout manager log finish
+INFO: PNN is defined in site-local-config. T1_US_FNAL_Disk changed to T1_US_FNAL_Disk
+Setting temp_storage_site = 'T1_US_FNAL_Disk', storage_site = 'T3_CH_CERNBOX', local_stageout = True for file cmsRun.log.tar.gz in job report.
+====== Mon May 26 06:12:39 2025: Finished local stageout of user logs archive file (status 0).
+====== Mon May 26 06:12:39 2025: Starting local stageout of user output files.
+-----> Mon May 26 06:12:39 2025: Starting local stageout of DY2M_ScoutingTree_Output_Renewed.root.
+       -----> Stageout manager log start
+INFO:root:==>Working on file: /store/temp/user/amalhotr.2382a3cf28fdeacb1de9b039908761ea517a5ed6/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621/0000/DY2M_ScoutingTree_Output_Renewed_5.root
+INFO:root:===> Attempting 2 Stage Outs
+INFO:root:LFN to PFN match made:
+LFN: /store/temp/user/amalhotr.2382a3cf28fdeacb1de9b039908761ea517a5ed6/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621/0000/DY2M_ScoutingTree_Output_Renewed_5.root
+PFN: root://cmseos.fnal.gov//eos/uscms/store/temp/user/amalhotr.2382a3cf28fdeacb1de9b039908761ea517a5ed6/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621/0000/DY2M_ScoutingTree_Output_Renewed_5.root
+
+INFO:root:Creating output directory...
+INFO:root:Running the stage out...
+INFO:root:Command exited with status: 0
+Output message: stdout: Local File Size is: 1211320
+xrdcp exit code: 0
+Remote File Size is: 1211320
+
+stderr: 
+INFO:root:attempting stageOut
+INFO:root:===> Stage Out Successful: {'LFN': '/store/temp/user/amalhotr.2382a3cf28fdeacb1de9b039908761ea517a5ed6/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621/0000/DY2M_ScoutingTree_Output_Renewed_5.root', 'PFN': 'root://cmseos.fnal.gov//eos/uscms/store/temp/user/amalhotr.2382a3cf28fdeacb1de9b039908761ea517a5ed6/ScoutingPFRun3/RealData_noLFNDirectory_All_LumiBased_2_boost_v1/250523_212621/0000/DY2M_ScoutingTree_Output_Renewed_5.root', 'StageOutReport': [], 'PNN': 'T1_US_FNAL_Disk', 'StageOutCommand': 'xrdcp'}
+       <----- Stageout manager log finish
+INFO: PNN is defined in site-local-config. T1_US_FNAL_Disk changed to T1_US_FNAL_Disk
+Setting temp_storage_site = 'T1_US_FNAL_Disk', storage_site = 'T3_CH_CERNBOX', local_stageout = True for file DY2M_ScoutingTree_Output_Renewed.root in job report.
+<----- Mon May 26 06:12:40 2025: Finished local stageout of DY2M_ScoutingTree_Output_Renewed.root (status 0).
+====== Mon May 26 06:12:40 2025: Finished local stageout of user output files (status 0).
+====== Mon May 26 06:12:40 2025: cmscp.py FINISHING (status 0).
+
+real	0m1.395s
+user	0m0.669s
+sys	0m0.397s
+======== Stageout at Mon May 26 06:12:40 GMT 2025 FINISHING (short status 0) ========
+======== gWMS-CMSRunAnalysis.sh FINISHING at Mon May 26 06:12:40 GMT 2025 on cmsgli-548817-0-cmswn7030.fnal.gov with (short) status 0 ========
+Local time: Mon May 26 06:12:40 UTC 2025
+Short exit status: 0
+======== Figuring out long exit code of the job for condor_chirp at Mon May 26 06:12:40 GMT 2025========
+==== Long exit code of the job is 0 ====
+======== Finished condor_chirp -ing the exit code of the job. Exit code of condor_chirp: 0 ========
+======== Checking execution of user application (cmsRun and scriptExe) Mon May 26 06:12:40 GMT 2025========
+the file cmsRun-stdout.log.tmp does **NOT** exist
+the file cmsRun-stdout.log exists
+the file cmsRun-stdout.log is non-empty. wc (newlines, words, bytes):  582 9761 71687 cmsRun-stdout.log
+======== Checking execution of cmsRun Mon May 26 06:12:40 GMT 2025========
+the file FrameworkJobReport.xml exists
+the file FrameworkJobReport.xml is non-empty. wc (newlines, words, bytes):  443 1201 26453 FrameworkJobReport.xml
+the file jobReport.json.5 exists
+the file jobReport.json.5 is non-empty. wc (newlines, words, bytes):  0 937 17072 jobReport.json.5
+the file jobReport.exitCode.txt exists
+the file jobReport.exitCode.txt is non-empty. wc (newlines, words, bytes):  0 1 1 jobReport.exitCode.txt
+======== Finished - Checking execution of user application Mon May 26 06:12:40 GMT 2025========
+Job started:   1748181377 ,  Sun May 25 13:56:17 GMT 2025
+Job finished:  1748239960 ,  Mon May 26 06:12:40 GMT 2025
+Job Running time in seconds:  58583
