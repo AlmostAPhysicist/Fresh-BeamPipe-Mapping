@@ -1,0 +1,1745 @@
+<FrameworkJobReport>
+
+<InputFile>
+<State  Value="closed"/>
+<LFN>/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/00ec2d24-6d81-4fde-a650-892805966ea9.root</LFN>
+<PFN>root://gfe02.grid.hep.ph.ic.ac.uk:1094//pnfs/hep.ph.ic.ac.uk/data/cms/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/00ec2d24-6d81-4fde-a650-892805966ea9.root</PFN>
+<Catalog></Catalog>
+<ModuleLabel>source</ModuleLabel>
+<GUID>00ec2d24-6d81-4fde-a650-892805966ea9</GUID>
+<Branches>
+  <Branch>CSCDetIdCSCSegmentsOwnedRangeMap_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>CSCDetIdCSCSegmentsOwnedRangeMap_slimmedMuons__PAT.</Branch>
+  <Branch>CTPPSLocalTrackLites_ctppsLocalTrackLiteProducer__RECO.</Branch>
+  <Branch>DTChamberIdDTRecSegment4DsOwnedRangeMap_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>DTChamberIdDTRecSegment4DsOwnedRangeMap_slimmedMuons__PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedEBRecHits_PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedEERecHits_PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedESRecHits_PAT.</Branch>
+  <Branch>FEDRawDataCollection_hltFEDSelectorL1__HLT.</Branch>
+  <Branch>GenEventInfoProduct_generator__SIM.</Branch>
+  <Branch>GlobalAlgBlkBXVector_gtStage2Digis__RECO.</Branch>
+  <Branch>GlobalExtBlkBXVector_gtStage2Digis__RECO.</Branch>
+  <Branch>HBHERecHitsSorted_reducedEgamma_reducedHBHEHits_PAT.</Branch>
+  <Branch>HBHERecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HFRecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HORecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HcalNoiseSummary_hcalnoise__RECO.</Branch>
+  <Branch>L1GlobalTriggerReadoutRecord_gtDigis__RECO.</Branch>
+  <Branch>LHEEventProduct_externalLHEProducer__SIM.</Branch>
+  <Branch>LumiScalerss_scalersRawToDigi__RECO.</Branch>
+  <Branch>PileupSummaryInfos_slimmedAddPileupInfo__PAT.</Branch>
+  <Branch>Run3ScoutingElectrons_hltScoutingEgammaPacker__HLT.</Branch>
+  <Branch>Run3ScoutingMuons_hltScoutingMuonPackerNoVtx__HLT.</Branch>
+  <Branch>Run3ScoutingMuons_hltScoutingMuonPackerVtx__HLT.</Branch>
+  <Branch>Run3ScoutingPFJets_hltScoutingPFPacker__HLT.</Branch>
+  <Branch>Run3ScoutingParticles_hltScoutingPFPacker__HLT.</Branch>
+  <Branch>Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT.</Branch>
+  <Branch>Run3ScoutingTracks_hltScoutingTrackPacker__HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingMuonPackerNoVtx_displacedVtx_HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingMuonPackerVtx_displacedVtx_HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingPrimaryVertexPacker_primaryVtx_HLT.</Branch>
+  <Branch>SiPixelClusteredmNewDetSetVector_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiPixelClusteredmNewDetSetVector_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiStripClusteredmNewDetSetVector_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiStripClusteredmNewDetSetVector_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>Strings_slimmedPatTrigger_filterLabels_PAT.</Branch>
+  <Branch>TrackingRecHitsOwned_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>TrackingRecHitsOwned_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>double_fixedGridRhoAll__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAll__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAllCalo__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAllTmp__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentral__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralCalo__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralChargedPileUp__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralNeutral__RECO.</Branch>
+  <Branch>double_hltScoutingPFPacker_pfMetPhi_HLT.</Branch>
+  <Branch>double_hltScoutingPFPacker_pfMetPt_HLT.</Branch>
+  <Branch>double_hltScoutingPFPacker_rho_HLT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__HLT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__PAT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__RECO.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__SIM.</Branch>
+  <Branch>float_genParticles_t0_HLT.</Branch>
+  <Branch>floatROOTMathCartesian3DROOTMathDefaultCoordinateSystemTagROOTMathPositionVector3D_genParticles_xyz0_HLT.</Branch>
+  <Branch>floatedmValueMap_offlineSlimmedPrimaryVertices__PAT.</Branch>
+  <Branch>floatedmValueMap_offlineSlimmedPrimaryVerticesWithBS__PAT.</Branch>
+  <Branch>l1tEGammaBXVector_caloStage2Digis_EGamma_RECO.</Branch>
+  <Branch>l1tEtSumBXVector_caloStage2Digis_EtSum_RECO.</Branch>
+  <Branch>l1tJetBXVector_caloStage2Digis_Jet_RECO.</Branch>
+  <Branch>l1tMuonBXVector_gmtStage2Digis_Muon_RECO.</Branch>
+  <Branch>l1tTauBXVector_caloStage2Digis_Tau_RECO.</Branch>
+  <Branch>patCompositeCandidates_oniaPhotonCandidates_conversions_PAT.</Branch>
+  <Branch>patElectrons_slimmedElectrons__PAT.</Branch>
+  <Branch>patElectrons_slimmedLowPtElectrons__PAT.</Branch>
+  <Branch>patIsolatedTracks_isolatedTracks__PAT.</Branch>
+  <Branch>patJets_slimmedJets__PAT.</Branch>
+  <Branch>patJets_slimmedJetsAK8__PAT.</Branch>
+  <Branch>patJets_slimmedJetsAK8PFPuppiSoftDropPacked_SubJets_PAT.</Branch>
+  <Branch>patJets_slimmedJetsPuppi__PAT.</Branch>
+  <Branch>patMETs_slimmedMETs__PAT.</Branch>
+  <Branch>patMETs_slimmedMETsPuppi__PAT.</Branch>
+  <Branch>patMuons_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>patMuons_slimmedMuons__PAT.</Branch>
+  <Branch>patPackedCandidates_lostTracks__PAT.</Branch>
+  <Branch>patPackedCandidates_lostTracks_eleTracks_PAT.</Branch>
+  <Branch>patPackedCandidates_packedPFCandidates__PAT.</Branch>
+  <Branch>patPackedGenParticles_packedGenParticles__PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger__PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger_l1max_PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger_l1min_PAT.</Branch>
+  <Branch>patPhotons_slimmedOOTPhotons__PAT.</Branch>
+  <Branch>patPhotons_slimmedPhotons__PAT.</Branch>
+  <Branch>patTaus_slimmedTaus__PAT.</Branch>
+  <Branch>patTaus_slimmedTausBoosted__PAT.</Branch>
+  <Branch>patTriggerObjectStandAlones_slimmedPatTrigger__PAT.</Branch>
+  <Branch>recoBaseTagInfosOwned_slimmedJets_tagInfos_PAT.</Branch>
+  <Branch>recoBaseTagInfosOwned_slimmedJetsPuppi_tagInfos_PAT.</Branch>
+  <Branch>recoBeamHaloSummary_BeamHaloSummary__RECO.</Branch>
+  <Branch>recoBeamSpot_offlineBeamSpot__RECO.</Branch>
+  <Branch>recoCSCHaloData_CSCHaloData__RECO.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedEBEEClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedESClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedOOTEBEEClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedOOTESClusters_PAT.</Branch>
+  <Branch>recoCaloJets_slimmedCaloJets__PAT.</Branch>
+  <Branch>recoCaloJets_slimmedJPTJets__PAT.</Branch>
+  <Branch>recoConversions_gsfTracksOpenConversions_gsfTracksOpenConversions_RECO.</Branch>
+  <Branch>recoConversions_reducedEgamma_reducedConversions_PAT.</Branch>
+  <Branch>recoConversions_reducedEgamma_reducedSingleLegConversions_PAT.</Branch>
+  <Branch>recoDeDxHitInfos_isolatedTracks__PAT.</Branch>
+  <Branch>recoDeDxHitInfosedmAssociation_isolatedTracks__PAT.</Branch>
+  <Branch>recoForwardProtons_ctppsProtons_multiRP_RECO.</Branch>
+  <Branch>recoForwardProtons_ctppsProtons_singleRP_RECO.</Branch>
+  <Branch>recoGenJets_slimmedGenJets__PAT.</Branch>
+  <Branch>recoGenJets_slimmedGenJetsAK8__PAT.</Branch>
+  <Branch>recoGenJets_slimmedGenJetsAK8SoftDropSubJets__PAT.</Branch>
+  <Branch>recoGenMETs_genMetTrue__HLT.</Branch>
+  <Branch>recoGenParticles_genPUProtons_genPUProtons_HLT.</Branch>
+  <Branch>recoGenParticles_prunedGenParticles__PAT.</Branch>
+  <Branch>recoGenParticlesedmAssociation_lostTracksToGenAssociation__PAT.</Branch>
+  <Branch>recoGenParticlesedmAssociation_packedPFCandidateToGenAssociation__PAT.</Branch>
+  <Branch>recoGsfElectronCores_reducedEgamma_reducedGedGsfElectronCores_PAT.</Branch>
+  <Branch>recoGsfTracks_reducedEgamma_reducedGsfTracks_PAT.</Branch>
+  <Branch>recoJPTJets_slimmedJPTJets__PAT.</Branch>
+  <Branch>recoJetFlavourInfoMatchingCollection_slimmedGenJetsFlavourInfos__PAT.</Branch>
+  <Branch>recoPhotonCores_reducedEgamma_reducedGedPhotonCores_PAT.</Branch>
+  <Branch>recoPhotonCores_reducedEgamma_reducedOOTPhotonCores_PAT.</Branch>
+  <Branch>recoSuperClusters_reducedEgamma_reducedOOTSuperClusters_PAT.</Branch>
+  <Branch>recoSuperClusters_reducedEgamma_reducedSuperClusters_PAT.</Branch>
+  <Branch>recoTrackExtras_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>recoTrackExtras_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>recoTracks_displacedGlobalMuons__RECO.</Branch>
+  <Branch>recoTracks_displacedStandAloneMuons__RECO.</Branch>
+  <Branch>recoTracks_displacedTracks__RECO.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedKshortVertices__PAT.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedLambdaVertices__PAT.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedSecondaryVertices__PAT.</Branch>
+  <Branch>recoVertexs_offlineSlimmedPrimaryVertices__PAT.</Branch>
+  <Branch>recoVertexs_offlineSlimmedPrimaryVerticesWithBS__PAT.</Branch>
+  <Branch>uint_bunchSpacingProducer__PAT.</Branch>
+</Branches>
+<InputType>primaryFiles</InputType>
+<InputSourceClass>PoolSource</InputSourceClass>
+<EventsRead>29939</EventsRead>
+<Runs>
+<Run ID="1">
+   <LumiSection ID="455"/>
+   <LumiSection ID="13539"/>
+   <LumiSection ID="14390"/>
+   <LumiSection ID="39298"/>
+   <LumiSection ID="39770"/>
+   <LumiSection ID="45138"/>
+   <LumiSection ID="45151"/>
+   <LumiSection ID="45153"/>
+   <LumiSection ID="45211"/>
+   <LumiSection ID="45738"/>
+   <LumiSection ID="45842"/>
+   <LumiSection ID="46027"/>
+   <LumiSection ID="46165"/>
+   <LumiSection ID="46510"/>
+   <LumiSection ID="46523"/>
+   <LumiSection ID="46617"/>
+   <LumiSection ID="47214"/>
+   <LumiSection ID="47548"/>
+   <LumiSection ID="48058"/>
+   <LumiSection ID="48164"/>
+   <LumiSection ID="48321"/>
+   <LumiSection ID="48956"/>
+   <LumiSection ID="49171"/>
+   <LumiSection ID="49173"/>
+   <LumiSection ID="49418"/>
+   <LumiSection ID="49539"/>
+   <LumiSection ID="49827"/>
+   <LumiSection ID="49988"/>
+   <LumiSection ID="50447"/>
+   <LumiSection ID="50486"/>
+   <LumiSection ID="50664"/>
+   <LumiSection ID="50845"/>
+   <LumiSection ID="89030"/>
+   <LumiSection ID="89244"/>
+   <LumiSection ID="90493"/>
+   <LumiSection ID="90543"/>
+   <LumiSection ID="90775"/>
+   <LumiSection ID="90837"/>
+   <LumiSection ID="90849"/>
+   <LumiSection ID="90862"/>
+   <LumiSection ID="90911"/>
+   <LumiSection ID="90977"/>
+</Run>
+
+</Runs>
+</InputFile>
+
+<InputFile>
+<State  Value="closed"/>
+<LFN>/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/050ea95d-2d49-4a18-bb9a-a0d272a79945.root</LFN>
+<PFN>root://gfe02.grid.hep.ph.ic.ac.uk:1094//pnfs/hep.ph.ic.ac.uk/data/cms/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/050ea95d-2d49-4a18-bb9a-a0d272a79945.root</PFN>
+<Catalog></Catalog>
+<ModuleLabel>source</ModuleLabel>
+<GUID>050ea95d-2d49-4a18-bb9a-a0d272a79945</GUID>
+<Branches>
+  <Branch>CSCDetIdCSCSegmentsOwnedRangeMap_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>CSCDetIdCSCSegmentsOwnedRangeMap_slimmedMuons__PAT.</Branch>
+  <Branch>CTPPSLocalTrackLites_ctppsLocalTrackLiteProducer__RECO.</Branch>
+  <Branch>DTChamberIdDTRecSegment4DsOwnedRangeMap_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>DTChamberIdDTRecSegment4DsOwnedRangeMap_slimmedMuons__PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedEBRecHits_PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedEERecHits_PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedESRecHits_PAT.</Branch>
+  <Branch>FEDRawDataCollection_hltFEDSelectorL1__HLT.</Branch>
+  <Branch>GenEventInfoProduct_generator__SIM.</Branch>
+  <Branch>GlobalAlgBlkBXVector_gtStage2Digis__RECO.</Branch>
+  <Branch>GlobalExtBlkBXVector_gtStage2Digis__RECO.</Branch>
+  <Branch>HBHERecHitsSorted_reducedEgamma_reducedHBHEHits_PAT.</Branch>
+  <Branch>HBHERecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HFRecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HORecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HcalNoiseSummary_hcalnoise__RECO.</Branch>
+  <Branch>L1GlobalTriggerReadoutRecord_gtDigis__RECO.</Branch>
+  <Branch>LHEEventProduct_externalLHEProducer__SIM.</Branch>
+  <Branch>LumiScalerss_scalersRawToDigi__RECO.</Branch>
+  <Branch>PileupSummaryInfos_slimmedAddPileupInfo__PAT.</Branch>
+  <Branch>Run3ScoutingElectrons_hltScoutingEgammaPacker__HLT.</Branch>
+  <Branch>Run3ScoutingMuons_hltScoutingMuonPackerNoVtx__HLT.</Branch>
+  <Branch>Run3ScoutingMuons_hltScoutingMuonPackerVtx__HLT.</Branch>
+  <Branch>Run3ScoutingPFJets_hltScoutingPFPacker__HLT.</Branch>
+  <Branch>Run3ScoutingParticles_hltScoutingPFPacker__HLT.</Branch>
+  <Branch>Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT.</Branch>
+  <Branch>Run3ScoutingTracks_hltScoutingTrackPacker__HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingMuonPackerNoVtx_displacedVtx_HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingMuonPackerVtx_displacedVtx_HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingPrimaryVertexPacker_primaryVtx_HLT.</Branch>
+  <Branch>SiPixelClusteredmNewDetSetVector_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiPixelClusteredmNewDetSetVector_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiStripClusteredmNewDetSetVector_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiStripClusteredmNewDetSetVector_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>Strings_slimmedPatTrigger_filterLabels_PAT.</Branch>
+  <Branch>TrackingRecHitsOwned_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>TrackingRecHitsOwned_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>double_fixedGridRhoAll__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAll__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAllCalo__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAllTmp__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentral__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralCalo__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralChargedPileUp__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralNeutral__RECO.</Branch>
+  <Branch>double_hltScoutingPFPacker_pfMetPhi_HLT.</Branch>
+  <Branch>double_hltScoutingPFPacker_pfMetPt_HLT.</Branch>
+  <Branch>double_hltScoutingPFPacker_rho_HLT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__HLT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__PAT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__RECO.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__SIM.</Branch>
+  <Branch>float_genParticles_t0_HLT.</Branch>
+  <Branch>floatROOTMathCartesian3DROOTMathDefaultCoordinateSystemTagROOTMathPositionVector3D_genParticles_xyz0_HLT.</Branch>
+  <Branch>floatedmValueMap_offlineSlimmedPrimaryVertices__PAT.</Branch>
+  <Branch>floatedmValueMap_offlineSlimmedPrimaryVerticesWithBS__PAT.</Branch>
+  <Branch>l1tEGammaBXVector_caloStage2Digis_EGamma_RECO.</Branch>
+  <Branch>l1tEtSumBXVector_caloStage2Digis_EtSum_RECO.</Branch>
+  <Branch>l1tJetBXVector_caloStage2Digis_Jet_RECO.</Branch>
+  <Branch>l1tMuonBXVector_gmtStage2Digis_Muon_RECO.</Branch>
+  <Branch>l1tTauBXVector_caloStage2Digis_Tau_RECO.</Branch>
+  <Branch>patCompositeCandidates_oniaPhotonCandidates_conversions_PAT.</Branch>
+  <Branch>patElectrons_slimmedElectrons__PAT.</Branch>
+  <Branch>patElectrons_slimmedLowPtElectrons__PAT.</Branch>
+  <Branch>patIsolatedTracks_isolatedTracks__PAT.</Branch>
+  <Branch>patJets_slimmedJets__PAT.</Branch>
+  <Branch>patJets_slimmedJetsAK8__PAT.</Branch>
+  <Branch>patJets_slimmedJetsAK8PFPuppiSoftDropPacked_SubJets_PAT.</Branch>
+  <Branch>patJets_slimmedJetsPuppi__PAT.</Branch>
+  <Branch>patMETs_slimmedMETs__PAT.</Branch>
+  <Branch>patMETs_slimmedMETsPuppi__PAT.</Branch>
+  <Branch>patMuons_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>patMuons_slimmedMuons__PAT.</Branch>
+  <Branch>patPackedCandidates_lostTracks__PAT.</Branch>
+  <Branch>patPackedCandidates_lostTracks_eleTracks_PAT.</Branch>
+  <Branch>patPackedCandidates_packedPFCandidates__PAT.</Branch>
+  <Branch>patPackedGenParticles_packedGenParticles__PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger__PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger_l1max_PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger_l1min_PAT.</Branch>
+  <Branch>patPhotons_slimmedOOTPhotons__PAT.</Branch>
+  <Branch>patPhotons_slimmedPhotons__PAT.</Branch>
+  <Branch>patTaus_slimmedTaus__PAT.</Branch>
+  <Branch>patTaus_slimmedTausBoosted__PAT.</Branch>
+  <Branch>patTriggerObjectStandAlones_slimmedPatTrigger__PAT.</Branch>
+  <Branch>recoBaseTagInfosOwned_slimmedJets_tagInfos_PAT.</Branch>
+  <Branch>recoBaseTagInfosOwned_slimmedJetsPuppi_tagInfos_PAT.</Branch>
+  <Branch>recoBeamHaloSummary_BeamHaloSummary__RECO.</Branch>
+  <Branch>recoBeamSpot_offlineBeamSpot__RECO.</Branch>
+  <Branch>recoCSCHaloData_CSCHaloData__RECO.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedEBEEClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedESClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedOOTEBEEClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedOOTESClusters_PAT.</Branch>
+  <Branch>recoCaloJets_slimmedCaloJets__PAT.</Branch>
+  <Branch>recoCaloJets_slimmedJPTJets__PAT.</Branch>
+  <Branch>recoConversions_gsfTracksOpenConversions_gsfTracksOpenConversions_RECO.</Branch>
+  <Branch>recoConversions_reducedEgamma_reducedConversions_PAT.</Branch>
+  <Branch>recoConversions_reducedEgamma_reducedSingleLegConversions_PAT.</Branch>
+  <Branch>recoDeDxHitInfos_isolatedTracks__PAT.</Branch>
+  <Branch>recoDeDxHitInfosedmAssociation_isolatedTracks__PAT.</Branch>
+  <Branch>recoForwardProtons_ctppsProtons_multiRP_RECO.</Branch>
+  <Branch>recoForwardProtons_ctppsProtons_singleRP_RECO.</Branch>
+  <Branch>recoGenJets_slimmedGenJets__PAT.</Branch>
+  <Branch>recoGenJets_slimmedGenJetsAK8__PAT.</Branch>
+  <Branch>recoGenJets_slimmedGenJetsAK8SoftDropSubJets__PAT.</Branch>
+  <Branch>recoGenMETs_genMetTrue__HLT.</Branch>
+  <Branch>recoGenParticles_genPUProtons_genPUProtons_HLT.</Branch>
+  <Branch>recoGenParticles_prunedGenParticles__PAT.</Branch>
+  <Branch>recoGenParticlesedmAssociation_lostTracksToGenAssociation__PAT.</Branch>
+  <Branch>recoGenParticlesedmAssociation_packedPFCandidateToGenAssociation__PAT.</Branch>
+  <Branch>recoGsfElectronCores_reducedEgamma_reducedGedGsfElectronCores_PAT.</Branch>
+  <Branch>recoGsfTracks_reducedEgamma_reducedGsfTracks_PAT.</Branch>
+  <Branch>recoJPTJets_slimmedJPTJets__PAT.</Branch>
+  <Branch>recoJetFlavourInfoMatchingCollection_slimmedGenJetsFlavourInfos__PAT.</Branch>
+  <Branch>recoPhotonCores_reducedEgamma_reducedGedPhotonCores_PAT.</Branch>
+  <Branch>recoPhotonCores_reducedEgamma_reducedOOTPhotonCores_PAT.</Branch>
+  <Branch>recoSuperClusters_reducedEgamma_reducedOOTSuperClusters_PAT.</Branch>
+  <Branch>recoSuperClusters_reducedEgamma_reducedSuperClusters_PAT.</Branch>
+  <Branch>recoTrackExtras_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>recoTrackExtras_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>recoTracks_displacedGlobalMuons__RECO.</Branch>
+  <Branch>recoTracks_displacedStandAloneMuons__RECO.</Branch>
+  <Branch>recoTracks_displacedTracks__RECO.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedKshortVertices__PAT.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedLambdaVertices__PAT.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedSecondaryVertices__PAT.</Branch>
+  <Branch>recoVertexs_offlineSlimmedPrimaryVertices__PAT.</Branch>
+  <Branch>recoVertexs_offlineSlimmedPrimaryVerticesWithBS__PAT.</Branch>
+  <Branch>uint_bunchSpacingProducer__PAT.</Branch>
+</Branches>
+<InputType>primaryFiles</InputType>
+<InputSourceClass>PoolSource</InputSourceClass>
+<EventsRead>37508</EventsRead>
+<Runs>
+<Run ID="1">
+   <LumiSection ID="394188"/>
+   <LumiSection ID="394507"/>
+   <LumiSection ID="394743"/>
+   <LumiSection ID="396291"/>
+   <LumiSection ID="396656"/>
+   <LumiSection ID="396870"/>
+   <LumiSection ID="399649"/>
+   <LumiSection ID="399772"/>
+   <LumiSection ID="399879"/>
+   <LumiSection ID="400018"/>
+   <LumiSection ID="400976"/>
+   <LumiSection ID="425181"/>
+   <LumiSection ID="425308"/>
+   <LumiSection ID="425325"/>
+   <LumiSection ID="425339"/>
+   <LumiSection ID="425388"/>
+   <LumiSection ID="425422"/>
+   <LumiSection ID="425463"/>
+   <LumiSection ID="425590"/>
+   <LumiSection ID="425610"/>
+   <LumiSection ID="425670"/>
+   <LumiSection ID="425678"/>
+   <LumiSection ID="425718"/>
+   <LumiSection ID="425743"/>
+   <LumiSection ID="425750"/>
+   <LumiSection ID="425776"/>
+   <LumiSection ID="425810"/>
+   <LumiSection ID="425844"/>
+   <LumiSection ID="425954"/>
+   <LumiSection ID="425957"/>
+   <LumiSection ID="426137"/>
+   <LumiSection ID="426378"/>
+   <LumiSection ID="426464"/>
+   <LumiSection ID="426649"/>
+   <LumiSection ID="426816"/>
+   <LumiSection ID="426858"/>
+   <LumiSection ID="426994"/>
+   <LumiSection ID="452118"/>
+   <LumiSection ID="452187"/>
+   <LumiSection ID="452503"/>
+   <LumiSection ID="452824"/>
+   <LumiSection ID="453027"/>
+   <LumiSection ID="453088"/>
+   <LumiSection ID="453414"/>
+   <LumiSection ID="454699"/>
+   <LumiSection ID="465511"/>
+   <LumiSection ID="465918"/>
+   <LumiSection ID="465981"/>
+   <LumiSection ID="472465"/>
+   <LumiSection ID="472550"/>
+   <LumiSection ID="472559"/>
+   <LumiSection ID="472606"/>
+   <LumiSection ID="472648"/>
+</Run>
+
+</Runs>
+</InputFile>
+
+<InputFile>
+<State  Value="closed"/>
+<LFN>/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/06ec8a57-3007-4c85-b9e7-383aaa1464a1.root</LFN>
+<PFN>root://gfe02.grid.hep.ph.ic.ac.uk:1094//pnfs/hep.ph.ic.ac.uk/data/cms/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/06ec8a57-3007-4c85-b9e7-383aaa1464a1.root</PFN>
+<Catalog></Catalog>
+<ModuleLabel>source</ModuleLabel>
+<GUID>06ec8a57-3007-4c85-b9e7-383aaa1464a1</GUID>
+<Branches>
+  <Branch>CSCDetIdCSCSegmentsOwnedRangeMap_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>CSCDetIdCSCSegmentsOwnedRangeMap_slimmedMuons__PAT.</Branch>
+  <Branch>CTPPSLocalTrackLites_ctppsLocalTrackLiteProducer__RECO.</Branch>
+  <Branch>DTChamberIdDTRecSegment4DsOwnedRangeMap_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>DTChamberIdDTRecSegment4DsOwnedRangeMap_slimmedMuons__PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedEBRecHits_PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedEERecHits_PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedESRecHits_PAT.</Branch>
+  <Branch>FEDRawDataCollection_hltFEDSelectorL1__HLT.</Branch>
+  <Branch>GenEventInfoProduct_generator__SIM.</Branch>
+  <Branch>GlobalAlgBlkBXVector_gtStage2Digis__RECO.</Branch>
+  <Branch>GlobalExtBlkBXVector_gtStage2Digis__RECO.</Branch>
+  <Branch>HBHERecHitsSorted_reducedEgamma_reducedHBHEHits_PAT.</Branch>
+  <Branch>HBHERecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HFRecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HORecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HcalNoiseSummary_hcalnoise__RECO.</Branch>
+  <Branch>L1GlobalTriggerReadoutRecord_gtDigis__RECO.</Branch>
+  <Branch>LHEEventProduct_externalLHEProducer__SIM.</Branch>
+  <Branch>LumiScalerss_scalersRawToDigi__RECO.</Branch>
+  <Branch>PileupSummaryInfos_slimmedAddPileupInfo__PAT.</Branch>
+  <Branch>Run3ScoutingElectrons_hltScoutingEgammaPacker__HLT.</Branch>
+  <Branch>Run3ScoutingMuons_hltScoutingMuonPackerNoVtx__HLT.</Branch>
+  <Branch>Run3ScoutingMuons_hltScoutingMuonPackerVtx__HLT.</Branch>
+  <Branch>Run3ScoutingPFJets_hltScoutingPFPacker__HLT.</Branch>
+  <Branch>Run3ScoutingParticles_hltScoutingPFPacker__HLT.</Branch>
+  <Branch>Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT.</Branch>
+  <Branch>Run3ScoutingTracks_hltScoutingTrackPacker__HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingMuonPackerNoVtx_displacedVtx_HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingMuonPackerVtx_displacedVtx_HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingPrimaryVertexPacker_primaryVtx_HLT.</Branch>
+  <Branch>SiPixelClusteredmNewDetSetVector_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiPixelClusteredmNewDetSetVector_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiStripClusteredmNewDetSetVector_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiStripClusteredmNewDetSetVector_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>Strings_slimmedPatTrigger_filterLabels_PAT.</Branch>
+  <Branch>TrackingRecHitsOwned_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>TrackingRecHitsOwned_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>double_fixedGridRhoAll__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAll__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAllCalo__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAllTmp__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentral__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralCalo__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralChargedPileUp__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralNeutral__RECO.</Branch>
+  <Branch>double_hltScoutingPFPacker_pfMetPhi_HLT.</Branch>
+  <Branch>double_hltScoutingPFPacker_pfMetPt_HLT.</Branch>
+  <Branch>double_hltScoutingPFPacker_rho_HLT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__HLT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__PAT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__RECO.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__SIM.</Branch>
+  <Branch>float_genParticles_t0_HLT.</Branch>
+  <Branch>floatROOTMathCartesian3DROOTMathDefaultCoordinateSystemTagROOTMathPositionVector3D_genParticles_xyz0_HLT.</Branch>
+  <Branch>floatedmValueMap_offlineSlimmedPrimaryVertices__PAT.</Branch>
+  <Branch>floatedmValueMap_offlineSlimmedPrimaryVerticesWithBS__PAT.</Branch>
+  <Branch>l1tEGammaBXVector_caloStage2Digis_EGamma_RECO.</Branch>
+  <Branch>l1tEtSumBXVector_caloStage2Digis_EtSum_RECO.</Branch>
+  <Branch>l1tJetBXVector_caloStage2Digis_Jet_RECO.</Branch>
+  <Branch>l1tMuonBXVector_gmtStage2Digis_Muon_RECO.</Branch>
+  <Branch>l1tTauBXVector_caloStage2Digis_Tau_RECO.</Branch>
+  <Branch>patCompositeCandidates_oniaPhotonCandidates_conversions_PAT.</Branch>
+  <Branch>patElectrons_slimmedElectrons__PAT.</Branch>
+  <Branch>patElectrons_slimmedLowPtElectrons__PAT.</Branch>
+  <Branch>patIsolatedTracks_isolatedTracks__PAT.</Branch>
+  <Branch>patJets_slimmedJets__PAT.</Branch>
+  <Branch>patJets_slimmedJetsAK8__PAT.</Branch>
+  <Branch>patJets_slimmedJetsAK8PFPuppiSoftDropPacked_SubJets_PAT.</Branch>
+  <Branch>patJets_slimmedJetsPuppi__PAT.</Branch>
+  <Branch>patMETs_slimmedMETs__PAT.</Branch>
+  <Branch>patMETs_slimmedMETsPuppi__PAT.</Branch>
+  <Branch>patMuons_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>patMuons_slimmedMuons__PAT.</Branch>
+  <Branch>patPackedCandidates_lostTracks__PAT.</Branch>
+  <Branch>patPackedCandidates_lostTracks_eleTracks_PAT.</Branch>
+  <Branch>patPackedCandidates_packedPFCandidates__PAT.</Branch>
+  <Branch>patPackedGenParticles_packedGenParticles__PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger__PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger_l1max_PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger_l1min_PAT.</Branch>
+  <Branch>patPhotons_slimmedOOTPhotons__PAT.</Branch>
+  <Branch>patPhotons_slimmedPhotons__PAT.</Branch>
+  <Branch>patTaus_slimmedTaus__PAT.</Branch>
+  <Branch>patTaus_slimmedTausBoosted__PAT.</Branch>
+  <Branch>patTriggerObjectStandAlones_slimmedPatTrigger__PAT.</Branch>
+  <Branch>recoBaseTagInfosOwned_slimmedJets_tagInfos_PAT.</Branch>
+  <Branch>recoBaseTagInfosOwned_slimmedJetsPuppi_tagInfos_PAT.</Branch>
+  <Branch>recoBeamHaloSummary_BeamHaloSummary__RECO.</Branch>
+  <Branch>recoBeamSpot_offlineBeamSpot__RECO.</Branch>
+  <Branch>recoCSCHaloData_CSCHaloData__RECO.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedEBEEClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedESClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedOOTEBEEClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedOOTESClusters_PAT.</Branch>
+  <Branch>recoCaloJets_slimmedCaloJets__PAT.</Branch>
+  <Branch>recoCaloJets_slimmedJPTJets__PAT.</Branch>
+  <Branch>recoConversions_gsfTracksOpenConversions_gsfTracksOpenConversions_RECO.</Branch>
+  <Branch>recoConversions_reducedEgamma_reducedConversions_PAT.</Branch>
+  <Branch>recoConversions_reducedEgamma_reducedSingleLegConversions_PAT.</Branch>
+  <Branch>recoDeDxHitInfos_isolatedTracks__PAT.</Branch>
+  <Branch>recoDeDxHitInfosedmAssociation_isolatedTracks__PAT.</Branch>
+  <Branch>recoForwardProtons_ctppsProtons_multiRP_RECO.</Branch>
+  <Branch>recoForwardProtons_ctppsProtons_singleRP_RECO.</Branch>
+  <Branch>recoGenJets_slimmedGenJets__PAT.</Branch>
+  <Branch>recoGenJets_slimmedGenJetsAK8__PAT.</Branch>
+  <Branch>recoGenJets_slimmedGenJetsAK8SoftDropSubJets__PAT.</Branch>
+  <Branch>recoGenMETs_genMetTrue__HLT.</Branch>
+  <Branch>recoGenParticles_genPUProtons_genPUProtons_HLT.</Branch>
+  <Branch>recoGenParticles_prunedGenParticles__PAT.</Branch>
+  <Branch>recoGenParticlesedmAssociation_lostTracksToGenAssociation__PAT.</Branch>
+  <Branch>recoGenParticlesedmAssociation_packedPFCandidateToGenAssociation__PAT.</Branch>
+  <Branch>recoGsfElectronCores_reducedEgamma_reducedGedGsfElectronCores_PAT.</Branch>
+  <Branch>recoGsfTracks_reducedEgamma_reducedGsfTracks_PAT.</Branch>
+  <Branch>recoJPTJets_slimmedJPTJets__PAT.</Branch>
+  <Branch>recoJetFlavourInfoMatchingCollection_slimmedGenJetsFlavourInfos__PAT.</Branch>
+  <Branch>recoPhotonCores_reducedEgamma_reducedGedPhotonCores_PAT.</Branch>
+  <Branch>recoPhotonCores_reducedEgamma_reducedOOTPhotonCores_PAT.</Branch>
+  <Branch>recoSuperClusters_reducedEgamma_reducedOOTSuperClusters_PAT.</Branch>
+  <Branch>recoSuperClusters_reducedEgamma_reducedSuperClusters_PAT.</Branch>
+  <Branch>recoTrackExtras_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>recoTrackExtras_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>recoTracks_displacedGlobalMuons__RECO.</Branch>
+  <Branch>recoTracks_displacedStandAloneMuons__RECO.</Branch>
+  <Branch>recoTracks_displacedTracks__RECO.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedKshortVertices__PAT.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedLambdaVertices__PAT.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedSecondaryVertices__PAT.</Branch>
+  <Branch>recoVertexs_offlineSlimmedPrimaryVertices__PAT.</Branch>
+  <Branch>recoVertexs_offlineSlimmedPrimaryVerticesWithBS__PAT.</Branch>
+  <Branch>uint_bunchSpacingProducer__PAT.</Branch>
+</Branches>
+<InputType>primaryFiles</InputType>
+<InputSourceClass>PoolSource</InputSourceClass>
+<EventsRead>32465</EventsRead>
+<Runs>
+<Run ID="1">
+   <LumiSection ID="205716"/>
+   <LumiSection ID="295705"/>
+   <LumiSection ID="295804"/>
+   <LumiSection ID="295828"/>
+   <LumiSection ID="311857"/>
+   <LumiSection ID="311962"/>
+   <LumiSection ID="312438"/>
+   <LumiSection ID="312856"/>
+   <LumiSection ID="312996"/>
+   <LumiSection ID="358146"/>
+   <LumiSection ID="358604"/>
+   <LumiSection ID="358872"/>
+   <LumiSection ID="359524"/>
+   <LumiSection ID="360025"/>
+   <LumiSection ID="360249"/>
+   <LumiSection ID="360440"/>
+   <LumiSection ID="360689"/>
+   <LumiSection ID="361042"/>
+   <LumiSection ID="361124"/>
+   <LumiSection ID="361186"/>
+   <LumiSection ID="361289"/>
+   <LumiSection ID="361785"/>
+   <LumiSection ID="361803"/>
+   <LumiSection ID="361877"/>
+   <LumiSection ID="362059"/>
+   <LumiSection ID="362753"/>
+   <LumiSection ID="362777"/>
+   <LumiSection ID="362780"/>
+   <LumiSection ID="362917"/>
+   <LumiSection ID="362946"/>
+   <LumiSection ID="363262"/>
+   <LumiSection ID="363511"/>
+   <LumiSection ID="363736"/>
+   <LumiSection ID="364247"/>
+   <LumiSection ID="395029"/>
+   <LumiSection ID="395033"/>
+   <LumiSection ID="395245"/>
+   <LumiSection ID="395295"/>
+   <LumiSection ID="395393"/>
+   <LumiSection ID="395478"/>
+   <LumiSection ID="395489"/>
+   <LumiSection ID="395496"/>
+   <LumiSection ID="395587"/>
+   <LumiSection ID="395604"/>
+   <LumiSection ID="395857"/>
+   <LumiSection ID="396514"/>
+</Run>
+
+</Runs>
+</InputFile>
+
+<InputFile>
+<State  Value="closed"/>
+<LFN>/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/16198f96-cbf3-4809-95f8-c77574e534ec.root</LFN>
+<PFN>root://gfe02.grid.hep.ph.ic.ac.uk:1094//pnfs/hep.ph.ic.ac.uk/data/cms/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/16198f96-cbf3-4809-95f8-c77574e534ec.root</PFN>
+<Catalog></Catalog>
+<ModuleLabel>source</ModuleLabel>
+<GUID>16198f96-cbf3-4809-95f8-c77574e534ec</GUID>
+<Branches>
+  <Branch>CSCDetIdCSCSegmentsOwnedRangeMap_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>CSCDetIdCSCSegmentsOwnedRangeMap_slimmedMuons__PAT.</Branch>
+  <Branch>CTPPSLocalTrackLites_ctppsLocalTrackLiteProducer__RECO.</Branch>
+  <Branch>DTChamberIdDTRecSegment4DsOwnedRangeMap_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>DTChamberIdDTRecSegment4DsOwnedRangeMap_slimmedMuons__PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedEBRecHits_PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedEERecHits_PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedESRecHits_PAT.</Branch>
+  <Branch>FEDRawDataCollection_hltFEDSelectorL1__HLT.</Branch>
+  <Branch>GenEventInfoProduct_generator__SIM.</Branch>
+  <Branch>GlobalAlgBlkBXVector_gtStage2Digis__RECO.</Branch>
+  <Branch>GlobalExtBlkBXVector_gtStage2Digis__RECO.</Branch>
+  <Branch>HBHERecHitsSorted_reducedEgamma_reducedHBHEHits_PAT.</Branch>
+  <Branch>HBHERecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HFRecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HORecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HcalNoiseSummary_hcalnoise__RECO.</Branch>
+  <Branch>L1GlobalTriggerReadoutRecord_gtDigis__RECO.</Branch>
+  <Branch>LHEEventProduct_externalLHEProducer__SIM.</Branch>
+  <Branch>LumiScalerss_scalersRawToDigi__RECO.</Branch>
+  <Branch>PileupSummaryInfos_slimmedAddPileupInfo__PAT.</Branch>
+  <Branch>Run3ScoutingElectrons_hltScoutingEgammaPacker__HLT.</Branch>
+  <Branch>Run3ScoutingMuons_hltScoutingMuonPackerNoVtx__HLT.</Branch>
+  <Branch>Run3ScoutingMuons_hltScoutingMuonPackerVtx__HLT.</Branch>
+  <Branch>Run3ScoutingPFJets_hltScoutingPFPacker__HLT.</Branch>
+  <Branch>Run3ScoutingParticles_hltScoutingPFPacker__HLT.</Branch>
+  <Branch>Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT.</Branch>
+  <Branch>Run3ScoutingTracks_hltScoutingTrackPacker__HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingMuonPackerNoVtx_displacedVtx_HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingMuonPackerVtx_displacedVtx_HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingPrimaryVertexPacker_primaryVtx_HLT.</Branch>
+  <Branch>SiPixelClusteredmNewDetSetVector_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiPixelClusteredmNewDetSetVector_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiStripClusteredmNewDetSetVector_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiStripClusteredmNewDetSetVector_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>Strings_slimmedPatTrigger_filterLabels_PAT.</Branch>
+  <Branch>TrackingRecHitsOwned_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>TrackingRecHitsOwned_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>double_fixedGridRhoAll__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAll__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAllCalo__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAllTmp__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentral__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralCalo__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralChargedPileUp__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralNeutral__RECO.</Branch>
+  <Branch>double_hltScoutingPFPacker_pfMetPhi_HLT.</Branch>
+  <Branch>double_hltScoutingPFPacker_pfMetPt_HLT.</Branch>
+  <Branch>double_hltScoutingPFPacker_rho_HLT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__HLT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__PAT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__RECO.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__SIM.</Branch>
+  <Branch>float_genParticles_t0_HLT.</Branch>
+  <Branch>floatROOTMathCartesian3DROOTMathDefaultCoordinateSystemTagROOTMathPositionVector3D_genParticles_xyz0_HLT.</Branch>
+  <Branch>floatedmValueMap_offlineSlimmedPrimaryVertices__PAT.</Branch>
+  <Branch>floatedmValueMap_offlineSlimmedPrimaryVerticesWithBS__PAT.</Branch>
+  <Branch>l1tEGammaBXVector_caloStage2Digis_EGamma_RECO.</Branch>
+  <Branch>l1tEtSumBXVector_caloStage2Digis_EtSum_RECO.</Branch>
+  <Branch>l1tJetBXVector_caloStage2Digis_Jet_RECO.</Branch>
+  <Branch>l1tMuonBXVector_gmtStage2Digis_Muon_RECO.</Branch>
+  <Branch>l1tTauBXVector_caloStage2Digis_Tau_RECO.</Branch>
+  <Branch>patCompositeCandidates_oniaPhotonCandidates_conversions_PAT.</Branch>
+  <Branch>patElectrons_slimmedElectrons__PAT.</Branch>
+  <Branch>patElectrons_slimmedLowPtElectrons__PAT.</Branch>
+  <Branch>patIsolatedTracks_isolatedTracks__PAT.</Branch>
+  <Branch>patJets_slimmedJets__PAT.</Branch>
+  <Branch>patJets_slimmedJetsAK8__PAT.</Branch>
+  <Branch>patJets_slimmedJetsAK8PFPuppiSoftDropPacked_SubJets_PAT.</Branch>
+  <Branch>patJets_slimmedJetsPuppi__PAT.</Branch>
+  <Branch>patMETs_slimmedMETs__PAT.</Branch>
+  <Branch>patMETs_slimmedMETsPuppi__PAT.</Branch>
+  <Branch>patMuons_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>patMuons_slimmedMuons__PAT.</Branch>
+  <Branch>patPackedCandidates_lostTracks__PAT.</Branch>
+  <Branch>patPackedCandidates_lostTracks_eleTracks_PAT.</Branch>
+  <Branch>patPackedCandidates_packedPFCandidates__PAT.</Branch>
+  <Branch>patPackedGenParticles_packedGenParticles__PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger__PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger_l1max_PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger_l1min_PAT.</Branch>
+  <Branch>patPhotons_slimmedOOTPhotons__PAT.</Branch>
+  <Branch>patPhotons_slimmedPhotons__PAT.</Branch>
+  <Branch>patTaus_slimmedTaus__PAT.</Branch>
+  <Branch>patTaus_slimmedTausBoosted__PAT.</Branch>
+  <Branch>patTriggerObjectStandAlones_slimmedPatTrigger__PAT.</Branch>
+  <Branch>recoBaseTagInfosOwned_slimmedJets_tagInfos_PAT.</Branch>
+  <Branch>recoBaseTagInfosOwned_slimmedJetsPuppi_tagInfos_PAT.</Branch>
+  <Branch>recoBeamHaloSummary_BeamHaloSummary__RECO.</Branch>
+  <Branch>recoBeamSpot_offlineBeamSpot__RECO.</Branch>
+  <Branch>recoCSCHaloData_CSCHaloData__RECO.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedEBEEClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedESClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedOOTEBEEClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedOOTESClusters_PAT.</Branch>
+  <Branch>recoCaloJets_slimmedCaloJets__PAT.</Branch>
+  <Branch>recoCaloJets_slimmedJPTJets__PAT.</Branch>
+  <Branch>recoConversions_gsfTracksOpenConversions_gsfTracksOpenConversions_RECO.</Branch>
+  <Branch>recoConversions_reducedEgamma_reducedConversions_PAT.</Branch>
+  <Branch>recoConversions_reducedEgamma_reducedSingleLegConversions_PAT.</Branch>
+  <Branch>recoDeDxHitInfos_isolatedTracks__PAT.</Branch>
+  <Branch>recoDeDxHitInfosedmAssociation_isolatedTracks__PAT.</Branch>
+  <Branch>recoForwardProtons_ctppsProtons_multiRP_RECO.</Branch>
+  <Branch>recoForwardProtons_ctppsProtons_singleRP_RECO.</Branch>
+  <Branch>recoGenJets_slimmedGenJets__PAT.</Branch>
+  <Branch>recoGenJets_slimmedGenJetsAK8__PAT.</Branch>
+  <Branch>recoGenJets_slimmedGenJetsAK8SoftDropSubJets__PAT.</Branch>
+  <Branch>recoGenMETs_genMetTrue__HLT.</Branch>
+  <Branch>recoGenParticles_genPUProtons_genPUProtons_HLT.</Branch>
+  <Branch>recoGenParticles_prunedGenParticles__PAT.</Branch>
+  <Branch>recoGenParticlesedmAssociation_lostTracksToGenAssociation__PAT.</Branch>
+  <Branch>recoGenParticlesedmAssociation_packedPFCandidateToGenAssociation__PAT.</Branch>
+  <Branch>recoGsfElectronCores_reducedEgamma_reducedGedGsfElectronCores_PAT.</Branch>
+  <Branch>recoGsfTracks_reducedEgamma_reducedGsfTracks_PAT.</Branch>
+  <Branch>recoJPTJets_slimmedJPTJets__PAT.</Branch>
+  <Branch>recoJetFlavourInfoMatchingCollection_slimmedGenJetsFlavourInfos__PAT.</Branch>
+  <Branch>recoPhotonCores_reducedEgamma_reducedGedPhotonCores_PAT.</Branch>
+  <Branch>recoPhotonCores_reducedEgamma_reducedOOTPhotonCores_PAT.</Branch>
+  <Branch>recoSuperClusters_reducedEgamma_reducedOOTSuperClusters_PAT.</Branch>
+  <Branch>recoSuperClusters_reducedEgamma_reducedSuperClusters_PAT.</Branch>
+  <Branch>recoTrackExtras_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>recoTrackExtras_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>recoTracks_displacedGlobalMuons__RECO.</Branch>
+  <Branch>recoTracks_displacedStandAloneMuons__RECO.</Branch>
+  <Branch>recoTracks_displacedTracks__RECO.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedKshortVertices__PAT.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedLambdaVertices__PAT.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedSecondaryVertices__PAT.</Branch>
+  <Branch>recoVertexs_offlineSlimmedPrimaryVertices__PAT.</Branch>
+  <Branch>recoVertexs_offlineSlimmedPrimaryVerticesWithBS__PAT.</Branch>
+  <Branch>uint_bunchSpacingProducer__PAT.</Branch>
+</Branches>
+<InputType>primaryFiles</InputType>
+<InputSourceClass>PoolSource</InputSourceClass>
+<EventsRead>43191</EventsRead>
+<Runs>
+<Run ID="1">
+   <LumiSection ID="295426"/>
+   <LumiSection ID="358192"/>
+   <LumiSection ID="358213"/>
+   <LumiSection ID="358260"/>
+   <LumiSection ID="358441"/>
+   <LumiSection ID="358444"/>
+   <LumiSection ID="358559"/>
+   <LumiSection ID="358602"/>
+   <LumiSection ID="358603"/>
+   <LumiSection ID="359223"/>
+   <LumiSection ID="359274"/>
+   <LumiSection ID="359482"/>
+   <LumiSection ID="359774"/>
+   <LumiSection ID="360715"/>
+   <LumiSection ID="360812"/>
+   <LumiSection ID="362737"/>
+   <LumiSection ID="362747"/>
+   <LumiSection ID="362994"/>
+   <LumiSection ID="363402"/>
+   <LumiSection ID="364073"/>
+   <LumiSection ID="364201"/>
+   <LumiSection ID="364450"/>
+   <LumiSection ID="364464"/>
+   <LumiSection ID="364465"/>
+   <LumiSection ID="394378"/>
+   <LumiSection ID="394408"/>
+   <LumiSection ID="394465"/>
+   <LumiSection ID="394521"/>
+   <LumiSection ID="394772"/>
+   <LumiSection ID="394815"/>
+   <LumiSection ID="394885"/>
+   <LumiSection ID="394953"/>
+   <LumiSection ID="394955"/>
+   <LumiSection ID="395079"/>
+   <LumiSection ID="395759"/>
+   <LumiSection ID="396437"/>
+   <LumiSection ID="396529"/>
+   <LumiSection ID="396786"/>
+   <LumiSection ID="396867"/>
+   <LumiSection ID="396930"/>
+   <LumiSection ID="396947"/>
+   <LumiSection ID="396951"/>
+   <LumiSection ID="396990"/>
+   <LumiSection ID="399057"/>
+   <LumiSection ID="399066"/>
+   <LumiSection ID="399125"/>
+   <LumiSection ID="399128"/>
+   <LumiSection ID="400058"/>
+   <LumiSection ID="400093"/>
+   <LumiSection ID="400166"/>
+   <LumiSection ID="400263"/>
+   <LumiSection ID="400345"/>
+   <LumiSection ID="400409"/>
+   <LumiSection ID="400447"/>
+   <LumiSection ID="400535"/>
+   <LumiSection ID="400586"/>
+   <LumiSection ID="400655"/>
+   <LumiSection ID="400690"/>
+   <LumiSection ID="400752"/>
+   <LumiSection ID="400805"/>
+   <LumiSection ID="400914"/>
+</Run>
+
+</Runs>
+</InputFile>
+
+<InputFile>
+<State  Value="closed"/>
+<LFN>/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/1d4ec7c3-cf3e-42af-8a13-1dd4b99540d6.root</LFN>
+<PFN>root://gfe02.grid.hep.ph.ic.ac.uk:1094//pnfs/hep.ph.ic.ac.uk/data/cms/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/1d4ec7c3-cf3e-42af-8a13-1dd4b99540d6.root</PFN>
+<Catalog></Catalog>
+<ModuleLabel>source</ModuleLabel>
+<GUID>1d4ec7c3-cf3e-42af-8a13-1dd4b99540d6</GUID>
+<Branches>
+  <Branch>CSCDetIdCSCSegmentsOwnedRangeMap_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>CSCDetIdCSCSegmentsOwnedRangeMap_slimmedMuons__PAT.</Branch>
+  <Branch>CTPPSLocalTrackLites_ctppsLocalTrackLiteProducer__RECO.</Branch>
+  <Branch>DTChamberIdDTRecSegment4DsOwnedRangeMap_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>DTChamberIdDTRecSegment4DsOwnedRangeMap_slimmedMuons__PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedEBRecHits_PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedEERecHits_PAT.</Branch>
+  <Branch>EcalRecHitsSorted_reducedEgamma_reducedESRecHits_PAT.</Branch>
+  <Branch>FEDRawDataCollection_hltFEDSelectorL1__HLT.</Branch>
+  <Branch>GenEventInfoProduct_generator__SIM.</Branch>
+  <Branch>GlobalAlgBlkBXVector_gtStage2Digis__RECO.</Branch>
+  <Branch>GlobalExtBlkBXVector_gtStage2Digis__RECO.</Branch>
+  <Branch>HBHERecHitsSorted_reducedEgamma_reducedHBHEHits_PAT.</Branch>
+  <Branch>HBHERecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HFRecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HORecHitsSorted_slimmedHcalRecHits_reducedHcalRecHits_PAT.</Branch>
+  <Branch>HcalNoiseSummary_hcalnoise__RECO.</Branch>
+  <Branch>L1GlobalTriggerReadoutRecord_gtDigis__RECO.</Branch>
+  <Branch>LHEEventProduct_externalLHEProducer__SIM.</Branch>
+  <Branch>LumiScalerss_scalersRawToDigi__RECO.</Branch>
+  <Branch>PileupSummaryInfos_slimmedAddPileupInfo__PAT.</Branch>
+  <Branch>Run3ScoutingElectrons_hltScoutingEgammaPacker__HLT.</Branch>
+  <Branch>Run3ScoutingMuons_hltScoutingMuonPackerNoVtx__HLT.</Branch>
+  <Branch>Run3ScoutingMuons_hltScoutingMuonPackerVtx__HLT.</Branch>
+  <Branch>Run3ScoutingPFJets_hltScoutingPFPacker__HLT.</Branch>
+  <Branch>Run3ScoutingParticles_hltScoutingPFPacker__HLT.</Branch>
+  <Branch>Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT.</Branch>
+  <Branch>Run3ScoutingTracks_hltScoutingTrackPacker__HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingMuonPackerNoVtx_displacedVtx_HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingMuonPackerVtx_displacedVtx_HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingPrimaryVertexPacker_primaryVtx_HLT.</Branch>
+  <Branch>SiPixelClusteredmNewDetSetVector_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiPixelClusteredmNewDetSetVector_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiStripClusteredmNewDetSetVector_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>SiStripClusteredmNewDetSetVector_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>Strings_slimmedPatTrigger_filterLabels_PAT.</Branch>
+  <Branch>TrackingRecHitsOwned_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>TrackingRecHitsOwned_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>double_fixedGridRhoAll__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAll__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAllCalo__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetAllTmp__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentral__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralCalo__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralChargedPileUp__RECO.</Branch>
+  <Branch>double_fixedGridRhoFastjetCentralNeutral__RECO.</Branch>
+  <Branch>double_hltScoutingPFPacker_pfMetPhi_HLT.</Branch>
+  <Branch>double_hltScoutingPFPacker_pfMetPt_HLT.</Branch>
+  <Branch>double_hltScoutingPFPacker_rho_HLT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__HLT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__PAT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__RECO.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__SIM.</Branch>
+  <Branch>float_genParticles_t0_HLT.</Branch>
+  <Branch>floatROOTMathCartesian3DROOTMathDefaultCoordinateSystemTagROOTMathPositionVector3D_genParticles_xyz0_HLT.</Branch>
+  <Branch>floatedmValueMap_offlineSlimmedPrimaryVertices__PAT.</Branch>
+  <Branch>floatedmValueMap_offlineSlimmedPrimaryVerticesWithBS__PAT.</Branch>
+  <Branch>l1tEGammaBXVector_caloStage2Digis_EGamma_RECO.</Branch>
+  <Branch>l1tEtSumBXVector_caloStage2Digis_EtSum_RECO.</Branch>
+  <Branch>l1tJetBXVector_caloStage2Digis_Jet_RECO.</Branch>
+  <Branch>l1tMuonBXVector_gmtStage2Digis_Muon_RECO.</Branch>
+  <Branch>l1tTauBXVector_caloStage2Digis_Tau_RECO.</Branch>
+  <Branch>patCompositeCandidates_oniaPhotonCandidates_conversions_PAT.</Branch>
+  <Branch>patElectrons_slimmedElectrons__PAT.</Branch>
+  <Branch>patElectrons_slimmedLowPtElectrons__PAT.</Branch>
+  <Branch>patIsolatedTracks_isolatedTracks__PAT.</Branch>
+  <Branch>patJets_slimmedJets__PAT.</Branch>
+  <Branch>patJets_slimmedJetsAK8__PAT.</Branch>
+  <Branch>patJets_slimmedJetsAK8PFPuppiSoftDropPacked_SubJets_PAT.</Branch>
+  <Branch>patJets_slimmedJetsPuppi__PAT.</Branch>
+  <Branch>patMETs_slimmedMETs__PAT.</Branch>
+  <Branch>patMETs_slimmedMETsPuppi__PAT.</Branch>
+  <Branch>patMuons_slimmedDisplacedMuons__PAT.</Branch>
+  <Branch>patMuons_slimmedMuons__PAT.</Branch>
+  <Branch>patPackedCandidates_lostTracks__PAT.</Branch>
+  <Branch>patPackedCandidates_lostTracks_eleTracks_PAT.</Branch>
+  <Branch>patPackedCandidates_packedPFCandidates__PAT.</Branch>
+  <Branch>patPackedGenParticles_packedGenParticles__PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger__PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger_l1max_PAT.</Branch>
+  <Branch>patPackedTriggerPrescales_patTrigger_l1min_PAT.</Branch>
+  <Branch>patPhotons_slimmedOOTPhotons__PAT.</Branch>
+  <Branch>patPhotons_slimmedPhotons__PAT.</Branch>
+  <Branch>patTaus_slimmedTaus__PAT.</Branch>
+  <Branch>patTaus_slimmedTausBoosted__PAT.</Branch>
+  <Branch>patTriggerObjectStandAlones_slimmedPatTrigger__PAT.</Branch>
+  <Branch>recoBaseTagInfosOwned_slimmedJets_tagInfos_PAT.</Branch>
+  <Branch>recoBaseTagInfosOwned_slimmedJetsPuppi_tagInfos_PAT.</Branch>
+  <Branch>recoBeamHaloSummary_BeamHaloSummary__RECO.</Branch>
+  <Branch>recoBeamSpot_offlineBeamSpot__RECO.</Branch>
+  <Branch>recoCSCHaloData_CSCHaloData__RECO.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedEBEEClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedESClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedOOTEBEEClusters_PAT.</Branch>
+  <Branch>recoCaloClusters_reducedEgamma_reducedOOTESClusters_PAT.</Branch>
+  <Branch>recoCaloJets_slimmedCaloJets__PAT.</Branch>
+  <Branch>recoCaloJets_slimmedJPTJets__PAT.</Branch>
+  <Branch>recoConversions_gsfTracksOpenConversions_gsfTracksOpenConversions_RECO.</Branch>
+  <Branch>recoConversions_reducedEgamma_reducedConversions_PAT.</Branch>
+  <Branch>recoConversions_reducedEgamma_reducedSingleLegConversions_PAT.</Branch>
+  <Branch>recoDeDxHitInfos_isolatedTracks__PAT.</Branch>
+  <Branch>recoDeDxHitInfosedmAssociation_isolatedTracks__PAT.</Branch>
+  <Branch>recoForwardProtons_ctppsProtons_multiRP_RECO.</Branch>
+  <Branch>recoForwardProtons_ctppsProtons_singleRP_RECO.</Branch>
+  <Branch>recoGenJets_slimmedGenJets__PAT.</Branch>
+  <Branch>recoGenJets_slimmedGenJetsAK8__PAT.</Branch>
+  <Branch>recoGenJets_slimmedGenJetsAK8SoftDropSubJets__PAT.</Branch>
+  <Branch>recoGenMETs_genMetTrue__HLT.</Branch>
+  <Branch>recoGenParticles_genPUProtons_genPUProtons_HLT.</Branch>
+  <Branch>recoGenParticles_prunedGenParticles__PAT.</Branch>
+  <Branch>recoGenParticlesedmAssociation_lostTracksToGenAssociation__PAT.</Branch>
+  <Branch>recoGenParticlesedmAssociation_packedPFCandidateToGenAssociation__PAT.</Branch>
+  <Branch>recoGsfElectronCores_reducedEgamma_reducedGedGsfElectronCores_PAT.</Branch>
+  <Branch>recoGsfTracks_reducedEgamma_reducedGsfTracks_PAT.</Branch>
+  <Branch>recoJPTJets_slimmedJPTJets__PAT.</Branch>
+  <Branch>recoJetFlavourInfoMatchingCollection_slimmedGenJetsFlavourInfos__PAT.</Branch>
+  <Branch>recoPhotonCores_reducedEgamma_reducedGedPhotonCores_PAT.</Branch>
+  <Branch>recoPhotonCores_reducedEgamma_reducedOOTPhotonCores_PAT.</Branch>
+  <Branch>recoSuperClusters_reducedEgamma_reducedOOTSuperClusters_PAT.</Branch>
+  <Branch>recoSuperClusters_reducedEgamma_reducedSuperClusters_PAT.</Branch>
+  <Branch>recoTrackExtras_slimmedDisplacedMuonTrackExtras__PAT.</Branch>
+  <Branch>recoTrackExtras_slimmedMuonTrackExtras__PAT.</Branch>
+  <Branch>recoTracks_displacedGlobalMuons__RECO.</Branch>
+  <Branch>recoTracks_displacedStandAloneMuons__RECO.</Branch>
+  <Branch>recoTracks_displacedTracks__RECO.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedKshortVertices__PAT.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedLambdaVertices__PAT.</Branch>
+  <Branch>recoVertexCompositePtrCandidates_slimmedSecondaryVertices__PAT.</Branch>
+  <Branch>recoVertexs_offlineSlimmedPrimaryVertices__PAT.</Branch>
+  <Branch>recoVertexs_offlineSlimmedPrimaryVerticesWithBS__PAT.</Branch>
+  <Branch>uint_bunchSpacingProducer__PAT.</Branch>
+</Branches>
+<InputType>primaryFiles</InputType>
+<InputSourceClass>PoolSource</InputSourceClass>
+<EventsRead>25777</EventsRead>
+<Runs>
+<Run ID="1">
+   <LumiSection ID="13253"/>
+   <LumiSection ID="13629"/>
+   <LumiSection ID="13659"/>
+   <LumiSection ID="13678"/>
+   <LumiSection ID="13701"/>
+   <LumiSection ID="13753"/>
+   <LumiSection ID="13946"/>
+   <LumiSection ID="14341"/>
+   <LumiSection ID="39615"/>
+   <LumiSection ID="46017"/>
+   <LumiSection ID="46057"/>
+   <LumiSection ID="46180"/>
+   <LumiSection ID="46421"/>
+   <LumiSection ID="46423"/>
+   <LumiSection ID="46461"/>
+   <LumiSection ID="46564"/>
+   <LumiSection ID="46898"/>
+   <LumiSection ID="47182"/>
+   <LumiSection ID="47467"/>
+   <LumiSection ID="47487"/>
+   <LumiSection ID="47520"/>
+   <LumiSection ID="47544"/>
+   <LumiSection ID="47574"/>
+   <LumiSection ID="47836"/>
+   <LumiSection ID="47862"/>
+   <LumiSection ID="47921"/>
+   <LumiSection ID="47947"/>
+   <LumiSection ID="48077"/>
+   <LumiSection ID="49081"/>
+   <LumiSection ID="49185"/>
+   <LumiSection ID="49207"/>
+   <LumiSection ID="49289"/>
+   <LumiSection ID="49388"/>
+   <LumiSection ID="50732"/>
+   <LumiSection ID="50808"/>
+   <LumiSection ID="50935"/>
+</Run>
+
+</Runs>
+</InputFile>
+
+<File>
+<State  Value="closed"/>
+<LFN></LFN>
+<PFN>HLTUnpackerOutputLarge.root</PFN>
+<Catalog></Catalog>
+<ModuleLabel>out</ModuleLabel>
+<GUID>e4ae7ed9-6ca5-41ad-a661-cf9001ef99b9</GUID>
+<Branches>
+  <Branch>GenEventInfoProduct_generator__SIM.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__SIM.</Branch>
+  <Branch>FEDRawDataCollection_hltFEDSelectorL1__HLT.</Branch>
+  <Branch>floatROOTMathCartesian3DROOTMathDefaultCoordinateSystemTagROOTMathPositionVector3D_genParticles_xyz0_HLT.</Branch>
+  <Branch>double_hltScoutingPFPacker_pfMetPhi_HLT.</Branch>
+  <Branch>double_hltScoutingPFPacker_pfMetPt_HLT.</Branch>
+  <Branch>double_hltScoutingPFPacker_rho_HLT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__HLT.</Branch>
+  <Branch>float_genParticles_t0_HLT.</Branch>
+  <Branch>Run3ScoutingElectrons_hltScoutingEgammaPacker__HLT.</Branch>
+  <Branch>Run3ScoutingMuons_hltScoutingMuonPackerNoVtx__HLT.</Branch>
+  <Branch>Run3ScoutingMuons_hltScoutingMuonPackerVtx__HLT.</Branch>
+  <Branch>Run3ScoutingPFJets_hltScoutingPFPacker__HLT.</Branch>
+  <Branch>Run3ScoutingParticles_hltScoutingPFPacker__HLT.</Branch>
+  <Branch>Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT.</Branch>
+  <Branch>Run3ScoutingTracks_hltScoutingTrackPacker__HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingMuonPackerNoVtx_displacedVtx_HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingMuonPackerVtx_displacedVtx_HLT.</Branch>
+  <Branch>Run3ScoutingVertexs_hltScoutingPrimaryVertexPacker_primaryVtx_HLT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__RECO.</Branch>
+  <Branch>recoGenParticlesedmAssociation_lostTracksToGenAssociation__PAT.</Branch>
+  <Branch>recoGenParticlesedmAssociation_packedPFCandidateToGenAssociation__PAT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__PAT.</Branch>
+  <Branch>patPackedCandidates_lostTracks__PAT.</Branch>
+  <Branch>patPackedCandidates_packedPFCandidates__PAT.</Branch>
+  <Branch>patPackedCandidates_lostTracks_eleTracks_PAT.</Branch>
+  <Branch>patPackedGenParticles_packedGenParticles__PAT.</Branch>
+  <Branch>recoGenParticles_prunedGenParticles__PAT.</Branch>
+  <Branch>edmTriggerResults_TriggerResults__TrackProducer.</Branch>
+  <Branch>Run3ScoutingTracksRun3ScoutingTrackRun3ScoutingTracksRun3ScoutingTrackedmrefhelperFindUsingAdvanceedmRefedmValueMap_hltScoutingUnpackProducer_Track-RefToOriginal_TrackProducer.</Branch>
+  <Branch>Run3ScoutingVertexsRun3ScoutingVertexRun3ScoutingVertexsRun3ScoutingVertexedmrefhelperFindUsingAdvanceedmRefedmValueMap_hltScoutingUnpackProducer_PrimaryVertex-RefToOriginal_TrackProducer.</Branch>
+  <Branch>recoTracks_hltScoutingUnpackProducer_Track_TrackProducer.</Branch>
+  <Branch>recoVertexs_hltScoutingUnpackProducer_PrimaryVertex_TrackProducer.</Branch>
+</Branches>
+<OutputModuleClass>PoolOutputModule</OutputModuleClass>
+<TotalEvents>168880</TotalEvents>
+
+<DataType>MC</DataType>
+
+<BranchHash>0fdc8151c0a330ecd754a0fb7a335585</BranchHash>
+
+<Runs>
+<Run ID="1">
+   <LumiSection ID="455" NEvents="709"/>
+   <LumiSection ID="13253" NEvents="726"/>
+   <LumiSection ID="13539" NEvents="707"/>
+   <LumiSection ID="13629" NEvents="696"/>
+   <LumiSection ID="13659" NEvents="707"/>
+   <LumiSection ID="13678" NEvents="725"/>
+   <LumiSection ID="13701" NEvents="709"/>
+   <LumiSection ID="13753" NEvents="706"/>
+   <LumiSection ID="13946" NEvents="707"/>
+   <LumiSection ID="14341" NEvents="715"/>
+   <LumiSection ID="14390" NEvents="735"/>
+   <LumiSection ID="39298" NEvents="716"/>
+   <LumiSection ID="39615" NEvents="700"/>
+   <LumiSection ID="39770" NEvents="709"/>
+   <LumiSection ID="45138" NEvents="726"/>
+   <LumiSection ID="45151" NEvents="704"/>
+   <LumiSection ID="45153" NEvents="741"/>
+   <LumiSection ID="45211" NEvents="690"/>
+   <LumiSection ID="45738" NEvents="766"/>
+   <LumiSection ID="45842" NEvents="707"/>
+   <LumiSection ID="46017" NEvents="703"/>
+   <LumiSection ID="46027" NEvents="695"/>
+   <LumiSection ID="46057" NEvents="710"/>
+   <LumiSection ID="46165" NEvents="715"/>
+   <LumiSection ID="46180" NEvents="723"/>
+   <LumiSection ID="46421" NEvents="693"/>
+   <LumiSection ID="46423" NEvents="727"/>
+   <LumiSection ID="46461" NEvents="699"/>
+   <LumiSection ID="46510" NEvents="674"/>
+   <LumiSection ID="46523" NEvents="732"/>
+   <LumiSection ID="46564" NEvents="717"/>
+   <LumiSection ID="46617" NEvents="693"/>
+   <LumiSection ID="46898" NEvents="703"/>
+   <LumiSection ID="47182" NEvents="717"/>
+   <LumiSection ID="47214" NEvents="713"/>
+   <LumiSection ID="47467" NEvents="760"/>
+   <LumiSection ID="47487" NEvents="726"/>
+   <LumiSection ID="47520" NEvents="712"/>
+   <LumiSection ID="47544" NEvents="701"/>
+   <LumiSection ID="47548" NEvents="699"/>
+   <LumiSection ID="47574" NEvents="717"/>
+   <LumiSection ID="47836" NEvents="730"/>
+   <LumiSection ID="47862" NEvents="710"/>
+   <LumiSection ID="47921" NEvents="702"/>
+   <LumiSection ID="47947" NEvents="737"/>
+   <LumiSection ID="48058" NEvents="687"/>
+   <LumiSection ID="48077" NEvents="743"/>
+   <LumiSection ID="48164" NEvents="737"/>
+   <LumiSection ID="48321" NEvents="738"/>
+   <LumiSection ID="48956" NEvents="709"/>
+   <LumiSection ID="49081" NEvents="692"/>
+   <LumiSection ID="49171" NEvents="682"/>
+   <LumiSection ID="49173" NEvents="730"/>
+   <LumiSection ID="49185" NEvents="721"/>
+   <LumiSection ID="49207" NEvents="722"/>
+   <LumiSection ID="49289" NEvents="733"/>
+   <LumiSection ID="49388" NEvents="718"/>
+   <LumiSection ID="49418" NEvents="734"/>
+   <LumiSection ID="49539" NEvents="703"/>
+   <LumiSection ID="49827" NEvents="715"/>
+   <LumiSection ID="49988" NEvents="712"/>
+   <LumiSection ID="50447" NEvents="732"/>
+   <LumiSection ID="50486" NEvents="690"/>
+   <LumiSection ID="50664" NEvents="713"/>
+   <LumiSection ID="50732" NEvents="727"/>
+   <LumiSection ID="50808" NEvents="747"/>
+   <LumiSection ID="50845" NEvents="712"/>
+   <LumiSection ID="50935" NEvents="696"/>
+   <LumiSection ID="89030" NEvents="736"/>
+   <LumiSection ID="89244" NEvents="710"/>
+   <LumiSection ID="90493" NEvents="697"/>
+   <LumiSection ID="90543" NEvents="718"/>
+   <LumiSection ID="90775" NEvents="720"/>
+   <LumiSection ID="90837" NEvents="707"/>
+   <LumiSection ID="90849" NEvents="738"/>
+   <LumiSection ID="90862" NEvents="718"/>
+   <LumiSection ID="90911" NEvents="721"/>
+   <LumiSection ID="90977" NEvents="649"/>
+   <LumiSection ID="205716" NEvents="723"/>
+   <LumiSection ID="295426" NEvents="738"/>
+   <LumiSection ID="295705" NEvents="681"/>
+   <LumiSection ID="295804" NEvents="738"/>
+   <LumiSection ID="295828" NEvents="737"/>
+   <LumiSection ID="311857" NEvents="723"/>
+   <LumiSection ID="311962" NEvents="681"/>
+   <LumiSection ID="312438" NEvents="696"/>
+   <LumiSection ID="312856" NEvents="707"/>
+   <LumiSection ID="312996" NEvents="701"/>
+   <LumiSection ID="358146" NEvents="727"/>
+   <LumiSection ID="358192" NEvents="700"/>
+   <LumiSection ID="358213" NEvents="703"/>
+   <LumiSection ID="358260" NEvents="709"/>
+   <LumiSection ID="358441" NEvents="681"/>
+   <LumiSection ID="358444" NEvents="733"/>
+   <LumiSection ID="358559" NEvents="688"/>
+   <LumiSection ID="358602" NEvents="736"/>
+   <LumiSection ID="358603" NEvents="710"/>
+   <LumiSection ID="358604" NEvents="713"/>
+   <LumiSection ID="358872" NEvents="687"/>
+   <LumiSection ID="359223" NEvents="712"/>
+   <LumiSection ID="359274" NEvents="733"/>
+   <LumiSection ID="359482" NEvents="714"/>
+   <LumiSection ID="359524" NEvents="684"/>
+   <LumiSection ID="359774" NEvents="710"/>
+   <LumiSection ID="360025" NEvents="692"/>
+   <LumiSection ID="360249" NEvents="740"/>
+   <LumiSection ID="360440" NEvents="688"/>
+   <LumiSection ID="360689" NEvents="752"/>
+   <LumiSection ID="360715" NEvents="710"/>
+   <LumiSection ID="360812" NEvents="728"/>
+   <LumiSection ID="361042" NEvents="702"/>
+   <LumiSection ID="361124" NEvents="699"/>
+   <LumiSection ID="361186" NEvents="700"/>
+   <LumiSection ID="361289" NEvents="685"/>
+   <LumiSection ID="361785" NEvents="714"/>
+   <LumiSection ID="361803" NEvents="682"/>
+   <LumiSection ID="361877" NEvents="694"/>
+   <LumiSection ID="362059" NEvents="703"/>
+   <LumiSection ID="362737" NEvents="713"/>
+   <LumiSection ID="362747" NEvents="691"/>
+   <LumiSection ID="362753" NEvents="701"/>
+   <LumiSection ID="362777" NEvents="701"/>
+   <LumiSection ID="362780" NEvents="694"/>
+   <LumiSection ID="362917" NEvents="776"/>
+   <LumiSection ID="362946" NEvents="691"/>
+   <LumiSection ID="362994" NEvents="737"/>
+   <LumiSection ID="363262" NEvents="734"/>
+   <LumiSection ID="363402" NEvents="729"/>
+   <LumiSection ID="363511" NEvents="680"/>
+   <LumiSection ID="363736" NEvents="696"/>
+   <LumiSection ID="364073" NEvents="724"/>
+   <LumiSection ID="364201" NEvents="702"/>
+   <LumiSection ID="364247" NEvents="683"/>
+   <LumiSection ID="364450" NEvents="696"/>
+   <LumiSection ID="364464" NEvents="714"/>
+   <LumiSection ID="364465" NEvents="677"/>
+   <LumiSection ID="394188" NEvents="719"/>
+   <LumiSection ID="394378" NEvents="677"/>
+   <LumiSection ID="394408" NEvents="704"/>
+   <LumiSection ID="394465" NEvents="705"/>
+   <LumiSection ID="394507" NEvents="703"/>
+   <LumiSection ID="394521" NEvents="716"/>
+   <LumiSection ID="394743" NEvents="719"/>
+   <LumiSection ID="394772" NEvents="721"/>
+   <LumiSection ID="394815" NEvents="724"/>
+   <LumiSection ID="394885" NEvents="696"/>
+   <LumiSection ID="394953" NEvents="728"/>
+   <LumiSection ID="394955" NEvents="676"/>
+   <LumiSection ID="395029" NEvents="706"/>
+   <LumiSection ID="395033" NEvents="711"/>
+   <LumiSection ID="395079" NEvents="720"/>
+   <LumiSection ID="395245" NEvents="709"/>
+   <LumiSection ID="395295" NEvents="714"/>
+   <LumiSection ID="395393" NEvents="713"/>
+   <LumiSection ID="395478" NEvents="686"/>
+   <LumiSection ID="395489" NEvents="700"/>
+   <LumiSection ID="395496" NEvents="713"/>
+   <LumiSection ID="395587" NEvents="722"/>
+   <LumiSection ID="395604" NEvents="700"/>
+   <LumiSection ID="395759" NEvents="719"/>
+   <LumiSection ID="395857" NEvents="704"/>
+   <LumiSection ID="396291" NEvents="744"/>
+   <LumiSection ID="396437" NEvents="711"/>
+   <LumiSection ID="396514" NEvents="682"/>
+   <LumiSection ID="396529" NEvents="724"/>
+   <LumiSection ID="396656" NEvents="728"/>
+   <LumiSection ID="396786" NEvents="709"/>
+   <LumiSection ID="396867" NEvents="667"/>
+   <LumiSection ID="396870" NEvents="717"/>
+   <LumiSection ID="396930" NEvents="736"/>
+   <LumiSection ID="396947" NEvents="715"/>
+   <LumiSection ID="396951" NEvents="712"/>
+   <LumiSection ID="396990" NEvents="682"/>
+   <LumiSection ID="399057" NEvents="672"/>
+   <LumiSection ID="399066" NEvents="704"/>
+   <LumiSection ID="399125" NEvents="712"/>
+   <LumiSection ID="399128" NEvents="680"/>
+   <LumiSection ID="399649" NEvents="728"/>
+   <LumiSection ID="399772" NEvents="732"/>
+   <LumiSection ID="399879" NEvents="723"/>
+   <LumiSection ID="400018" NEvents="682"/>
+   <LumiSection ID="400058" NEvents="720"/>
+   <LumiSection ID="400093" NEvents="719"/>
+   <LumiSection ID="400166" NEvents="718"/>
+   <LumiSection ID="400263" NEvents="668"/>
+   <LumiSection ID="400345" NEvents="683"/>
+   <LumiSection ID="400409" NEvents="696"/>
+   <LumiSection ID="400447" NEvents="719"/>
+   <LumiSection ID="400535" NEvents="679"/>
+   <LumiSection ID="400586" NEvents="694"/>
+   <LumiSection ID="400655" NEvents="731"/>
+   <LumiSection ID="400690" NEvents="737"/>
+   <LumiSection ID="400752" NEvents="729"/>
+   <LumiSection ID="400805" NEvents="692"/>
+   <LumiSection ID="400914" NEvents="708"/>
+   <LumiSection ID="400976" NEvents="688"/>
+   <LumiSection ID="425181" NEvents="711"/>
+   <LumiSection ID="425308" NEvents="718"/>
+   <LumiSection ID="425325" NEvents="711"/>
+   <LumiSection ID="425339" NEvents="721"/>
+   <LumiSection ID="425388" NEvents="717"/>
+   <LumiSection ID="425422" NEvents="720"/>
+   <LumiSection ID="425463" NEvents="702"/>
+   <LumiSection ID="425590" NEvents="667"/>
+   <LumiSection ID="425610" NEvents="707"/>
+   <LumiSection ID="425670" NEvents="717"/>
+   <LumiSection ID="425678" NEvents="724"/>
+   <LumiSection ID="425718" NEvents="712"/>
+   <LumiSection ID="425743" NEvents="691"/>
+   <LumiSection ID="425750" NEvents="689"/>
+   <LumiSection ID="425776" NEvents="677"/>
+   <LumiSection ID="425810" NEvents="735"/>
+   <LumiSection ID="425844" NEvents="718"/>
+   <LumiSection ID="425954" NEvents="719"/>
+   <LumiSection ID="425957" NEvents="690"/>
+   <LumiSection ID="426137" NEvents="700"/>
+   <LumiSection ID="426378" NEvents="689"/>
+   <LumiSection ID="426464" NEvents="686"/>
+   <LumiSection ID="426649" NEvents="706"/>
+   <LumiSection ID="426816" NEvents="687"/>
+   <LumiSection ID="426858" NEvents="679"/>
+   <LumiSection ID="426994" NEvents="736"/>
+   <LumiSection ID="452118" NEvents="698"/>
+   <LumiSection ID="452187" NEvents="698"/>
+   <LumiSection ID="452503" NEvents="706"/>
+   <LumiSection ID="452824" NEvents="760"/>
+   <LumiSection ID="453027" NEvents="697"/>
+   <LumiSection ID="453088" NEvents="675"/>
+   <LumiSection ID="453414" NEvents="693"/>
+   <LumiSection ID="454699" NEvents="745"/>
+   <LumiSection ID="465511" NEvents="647"/>
+   <LumiSection ID="465918" NEvents="737"/>
+   <LumiSection ID="465981" NEvents="652"/>
+   <LumiSection ID="472465" NEvents="724"/>
+   <LumiSection ID="472550" NEvents="733"/>
+   <LumiSection ID="472559" NEvents="741"/>
+   <LumiSection ID="472606" NEvents="678"/>
+   <LumiSection ID="472648" NEvents="712"/>
+</Run>
+
+</Runs>
+
+<Inputs>
+<Input>
+  <LFN>/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/00ec2d24-6d81-4fde-a650-892805966ea9.root</LFN>
+  <PFN>root://gfe02.grid.hep.ph.ic.ac.uk:1094//pnfs/hep.ph.ic.ac.uk/data/cms/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/00ec2d24-6d81-4fde-a650-892805966ea9.root</PFN>
+  <FastCopying>1</FastCopying>
+</Input>
+<Input>
+  <LFN>/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/050ea95d-2d49-4a18-bb9a-a0d272a79945.root</LFN>
+  <PFN>root://gfe02.grid.hep.ph.ic.ac.uk:1094//pnfs/hep.ph.ic.ac.uk/data/cms/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/050ea95d-2d49-4a18-bb9a-a0d272a79945.root</PFN>
+  <FastCopying>1</FastCopying>
+</Input>
+<Input>
+  <LFN>/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/06ec8a57-3007-4c85-b9e7-383aaa1464a1.root</LFN>
+  <PFN>root://gfe02.grid.hep.ph.ic.ac.uk:1094//pnfs/hep.ph.ic.ac.uk/data/cms/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/06ec8a57-3007-4c85-b9e7-383aaa1464a1.root</PFN>
+  <FastCopying>1</FastCopying>
+</Input>
+<Input>
+  <LFN>/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/16198f96-cbf3-4809-95f8-c77574e534ec.root</LFN>
+  <PFN>root://gfe02.grid.hep.ph.ic.ac.uk:1094//pnfs/hep.ph.ic.ac.uk/data/cms/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/16198f96-cbf3-4809-95f8-c77574e534ec.root</PFN>
+  <FastCopying>1</FastCopying>
+</Input>
+<Input>
+  <LFN>/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/1d4ec7c3-cf3e-42af-8a13-1dd4b99540d6.root</LFN>
+  <PFN>root://gfe02.grid.hep.ph.ic.ac.uk:1094//pnfs/hep.ph.ic.ac.uk/data/cms/store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/1d4ec7c3-cf3e-42af-8a13-1dd4b99540d6.root</PFN>
+  <FastCopying>1</FastCopying>
+</Input>
+</Inputs>
+</File>
+<ReadBranches>
+<Branch Name="FEDRawDataCollection_hltFEDSelectorL1__HLT." ReadCount="509281"/>
+<Branch Name="GenEventInfoProduct_generator__SIM." ReadCount="509281"/>
+<Branch Name="Run3ScoutingElectrons_hltScoutingEgammaPacker__HLT." ReadCount="509281"/>
+<Branch Name="Run3ScoutingMuons_hltScoutingMuonPackerNoVtx__HLT." ReadCount="509281"/>
+<Branch Name="Run3ScoutingMuons_hltScoutingMuonPackerVtx__HLT." ReadCount="509281"/>
+<Branch Name="Run3ScoutingPFJets_hltScoutingPFPacker__HLT." ReadCount="509281"/>
+<Branch Name="Run3ScoutingParticles_hltScoutingPFPacker__HLT." ReadCount="509281"/>
+<Branch Name="Run3ScoutingPhotons_hltScoutingEgammaPacker__HLT." ReadCount="509281"/>
+<Branch Name="Run3ScoutingTracks_hltScoutingTrackPacker__HLT." ReadCount="509281"/>
+<Branch Name="Run3ScoutingVertexs_hltScoutingMuonPackerNoVtx_displacedVtx_HLT." ReadCount="509281"/>
+<Branch Name="Run3ScoutingVertexs_hltScoutingMuonPackerVtx_displacedVtx_HLT." ReadCount="509281"/>
+<Branch Name="Run3ScoutingVertexs_hltScoutingPrimaryVertexPacker_primaryVtx_HLT." ReadCount="509281"/>
+<Branch Name="double_hltScoutingPFPacker_pfMetPhi_HLT." ReadCount="509281"/>
+<Branch Name="double_hltScoutingPFPacker_pfMetPt_HLT." ReadCount="509281"/>
+<Branch Name="double_hltScoutingPFPacker_rho_HLT." ReadCount="509281"/>
+<Branch Name="edmTriggerResults_TriggerResults__HLT." ReadCount="509281"/>
+<Branch Name="edmTriggerResults_TriggerResults__PAT." ReadCount="509281"/>
+<Branch Name="edmTriggerResults_TriggerResults__RECO." ReadCount="509281"/>
+<Branch Name="edmTriggerResults_TriggerResults__SIM." ReadCount="509281"/>
+<Branch Name="floatROOTMathCartesian3DROOTMathDefaultCoordinateSystemTagROOTMathPositionVector3D_genParticles_xyz0_HLT." ReadCount="509281"/>
+<Branch Name="float_genParticles_t0_HLT." ReadCount="509281"/>
+<Branch Name="patPackedCandidates_lostTracks__PAT." ReadCount="509281"/>
+<Branch Name="patPackedCandidates_lostTracks_eleTracks_PAT." ReadCount="509281"/>
+<Branch Name="patPackedCandidates_packedPFCandidates__PAT." ReadCount="509281"/>
+<Branch Name="patPackedGenParticles_packedGenParticles__PAT." ReadCount="509281"/>
+<Branch Name="recoGenParticles_prunedGenParticles__PAT." ReadCount="509281"/>
+<Branch Name="recoGenParticlesedmAssociation_lostTracksToGenAssociation__PAT." ReadCount="509281"/>
+<Branch Name="recoGenParticlesedmAssociation_packedPFCandidateToGenAssociation__PAT." ReadCount="509281"/>
+</ReadBranches>
+<PerformanceReport>
+  <PerformanceSummary Metric="ApplicationMemory">
+    <Metric Name="AverageGrowthRateRss" Value="-0.00176464"/>
+    <Metric Name="AverageGrowthRateVsize" Value="0.00222657"/>
+    <Metric Name="HEAP_ARENA_N_UNUSED_CHUNKS" Value="1"/>
+    <Metric Name="HEAP_ARENA_SIZE_BYTES" Value="0"/>
+    <Metric Name="HEAP_MAPPED_N_CHUNKS" Value="0"/>
+    <Metric Name="HEAP_MAPPED_SIZE_BYTES" Value="0"/>
+    <Metric Name="HEAP_TOP_FREE_BYTES" Value="0"/>
+    <Metric Name="HEAP_UNUSED_BYTES" Value="0"/>
+    <Metric Name="HEAP_USED_BYTES" Value="0"/>
+    <Metric Name="LargeVsizeIncreaseEventL1-a-COUNT" Value="29940"/>
+    <Metric Name="LargeVsizeIncreaseEventL1-b-RUN" Value="1"/>
+    <Metric Name="LargeVsizeIncreaseEventL1-c-EVENT" Value="2.05726e+09"/>
+    <Metric Name="LargeVsizeIncreaseEventL1-d-VSIZE" Value="1834.79"/>
+    <Metric Name="LargeVsizeIncreaseEventL1-e-DELTV" Value="84"/>
+    <Metric Name="LargeVsizeIncreaseEventL1-f-RSS" Value="1085.74"/>
+    <Metric Name="LargeVsizeIncreaseEventL2-a-COUNT" Value="21"/>
+    <Metric Name="LargeVsizeIncreaseEventL2-b-RUN" Value="1"/>
+    <Metric Name="LargeVsizeIncreaseEventL2-c-EVENT" Value="2.3696e+06"/>
+    <Metric Name="LargeVsizeIncreaseEventL2-d-VSIZE" Value="1750.79"/>
+    <Metric Name="LargeVsizeIncreaseEventL2-e-DELTV" Value="64"/>
+    <Metric Name="LargeVsizeIncreaseEventL2-f-RSS" Value="1073.46"/>
+    <Metric Name="LargeVsizeIncreaseEventR1-a-COUNT" Value="143104"/>
+    <Metric Name="LargeVsizeIncreaseEventR1-b-RUN" Value="1"/>
+    <Metric Name="LargeVsizeIncreaseEventR1-c-EVENT" Value="6.91622e+07"/>
+    <Metric Name="LargeVsizeIncreaseEventR1-d-VSIZE" Value="1942.79"/>
+    <Metric Name="LargeVsizeIncreaseEventR1-e-DELTV" Value="4"/>
+    <Metric Name="LargeVsizeIncreaseEventR1-f-RSS" Value="1156.96"/>
+    <Metric Name="LargestIncreaseRssEvent-a-COUNT" Value="21"/>
+    <Metric Name="LargestIncreaseRssEvent-b-RUN" Value="1"/>
+    <Metric Name="LargestIncreaseRssEvent-c-EVENT" Value="2.3696e+06"/>
+    <Metric Name="LargestIncreaseRssEvent-d-VSIZE" Value="1750.79"/>
+    <Metric Name="LargestIncreaseRssEvent-e-DELTV" Value="64"/>
+    <Metric Name="LargestIncreaseRssEvent-f-RSS" Value="1073.46"/>
+    <Metric Name="LargestRssEvent-a-COUNT" Value="143124"/>
+    <Metric Name="LargestRssEvent-b-RUN" Value="1"/>
+    <Metric Name="LargestRssEvent-c-EVENT" Value="6.91624e+07"/>
+    <Metric Name="LargestRssEvent-d-VSIZE" Value="1942.79"/>
+    <Metric Name="LargestRssEvent-e-DELTV" Value="0"/>
+    <Metric Name="LargestRssEvent-f-RSS" Value="1195.65"/>
+    <Metric Name="LargestVsizeEventT1-a-COUNT" Value="143104"/>
+    <Metric Name="LargestVsizeEventT1-b-RUN" Value="1"/>
+    <Metric Name="LargestVsizeEventT1-c-EVENT" Value="6.91622e+07"/>
+    <Metric Name="LargestVsizeEventT1-d-VSIZE" Value="1942.79"/>
+    <Metric Name="LargestVsizeEventT1-e-DELTV" Value="4"/>
+    <Metric Name="LargestVsizeEventT1-f-RSS" Value="1156.96"/>
+    <Metric Name="LargestVsizeIncreaseEvent-a-COUNT" Value="99913"/>
+    <Metric Name="LargestVsizeIncreaseEvent-b-RUN" Value="1"/>
+    <Metric Name="LargestVsizeIncreaseEvent-c-EVENT" Value="1.54182e+09"/>
+    <Metric Name="LargestVsizeIncreaseEvent-d-VSIZE" Value="1938.79"/>
+    <Metric Name="LargestVsizeIncreaseEvent-e-DELTV" Value="100"/>
+    <Metric Name="LargestVsizeIncreaseEvent-f-RSS" Value="1132.64"/>
+    <Metric Name="PeakValueRss" Value="1195.65"/>
+    <Metric Name="PeakValueVsize" Value="1942.79"/>
+    <Metric Name="SecondLargestIncreaseRssEvent-a-COUNT" Value="29960"/>
+    <Metric Name="SecondLargestIncreaseRssEvent-b-RUN" Value="1"/>
+    <Metric Name="SecondLargestIncreaseRssEvent-c-EVENT" Value="2.05726e+09"/>
+    <Metric Name="SecondLargestIncreaseRssEvent-d-VSIZE" Value="1834.79"/>
+    <Metric Name="SecondLargestIncreaseRssEvent-e-DELTV" Value="0"/>
+    <Metric Name="SecondLargestIncreaseRssEvent-f-RSS" Value="1125"/>
+    <Metric Name="SecondLargestRssEvent-a-COUNT" Value="143125"/>
+    <Metric Name="SecondLargestRssEvent-b-RUN" Value="1"/>
+    <Metric Name="SecondLargestRssEvent-c-EVENT" Value="6.91624e+07"/>
+    <Metric Name="SecondLargestRssEvent-d-VSIZE" Value="1942.79"/>
+    <Metric Name="SecondLargestRssEvent-e-DELTV" Value="0"/>
+    <Metric Name="SecondLargestRssEvent-f-RSS" Value="1195.65"/>
+    <Metric Name="SecondLargestVsizeEventT2-a-COUNT" Value="143105"/>
+    <Metric Name="SecondLargestVsizeEventT2-b-RUN" Value="1"/>
+    <Metric Name="SecondLargestVsizeEventT2-c-EVENT" Value="6.91622e+07"/>
+    <Metric Name="SecondLargestVsizeEventT2-d-VSIZE" Value="1942.79"/>
+    <Metric Name="SecondLargestVsizeEventT2-e-DELTV" Value="0"/>
+    <Metric Name="SecondLargestVsizeEventT2-f-RSS" Value="1156.96"/>
+    <Metric Name="ThirdLargestIncreaseRssEvent-a-COUNT" Value="99933"/>
+    <Metric Name="ThirdLargestIncreaseRssEvent-b-RUN" Value="1"/>
+    <Metric Name="ThirdLargestIncreaseRssEvent-c-EVENT" Value="1.54182e+09"/>
+    <Metric Name="ThirdLargestIncreaseRssEvent-d-VSIZE" Value="1938.79"/>
+    <Metric Name="ThirdLargestIncreaseRssEvent-e-DELTV" Value="0"/>
+    <Metric Name="ThirdLargestIncreaseRssEvent-f-RSS" Value="1169.96"/>
+    <Metric Name="ThirdLargestRssEvent-a-COUNT" Value="143126"/>
+    <Metric Name="ThirdLargestRssEvent-b-RUN" Value="1"/>
+    <Metric Name="ThirdLargestRssEvent-c-EVENT" Value="6.91624e+07"/>
+    <Metric Name="ThirdLargestRssEvent-d-VSIZE" Value="1942.79"/>
+    <Metric Name="ThirdLargestRssEvent-e-DELTV" Value="0"/>
+    <Metric Name="ThirdLargestRssEvent-f-RSS" Value="1195.65"/>
+    <Metric Name="ThirdLargestVsizeEventT3-a-COUNT" Value="143106"/>
+    <Metric Name="ThirdLargestVsizeEventT3-b-RUN" Value="1"/>
+    <Metric Name="ThirdLargestVsizeEventT3-c-EVENT" Value="6.91622e+07"/>
+    <Metric Name="ThirdLargestVsizeEventT3-d-VSIZE" Value="1942.79"/>
+    <Metric Name="ThirdLargestVsizeEventT3-e-DELTV" Value="0"/>
+    <Metric Name="ThirdLargestVsizeEventT3-f-RSS" Value="1156.96"/>
+  </PerformanceSummary>
+</PerformanceReport>
+<PerformanceReport>
+  <PerformanceSummary Metric="SystemMemory">
+    <Metric Name="Active" Value="242345912"/>
+    <Metric Name="Active(anon)" Value="236387608"/>
+    <Metric Name="Active(file)" Value="5958304"/>
+    <Metric Name="AnonHugePages" Value="113784832"/>
+    <Metric Name="AnonPages" Value="227972656"/>
+    <Metric Name="Bounce" Value="0"/>
+    <Metric Name="Buffers" Value="1791224"/>
+    <Metric Name="Cached" Value="118305604"/>
+    <Metric Name="CmaFree" Value="0"/>
+    <Metric Name="CmaTotal" Value="0"/>
+    <Metric Name="CommitLimit" Value="532110512"/>
+    <Metric Name="Committed_AS" Value="77006892"/>
+    <Metric Name="DirectMap1G" Value="1047527424"/>
+    <Metric Name="DirectMap2M" Value="24872960"/>
+    <Metric Name="DirectMap4k" Value="920384"/>
+    <Metric Name="Dirty" Value="13352"/>
+    <Metric Name="FileHugePages" Value="0"/>
+    <Metric Name="FilePmdMapped" Value="0"/>
+    <Metric Name="HardwareCorrupted" Value="0"/>
+    <Metric Name="HugePages_Free" Value="0"/>
+    <Metric Name="HugePages_Rsvd" Value="0"/>
+    <Metric Name="HugePages_Surp" Value="0"/>
+    <Metric Name="HugePages_Total" Value="0"/>
+    <Metric Name="Hugepagesize" Value="2048"/>
+    <Metric Name="Hugetlb" Value="0"/>
+    <Metric Name="Inactive" Value="127537636"/>
+    <Metric Name="Inactive(anon)" Value="10510488"/>
+    <Metric Name="Inactive(file)" Value="117027148"/>
+    <Metric Name="KReclaimable" Value="6353088"/>
+    <Metric Name="KernelStack" Value="113888"/>
+    <Metric Name="Mapped" Value="3758036"/>
+    <Metric Name="MemAvailable" Value="796018356"/>
+    <Metric Name="MemFree" Value="672361016"/>
+    <Metric Name="MemTotal" Value="1055832428"/>
+    <Metric Name="Mlocked" Value="0"/>
+    <Metric Name="NFS_Unstable" Value="0"/>
+    <Metric Name="PageTables" Value="891448"/>
+    <Metric Name="Percpu" Value="531456"/>
+    <Metric Name="SReclaimable" Value="6353088"/>
+    <Metric Name="SUnreclaim" Value="2464856"/>
+    <Metric Name="SecPageTables" Value="0"/>
+    <Metric Name="Shmem" Value="95484"/>
+    <Metric Name="ShmemHugePages" Value="0"/>
+    <Metric Name="ShmemPmdMapped" Value="0"/>
+    <Metric Name="Slab" Value="8817944"/>
+    <Metric Name="SwapCached" Value="100476"/>
+    <Metric Name="SwapFree" Value="952112"/>
+    <Metric Name="SwapTotal" Value="4194300"/>
+    <Metric Name="Unaccepted" Value="0"/>
+    <Metric Name="Unevictable" Value="3072"/>
+    <Metric Name="VmallocChunk" Value="0"/>
+    <Metric Name="VmallocTotal" Value="-1"/>
+    <Metric Name="VmallocUsed" Value="567804"/>
+    <Metric Name="Writeback" Value="384"/>
+    <Metric Name="WritebackTmp" Value="0"/>
+    <Metric Name="Zswap" Value="0"/>
+    <Metric Name="Zswapped" Value="0"/>
+  </PerformanceSummary>
+</PerformanceReport>
+<PerformanceReport>
+  <PerformanceSummary Metric="StorageStatistics">
+    <Metric Name="Parameter-untracked-bool-enabled" Value="true"/>
+    <Metric Name="Parameter-untracked-bool-prefetching" Value="false"/>
+    <Metric Name="Parameter-untracked-bool-stats" Value="true"/>
+    <Metric Name="Parameter-untracked-string-cacheHint" Value="auto-detect"/>
+    <Metric Name="Parameter-untracked-string-readHint" Value="auto-detect"/>
+    <Metric Name="ROOT-tfile-read-totalMegabytes" Value="1.44266"/>
+    <Metric Name="ROOT-tfile-write-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-file-close-maxMsecs" Value="0.033503"/>
+    <Metric Name="Timing-file-close-minMsecs" Value="0.033503"/>
+    <Metric Name="Timing-file-close-numOperations" Value="1"/>
+    <Metric Name="Timing-file-close-numSuccessfulOperations" Value="1"/>
+    <Metric Name="Timing-file-close-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-file-close-totalMsecs" Value="0.033503"/>
+    <Metric Name="Timing-file-construct-maxMsecs" Value="0.000581"/>
+    <Metric Name="Timing-file-construct-minMsecs" Value="0.000581"/>
+    <Metric Name="Timing-file-construct-numOperations" Value="1"/>
+    <Metric Name="Timing-file-construct-numSuccessfulOperations" Value="1"/>
+    <Metric Name="Timing-file-construct-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-file-construct-totalMsecs" Value="0.000581"/>
+    <Metric Name="Timing-file-flush-maxMsecs" Value="14.0573"/>
+    <Metric Name="Timing-file-flush-minMsecs" Value="3.17496"/>
+    <Metric Name="Timing-file-flush-numOperations" Value="2"/>
+    <Metric Name="Timing-file-flush-numSuccessfulOperations" Value="2"/>
+    <Metric Name="Timing-file-flush-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-file-flush-totalMsecs" Value="17.2323"/>
+    <Metric Name="Timing-file-open-maxMsecs" Value="0.185361"/>
+    <Metric Name="Timing-file-open-minMsecs" Value="0.185361"/>
+    <Metric Name="Timing-file-open-numOperations" Value="1"/>
+    <Metric Name="Timing-file-open-numSuccessfulOperations" Value="1"/>
+    <Metric Name="Timing-file-open-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-file-open-totalMsecs" Value="0.185361"/>
+    <Metric Name="Timing-file-position-maxMsecs" Value="14.1249"/>
+    <Metric Name="Timing-file-position-minMsecs" Value="0.000521"/>
+    <Metric Name="Timing-file-position-numOperations" Value="3230657"/>
+    <Metric Name="Timing-file-position-numSuccessfulOperations" Value="3230657"/>
+    <Metric Name="Timing-file-position-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-file-position-totalMsecs" Value="4243.37"/>
+    <Metric Name="Timing-file-prefetch-maxMsecs" Value="0"/>
+    <Metric Name="Timing-file-prefetch-minMsecs" Value="0"/>
+    <Metric Name="Timing-file-prefetch-numOperations" Value="0"/>
+    <Metric Name="Timing-file-prefetch-numSuccessfulOperations" Value="0"/>
+    <Metric Name="Timing-file-prefetch-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-file-prefetch-totalMsecs" Value="0"/>
+    <Metric Name="Timing-file-read-maxMsecs" Value="0"/>
+    <Metric Name="Timing-file-read-minMsecs" Value="0"/>
+    <Metric Name="Timing-file-read-numOperations" Value="0"/>
+    <Metric Name="Timing-file-read-numSuccessfulOperations" Value="0"/>
+    <Metric Name="Timing-file-read-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-file-read-totalMsecs" Value="0"/>
+    <Metric Name="Timing-file-readv-maxMsecs" Value="0"/>
+    <Metric Name="Timing-file-readv-minMsecs" Value="0"/>
+    <Metric Name="Timing-file-readv-numOperations" Value="0"/>
+    <Metric Name="Timing-file-readv-numSuccessfulOperations" Value="0"/>
+    <Metric Name="Timing-file-readv-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-file-readv-totalMsecs" Value="0"/>
+    <Metric Name="Timing-file-write-maxMsecs" Value="452.283"/>
+    <Metric Name="Timing-file-write-minMsecs" Value="0.003477"/>
+    <Metric Name="Timing-file-write-numOperations" Value="3230637"/>
+    <Metric Name="Timing-file-write-numSuccessfulOperations" Value="3230637"/>
+    <Metric Name="Timing-file-write-totalMegabytes" Value="8323.94"/>
+    <Metric Name="Timing-file-write-totalMsecs" Value="252611"/>
+    <Metric Name="Timing-file-writev-maxMsecs" Value="0"/>
+    <Metric Name="Timing-file-writev-minMsecs" Value="0"/>
+    <Metric Name="Timing-file-writev-numOperations" Value="0"/>
+    <Metric Name="Timing-file-writev-numSuccessfulOperations" Value="0"/>
+    <Metric Name="Timing-file-writev-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-file-writev-totalMsecs" Value="0"/>
+    <Metric Name="Timing-root-close-maxMsecs" Value="0.513129"/>
+    <Metric Name="Timing-root-close-minMsecs" Value="0.138692"/>
+    <Metric Name="Timing-root-close-numOperations" Value="5"/>
+    <Metric Name="Timing-root-close-numSuccessfulOperations" Value="5"/>
+    <Metric Name="Timing-root-close-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-root-close-totalMsecs" Value="1.6921"/>
+    <Metric Name="Timing-root-construct-maxMsecs" Value="0.000611"/>
+    <Metric Name="Timing-root-construct-minMsecs" Value="0.00019"/>
+    <Metric Name="Timing-root-construct-numOperations" Value="5"/>
+    <Metric Name="Timing-root-construct-numSuccessfulOperations" Value="5"/>
+    <Metric Name="Timing-root-construct-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-root-construct-totalMsecs" Value="0.001442"/>
+    <Metric Name="Timing-root-open-maxMsecs" Value="5077.36"/>
+    <Metric Name="Timing-root-open-minMsecs" Value="3032.05"/>
+    <Metric Name="Timing-root-open-numOperations" Value="5"/>
+    <Metric Name="Timing-root-open-numSuccessfulOperations" Value="5"/>
+    <Metric Name="Timing-root-open-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-root-open-totalMsecs" Value="23096.4"/>
+    <Metric Name="Timing-root-position-maxMsecs" Value="0.264049"/>
+    <Metric Name="Timing-root-position-minMsecs" Value="4e-05"/>
+    <Metric Name="Timing-root-position-numOperations" Value="3003176"/>
+    <Metric Name="Timing-root-position-numSuccessfulOperations" Value="3003176"/>
+    <Metric Name="Timing-root-position-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-root-position-totalMsecs" Value="465.957"/>
+    <Metric Name="Timing-root-prefetch-maxMsecs" Value="0"/>
+    <Metric Name="Timing-root-prefetch-minMsecs" Value="0"/>
+    <Metric Name="Timing-root-prefetch-numOperations" Value="50"/>
+    <Metric Name="Timing-root-prefetch-numSuccessfulOperations" Value="0"/>
+    <Metric Name="Timing-root-prefetch-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-root-prefetch-totalMsecs" Value="0"/>
+    <Metric Name="Timing-root-read-maxMsecs" Value="209.071"/>
+    <Metric Name="Timing-root-read-minMsecs" Value="0.15863"/>
+    <Metric Name="Timing-root-read-numOperations" Value="3002716"/>
+    <Metric Name="Timing-root-read-numSuccessfulOperations" Value="3002716"/>
+    <Metric Name="Timing-root-read-totalMegabytes" Value="7568.83"/>
+    <Metric Name="Timing-root-read-totalMsecs" Value="1.36811e+06"/>
+    <Metric Name="Timing-root-readv-maxMsecs" Value="583.281"/>
+    <Metric Name="Timing-root-readv-minMsecs" Value="0.303002"/>
+    <Metric Name="Timing-root-readv-numOperations" Value="1348"/>
+    <Metric Name="Timing-root-readv-numSuccessfulOperations" Value="1348"/>
+    <Metric Name="Timing-root-readv-totalMegabytes" Value="12171.8"/>
+    <Metric Name="Timing-root-readv-totalMsecs" Value="34442.5"/>
+    <Metric Name="Timing-root-stagein-maxMsecs" Value="117.689"/>
+    <Metric Name="Timing-root-stagein-minMsecs" Value="0.024836"/>
+    <Metric Name="Timing-root-stagein-numOperations" Value="5"/>
+    <Metric Name="Timing-root-stagein-numSuccessfulOperations" Value="5"/>
+    <Metric Name="Timing-root-stagein-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-root-stagein-totalMsecs" Value="117.887"/>
+    <Metric Name="Timing-root-write-maxMsecs" Value="0"/>
+    <Metric Name="Timing-root-write-minMsecs" Value="0"/>
+    <Metric Name="Timing-root-write-numOperations" Value="0"/>
+    <Metric Name="Timing-root-write-numSuccessfulOperations" Value="0"/>
+    <Metric Name="Timing-root-write-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-root-write-totalMsecs" Value="0"/>
+    <Metric Name="Timing-root-writev-maxMsecs" Value="0"/>
+    <Metric Name="Timing-root-writev-minMsecs" Value="0"/>
+    <Metric Name="Timing-root-writev-numOperations" Value="0"/>
+    <Metric Name="Timing-root-writev-numSuccessfulOperations" Value="0"/>
+    <Metric Name="Timing-root-writev-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-root-writev-totalMsecs" Value="0"/>
+    <Metric Name="Timing-tstoragefile-close-maxMsecs" Value="0.515494"/>
+    <Metric Name="Timing-tstoragefile-close-minMsecs" Value="0.038112"/>
+    <Metric Name="Timing-tstoragefile-close-numOperations" Value="6"/>
+    <Metric Name="Timing-tstoragefile-close-numSuccessfulOperations" Value="6"/>
+    <Metric Name="Timing-tstoragefile-close-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-tstoragefile-close-totalMsecs" Value="1.74204"/>
+    <Metric Name="Timing-tstoragefile-construct-maxMsecs" Value="12165.9"/>
+    <Metric Name="Timing-tstoragefile-construct-minMsecs" Value="14.5532"/>
+    <Metric Name="Timing-tstoragefile-construct-numOperations" Value="6"/>
+    <Metric Name="Timing-tstoragefile-construct-numSuccessfulOperations" Value="6"/>
+    <Metric Name="Timing-tstoragefile-construct-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-tstoragefile-construct-totalMsecs" Value="30547.7"/>
+    <Metric Name="Timing-tstoragefile-flush-maxMsecs" Value="14.0593"/>
+    <Metric Name="Timing-tstoragefile-flush-minMsecs" Value="3.1779"/>
+    <Metric Name="Timing-tstoragefile-flush-numOperations" Value="2"/>
+    <Metric Name="Timing-tstoragefile-flush-numSuccessfulOperations" Value="2"/>
+    <Metric Name="Timing-tstoragefile-flush-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-tstoragefile-flush-totalMsecs" Value="17.2372"/>
+    <Metric Name="Timing-tstoragefile-read-maxMsecs" Value="209.073"/>
+    <Metric Name="Timing-tstoragefile-read-minMsecs" Value="0.159091"/>
+    <Metric Name="Timing-tstoragefile-read-numOperations" Value="3002716"/>
+    <Metric Name="Timing-tstoragefile-read-numSuccessfulOperations" Value="3002716"/>
+    <Metric Name="Timing-tstoragefile-read-totalMegabytes" Value="7568.83"/>
+    <Metric Name="Timing-tstoragefile-read-totalMsecs" Value="1.37026e+06"/>
+    <Metric Name="Timing-tstoragefile-readActual-maxMsecs" Value="583.283"/>
+    <Metric Name="Timing-tstoragefile-readActual-minMsecs" Value="0.15892"/>
+    <Metric Name="Timing-tstoragefile-readActual-numOperations" Value="3004064"/>
+    <Metric Name="Timing-tstoragefile-readActual-numSuccessfulOperations" Value="3004064"/>
+    <Metric Name="Timing-tstoragefile-readActual-totalMegabytes" Value="19740.6"/>
+    <Metric Name="Timing-tstoragefile-readActual-totalMsecs" Value="1.40396e+06"/>
+    <Metric Name="Timing-tstoragefile-readAsync-maxMsecs" Value="0"/>
+    <Metric Name="Timing-tstoragefile-readAsync-minMsecs" Value="0"/>
+    <Metric Name="Timing-tstoragefile-readAsync-numOperations" Value="50"/>
+    <Metric Name="Timing-tstoragefile-readAsync-numSuccessfulOperations" Value="0"/>
+    <Metric Name="Timing-tstoragefile-readAsync-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-tstoragefile-readAsync-totalMsecs" Value="0"/>
+    <Metric Name="Timing-tstoragefile-readViaCache-maxMsecs" Value="0"/>
+    <Metric Name="Timing-tstoragefile-readViaCache-minMsecs" Value="0"/>
+    <Metric Name="Timing-tstoragefile-readViaCache-numOperations" Value="405"/>
+    <Metric Name="Timing-tstoragefile-readViaCache-numSuccessfulOperations" Value="0"/>
+    <Metric Name="Timing-tstoragefile-readViaCache-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-tstoragefile-readViaCache-totalMsecs" Value="0"/>
+    <Metric Name="Timing-tstoragefile-seek-maxMsecs" Value="14.1267"/>
+    <Metric Name="Timing-tstoragefile-seek-minMsecs" Value="0.00015"/>
+    <Metric Name="Timing-tstoragefile-seek-numOperations" Value="6233753"/>
+    <Metric Name="Timing-tstoragefile-seek-numSuccessfulOperations" Value="6233753"/>
+    <Metric Name="Timing-tstoragefile-seek-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-tstoragefile-seek-totalMsecs" Value="6131.25"/>
+    <Metric Name="Timing-tstoragefile-stat-maxMsecs" Value="0.006292"/>
+    <Metric Name="Timing-tstoragefile-stat-minMsecs" Value="0.000802"/>
+    <Metric Name="Timing-tstoragefile-stat-numOperations" Value="14"/>
+    <Metric Name="Timing-tstoragefile-stat-numSuccessfulOperations" Value="14"/>
+    <Metric Name="Timing-tstoragefile-stat-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-tstoragefile-stat-totalMsecs" Value="0.04134"/>
+    <Metric Name="Timing-tstoragefile-write-maxMsecs" Value="452.286"/>
+    <Metric Name="Timing-tstoragefile-write-minMsecs" Value="0.003757"/>
+    <Metric Name="Timing-tstoragefile-write-numOperations" Value="3230637"/>
+    <Metric Name="Timing-tstoragefile-write-numSuccessfulOperations" Value="3230637"/>
+    <Metric Name="Timing-tstoragefile-write-totalMegabytes" Value="8323.94"/>
+    <Metric Name="Timing-tstoragefile-write-totalMsecs" Value="254371"/>
+    <Metric Name="Timing-tstoragefile-writeActual-maxMsecs" Value="452.285"/>
+    <Metric Name="Timing-tstoragefile-writeActual-minMsecs" Value="0.003607"/>
+    <Metric Name="Timing-tstoragefile-writeActual-numOperations" Value="3230637"/>
+    <Metric Name="Timing-tstoragefile-writeActual-numSuccessfulOperations" Value="3230637"/>
+    <Metric Name="Timing-tstoragefile-writeActual-totalMegabytes" Value="8323.94"/>
+    <Metric Name="Timing-tstoragefile-writeActual-totalMsecs" Value="253374"/>
+    <Metric Name="Timing-tstoragefile-writeViaCache-maxMsecs" Value="0"/>
+    <Metric Name="Timing-tstoragefile-writeViaCache-minMsecs" Value="0"/>
+    <Metric Name="Timing-tstoragefile-writeViaCache-numOperations" Value="3230637"/>
+    <Metric Name="Timing-tstoragefile-writeViaCache-numSuccessfulOperations" Value="0"/>
+    <Metric Name="Timing-tstoragefile-writeViaCache-totalMegabytes" Value="0"/>
+    <Metric Name="Timing-tstoragefile-writeViaCache-totalMsecs" Value="0"/>
+  </PerformanceSummary>
+</PerformanceReport>
+<PerformanceReport>
+  <PerformanceSummary Metric="SystemCPU">
+    <Metric Name="CPUModels" Value="AMD EPYC 7742 64-Core Processor"/>
+    <Metric Name="averageCoreSpeed" Value="2551.257953"/>
+    <Metric Name="cpusetCount" Value="8"/>
+    <Metric Name="totalCPUs" Value="256"/>
+  </PerformanceSummary>
+</PerformanceReport>
+<PerformanceReport>
+  <PerformanceSummary Metric="Timing">
+    <Metric Name="AvgEventTime" Value="0.0112609"/>
+    <Metric Name="EventThroughput" Value="45.6005"/>
+    <Metric Name="MaxEventTime" Value="26.8632"/>
+    <Metric Name="MinEventTime" Value="0.00125117"/>
+    <Metric Name="NumberOfStreams" Value="1"/>
+    <Metric Name="NumberOfThreads" Value="1"/>
+    <Metric Name="TotalEventSetupTime" Value="0"/>
+    <Metric Name="TotalInitCPU" Value="38.796"/>
+    <Metric Name="TotalInitTime" Value="102.971"/>
+    <Metric Name="TotalJobCPU" Value="2437.72"/>
+    <Metric Name="TotalJobChildrenCPU" Value="184.608"/>
+    <Metric Name="TotalJobTime" Value="3833.56"/>
+    <Metric Name="TotalLoopCPU" Value="2387.24"/>
+    <Metric Name="TotalLoopTime" Value="3703.47"/>
+    <Metric Name="TotalNonModuleTime" Value="2001.3"/>
+  </PerformanceSummary>
+</PerformanceReport>
+<PerformanceReport>
+  <PerformanceSummary Metric="ProcessingSummary">
+    <Metric Name="NumberBeginLumiCalls" Value="238"/>
+    <Metric Name="NumberBeginRunCalls" Value="1"/>
+    <Metric Name="NumberEvents" Value="168880"/>
+  </PerformanceSummary>
+</PerformanceReport>
+<PerformanceReport>
+  <PerformanceModule Metric="grid.hep.ph.ic.ac.uk"  Module="XrdSiteStatistics" >
+    <Metric Name="read-numOperations" Value="3002736"/>
+    <Metric Name="read-totalMegabytes" Value="7574.99"/>
+    <Metric Name="read-totalMsecs" Value="1.2467e+06"/>
+    <Metric Name="readv-numChunks" Value="49739"/>
+    <Metric Name="readv-numOperations" Value="1328"/>
+    <Metric Name="readv-totalMegabytes" Value="12165.6"/>
+    <Metric Name="readv-totalMsecs" Value="34087.1"/>
+  </PerformanceModule>
+</PerformanceReport>
+<!--                                                            -->
+</FrameworkJobReport>
