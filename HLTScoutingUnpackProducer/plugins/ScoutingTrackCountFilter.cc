@@ -16,7 +16,8 @@ public:
     token_ = consumes<std::vector<Run3ScoutingTrack>>(src_);
   }
 
-  bool filter(edm::Event const& iEvent, edm::EventSetup const&) const override {
+  // corrected signature: StreamID, Event& (non-const), EventSetup const&
+  bool filter(edm::StreamID, edm::Event & iEvent, edm::EventSetup const&) const override {
     edm::Handle<std::vector<Run3ScoutingTrack>> h;
     iEvent.getByToken(token_, h);
     if (!h.isValid()) return false;

@@ -9,7 +9,8 @@ public:
     modulo_(iConfig.getParameter<unsigned int>("modulo")),
     remainder_(iConfig.getUntrackedParameter<unsigned int>("remainder", 0))
   {}
-  bool filter(edm::Event const& iEvent, edm::EventSetup const&) const override {
+  // corrected signature: StreamID, Event& (non-const), EventSetup const&
+  bool filter(edm::StreamID, edm::Event & iEvent, edm::EventSetup const&) const override {
     unsigned int ev = iEvent.id().event();
     if (modulo_ == 0) return true;
     return ((ev % modulo_) == remainder_);

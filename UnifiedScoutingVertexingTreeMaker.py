@@ -143,8 +143,8 @@ process = cms.Process("CHAIN")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 # process.MessageLogger.cerr.FwkSummary.reportEvery = 500
 # process.MessageLogger.cerr.FwkReport.reportEvery = 500
-process.MessageLogger.cerr.FwkSummary.reportEvery = 10
-process.MessageLogger.cerr.FwkReport.reportEvery = 10
+process.MessageLogger.cerr.FwkSummary.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
 # process.MessageLogger.cerr.threshold = cms.untracked.string('DEBUG')
 # process.MessageLogger.debugModules = cms.untracked.vstring('hltScoutingUnpackProducer', 'Vertexer', 'scoutingTree')
@@ -193,7 +193,7 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # TFileService for output
 process.TFileService = cms.Service("TFileService",
     # fileName = cms.string("DY2M_ScoutingTree_Output.root")
-    fileName = cms.string("./test-outputs/DY2M_ScoutingTree_Output_Cleanup.root")  # This is the only output saved
+    fileName = cms.string("./test-outputs/DY2M_ScoutingTree_Output_Cleanup_v1.root")  # This is the only output saved
 )
 
 # Step 1: HLT Scouting Unpacker
@@ -229,7 +229,10 @@ process.Vertexer = cms.EDProducer('Vertexer',
     max_nm1_refit_dist3 = cms.double(-1),
     max_nm1_refit_distz = cms.double(0.005),
     max_nm1_refit_count = cms.int32(-1),
-    verbose = cms.bool(False)  # Enable verbose output for debugging
+    verbose = cms.bool(False),
+    # IPSig and Pt cuts on seed tracks extracted from Vertexer.cc (hard cut) (Defaults were 4.0 and 0.9)
+    minSeedIPSig = cms.untracked.double(4.0),
+    minSeedPt    = cms.untracked.double(0.9)
 )
 
 # Step 3: Scouting Tree Maker
@@ -250,8 +253,20 @@ process.scoutingTree = cms.EDAnalyzer('ScoutingTreeMakerRun3',
     tracks = cms.InputTag("hltScoutingUnpackProducer", "Track")  # May need to change to "generalTracks"
 )
 
+process.scoutingTrackCount = cms.EDFilter('ScoutingTrackCountFilter',
+    src = cms.InputTag('hltScoutingTrackPacker'),      # or 'hltScoutingTrack' depending on your input label
+    minNumber = cms.untracked.uint32(1)                # require >=1 scouting track
+)
+
+process.moduloEventFilter = cms.EDFilter('ModuloEventFilter',
+    modulo = cms.uint32(5),                           # keep 1-in-5 events
+    remainder = cms.untracked.uint32(1)                # keep events with eventNumber % 5 == 1
+)
+
 # Full chain schedule
 process.p = cms.Path(
+    process.moduloEventFilter +
+    process.scoutingTrackCount +
     process.hltScoutingUnpackProducer +
     process.offlineBeamSpot +
     process.Vertexer +

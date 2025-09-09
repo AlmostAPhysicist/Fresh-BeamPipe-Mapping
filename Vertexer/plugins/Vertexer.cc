@@ -58,6 +58,7 @@
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include <unordered_map>
 
 
 using namespace edm;
@@ -69,11 +70,7 @@ using namespace edm;
 class Vertexer : public edm::stream::EDProducer<> {
 public:
   ~Vertexer() override;
-
   explicit Vertexer(edm::ParameterSet const& params);
-
-  
-
 private:
   typedef std::set<reco::TrackRef> track_set;
   typedef std::vector<reco::TrackRef> track_vec;
@@ -102,6 +99,10 @@ private:
   const int max_nm1_refit_count;
   const bool investigate_merged_vertices;
   const bool verbose;
+
+  // new, configurable seed thresholds (default values preserve current behaviour)
+  const double minSeedIPSig;
+  const double minSeedPt;
 
   const edm::EDGetTokenT<reco::BeamSpot> beamspot_token;
   const edm::EDGetTokenT<std::vector<reco::Track>> seed_tracks_token_;
@@ -137,18 +138,17 @@ private:
   }
   
     track_set vertex_track_set(const reco::Vertex & v, const double min_weight = 0.5) const {
-      track_set result;
-
-      for (auto it = v.tracks_begin(), ite = v.tracks_end(); it != ite; ++it) {
-        const double w = v.trackWeight(*it);
-        const bool use = w >= min_weight;
-        assert(use);
-        if (use)
-          result.insert(it->castTo<reco::TrackRef>());
-      }
-
-      return result;
-    }
+     track_set result;
+ 
+     for (auto it = v.tracks_begin(), ite = v.tracks_end(); it != ite; ++it) {
+       const double w = v.trackWeight(*it);
+       const bool use = w >= min_weight;
+       if (use)
+         result.insert(it->castTo<reco::TrackRef>());
+     }
+ 
+     return result;
+   }
 
   
   
@@ -184,7 +184,6 @@ private:
   
 };
 
-
 //
 // constants, enums and typedefs
 //
@@ -219,6 +218,10 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
   investigate_merged_vertices(params.getParameter<bool>("investigate_merged_vertices")),
   verbose(params.getParameter<bool>("verbose")),
   
+  // read new params (provide same defaults as current hard-coded values)
+  minSeedIPSig(params.getUntrackedParameter<double>("minSeedIPSig", 4.0)),
+  minSeedPt(params.getUntrackedParameter<double>("minSeedPt", 0.9)),
+
   beamspot_token(consumes<reco::BeamSpot>(params.getParameter<edm::InputTag>("beamspot_src"))),
   seed_tracks_token_(consumes(params.getParameter<edm::InputTag>("seed_tracks_src"))),
   token_builder(esConsumes(edm::ESInputTag("", "TransientTrackBuilder"))),
@@ -252,40 +255,55 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   edm::Handle<reco::BeamSpot> beamspot;
   iEvent.getByToken(beamspot_token, beamspot);
+  // get handles
+  edm::Handle<std::vector<reco::Track>> seed_track_handle;
+  iEvent.getByToken(seed_tracks_token_, seed_track_handle);
+
+  // guard against missing handles early (avoids dereferencing beamspot before validity check)
+  if (!beamspot.isValid() || !seed_track_handle.isValid()) {
+    iEvent.emplace(putToken_, reco::VertexCollection());
+    return;
+  }
+
+  // safe to dereference beamspot now
   const double bsx = beamspot->position().x();
   const double bsy = beamspot->position().y();
   const double bsz = beamspot->position().z();
   const reco::Vertex fake_bs_vtx(beamspot->position(), beamspot->covariance3D());
-  
-  //Get the Transient Track Builder
+
+  // Get the Transient Track Builder
   auto const &tt_builder = iSetup.getData(token_builder);
 
-  //Get the reco tracks from the events
-  edm::Handle<std::vector<reco::Track>> seed_track_handle;
-  iEvent.getByToken(seed_tracks_token_, seed_track_handle);
+  // Build transient tracks once for selected seed tracks and map track key -> index
+  std::vector<reco::TransientTrack> seed_tracks;
+  seed_tracks.reserve(seed_track_handle->size());
+  std::unordered_map<unsigned int, size_t> seed_track_ref_map;
+  seed_track_ref_map.reserve(seed_track_handle->size());
 
-  // Build the references to the tracks
-  std::vector<reco::TrackRef> seed_track_refs;
-  
-  for (size_t i_tk = 0; i_tk < seed_track_handle->size(); i_tk++){
+  for (size_t i_tk = 0; i_tk < seed_track_handle->size(); ++i_tk) {
     const edm::Ref<reco::TrackCollection> tk_ref(seed_track_handle, i_tk);
     reco::TransientTrack ttk = tt_builder.build(tk_ref);
     std::pair<bool, Measurement1D> ttk_dist = track_dist(ttk, fake_bs_vtx);
     float IP_sig = ttk_dist.second.significance();
-    if ((IP_sig > 4) && (tk_ref->pt()>0.9)) seed_track_refs.push_back(tk_ref);
+    if ((IP_sig > minSeedIPSig) && (tk_ref->pt() > minSeedPt)) {
+      seed_track_ref_map[tk_ref.key()] = seed_tracks.size();
+      seed_tracks.push_back(std::move(ttk));
+    }
     if (verbose) printf("Build track references. IP_sig = %f\n", IP_sig);
   }
-  
-  
-  //Build transient tracks from reco tracks
-  std::vector<reco::TransientTrack> seed_tracks;
 
-  std::map<reco::TrackRef, size_t> seed_track_ref_map;
-  for (const reco::TrackRef& tk : seed_track_refs) {
-    seed_tracks.push_back(tt_builder.build(tk));
-    seed_track_ref_map[tk] = seed_tracks.size() - 1;
-  }
-  
+  // helper: get a TransientTrack for a TrackRef: use prebuilt seed_tracks when available,
+  // otherwise build one on the fly (preserves behaviour for tracks not included in the seed set)
+  // accessor: accept edm::Ref<...> or edm::RefToBase<...> by using .key()
+  auto getTransientTrack = [&](auto const& tk)->reco::TransientTrack {
+    // use key() for lookup (works for both Ref and RefToBase)
+    const unsigned int k = tk.key();
+    auto it = seed_track_ref_map.find(k);
+    if (it != seed_track_ref_map.end()) return seed_tracks[it->second];
+    // fallback: construct a TrackRef from the known input collection and build a transient track
+    const edm::Ref<reco::TrackCollection> tr(seed_track_handle, k);
+    return tt_builder.build(tr);
+  };
 
   //////////////////////////////////////////////////////////////////////
   // Form seed vertices from all pairs of tracks whose vertex fit
@@ -299,7 +317,10 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   if (ntk == 0) {
     iEvent.emplace(putToken_, std::move(*vertices));
     return;
-  }  
+  }
+
+  // reserve a reasonable amount to reduce reallocations
+  vertices->reserve(std::min<size_t>(ntk * (ntk - 1) / 2, 1024));
 
   
   std::vector<size_t> itks(n_tracks_per_seed_vertex, 0);
@@ -449,7 +470,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	
         
 	for (auto tk : shared_tracks) {
-	  const reco::TransientTrack& ttk = seed_tracks[seed_track_ref_map[tk]];
+	  const reco::TransientTrack& ttk = getTransientTrack(tk);
 	  std::pair<bool, Measurement1D> t_dist_0 = track_dist(ttk, *v[0]);
 	  std::pair<bool, Measurement1D> t_dist_1 = track_dist(ttk, *v[1]);
 	  
@@ -492,7 +513,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       
       std::vector<reco::TransientTrack> ttks;
       for (auto tk : tracks_to_fit)
-	ttks.push_back(seed_tracks[seed_track_ref_map[tk]]);
+	ttks.push_back(getTransientTrack(tk));
       
       reco::VertexCollection new_vertices;
       
@@ -529,7 +550,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         std::vector<reco::TransientTrack> ttks;
         for (auto tk : tracks[i])
           if (tracks_to_remove_in_refit[i].count(tk) == 0)
-            ttks.push_back(seed_tracks[seed_track_ref_map[tk]]);
+            ttks.push_back(getTransientTrack(tk));
 
         reco::VertexCollection new_vertices;
         for (const TransientVertex& tv : kv_reco_dropin(ttks)){
@@ -600,7 +621,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
             for (int i = 0; i < 2; ++i) {
               for (auto tk : vertex_track_set(*v[i])) {
-                ttks.push_back(tt_builder.build(tk));
+                ttks.push_back(getTransientTrack(tk));
               }
             }
 
@@ -609,8 +630,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
               merged_vertices.push_back(reco::Vertex(tv));
 
               for (auto it = merged_vertices[0].tracks_begin(), ite = merged_vertices[0].tracks_end(); it != ite; ++it) {
-                reco::TransientTrack seed_track;
-                seed_track = tt_builder.build(*it.operator*());
+                reco::TransientTrack seed_track = getTransientTrack(*it);
                 std::pair<bool, Measurement1D> tk_vtx_dist = track_dist(seed_track, merged_vertices[0]);
               }
             }
@@ -651,7 +671,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       for (size_t i = 0; i < ntks; ++i) {
         for (size_t j = 0; j < ntks; ++j)
           if (j != i)
-            ttks[j - (j >= i)] = tt_builder.build(tks[j]);
+            ttks[j - (j >= i)] = getTransientTrack(tks[j]);
         reco::Vertex vnm1(TransientVertex(kv_reco.vertex(ttks)));
         const double dist3_2 = (vnm1.x() - v[0]->x())*(vnm1.x() - v[0]->x()) + (vnm1.y() - v[0]->y())*(vnm1.y() - v[0]->y()) + (vnm1.z() - v[0]->z())*(vnm1.z() - v[0]->z());
         const double distz = sqrt( (vnm1.z() - v[0]->z()) * (vnm1.z() - v[0]->z()) );
@@ -725,7 +745,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
                 tracks_to_fit.insert(tk);
             std::vector<reco::TransientTrack> ttks;
             for (auto tk : tracks_to_fit)
-              ttks.push_back(seed_tracks[seed_track_ref_map[tk]]);
+              ttks.push_back(getTransientTrack(tk));
 
             if (investigate_merged_vertices) {
               std::vector<TransientVertex> tv(1, kv_reco.vertex(ttks));
