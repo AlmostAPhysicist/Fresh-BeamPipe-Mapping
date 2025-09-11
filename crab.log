@@ -1,0 +1,12 @@
+DEBUG 2025-09-09 05:50:47.967 UTC: 	 CRAB Client version: v3.250820
+DEBUG 2025-09-09 05:50:47.967 UTC: 	 Running on: Linux lxplus930.cern.ch 5.14.0-570.37.1.el9_6.x86_64 #1 SMP PREEMPT_DYNAMIC Sat Aug 16 01:10:00 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-09-09 05:50:47.967 UTC: 	 Not using Singularity
+DEBUG 2025-09-09 05:50:47.967 UTC: 	 Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+DEBUG 2025-09-09 05:50:47.967 UTC: 	 Executing command: 'getlog'
+DEBUG 2025-09-09 05:50:47.971 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-09-09 05:51:16.672 UTC: 	 CRAB Client version: v3.250820
+DEBUG 2025-09-09 05:51:16.672 UTC: 	 Running on: Linux lxplus930.cern.ch 5.14.0-570.37.1.el9_6.x86_64 #1 SMP PREEMPT_DYNAMIC Sat Aug 16 01:10:00 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-09-09 05:51:16.672 UTC: 	 Not using Singularity
+DEBUG 2025-09-09 05:51:16.672 UTC: 	 Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+DEBUG 2025-09-09 05:51:16.672 UTC: 	 Executing command: 'getlog'
+DEBUG 2025-09-09 05:51:16.672 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3

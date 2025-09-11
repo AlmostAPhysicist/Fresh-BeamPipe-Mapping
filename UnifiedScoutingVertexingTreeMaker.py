@@ -141,10 +141,10 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("CHAIN")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-# process.MessageLogger.cerr.FwkSummary.reportEvery = 500
-# process.MessageLogger.cerr.FwkReport.reportEvery = 500
-process.MessageLogger.cerr.FwkSummary.reportEvery = 1
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+# process.MessageLogger.cerr.FwkSummary.reportEvery = 50
+# process.MessageLogger.cerr.FwkReport.reportEvery = 50
+process.MessageLogger.cerr.FwkSummary.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 # process.MessageLogger.cerr.threshold = cms.untracked.string('DEBUG')
 # process.MessageLogger.debugModules = cms.untracked.vstring('hltScoutingUnpackProducer', 'Vertexer', 'scoutingTree')
@@ -155,13 +155,13 @@ process.MessageLogger.debugModules = cms.untracked.vstring()  # Disable debug fo
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True),
     # TryToContinue = cms.untracked.vstring('ProductNotFound')
-    numberOfThreads = cms.untracked.uint32(4),     # adjust to machine cores
-    numberOfStreams = cms.untracked.uint32(0),     # let framework pick sensible streams
+    # numberOfThreads = cms.untracked.uint32(4),     # adjust to machine cores
+    # numberOfStreams = cms.untracked.uint32(0),     # let framework pick sensible streams
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)  # Limited events for testing
-    # input = cms.untracked.int32(-1)  # Process all events
+    # input = cms.untracked.int32(1000)  # Limited events for testing
+    input = cms.untracked.int32(500000)  # Process all events
 )
 
 # Input source
@@ -175,7 +175,7 @@ process.source = cms.Source("PoolSource",
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/003ca643-43f8-40dd-92b3-4c6a4ccdc894.root" #EDM Number of events: 527035
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root"
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root",
-    "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/013b488b-7af4-450f-b175-b39623c72ae2.root"
+    # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/013b488b-7af4-450f-b175-b39623c72ae2.root"
     )
 )
 
@@ -193,7 +193,7 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # TFileService for output
 process.TFileService = cms.Service("TFileService",
     # fileName = cms.string("DY2M_ScoutingTree_Output.root")
-    fileName = cms.string("./test-outputs/DY2M_ScoutingTree_Output_Cleanup_v1.root")  # This is the only output saved
+    fileName = cms.string("DY2M_ScoutingTree_Output.root")  # This is the only output saved
 )
 
 # Step 1: HLT Scouting Unpacker
@@ -259,8 +259,8 @@ process.scoutingTrackCount = cms.EDFilter('ScoutingTrackCountFilter',
 )
 
 process.moduloEventFilter = cms.EDFilter('ModuloEventFilter',
-    modulo = cms.uint32(5),                           # keep 1-in-5 events
-    remainder = cms.untracked.uint32(1)                # keep events with eventNumber % 5 == 1
+    modulo = cms.uint32(10),                           # keep 1-in-10 events
+    remainder = cms.untracked.uint32(1)                # keep events with eventNumber % 10 == 1
 )
 
 # Full chain schedule

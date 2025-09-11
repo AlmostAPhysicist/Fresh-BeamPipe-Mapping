@@ -1,0 +1,321 @@
+DEBUG 2025-09-09 17:53:02.209 UTC: 	 CRAB Client version: v3.250820
+DEBUG 2025-09-09 17:53:02.210 UTC: 	 Running on: Linux lxplus937.cern.ch 5.14.0-570.37.1.el9_6.x86_64 #1 SMP PREEMPT_DYNAMIC Sat Aug 16 01:10:00 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-09-09 17:53:02.210 UTC: 	 Not using Singularity
+DEBUG 2025-09-09 17:53:02.210 UTC: 	 Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+DEBUG 2025-09-09 17:53:02.210 UTC: 	 Executing command: 'submit'
+DEBUG 2025-09-09 17:53:02.210 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+INFO 2025-09-09 17:53:02.210 UTC: 	 Will use CRAB configuration file chainedCrabConfig.py
+DEBUG 2025-09-09 17:53:02.211 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-09-09 17:53:02.217 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+DEBUG 2025-09-09 17:53:02.226 UTC: 	 Checking credentials
+DEBUG 2025-09-09 17:53:02.226 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-09-09 17:53:02.226 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-09-09 17:53:02.226 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-09-09 17:53:02.249 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-09 17:53:02.250 UTC: 	 Getting proxy life time left
+DEBUG 2025-09-09 17:53:02.250 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-09-09 17:53:02.271 UTC: 	 output : 690984
+690984
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-09 17:53:02.271 UTC: 	 Proxy valid for 191:56:24 hours
+DEBUG 2025-09-09 17:53:02.271 UTC: 	 Encoded data for curl request: subresource=delegatedn
+DEBUG 2025-09-09 17:53:02.333 UTC: 	 Registering user credentials on myproxy for /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+DEBUG 2025-09-09 17:53:02.333 UTC: 	 Executing command :
+ voms-proxy-info --identity --file /tmp/x509up_u180451
+DEBUG 2025-09-09 17:53:02.356 UTC: 	 output : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-09 17:53:02.356 UTC: 	 Getting myproxy life time left for 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-09-09 17:53:02.356 UTC: 	 Executing command :
+ myproxy-info -s myproxy.cern.ch -l 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-09-09 17:53:02.673 UTC: 	 output : username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  timeleft: 694:51:41  (29.0 days)
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-09 17:53:02.673 UTC: 	 Myproxy is valid: 2501460
+DEBUG 2025-09-09 17:53:02.673 UTC: 	 Result of myproxy credential check:
+  Credential exists on myproxy: username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6  - validity: 28 days, 22:51:00
+DEBUG 2025-09-09 17:53:02.673 UTC: 	 Command use: submit
+DEBUG 2025-09-09 17:53:02.673 UTC: 	 Options use: ['-c', 'chainedCrabConfig.py']
+DEBUG 2025-09-09 17:53:02.673 UTC: 	 Encoded data for curl request: subresource=version
+DEBUG 2025-09-09 17:53:02.719 UTC: 	 CRABClient version: v3.250820
+DEBUG 2025-09-09 17:53:02.719 UTC: 	 Instance is prod
+DEBUG 2025-09-09 17:53:02.719 UTC: 	 Server base url is cmsweb.cern.ch
+DEBUG 2025-09-09 17:53:02.719 UTC: 	 Command api workflow
+DEBUG 2025-09-09 17:53:02.719 UTC: 	 Started submission
+DEBUG 2025-09-09 17:53:02.719 UTC: 	 Working on /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1
+DEBUG 2025-09-09 17:53:02.719 UTC: 	 Encoded data for curl request: subresource=backendurls
+DEBUG 2025-09-09 17:53:02.792 UTC: 	 Loading required information from the environment
+DEBUG 2025-09-09 17:53:02.792 UTC: 	 Found CMSSW_14_0_18_patch1 for el9_amd64_gcc12 with base /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1
+DEBUG 2025-09-09 17:53:02.792 UTC: 	 Loading required information from the environment
+DEBUG 2025-09-09 17:53:02.792 UTC: 	 Found CMSSW_14_0_18_patch1 for el9_amd64_gcc12 with base /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1
+DEBUG 2025-09-09 17:53:02.792 UTC: 	 UNIQUE NAME: tarUUID 05ac20aa-b46a-40f0-b5e2-485ad3969b5e 
+DEBUG 2025-09-09 17:53:02.792 UTC: 	 self.config: from WMCore.Configuration import Configuration
+config = Configuration()
+config.section_('General')
+config.General.transferOutputs = True
+config.General.requestName = 'Data_ScoutingPFRun3_1mod10_v1'
+config.General.transferLogs = True
+config.section_('JobType')
+config.JobType.pluginName = 'Analysis'
+config.JobType.maxJobRuntimeMin = 2750
+config.JobType.maxMemoryMB = 3000
+config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'
+config.JobType.outputFiles = ['DY2M_ScoutingTree_Output.root']
+config.section_('Data')
+config.Data.splitting = 'FileBased'
+config.Data.allowNonValidInputDataset = True
+config.Data.unitsPerJob = 2
+config.Data.inputDBS = 'global'
+config.Data.outputDatasetTag = 'Data_ScoutingPFRun3_1mod10_v1'
+config.Data.inputDataset = '/ScoutingPFRun3/Run2024H-v1/HLTSCOUT'
+config.Data.publication = False
+config.section_('Site')
+config.Site.storageSite = 'T3_CH_CERNBOX'
+config.section_('User')
+config.section_('Debug')
+
+DEBUG 2025-09-09 17:53:02.792 UTC: 	 self.config.JobType.psetName: UnifiedScoutingVertexingTreeMaker.py
+INFO 2025-09-09 17:53:02.792 UTC: 	 Importing CMSSW configuration UnifiedScoutingVertexingTreeMaker.py
+INFO 2025-09-09 17:53:03.416 UTC: 	 Finished importing CMSSW configuration UnifiedScoutingVertexingTreeMaker.py
+DEBUG 2025-09-09 17:53:03.416 UTC: 	 Writing CMSSW configuration to /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/inputs/PSet.py
+DEBUG 2025-09-09 17:53:03.446 UTC: 	 The following EDM output files will be collected: []
+DEBUG 2025-09-09 17:53:03.446 UTC: 	 The following TFile output files will be collected: ['DY2M_ScoutingTree_Output.root']
+DEBUG 2025-09-09 17:53:03.446 UTC: 	 The following user output files (not listed as PoolOuputModule or TFileService in the CMSSW PSet) will be collected: 
+DEBUG 2025-09-09 17:53:03.446 UTC: 	 Loading required information from the environment
+DEBUG 2025-09-09 17:53:03.446 UTC: 	 Found CMSSW_14_0_18_patch1 for el9_amd64_gcc12 with base /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1
+DEBUG 2025-09-09 17:53:03.447 UTC: 	 Making tarball in /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/inputs/05ac20aa-b46a-40f0-b5e2-485ad3969b5edefault.tgz
+DEBUG 2025-09-09 17:53:03.447 UTC: 	 Checking directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/bin
+DEBUG 2025-09-09 17:53:03.447 UTC: 	 Adding directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/bin to tarball
+DEBUG 2025-09-09 17:53:03.473 UTC: 	 Checking directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/python
+DEBUG 2025-09-09 17:53:03.473 UTC: 	 Adding directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/python to tarball
+DEBUG 2025-09-09 17:53:04.069 UTC: 	 Checking directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/cfipython
+DEBUG 2025-09-09 17:53:04.069 UTC: 	 Adding directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/cfipython to tarball
+DEBUG 2025-09-09 17:53:04.113 UTC: 	 Checking directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/lib
+DEBUG 2025-09-09 17:53:04.113 UTC: 	 Adding directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/lib to tarball
+DEBUG 2025-09-09 17:53:04.437 UTC: 	 Checking directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/biglib
+DEBUG 2025-09-09 17:53:04.437 UTC: 	 Adding directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/biglib to tarball
+DEBUG 2025-09-09 17:53:04.441 UTC: 	 Checking directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/module
+DEBUG 2025-09-09 17:53:04.441 UTC: 	 Checking directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/config/SCRAM/hooks
+DEBUG 2025-09-09 17:53:04.444 UTC: 	 Adding directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/config/SCRAM/hooks to tarball
+DEBUG 2025-09-09 17:53:05.824 UTC: 	 Adding directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/DataFormats/Scouting/interface to tarball
+DEBUG 2025-09-09 17:53:05.895 UTC: 	 Adding directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/ScoutingTreeMakerRun3/python to tarball
+DEBUG 2025-09-09 17:53:06.143 UTC: 	 Adding directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/DataFormats/Scouting/interface to tarball
+DEBUG 2025-09-09 17:53:06.225 UTC: 	 Adding directory /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Configuration/GenProduction/python to tarball
+DEBUG 2025-09-09 17:53:06.295 UTC: 	 Uploading archive /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/inputs/05ac20aa-b46a-40f0-b5e2-485ad3969b5edefault.tgz (451 KB) to the CRAB cache. Using URI https://cmsweb.cern.ch/S3/crabcache_prod
+DEBUG 2025-09-09 17:53:06.499 UTC: 	 Encoded data for curl request: subresource=upload&objecttype=sandbox&tarballname=c1cf48dd54b7998620a09c9925e7240137e933a5d4d3448a6de32e2ed9c447d2.tar.gz
+DEBUG 2025-09-09 17:53:06.646 UTC: 	 Will execute:
+curl -f -v -X POST  -H "User-Agent: CRAB" -F "key=amalhotr/sandboxes/c1cf48dd54b7998620a09c9925e7240137e933a5d4d3448a6de32e2ed9c447d2.tar.gz" -F "AWSAccessKeyId=715203df6482458ba839e73e6dab634b" -F "policy=eyJleHBpcmF0aW9uIjogIjIwMjUtMDktMDlUMTg6NTM6MDZaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAiY3JhYmNhY2hlX3Byb2QifSwgeyJrZXkiOiAiYW1hbGhvdHIvc2FuZGJveGVzL2MxY2Y0OGRkNTRiNzk5ODYyMGEwOWM5OTI1ZTcyNDAxMzdlOTMzYTVkNGQzNDQ4YTZkZTMyZTJlZDljNDQ3ZDIudGFyLmd6In1dfQ==" -F "signature=J8iSPylX9CkalZJ3b584He6RQvo=" -F "file=@/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/inputs/05ac20aa-b46a-40f0-b5e2-485ad3969b5edefault.tgz" "https://s3.cern.ch/crabcache_prod"
+DEBUG 2025-09-09 17:53:06.831 UTC: 	 exitcode: 0
+stdout: b''
+DEBUG 2025-09-09 17:53:06.831 UTC: 	 upload to S3 of sandbox /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/inputs/05ac20aa-b46a-40f0-b5e2-485ad3969b5edefault.tgz completed
+DEBUG 2025-09-09 17:53:06.831 UTC: 	 make sure that object is ready for retrieve
+DEBUG 2025-09-09 17:53:07.833 UTC: 	 Encoded data for curl request: subresource=download&objecttype=sandbox&tarballname=c1cf48dd54b7998620a09c9925e7240137e933a5d4d3448a6de32e2ed9c447d2.tar.gz&clientmethod=head_object
+DEBUG 2025-09-09 17:53:07.878 UTC: 	 PreSignedUrl to download sandbox received OK
+DEBUG 2025-09-09 17:53:07.882 UTC: 	 Will execute:
+ curl -v -s -f -o /dev/null --head  "https://s3.cern.ch/crabcache_prod/amalhotr/sandboxes/c1cf48dd54b7998620a09c9925e7240137e933a5d4d3448a6de32e2ed9c447d2.tar.gz?AWSAccessKeyId=715203df6482458ba839e73e6dab634b&Signature=wXvsWgiUJoGTmtE0xZL8iY%2FSJBo%3D&Expires=1757443987"
+DEBUG 2025-09-09 17:53:07.921 UTC: 	 exitcode: 0
+stdout: b''
+DEBUG 2025-09-09 17:53:07.921 UTC: 	 sandbox /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/inputs/05ac20aa-b46a-40f0-b5e2-485ad3969b5edefault.tgz successfully uploaded to S3
+DEBUG 2025-09-09 17:53:07.921 UTC: 	 Loading required information from the environment
+DEBUG 2025-09-09 17:53:07.921 UTC: 	 Found CMSSW_14_0_18_patch1 for el9_amd64_gcc12 with base /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1
+DEBUG 2025-09-09 17:53:07.921 UTC: 	 Making tarball in /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/inputs/debugFiles.tgz
+DEBUG 2025-09-09 17:53:07.937 UTC: 	 Uploading archive /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/inputs/debugFiles.tgz (3 KB) to the CRAB cache. Using URI https://cmsweb.cern.ch/S3/crabcache_prod
+DEBUG 2025-09-09 17:53:07.940 UTC: 	 Encoded data for curl request: subresource=upload&objecttype=sandbox&tarballname=7ec30e7ecb99c0740ccb615cc70edb3cc3f037835921b03e4b2b16a54d236d59.tar.gz
+DEBUG 2025-09-09 17:53:08.003 UTC: 	 Will execute:
+curl -f -v -X POST  -H "User-Agent: CRAB" -F "key=amalhotr/sandboxes/7ec30e7ecb99c0740ccb615cc70edb3cc3f037835921b03e4b2b16a54d236d59.tar.gz" -F "AWSAccessKeyId=715203df6482458ba839e73e6dab634b" -F "policy=eyJleHBpcmF0aW9uIjogIjIwMjUtMDktMDlUMTg6NTM6MDdaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAiY3JhYmNhY2hlX3Byb2QifSwgeyJrZXkiOiAiYW1hbGhvdHIvc2FuZGJveGVzLzdlYzMwZTdlY2I5OWMwNzQwY2NiNjE1Y2M3MGVkYjNjYzNmMDM3ODM1OTIxYjAzZTRiMmIxNmE1NGQyMzZkNTkudGFyLmd6In1dfQ==" -F "signature=xD12sSfKMs7xdSkw5FCEhDYyeOc=" -F "file=@/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/inputs/debugFiles.tgz" "https://s3.cern.ch/crabcache_prod"
+DEBUG 2025-09-09 17:53:08.098 UTC: 	 exitcode: 0
+stdout: b''
+DEBUG 2025-09-09 17:53:08.098 UTC: 	 upload to S3 of sandbox /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/inputs/debugFiles.tgz completed
+DEBUG 2025-09-09 17:53:08.098 UTC: 	 make sure that object is ready for retrieve
+DEBUG 2025-09-09 17:53:09.099 UTC: 	 Encoded data for curl request: subresource=download&objecttype=sandbox&tarballname=7ec30e7ecb99c0740ccb615cc70edb3cc3f037835921b03e4b2b16a54d236d59.tar.gz&clientmethod=head_object
+DEBUG 2025-09-09 17:53:09.142 UTC: 	 PreSignedUrl to download sandbox received OK
+DEBUG 2025-09-09 17:53:09.143 UTC: 	 Will execute:
+ curl -v -s -f -o /dev/null --head  "https://s3.cern.ch/crabcache_prod/amalhotr/sandboxes/7ec30e7ecb99c0740ccb615cc70edb3cc3f037835921b03e4b2b16a54d236d59.tar.gz?AWSAccessKeyId=715203df6482458ba839e73e6dab634b&Signature=FjIrH%2B9aE%2BgySQJMvGSfHrWN7Ro%3D&Expires=1757443989"
+DEBUG 2025-09-09 17:53:09.176 UTC: 	 exitcode: 0
+stdout: b''
+DEBUG 2025-09-09 17:53:09.176 UTC: 	 sandbox /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/inputs/debugFiles.tgz successfully uploaded to S3
+DEBUG 2025-09-09 17:53:09.176 UTC: 	 Result uploading input files: c1cf48dd54b7998620a09c9925e7240137e933a5d4d3448a6de32e2ed9c447d2.tar.gz 
+DEBUG 2025-09-09 17:53:09.176 UTC: 	 submit() - self.configuration from WMCore.Configuration import Configuration
+config = Configuration()
+config.section_('General')
+config.General.transferOutputs = True
+config.General.requestName = 'Data_ScoutingPFRun3_1mod10_v1'
+config.General.transferLogs = True
+config.section_('JobType')
+config.JobType.pluginName = 'Analysis'
+config.JobType.maxJobRuntimeMin = 2750
+config.JobType.maxMemoryMB = 3000
+config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'
+config.JobType.outputFiles = ['DY2M_ScoutingTree_Output.root']
+config.section_('Data')
+config.Data.splitting = 'FileBased'
+config.Data.allowNonValidInputDataset = True
+config.Data.unitsPerJob = 2
+config.Data.inputDBS = 'global'
+config.Data.outputDatasetTag = 'Data_ScoutingPFRun3_1mod10_v1'
+config.Data.inputDataset = '/ScoutingPFRun3/Run2024H-v1/HLTSCOUT'
+config.Data.publication = False
+config.section_('Site')
+config.Site.storageSite = 'T3_CH_CERNBOX'
+config.section_('User')
+config.section_('Debug')
+
+DEBUG 2025-09-09 17:53:09.176 UTC: 	 submit() - self.configreq {'dryrun': 0, 'workflow': 'crab_Data_ScoutingPFRun3_1mod10_v1', 'saveoutput': 1, 'savelogsflag': 1, 'inputdata': '/ScoutingPFRun3/Run2024H-v1/HLTSCOUT', 'nonvaliddata': 1, 'userfiles': [], 'dbsurl': 'https://cmsweb.cern.ch/dbs/prod/global/DBSReader', 'useparent': 0, 'ignorelocality': 0, 'splitalgo': 'FileBased', 'algoargs': 2, 'totalunits': 0, 'publication': 0, 'publishdbsurl': 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter', 'publishname2': 'Data_ScoutingPFRun3_1mod10_v1', 'jobtype': 'Analysis', 'generator': 'pythia', 'addoutputfiles': ['DY2M_ScoutingTree_Output.root'], 'maxjobruntime': 2750, 'numcores': 1, 'maxmemory': 3000, 'priority': 10, 'nonprodsw': 0, 'asyncdest': 'T3_CH_CERNBOX', 'requireaccelerator': 0, 'oneEventMode': 0, 'extrajdl': [], 'ignoreglobalblacklist': 0, 'partialdataset': 0, 'inputblocks': []}
+DEBUG 2025-09-09 17:53:09.177 UTC: 	 submit() - jobconfig {'addoutputfiles': [], 'tfileoutfiles': ['DY2M_ScoutingTree_Output.root'], 'edmoutfiles': [], 'jobarch': 'el9_amd64_gcc12', 'jobminuarch': 'any', 'jobsw': 'CMSSW_14_0_18_patch1', 'inputdata': '/ScoutingPFRun3/Run2024H-v1/HLTSCOUT', 'cacheurl': 'https://cmsweb.cern.ch/S3/crabcache_prod', 'cachefilename': 'c1cf48dd54b7998620a09c9925e7240137e933a5d4d3448a6de32e2ed9c447d2.tar.gz', 'debugfilename': '7ec30e7ecb99c0740ccb615cc70edb3cc3f037835921b03e4b2b16a54d236d59.tar.gz', 'jobtype': 'Analysis'}
+INFO 2025-09-09 17:53:09.177 UTC: 	 Sending the request to the server at cmsweb.cern.ch
+DEBUG 2025-09-09 17:53:09.177 UTC: 	 Submitting {'dryrun': 0, 'workflow': 'crab_Data_ScoutingPFRun3_1mod10_v1', 'saveoutput': 1, 'savelogsflag': 1, 'inputdata': '/ScoutingPFRun3/Run2024H-v1/HLTSCOUT', 'nonvaliddata': 1, 'userfiles': [], 'dbsurl': 'https://cmsweb.cern.ch/dbs/prod/global/DBSReader', 'useparent': 0, 'ignorelocality': 0, 'splitalgo': 'FileBased', 'algoargs': 2, 'totalunits': 0, 'publication': 0, 'publishdbsurl': 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter', 'publishname2': 'Data_ScoutingPFRun3_1mod10_v1', 'jobtype': 'Analysis', 'generator': 'pythia', 'addoutputfiles': [], 'maxjobruntime': 2750, 'numcores': 1, 'maxmemory': 3000, 'priority': 10, 'nonprodsw': 0, 'asyncdest': 'T3_CH_CERNBOX', 'requireaccelerator': 0, 'oneEventMode': 0, 'extrajdl': [], 'ignoreglobalblacklist': 0, 'partialdataset': 0, 'inputblocks': [], 'tfileoutfiles': ['DY2M_ScoutingTree_Output.root'], 'edmoutfiles': [], 'jobarch': 'el9_amd64_gcc12', 'jobminuarch': 'any', 'jobsw': 'CMSSW_14_0_18_patch1', 'cacheurl': 'https://cmsweb.cern.ch/S3/crabcache_prod', 'cachefilename': 'c1cf48dd54b7998620a09c9925e7240137e933a5d4d3448a6de32e2ed9c447d2.tar.gz', 'debugfilename': '7ec30e7ecb99c0740ccb615cc70edb3cc3f037835921b03e4b2b16a54d236d59.tar.gz'} 
+DEBUG 2025-09-09 17:53:09.177 UTC: 	 Encoded data for curl request: dryrun=0&workflow=crab_Data_ScoutingPFRun3_1mod10_v1&saveoutput=1&savelogsflag=1&inputdata=%2FScoutingPFRun3%2FRun2024H-v1%2FHLTSCOUT&nonvaliddata=1&dbsurl=https%3A%2F%2Fcmsweb.cern.ch%2Fdbs%2Fprod%2Fglobal%2FDBSReader&useparent=0&ignorelocality=0&splitalgo=FileBased&algoargs=2&totalunits=0&publication=0&publishdbsurl=https%3A%2F%2Fcmsweb.cern.ch%2Fdbs%2Fprod%2Fphys03%2FDBSWriter&publishname2=Data_ScoutingPFRun3_1mod10_v1&jobtype=Analysis&generator=pythia&maxjobruntime=2750&numcores=1&maxmemory=3000&priority=10&nonprodsw=0&asyncdest=T3_CH_CERNBOX&requireaccelerator=0&oneEventMode=0&ignoreglobalblacklist=0&partialdataset=0&jobarch=el9_amd64_gcc12&jobminuarch=any&jobsw=CMSSW_14_0_18_patch1&cacheurl=https%3A%2F%2Fcmsweb.cern.ch%2FS3%2Fcrabcache_prod&cachefilename=c1cf48dd54b7998620a09c9925e7240137e933a5d4d3448a6de32e2ed9c447d2.tar.gz&debugfilename=7ec30e7ecb99c0740ccb615cc70edb3cc3f037835921b03e4b2b16a54d236d59.tar.gz&tfileoutfiles=DY2M_ScoutingTree_Output.root
+DEBUG 2025-09-09 17:53:09.726 UTC: 	 Result: {'result': [{'RequestName': '250909_175309:amalhotr_crab_Data_ScoutingPFRun3_1mod10_v1'}]}
+INFO 2025-09-09 17:53:09.734 UTC: 	 Success: Your task has been delivered to the prod CRAB3 server.
+INFO 2025-09-09 17:53:09.734 UTC: 	 Task name: 250909_175309:amalhotr_crab_Data_ScoutingPFRun3_1mod10_v1
+INFO 2025-09-09 17:53:09.734 UTC: 	 Project dir: ./crab_Data_ScoutingPFRun3_1mod10_v1
+INFO 2025-09-09 17:53:09.734 UTC: 	 Please use ' crab status -d ./crab_Data_ScoutingPFRun3_1mod10_v1 ' to check how the submission process proceeds.
+DEBUG 2025-09-09 17:53:09.734 UTC: 	 About to return
+INFO 2025-09-09 17:53:09.739 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/crab.log
+DEBUG 2025-09-09 17:53:18.562 UTC: 	 CRAB Client version: v3.250820
+DEBUG 2025-09-09 17:53:18.562 UTC: 	 Running on: Linux lxplus937.cern.ch 5.14.0-570.37.1.el9_6.x86_64 #1 SMP PREEMPT_DYNAMIC Sat Aug 16 01:10:00 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-09-09 17:53:18.562 UTC: 	 Not using Singularity
+DEBUG 2025-09-09 17:53:18.562 UTC: 	 Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+DEBUG 2025-09-09 17:53:18.562 UTC: 	 Executing command: 'status'
+DEBUG 2025-09-09 17:53:18.562 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-09-09 17:53:18.601 UTC: 	 Checking credentials
+DEBUG 2025-09-09 17:53:18.601 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-09-09 17:53:18.601 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-09-09 17:53:18.601 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-09-09 17:53:18.628 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-09 17:53:18.628 UTC: 	 Getting proxy life time left
+DEBUG 2025-09-09 17:53:18.628 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-09-09 17:53:18.652 UTC: 	 output : 690968
+690968
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-09 17:53:18.652 UTC: 	 Proxy valid for 191:56:08 hours
+DEBUG 2025-09-09 17:53:18.653 UTC: 	 Encoded data for curl request: subresource=delegatedn
+DEBUG 2025-09-09 17:53:18.697 UTC: 	 Registering user credentials on myproxy for /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+DEBUG 2025-09-09 17:53:18.697 UTC: 	 Executing command :
+ voms-proxy-info --identity --file /tmp/x509up_u180451
+DEBUG 2025-09-09 17:53:18.728 UTC: 	 output : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-09 17:53:18.728 UTC: 	 Getting myproxy life time left for 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-09-09 17:53:18.728 UTC: 	 Executing command :
+ myproxy-info -s myproxy.cern.ch -l 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-09-09 17:53:18.996 UTC: 	 output : username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  timeleft: 694:51:25  (29.0 days)
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-09 17:53:18.996 UTC: 	 Myproxy is valid: 2501460
+DEBUG 2025-09-09 17:53:18.997 UTC: 	 Result of myproxy credential check:
+  Credential exists on myproxy: username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6  - validity: 28 days, 22:51:00
+DEBUG 2025-09-09 17:53:18.997 UTC: 	 Retrieving username ...
+DEBUG 2025-09-09 17:53:18.997 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-09-09 17:53:19.845 UTC: 	 username is amalhotr
+INFO 2025-09-09 17:53:20.481 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-09-09 17:53:20.481 UTC: 	 Command use: status
+DEBUG 2025-09-09 17:53:20.481 UTC: 	 Options use: ['-d', './crab_Data_ScoutingPFRun3_1mod10_v1']
+DEBUG 2025-09-09 17:53:20.481 UTC: 	 Encoded data for curl request: subresource=version
+DEBUG 2025-09-09 17:53:20.529 UTC: 	 CRABClient version: v3.250820
+DEBUG 2025-09-09 17:53:20.529 UTC: 	 Instance is prod
+DEBUG 2025-09-09 17:53:20.529 UTC: 	 Server base url is cmsweb.cern.ch
+DEBUG 2025-09-09 17:53:20.529 UTC: 	 Command api workflow
+DEBUG 2025-09-09 17:53:20.529 UTC: 	 Encoded data for curl request: subresource=search&workflow=250909_175309%3Aamalhotr_crab_Data_ScoutingPFRun3_1mod10_v1
+DEBUG 2025-09-09 17:53:20.594 UTC: 	 Got information from server oracle database: {'desc': {'columns': ['tm_taskname', 'tm_activity', 'tm_task_status', 'tm_task_command', 'tm_start_time', 'tm_start_injection', 'tm_end_injection', 'tm_task_failure', 'tm_job_sw', 'tm_job_arch', 'tm_input_dataset', 'tm_nonvalid_input_dataset', 'tm_use_parent', 'tm_site_whitelist', 'tm_site_blacklist', 'tm_split_algo', 'tm_split_args', 'tm_user_sandbox', 'tm_cache_url', 'tm_username', 'tm_user_dn', 'tm_user_vo', 'tm_user_role', 'tm_user_group', 'tm_publish_name', 'tm_publish_groupname', 'tm_asyncdest', 'tm_dbs_url', 'tm_publish_dbs_url', 'tm_publication', 'tm_outfiles', 'tm_tfile_outfiles', 'tm_edm_outfiles', 'tm_job_type', 'tm_generator', 'tm_events_per_lumi', 'tm_arguments', 'tm_save_logs', 'tw_name', 'tm_user_infiles', 'tm_maxjobruntime', 'tm_numcores', 'tm_maxmemory', 'tm_priority', 'tm_output_dataset', 'tm_task_warnings', 'tm_user_webdir', 'tm_scriptexe', 'tm_scriptargs', 'tm_extrajdl', 'tm_collector', 'tm_schedd', 'tm_dry_run', 'tm_user_files', 'tm_transfer_outputs', 'tm_output_lfn', 'tm_ignore_locality', 'tm_fail_limit', 'tm_one_event_mode', 'tm_secondary_input_dataset', 'tm_primary_dataset', 'tm_last_publication', 'tm_debug_files', 'clusterid', 'tm_ignore_global_blacklist', 'tm_submitter_ip_addr', 'tm_totalunits', 'tm_ddm_reqid', 'tm_user_config', 'tm_transfer_container', 'tm_transfer_rule', 'tm_publish_rule', 'tm_multipub_rule', 'tm_job_min_microarch', 'tm_dagman_status', 'tm_num_jobs', 'tm_uploaded']}, 'result': ['250909_175309:amalhotr_crab_Data_ScoutingPFRun3_1mod10_v1', 'None', 'WAITING', 'SUBMIT', '2025-09-09 17:53:09.686125', 'None', 'None', 'None', 'CMSSW_14_0_18_patch1', 'el9_amd64_gcc12', '/ScoutingPFRun3/Run2024H-v1/HLTSCOUT', 'T', '0', '[]', '[]', 'FileBased', "{'halt_job_on_file_boundaries': False, 'splitOnRun': False, 'files_per_job': 2, 'runs': [], 'lumis': []}", 'c1cf48dd54b7998620a09c9925e7240137e933a5d4d3448a6de32e2ed9c447d2.tar.gz', 'https://cmsweb.cern.ch/S3/crabcache_prod', 'amalhotr', '/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra', 'cms', 'None', 'None', 'Data_ScoutingPFRun3_1mod10_v1-00000000000000000000000000000000', 'F', 'T3_CH_CERNBOX', 'https://cmsweb.cern.ch/dbs/prod/global/DBSReader', 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter', 'F', '[]', "['DY2M_ScoutingTree_Output.root']", '[]', 'Analysis', 'pythia', 'None', '{}', 'T', 'NotKnownYet', '[]', '2750', '1', '3000', '10', 'None', '[]', 'None', 'None', '[]', '[]', 'cmsgwms-collector-global.cern.ch:9620,cmsgwms-collector-global.fnal.gov:9620', 'None', 'F', '[]', 'T', '/store/user/amalhotr/', 'F', 'None', 'F', 'None', 'ScoutingPFRun3', 'None', '7ec30e7ecb99c0740ccb615cc70edb3cc3f037835921b03e4b2b16a54d236d59.tar.gz', 'None', 'F', '188.184.89.113', '0.0', 'None', '{"partialdataset": false, "requireaccelerator": false, "acceleratorparams": null, "inputblocks": null}', 'None', 'None', 'None', 'None', 'any', 'NOT_READY', '0', 'F']}
+INFO 2025-09-09 17:53:20.595 UTC: 	 CRAB project directory:		/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1
+INFO 2025-09-09 17:53:20.595 UTC: 	 Task name:			250909_175309:amalhotr_crab_Data_ScoutingPFRun3_1mod10_v1
+INFO 2025-09-09 17:53:20.595 UTC: 	 Grid scheduler - Task Worker:	N/A yet - NotKnownYet
+INFO 2025-09-09 17:53:20.595 UTC: 	 Status on the CRAB server:	WAITING on command SUBMIT
+INFO 2025-09-09 17:53:20.595 UTC: 	 Task URL to use for HELP:	https://cmsweb.cern.ch/crabserver/ui/task/250909_175309%3Aamalhotr_crab_Data_ScoutingPFRun3_1mod10_v1
+INFO 2025-09-09 17:53:20.603 UTC: 	 Dashboard monitoring URL:	https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=amalhotr&var-task=250909_175309%3Aamalhotr_crab_Data_ScoutingPFRun3_1mod10_v1&from=1757436789000&to=now
+DEBUG 2025-09-09 17:53:20.603 UTC: 	 The task has not been submitted to the Grid scheduler yet. Not printing job information.
+INFO 2025-09-09 17:53:20.605 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/crab.log
+DEBUG 2025-09-09 17:53:37.674 UTC: 	 CRAB Client version: v3.250820
+DEBUG 2025-09-09 17:53:37.674 UTC: 	 Running on: Linux lxplus937.cern.ch 5.14.0-570.37.1.el9_6.x86_64 #1 SMP PREEMPT_DYNAMIC Sat Aug 16 01:10:00 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-09-09 17:53:37.674 UTC: 	 Not using Singularity
+DEBUG 2025-09-09 17:53:37.674 UTC: 	 Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+DEBUG 2025-09-09 17:53:37.674 UTC: 	 Executing command: 'status'
+DEBUG 2025-09-09 17:53:37.674 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-09-09 17:53:37.681 UTC: 	 Checking credentials
+DEBUG 2025-09-09 17:53:37.681 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-09-09 17:53:37.681 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-09-09 17:53:37.681 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-09-09 17:53:37.705 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-09 17:53:37.705 UTC: 	 Getting proxy life time left
+DEBUG 2025-09-09 17:53:37.705 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-09-09 17:53:37.728 UTC: 	 output : 690949
+690949
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-09 17:53:37.728 UTC: 	 Proxy valid for 191:55:49 hours
+DEBUG 2025-09-09 17:53:37.728 UTC: 	 Encoded data for curl request: subresource=delegatedn
+DEBUG 2025-09-09 17:53:37.780 UTC: 	 Registering user credentials on myproxy for /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+DEBUG 2025-09-09 17:53:37.780 UTC: 	 Executing command :
+ voms-proxy-info --identity --file /tmp/x509up_u180451
+DEBUG 2025-09-09 17:53:37.808 UTC: 	 output : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-09 17:53:37.808 UTC: 	 Getting myproxy life time left for 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-09-09 17:53:37.808 UTC: 	 Executing command :
+ myproxy-info -s myproxy.cern.ch -l 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-09-09 17:53:38.096 UTC: 	 output : username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  timeleft: 694:51:05  (29.0 days)
+
+ error: 
+ retcode : 0
+DEBUG 2025-09-09 17:53:38.096 UTC: 	 Myproxy is valid: 2501460
+DEBUG 2025-09-09 17:53:38.096 UTC: 	 Result of myproxy credential check:
+  Credential exists on myproxy: username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6  - validity: 28 days, 22:51:00
+DEBUG 2025-09-09 17:53:38.096 UTC: 	 Retrieving username ...
+DEBUG 2025-09-09 17:53:38.096 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-09-09 17:53:38.899 UTC: 	 username is amalhotr
+INFO 2025-09-09 17:53:39.587 UTC: 	 Rucio client intialized for account amalhotr
+DEBUG 2025-09-09 17:53:39.588 UTC: 	 Command use: status
+DEBUG 2025-09-09 17:53:39.588 UTC: 	 Options use: ['-d', './crab_Data_ScoutingPFRun3_1mod10_v1']
+DEBUG 2025-09-09 17:53:39.588 UTC: 	 Encoded data for curl request: subresource=version
+DEBUG 2025-09-09 17:53:39.629 UTC: 	 CRABClient version: v3.250820
+DEBUG 2025-09-09 17:53:39.630 UTC: 	 Instance is prod
+DEBUG 2025-09-09 17:53:39.630 UTC: 	 Server base url is cmsweb.cern.ch
+DEBUG 2025-09-09 17:53:39.630 UTC: 	 Command api workflow
+DEBUG 2025-09-09 17:53:39.630 UTC: 	 Encoded data for curl request: subresource=search&workflow=250909_175309%3Aamalhotr_crab_Data_ScoutingPFRun3_1mod10_v1
+DEBUG 2025-09-09 17:53:39.683 UTC: 	 Got information from server oracle database: {'desc': {'columns': ['tm_taskname', 'tm_activity', 'tm_task_status', 'tm_task_command', 'tm_start_time', 'tm_start_injection', 'tm_end_injection', 'tm_task_failure', 'tm_job_sw', 'tm_job_arch', 'tm_input_dataset', 'tm_nonvalid_input_dataset', 'tm_use_parent', 'tm_site_whitelist', 'tm_site_blacklist', 'tm_split_algo', 'tm_split_args', 'tm_user_sandbox', 'tm_cache_url', 'tm_username', 'tm_user_dn', 'tm_user_vo', 'tm_user_role', 'tm_user_group', 'tm_publish_name', 'tm_publish_groupname', 'tm_asyncdest', 'tm_dbs_url', 'tm_publish_dbs_url', 'tm_publication', 'tm_outfiles', 'tm_tfile_outfiles', 'tm_edm_outfiles', 'tm_job_type', 'tm_generator', 'tm_events_per_lumi', 'tm_arguments', 'tm_save_logs', 'tw_name', 'tm_user_infiles', 'tm_maxjobruntime', 'tm_numcores', 'tm_maxmemory', 'tm_priority', 'tm_output_dataset', 'tm_task_warnings', 'tm_user_webdir', 'tm_scriptexe', 'tm_scriptargs', 'tm_extrajdl', 'tm_collector', 'tm_schedd', 'tm_dry_run', 'tm_user_files', 'tm_transfer_outputs', 'tm_output_lfn', 'tm_ignore_locality', 'tm_fail_limit', 'tm_one_event_mode', 'tm_secondary_input_dataset', 'tm_primary_dataset', 'tm_last_publication', 'tm_debug_files', 'clusterid', 'tm_ignore_global_blacklist', 'tm_submitter_ip_addr', 'tm_totalunits', 'tm_ddm_reqid', 'tm_user_config', 'tm_transfer_container', 'tm_transfer_rule', 'tm_publish_rule', 'tm_multipub_rule', 'tm_job_min_microarch', 'tm_dagman_status', 'tm_num_jobs', 'tm_uploaded']}, 'result': ['250909_175309:amalhotr_crab_Data_ScoutingPFRun3_1mod10_v1', 'None', 'WAITING', 'SUBMIT', '2025-09-09 17:53:09.686125', 'None', 'None', 'None', 'CMSSW_14_0_18_patch1', 'el9_amd64_gcc12', '/ScoutingPFRun3/Run2024H-v1/HLTSCOUT', 'T', '0', '[]', '[]', 'FileBased', "{'halt_job_on_file_boundaries': False, 'splitOnRun': False, 'files_per_job': 2, 'runs': [], 'lumis': []}", 'c1cf48dd54b7998620a09c9925e7240137e933a5d4d3448a6de32e2ed9c447d2.tar.gz', 'https://cmsweb.cern.ch/S3/crabcache_prod', 'amalhotr', '/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra', 'cms', 'None', 'None', 'Data_ScoutingPFRun3_1mod10_v1-00000000000000000000000000000000', 'F', 'T3_CH_CERNBOX', 'https://cmsweb.cern.ch/dbs/prod/global/DBSReader', 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter', 'F', '[]', "['DY2M_ScoutingTree_Output.root']", '[]', 'Analysis', 'pythia', 'None', '{}', 'T', 'NotKnownYet', '[]', '2750', '1', '3000', '10', 'None', '[]', 'None', 'None', '[]', '[]', 'cmsgwms-collector-global.cern.ch:9620,cmsgwms-collector-global.fnal.gov:9620', 'None', 'F', '[]', 'T', '/store/user/amalhotr/', 'F', 'None', 'F', 'None', 'ScoutingPFRun3', 'None', '7ec30e7ecb99c0740ccb615cc70edb3cc3f037835921b03e4b2b16a54d236d59.tar.gz', 'None', 'F', '188.184.89.113', '0.0', 'None', '{"partialdataset": false, "requireaccelerator": false, "acceleratorparams": null, "inputblocks": null}', 'None', 'None', 'None', 'None', 'any', 'NOT_READY', '0', 'F']}
+INFO 2025-09-09 17:53:39.683 UTC: 	 CRAB project directory:		/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1
+INFO 2025-09-09 17:53:39.683 UTC: 	 Task name:			250909_175309:amalhotr_crab_Data_ScoutingPFRun3_1mod10_v1
+INFO 2025-09-09 17:53:39.683 UTC: 	 Grid scheduler - Task Worker:	N/A yet - NotKnownYet
+INFO 2025-09-09 17:53:39.683 UTC: 	 Status on the CRAB server:	WAITING on command SUBMIT
+INFO 2025-09-09 17:53:39.683 UTC: 	 Task URL to use for HELP:	https://cmsweb.cern.ch/crabserver/ui/task/250909_175309%3Aamalhotr_crab_Data_ScoutingPFRun3_1mod10_v1
+INFO 2025-09-09 17:53:39.691 UTC: 	 Dashboard monitoring URL:	https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=amalhotr&var-task=250909_175309%3Aamalhotr_crab_Data_ScoutingPFRun3_1mod10_v1&from=1757436789000&to=now
+DEBUG 2025-09-09 17:53:39.691 UTC: 	 The task has not been submitted to the Grid scheduler yet. Not printing job information.
+INFO 2025-09-09 17:53:39.692 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_1mod10_v1/crab.log

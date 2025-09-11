@@ -1,15 +1,25 @@
 // -*- C++ -*-
 // Package:    Vertexing/ScoutingTreeMakerRun3
 // Class:      ScoutingTreeMakerRun3
-// 
-// Original Author:  David Sperka
-//         Created:  Tue, 14 May 2024 14:23:11 GMT
+//
+// Author:     Adapted / fixed by an assistant (based on original by David Sperka)
+// Created:    Tue, 14 May 2024 14:23:11 GMT
+// Revised:    2025-09-09
 
 #include <memory>
+#include <vector>
+#include <set>
+#include <string>
+#include <cmath>
+#include <fstream>
+
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TTree.h"
+#include "TLorentzVector.h"
+#include "TMath.h"
+
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -17,23 +27,18 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
-#include "DataFormats/Math/interface/deltaR.h"
-#include "DataFormats/Math/interface/deltaPhi.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+
 #include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "TLorentzVector.h"
-#include "TMath.h"
-#include <vector>
-#include <set>
-#include <string>
-#include <fstream>
+#include "DataFormats/Math/interface/Point3D.h"
 
 class ScoutingTreeMakerRun3 : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 public:
@@ -61,60 +66,59 @@ private:
 
     const edm::EDGetTokenT<std::vector<reco::Vertex>> verticesToken;
     const edm::EDGetTokenT<reco::BeamSpot> beamspot_token;
-    const edm::EDGetTokenT<std::vector<reco::Track>> tracksToken;
-    
-    // Histogram declarations for vertices and tracks.
+
+    // Histograms (canonical set)
     TH2F* h_vertex_xy_global;          // vertex XY positions in global coordinates (x vs y)
     TH2F* h_vertex_xy_beamspot;        // vertex XY positions relative to the beamspot (x-bs.x0 vs y-bs.y0)
     TH1F* h_ntracks_global;            // number of tracks per vertex (after selection)
     TH1F* h_track_momenta_global;      // momentum magnitude (p) of all tracks in selected vertices
     TH1F* h_radial_distance_global;    // radial distance of vertices from the origin (sqrt(x^2 + y^2)), global
-    TH1F* h_radial_distance_beamspot;  // radial distance of vertices from the beamspot (sqrt((x-bs.x0)^2 + (y-bs.y0)^2))
-    TH1F* h_eta_distribution_global;   // pseudorapidity (eta) of all tracks in selected vertices (eta = -ln(tan(theta/2)), 0 at track perpendicular to beam and -inf,+inf at beamline. theta=0 when particle moving along the positive beam axis, theta=pi when moving along the negative beam axis, theta=pi/2 when moving perpendicular to the beam axis)
-    TH1F* h_phi_distribution_global;   // azimuthal angle (phi) of all tracks in selected vertices (the angle in the transverse plane, 0 at the positive x-axis, pi/2 at the positive y-axis, pi at the negative x-axis, and 3pi/2 at the negative y-axis)
+    TH1F* h_radial_distance_beamspot;  // radial distance of vertices from the beamspot
+    TH1F* h_eta_distribution_global;   // pseudorapidity (eta) of all tracks in selected vertices
+    TH1F* h_phi_distribution_global;   // azimuthal angle (phi) of all tracks in selected vertices
     TH2F* h_beamspot_global;           // beamspot position in global coordinates (x0 vs y0)
+    TH2F* h_beamspot_vs_pmvtx;         // beamspot position relative to chosen primary-vertex (x_bs - x_pv vs y_bs - y_pv)
     TH1F* h_vertex_pt;                 // transverse momentum (pT) of the vertex (sum of track 4-vectors)
     TH1F* h_vertex_eta;                // pseudorapidity (eta) of the vertex (sum of track 4-vectors)
     TH1F* h_vertex_phi;                // azimuthal angle (phi) of the vertex (sum of track 4-vectors)
-    TH1F* h_vertex_mass;               // invariant mass of the vertex (sum of track 4-vectors, pion mass hypothesis)
-    TH1F* h_vertex_eta_barrel;         // vertex eta for vertices in the barrel region (|eta| < 1.0)
-    TH1F* h_vertex_eta_endcap;         // vertex eta for vertices in the endcap region (|eta| >= 1.0)
-    TH1F* h_vertex_dBV_barrel;         // d_{BV} (transverse distance from beamspot) for barrel vertices
-    TH1F* h_vertex_dBV_endcap;         // d_{BV} (transverse distance from beamspot) for endcap vertices
-    TH1F* h_vertex_mass_barrel;        // vertex invariant mass for barrel vertices
-    TH1F* h_vertex_mass_endcap;        // vertex invariant mass for endcap vertices
-    TH2F* h_vertex_xy_barrel_global;   // vertex XY positions for barrel vertices (global coordinates)
-    TH2F* h_vertex_xy_endcap_global;   // vertex XY positions for endcap vertices (global coordinates)
-    TH2F* h_vertex_xy_barrel_beamspot; // vertex XY positions for barrel vertices (beamspot-centered)
-    TH2F* h_vertex_xy_endcap_beamspot; // vertex XY positions for endcap vertices (beamspot-centered)
-    TH1F* h_vertex_dBV;                // d_{BV} (transverse distance from beamspot) for all selected vertices
-    TH1F* h_vertex_dBV_error;          // uncertainty (error) on d_{BV} for all selected vertices
-    TH1F* h_nvertices_ntk;             // number of candidate vertices per event (after ntk cut)
-    TH1F* h_track_dxy_barrel;          // track d_{xy} in the barrel (signed distance of closest approach to beamspot in transverse plane)
-    TH1F* h_track_dxy_endcap;          // track d_{xy} in the endcap (signed distance of closest approach to beamspot in transverse plane)
-    TH1F* h_track_dxyError_barrel;     // uncertainty (error) on track d_{xy} in the barrel
-    TH1F* h_track_dxyError_endcap;     // uncertainty (error) on track d_{xy} in the endcap
+    TH1F* h_vertex_mass;               // invariant mass of the vertex (sum of track 4-vectors)
+    TH1F* h_vertex_eta_barrel;         // vertex eta for barrel region
+    TH1F* h_vertex_eta_endcap;         // vertex eta for endcap region
+    TH1F* h_vertex_dBV_barrel;         // dBV for barrel vertices
+    TH1F* h_vertex_dBV_endcap;         // dBV for endcap vertices
+    TH1F* h_vertex_mass_barrel;        // mass barrel
+    TH1F* h_vertex_mass_endcap;        // mass endcap
+    TH2F* h_vertex_xy_barrel_global;   // barrel XY global
+    TH2F* h_vertex_xy_endcap_global;   // endcap XY global
+    TH2F* h_vertex_xy_barrel_beamspot; // barrel XY beamspot-centered
+    TH2F* h_vertex_xy_endcap_beamspot; // endcap XY beamspot-centered
+    TH1F* h_vertex_dBV;                // dBV for all selected vertices
+    TH1F* h_vertex_dBV_error;          // uncertainty on dBV
+    TH1F* h_nvertices_ntk;             // number of candidate vertices per event
 
-    // Output file stream for track method diagnostics (if used)
-    std::ofstream trackMethodsFile_;
-    // Counter for tracks processed (if used)
-    int trackCounter_;
-    // Added overall track dxy histograms
-    TH1F* h_track_dxy;
-    TH1F* h_track_dxyError;
+    // Canonical per-track dxy histograms (only these three + error + significances)
+    TH1F* h_track_dxy_00;              // Track dxy w.r.t. global origin (0,0)
+    TH1F* h_track_dxy_beamspot;        // Track dxy w.r.t. beamspot (x0,y0)
+    TH1F* h_track_dxy_pmvtx;           // Track dxy w.r.t. event primary vertex (pmvtx)
+    TH1F* h_track_dxyError;            // shared dxy error histogram
+    TH1F* h_track_dxySig_00;           // |dxy_00 / dxyError|
+    TH1F* h_track_dxySig_beamspot;     // |dxy_beamspot / dxyError|
+    TH1F* h_track_dxySig_pmvtx;        // |dxy_pmvtx / dxyError|
+    // per-region dxy uncertainty histograms
+    TH1F* h_track_dxyError_barrel;
+    TH1F* h_track_dxyError_endcap;
 
     typedef std::set<reco::TrackRef> track_set;
     typedef std::vector<reco::TrackRef> track_vec;
     track_set vertex_track_set(const reco::Vertex & v, const double min_weight = 0.5) const {
-        track_set result;
-        for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
-            const double w = v.trackWeight(*it);
-            const bool use = w >= min_weight;
-            assert(use);
-            if (use) result.insert(it->castTo<reco::TrackRef>());
-        }
-        return result;
-    }
+         track_set result;
+         for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
+             const double w = v.trackWeight(*it);
+             const bool use = w >= min_weight;
+             if (use) result.insert(it->castTo<reco::TrackRef>());
+         }
+         return result;
+     }
     track_vec vertex_track_vec(const reco::Vertex & v, const double min_weight = 0.5) const {
         track_set s = vertex_track_set(v, min_weight);
         return track_vec(s.begin(), s.end());
@@ -133,28 +137,28 @@ ScoutingTreeMakerRun3::ScoutingTreeMakerRun3(const edm::ParameterSet& iConfig):
     required_dBV_error(iConfig.getParameter<double>("required_dBV_error")),
     required_dxy_error(iConfig.getParameter<double>("required_dxy_error")),
     verticesToken(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("displacedVertices"))),
-    beamspot_token(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot_src"))),
-    tracksToken(consumes<std::vector<reco::Track>>(iConfig.getParameter<edm::InputTag>("tracks")))
+    beamspot_token(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot_src")))
 {
     usesResource("TFileService");
 }
 
 ScoutingTreeMakerRun3::~ScoutingTreeMakerRun3() {
-    // ...existing cleanup if necessary...
+    // no explicit cleanup required; histograms owned by TFileService
 }
 
 void ScoutingTreeMakerRun3::beginJob() {
     edm::Service<TFileService> fs;
-    // Overall histograms
+    // Overall histograms (kept high resolution where requested)
     h_vertex_xy_global        = fs->make<TH2F>("vertex_xy_global", "Vertex XY Position (Global); X [cm]; Y [cm]", 2000, -10, 10, 2000, -10, 10);
-    h_vertex_xy_beamspot      = fs->make<TH2F>("vertex_xy_beamspot", "Vertex XY Position (Beamspot); X [cm]; Y [cm]", 2000, -10, 10, 2000, -10, 10);
+    h_vertex_xy_beamspot      = fs->make<TH2F>("vertex_xy_beamspot", "Vertex XY Position (Beamspot); X-bs_x0 [cm]; Y-bs_y0 [cm]", 2000, -10, 10, 2000, -10, 10);
     h_ntracks_global          = fs->make<TH1F>("ntracks_global", "Number of Tracks; Number of Tracks; Vertices", 200, 0, 100);
     h_track_momenta_global    = fs->make<TH1F>("track_momenta_global", "Track Momenta; Momentum [GeV/c]; Tracks", 400, 0, 100);
     h_radial_distance_global  = fs->make<TH1F>("radial_distance_global", "Radial Distance (Global); Distance [cm]; Vertices", 700, 0, 7);
     h_radial_distance_beamspot= fs->make<TH1F>("radial_distance_beamspot", "Radial Distance (Beamspot); Distance [cm]; Vertices", 700, 0, 7);
     h_eta_distribution_global = fs->make<TH1F>("eta_distribution_global", "Eta Distribution; Eta; Tracks", 400, -3, 3);
-    h_phi_distribution_global   = fs->make<TH1F>("phi_distribution_global", "Phi Distribution; Phi; Tracks", 400, -3.142, 3.142);
-    h_beamspot_global         = fs->make<TH2F>("beamspot_global", "Beamspot Position (Global); X [cm]; Y [cm]", 400, -1, 1, 400, -1, 1);
+    h_phi_distribution_global = fs->make<TH1F>("phi_distribution_global", "Phi Distribution; Phi; Tracks", 400, -3.142, 3.142);
+    h_beamspot_global         = fs->make<TH2F>("beamspot_global", "Beamspot Position (Global ref = (0,0)); x0 [cm]; y0 [cm]", 400, -1, 1, 400, -1, 1);
+    h_beamspot_vs_pmvtx       = fs->make<TH2F>("beamspot_vs_pmvtx", "Beamspot - PrimaryVertex; x_{BS}-x_{PV} [cm]; y_{BS}-y_{PV} [cm]", 400, -1, 1, 400, -1, 1);
     h_vertex_pt               = fs->make<TH1F>("vertex_pt", "Vertex pT; pT [GeV/c]; Vertices", 200, 0., 100.);
     h_vertex_eta              = fs->make<TH1F>("vertex_eta", "Vertex eta; eta; Vertices", 200, -5., 5.);
     h_vertex_phi              = fs->make<TH1F>("vertex_phi", "Vertex phi; phi; Vertices", 200, -3.14, 3.14);
@@ -162,99 +166,178 @@ void ScoutingTreeMakerRun3::beginJob() {
     h_vertex_dBV              = fs->make<TH1F>("vertex_dBV", "Vertex d_{BV} [cm]; Vertices / 0.05 cm", 200, 0, 10);
     h_vertex_dBV_error        = fs->make<TH1F>("vertex_dBV_error", "Vertex d_{BV} Uncertainty; d_{BV} Uncertainty [cm]; Entries", 1000, 0, 0.1);
     h_nvertices_ntk           = fs->make<TH1F>("nvertices_ntk", "Number of Candidate Vertices (ntk within cut); Number of Vertices; Events", 1000, 0, 1000);
-    h_track_dxy               = fs->make<TH1F>("track_dxy", "Track dxy; dxy [cm]; Tracks", 1000, -5, 5);
-    h_track_dxyError          = fs->make<TH1F>("track_dxyError", "Track dxy Error; dxy Error [cm]; Tracks", 1000, 0, 0.1);
-    // Barrel histograms
+
+    // Canonical dxy histograms (high resolution)
+    h_track_dxy_00            = fs->make<TH1F>("track_dxy_00", "Track dxy w.r.t. global origin (0,0); dxy_{00} [cm]; Tracks", 1000, -5, 5);
+    h_track_dxy_beamspot      = fs->make<TH1F>("track_dxy_beamspot", "Track dxy w.r.t. beamspot (x0,y0); dxy_{BS} [cm]; Tracks", 1000, -5, 5);
+    h_track_dxy_pmvtx         = fs->make<TH1F>("track_dxy_pmvtx", "Track dxy w.r.t. primary vertex (pmvtx); dxy_{PV} [cm]; Tracks", 1000, -5, 5);
+    // shared dxy uncertainty for all dxy definitions (00 / beamspot / primary-vertex)
+    h_track_dxyError          = fs->make<TH1F>("track_dxyError", "Track dxy Uncertainty (applies to dxy_00, dxy_BS, dxy_PV); dxy Error [cm]; Tracks", 1000, 0, 0.1);
+    h_track_dxySig_00         = fs->make<TH1F>("track_dxySig_00", "Track dxy significance |dxy_{00}/err|; |dxy_{00}/err|; Tracks", 200, 0, 50);
+    h_track_dxySig_beamspot   = fs->make<TH1F>("track_dxySig_beamspot", "Track dxy significance |dxy_{BS}/err|; |dxy_{BS}/err|; Tracks", 200, 0, 50);
+    h_track_dxySig_pmvtx      = fs->make<TH1F>("track_dxySig_pmvtx", "Track dxy significance |dxy_{PV}/err|; |dxy_{PV}/err|; Tracks", 200, 0, 50);
+    // per-region dxy uncertainty histograms (restore as requested)
+    h_track_dxyError_barrel   = fs->make<TH1F>("track_dxyError_barrel", "Track dxy Uncertainty (Barrel); dxy Error [cm]; Tracks", 1000, 0, 0.1);
+    h_track_dxyError_endcap   = fs->make<TH1F>("track_dxyError_endcap", "Track dxy Uncertainty (Endcap); dxy Error [cm]; Tracks", 1000, 0, 0.1);
+
+    // Barrel / endcap vertex histograms (kept)
     h_vertex_eta_barrel       = fs->make<TH1F>("vertex_eta_barrel", "Vertex Eta (Barrel); eta; Vertices", 200, -3.0, 3.0);
     h_vertex_dBV_barrel       = fs->make<TH1F>("vertex_dBV_barrel", "Vertex d_{BV} (Barrel); d_{BV} [cm]; Vertices", 200, 0, 10);
     h_vertex_mass_barrel      = fs->make<TH1F>("vertex_mass_barrel", "Vertex Mass (Barrel); mass [GeV/c^{2}]; Vertices", 200, 0, 10);
     h_vertex_xy_barrel_global = fs->make<TH2F>("vertex_xy_barrel_global", "Vertex XY (Barrel, Global); X [cm]; Y [cm]", 2000, -10, 10, 2000, -10, 10);
-    h_vertex_xy_barrel_beamspot = fs->make<TH2F>("vertex_xy_barrel_beamspot", "Vertex XY (Barrel, Beamspot-Centered); X [cm]; Y [cm]", 2000, -10, 10, 2000, -10, 10);
-    h_track_dxy_barrel        = fs->make<TH1F>("track_dxy_barrel", "Track d_{xy} (Barrel); d_{xy} [cm]; Tracks", 1000, -5, 5);
-    h_track_dxyError_barrel   = fs->make<TH1F>("track_dxyError_barrel", "Track d_{xy} Error (Barrel); d_{xy} Error [cm]; Tracks", 1000, 0, 0.1);
-    // Endcap histograms
+    h_vertex_xy_barrel_beamspot = fs->make<TH2F>("vertex_xy_barrel_beamspot", "Vertex XY (Barrel, Beamspot-Centered); X-bs_x0 [cm]; Y-bs_y0 [cm]", 2000, -10, 10, 2000, -10, 10);
+
     h_vertex_eta_endcap       = fs->make<TH1F>("vertex_eta_endcap", "Vertex Eta (Endcap); eta; Vertices", 200, -3.0, 3.0);
     h_vertex_dBV_endcap       = fs->make<TH1F>("vertex_dBV_endcap", "Vertex d_{BV} (Endcap); d_{BV} [cm]; Vertices", 200, 0, 10);
     h_vertex_mass_endcap      = fs->make<TH1F>("vertex_mass_endcap", "Vertex Mass (Endcap); mass [GeV/c^{2}]; Vertices", 200, 0, 10);
     h_vertex_xy_endcap_global = fs->make<TH2F>("vertex_xy_endcap_global", "Vertex XY (Endcap, Global); X [cm]; Y [cm]", 2000, -10, 10, 2000, -10, 10);
-    h_vertex_xy_endcap_beamspot = fs->make<TH2F>("vertex_xy_endcap_beamspot", "Vertex XY (Endcap, Beamspot-Centered); X [cm]; Y [cm]", 2000, -10, 10, 2000, -10, 10);
-    h_track_dxy_endcap        = fs->make<TH1F>("track_dxy_endcap", "Track d_{xy} (Endcap); d_{xy} [cm]; Tracks", 1000, -5, 5);
-    h_track_dxyError_endcap   = fs->make<TH1F>("track_dxyError_endcap", "Track d_{xy} Error (Endcap); d_{xy} Error [cm]; Tracks", 1000, 0, 0.1);
+    h_vertex_xy_endcap_beamspot = fs->make<TH2F>("vertex_xy_endcap_beamspot", "Vertex XY (Endcap, Beamspot-Centered); X-bs_x0 [cm]; Y-bs_y0 [cm]", 2000, -10, 10, 2000, -10, 10);
 }
 
 void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     using namespace edm; using namespace std; using namespace reco;
+
     Handle<BeamSpot> beamspot;
     iEvent.getByToken(beamspot_token, beamspot);
     if(!beamspot.isValid()){
         LogError("ScoutingTreeMakerRun3") << "Beamspot handle invalid!";
         return;
     }
-    const Vertex fake_bs_vtx(beamspot->position(), beamspot->covariance3D());
-    
+
     Handle<vector<Vertex>> verticesH;
     iEvent.getByToken(verticesToken, verticesH);
     if(!verticesH.isValid()){
         LogError("ScoutingTreeMakerRun3") << "Vertex handle invalid!";
         return;
     }
-    
+
+    // Choose event primary vertex (pmvtx): vertex with largest summed track pT
+    Vertex pmvtx; // default constructed; if no good vertex we'll use it as origin approximation
+    bool havePmvtx = false;
+    if (!verticesH->empty()) {
+        double bestSumPt = -1.0;
+        size_t bestIdx = 0;
+        for (size_t iv = 0; iv < verticesH->size(); ++iv) {
+            const Vertex &v = verticesH->at(iv);
+            double sumPt = 0.0;
+            for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
+                reco::TrackRef tr = it->castTo<reco::TrackRef>();
+                if (tr.isNonnull()) sumPt += tr->pt();
+            }
+            if (sumPt > bestSumPt) { bestSumPt = sumPt; bestIdx = iv; }
+        }
+        if (bestSumPt >= 0) {
+            pmvtx = verticesH->at(bestIdx);
+            havePmvtx = true;
+        }
+    }
+
     vector<Vertex> selVertices;
-    VertexDistanceXY vertex_dist_2d;
-    
+
+    // fill beamspot diagnostics: global and relative to pmvtx (if present)
+    h_beamspot_global->Fill(beamspot->x0(), beamspot->y0());
+    if (havePmvtx) h_beamspot_vs_pmvtx->Fill(beamspot->x0() - pmvtx.x(), beamspot->y0() - pmvtx.y());
+    else h_beamspot_vs_pmvtx->Fill(beamspot->x0(), beamspot->y0());
+
     for (unsigned int t = 0; t < verticesH->size(); t++) {
         Vertex v = verticesH->at(t);
         vector<TrackRef> tks = vertex_track_vec(v);
-        int ntk = tks.size();
-        
+        int ntk = static_cast<int>(tks.size());
+
         TLorentzVector sumVec(0,0,0,0);
         double sum_dxy = 0.0, sum_dxyErr = 0.0;
+        // Optionally compute avg_abs_dxy if you prefer absolute selection
+        double sum_abs_dxy = 0.0;
+
         for(auto track : tks) {
             if(!track.isNonnull()) continue; // Safety: skip null track references
             TLorentzVector trackVec;
-            trackVec.SetPtEtaPhiM(track->pt(), track->eta(), track->phi(), 0.13957);
+            // assumption: charged pion mass
+            constexpr double kPionMass = 0.13957;
+            trackVec.SetPtEtaPhiM(track->pt(), track->eta(), track->phi(), kPionMass);
             sumVec += trackVec;
-            sum_dxy += track->dxy(beamspot->position());
-            sum_dxyErr += track->dxyError();
+
+            // compute canonical dxy values (do NOT change selection logic: avg_dxy for cuts stays beamspot-based unless you ask)
+            const math::XYZPoint origin(0.,0.,0.);
+            double dxy_00 = track->dxy(origin);                 // wrt global (0,0)
+            double dxy_beam = track->dxy(beamspot->position()); // wrt beamspot (legacy for avg_dxy)
+            double dxy_pv = 0.0;
+            if (havePmvtx) dxy_pv = track->dxy(pmvtx.position());      // wrt chosen event primary vertex (pmvtx)
+            double dxyErr = track->dxyError();
+
+            // keep sum_dxy used for selection exactly as before (beamspot-based)
+            sum_dxy += dxy_beam;
+            sum_dxyErr += dxyErr;
+            sum_abs_dxy += std::fabs(dxy_beam);
+
+            // Fill canonical histograms (titles explicitly mention reference)
+            h_track_dxy_00->Fill(dxy_00);
+            h_track_dxy_beamspot->Fill(dxy_beam);
+            h_track_dxy_pmvtx->Fill(dxy_pv);
+            h_track_dxyError->Fill(dxyErr);
+
+            // per-region dxy error fills
+            if (std::fabs(track->eta()) < 1.0) {
+                 h_track_dxyError_barrel->Fill(dxyErr);
+             } else {
+                 h_track_dxyError_endcap->Fill(dxyErr);
+             }
+            // fill significance histograms for each dxy definition (absolute value)
+            if (dxyErr > 0.0) {
+                h_track_dxySig_00->Fill(std::fabs(dxy_00 / dxyErr));
+                h_track_dxySig_beamspot->Fill(std::fabs(dxy_beam / dxyErr));
+                h_track_dxySig_pmvtx->Fill(std::fabs(dxy_pv / dxyErr));
+            }
         }
+
         double invMass = sumVec.M();
-        double avg_dxy = (ntk > 0 ? sum_dxy/ntk : 0);
-        double avg_dxyErr = (ntk > 0 ? sum_dxyErr/ntk : 0);
-        double dBV = vertex_dist_2d.distance(v, fake_bs_vtx).value();
-        double dBV_err = vertex_dist_2d.distance(v, fake_bs_vtx).error();
-        
-        // Apply cuts (skip cut if parameter is -1)
+        double avg_dxy = (ntk > 0 ? sum_dxy/ntk : 0.0);             // signed-average dxy (legacy)
+        // double avg_abs_dxy = (ntk > 0 ? sum_abs_dxy/ntk : 0.0);    // alternative often preferred
+        double avg_dxyErr = (ntk > 0 ? sum_dxyErr/ntk : 0.0);
+
+        // compute dBV = XY distance vertex-to-beamspot (explicit, robust)
+        double dx = v.x() - beamspot->x0();
+        double dy = v.y() - beamspot->y0();
+        double dBV = std::hypot(dx, dy);
+
+        // approximate uncertainty on dBV from vertex x/y uncertainties (beamspot uncertainty can be added if desired)
+        double dBV_err = std::sqrt(v.xError()*v.xError() + v.yError()*v.yError());
+
+        // Apply selection cuts (unchanged behavior by default)
         if(required_ntk_min != -1 && ntk < required_ntk_min) continue;
         if(required_ntk_max != -1 && ntk > required_ntk_max) continue;
         if(required_invmass != -1 && invMass < required_invmass) continue;
         if(required_chi2 != -1 && v.normalizedChi2() > required_chi2) continue;
         if(required_dBV_min != -1 && dBV < required_dBV_min) continue;
         if(required_dBV_max != -1 && dBV > required_dBV_max) continue;
+
+        // NOTE: selection below uses signed average dxy (legacy behavior).
+        // If you prefer average absolute dxy (common), replace avg_dxy with avg_abs_dxy here.
         if(required_dxy_min != -1 && avg_dxy < required_dxy_min) continue;
         if(required_dxy_max != -1 && avg_dxy > required_dxy_max) continue;
+
         if(required_dBV_error != -1 && dBV_err > required_dBV_error) continue;
         if(required_dxy_error != -1 && avg_dxyErr > required_dxy_error) continue;
-        
-    // Vertex passed selection:
-    
+
+        // Vertex passed selection:
         selVertices.push_back(v);
 
-        // Fill missing histograms for vertices that pass cuts:
-        h_beamspot_global->Fill(beamspot->x0(), beamspot->y0());
+        // fill general vertex eta (using summed 4-vector)
+        h_vertex_eta->Fill(sumVec.Eta());
 
+        // Fill vertex histograms
         h_ntracks_global->Fill(ntk);
         h_vertex_xy_global->Fill(v.x(), v.y());
         h_vertex_xy_beamspot->Fill(v.x() - beamspot->x0(), v.y() - beamspot->y0());
-        
         h_vertex_dBV->Fill(dBV);
         h_vertex_dBV_error->Fill(dBV_err);
-        // Compute radial distances and fill:
-        double rad_global = TMath::Sqrt(v.x()*v.x() + v.y()*v.y());
-        double rad_beam = TMath::Sqrt(pow(v.x()-beamspot->x0(),2) + pow(v.y()-beamspot->y0(),2));
+
+        double rad_global = std::hypot(v.x(), v.y());
+        double rad_beam = std::hypot(v.x()-beamspot->x0(), v.y()-beamspot->y0());
         h_radial_distance_global->Fill(rad_global);
         h_radial_distance_beamspot->Fill(rad_beam);
-        
-        if(fabs(sumVec.Eta()) < 1.0) {
+
+        if(std::fabs(sumVec.Eta()) < 1.0) {
             h_vertex_eta_barrel->Fill(sumVec.Eta());
             h_vertex_dBV_barrel->Fill(dBV);
             h_vertex_mass_barrel->Fill(invMass);
@@ -269,7 +352,9 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         }
         h_vertex_pt->Fill(sumVec.Pt());
         h_vertex_phi->Fill(sumVec.Phi());
-        
+        h_vertex_mass->Fill(invMass);
+
+        // Per-track legacy fills (momentum, eta, phi)
         for(auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
             reco::TrackRef track = it->castTo<reco::TrackRef>();
             if(!track.isNonnull()){
@@ -279,65 +364,33 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
             h_track_momenta_global->Fill(track->p());
             h_eta_distribution_global->Fill(track->eta());
             h_phi_distribution_global->Fill(track->phi());
-            if(fabs(track->eta()) < 1.0) {
-                h_track_dxy_barrel->Fill(track->dxy(beamspot->position()));
-                h_track_dxyError_barrel->Fill(track->dxyError());
-            } else {
-                h_track_dxy_endcap->Fill(track->dxy(beamspot->position()));
-                h_track_dxyError_endcap->Fill(track->dxyError());
-            }
-            h_track_dxy->Fill(track->dxy(beamspot->position()));
-            h_track_dxyError->Fill(track->dxyError());
         }
     }
-    h_nvertices_ntk->Fill(selVertices.size());
-    // ...existing code for inter-vertex quantities if needed...
+
+    h_nvertices_ntk->Fill(static_cast<double>(selVertices.size()));
 }
 
 void ScoutingTreeMakerRun3::endJob() {
-    // Overall histograms
-    h_vertex_xy_global->Draw();        h_vertex_xy_global->Write();
-    h_vertex_xy_beamspot->Draw();      h_vertex_xy_beamspot->Write();
-    h_ntracks_global->Draw();          h_ntracks_global->Write();
-    h_track_momenta_global->Draw();    h_track_momenta_global->Write();
-    h_radial_distance_global->Draw();  h_radial_distance_global->Write();
-    h_radial_distance_beamspot->Draw();h_radial_distance_beamspot->Write();
-    h_eta_distribution_global->Draw(); h_eta_distribution_global->Write();
-    h_phi_distribution_global->Draw(); h_phi_distribution_global->Write();
-    h_beamspot_global->Draw();         h_beamspot_global->Write();
-    h_vertex_pt->Draw();               h_vertex_pt->Write();
-    h_vertex_eta->Draw();              h_vertex_eta->Write();
-    h_vertex_phi->Draw();              h_vertex_phi->Write();
-    h_vertex_mass->Draw();             h_vertex_mass->Write();
-    h_vertex_dBV->Draw();              h_vertex_dBV->Write();
-    h_vertex_dBV_error->Draw();        h_vertex_dBV_error->Write();
-    h_nvertices_ntk->Draw();           h_nvertices_ntk->Write();
-    h_track_dxy->Draw();               h_track_dxy->Write();
-    h_track_dxyError->Draw();          h_track_dxyError->Write();
-
-    // Barrel histograms
-    h_vertex_eta_barrel->Draw();       h_vertex_eta_barrel->Write();
-    h_vertex_dBV_barrel->Draw();       h_vertex_dBV_barrel->Write();
-    h_vertex_mass_barrel->Draw();      h_vertex_mass_barrel->Write();
-    h_vertex_xy_barrel_global->Draw(); h_vertex_xy_barrel_global->Write();
-    h_vertex_xy_barrel_beamspot->Draw(); h_vertex_xy_barrel_beamspot->Write();
-    h_track_dxy_barrel->Draw();        h_track_dxy_barrel->Write();
-    h_track_dxyError_barrel->Draw();   h_track_dxyError_barrel->Write();
-
-    // Endcap histograms
-    h_vertex_eta_endcap->Draw();       h_vertex_eta_endcap->Write();
-    h_vertex_dBV_endcap->Draw();       h_vertex_dBV_endcap->Write();
-    h_vertex_mass_endcap->Draw();      h_vertex_mass_endcap->Write();
-    h_vertex_xy_endcap_global->Draw(); h_vertex_xy_endcap_global->Write();
-    h_vertex_xy_endcap_beamspot->Draw(); h_vertex_xy_endcap_beamspot->Write();
-    h_track_dxy_endcap->Draw();        h_track_dxy_endcap->Write();
-    h_track_dxyError_endcap->Draw();   h_track_dxyError_endcap->Write();
+    // With TFileService the histograms get written automatically.
+    // Avoid calling Draw() or Write() here to be safe in multithreaded contexts.
 }
 
 void ScoutingTreeMakerRun3::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
     edm::ParameterSetDescription desc;
-    desc.setUnknown();
-    descriptions.addDefault(desc);
+    desc.add<int>("required_ntk_min", -1);
+    desc.add<int>("required_ntk_max", -1);
+    desc.add<double>("required_invmass", -1.0);
+    desc.add<double>("required_chi2", -1.0);
+    desc.add<double>("required_dBV_min", -1.0);
+    desc.add<double>("required_dBV_max", -1.0);
+    desc.add<double>("required_dxy_min", -1.0);
+    desc.add<double>("required_dxy_max", -1.0);
+    desc.add<double>("required_dBV_error", -1.0);
+    desc.add<double>("required_dxy_error", -1.0);
+    desc.add<edm::InputTag>("displacedVertices", edm::InputTag("displacedVertices"));
+    desc.add<edm::InputTag>("beamspot_src", edm::InputTag("offlineBeamSpot"));
+    desc.add<edm::InputTag>("tracks", edm::InputTag("hltScoutingUnpackProducer", "Track"));
+    descriptions.add("scoutingTreeMakerRun3", desc);
 }
 
 DEFINE_FWK_MODULE(ScoutingTreeMakerRun3);
