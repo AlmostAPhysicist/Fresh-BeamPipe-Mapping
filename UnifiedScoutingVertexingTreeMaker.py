@@ -260,7 +260,7 @@ process.scoutingTrackCount = cms.EDFilter('ScoutingTrackCountFilter',
 
 process.moduloEventFilter = cms.EDFilter('ModuloEventFilter',
     modulo = cms.uint32(10),                           # keep 1-in-10 events
-    remainder = cms.untracked.uint32(1)                # keep events with eventNumber % 10 == 1
+    remainder = cms.untracked.uint32(6)                # keep events with eventNumber % 10 == 4
 )
 
 # Full chain schedule

@@ -211,7 +211,7 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         return;
     }
 
-    // Choose event primary vertex (pmvtx): vertex with largest summed track pT
+    // Choose event primary vertex (pmvtx): vertex with largest summed track pT^2
     Vertex pmvtx; // default constructed; if no good vertex we'll use it as origin approximation
     bool havePmvtx = false;
     if (!verticesH->empty()) {
@@ -222,7 +222,7 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
             double sumPt = 0.0;
             for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
                 reco::TrackRef tr = it->castTo<reco::TrackRef>();
-                if (tr.isNonnull()) sumPt += tr->pt();
+                if (tr.isNonnull()) sumPt += tr->pt() * tr->pt();
             }
             if (sumPt > bestSumPt) { bestSumPt = sumPt; bestIdx = iv; }
         }

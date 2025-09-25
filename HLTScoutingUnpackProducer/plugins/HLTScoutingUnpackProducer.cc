@@ -431,7 +431,7 @@ void HLTScoutingUnpackProducer::fillDescriptions(edm::ConfigurationDescriptions&
     edm::ParameterSetDescription desc;
 
     desc.add<edm::InputTag>("scoutingTrack", edm::InputTag("hltScoutingTrack"));
-    desc.add<edm::InputTag>("scoutingPrimaryVertex", e  dm::InputTag("hltScoutingPrimaryVertex"));
+    desc.add<edm::InputTag>("scoutingPrimaryVertex", edm::InputTag("hltScoutingPrimaryVertex"));
     desc.add<edm::InputTag>("pfCand", edm::InputTag(""));
     desc.add<edm::InputTag>("lostTrack", edm::InputTag(""));
     desc.add<bool>("isScouting", true);

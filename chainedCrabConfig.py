@@ -1,7 +1,7 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-theTag = "Data_ScoutingPFRun3_1mod10_v1"  # updated tag
+theTag = "Data_ScoutingPFRun3_6mod10_v1"  # updated tag
 
 config.General.requestName = theTag
 config.General.transferOutputs = True
