@@ -1,7 +1,7 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-theTag = "Data_ScoutingPFRun3_6mod10_v1"  # updated tag
+theTag = "Data_ScoutingPFRun3_PV_1mod20_v1"  # updated tag
 
 config.General.requestName = theTag
 config.General.transferOutputs = True
@@ -49,7 +49,7 @@ config.Data.unitsPerJob = 2
 # config.Data.totalUnits = 10000  # Total number of files to process
 
 
-config.JobType.outputFiles = ['DY2M_ScoutingTree_Output.root']
+config.JobType.outputFiles = ["DY2M_ScoutingTree_Output_PV.root"]
 
 
 config.Data.outputDatasetTag = theTag

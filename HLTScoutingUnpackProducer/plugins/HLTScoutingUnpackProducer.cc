@@ -105,7 +105,7 @@ HLTScoutingUnpackProducer::HLTScoutingUnpackProducer(edm::ParameterSet const& pa
     
     if(isScouting_){
       produceWithRef<reco::Track, Run3ScoutingTrack>("Track");
-      produceWithRef<reco::Vertex, Run3ScoutingVertex>("PrimaryVertex");
+      produceWithRef<reco::Vertex, Run3ScoutingVertex>("PrimaryVertex");  // <- This is the output label
     }
     else{
       produces<std::vector<reco::Track>>("Track");
@@ -184,7 +184,7 @@ void HLTScoutingUnpackProducer::produce(edm::Event& iEvent, edm::EventSetup cons
 
     // put products in Event
     if(isScouting_){
-      putWithRef<reco::Vertex, Run3ScoutingVertex>(iEvent, "PrimaryVertex", recoPrimaryVertex_collection_ptr, scoutingPrimaryVertexRef_collection_ptr);
+      putWithRef<reco::Vertex, Run3ScoutingVertex>(iEvent, "PrimaryVertex", recoPrimaryVertex_collection_ptr, scoutingPrimaryVertexRef_collection_ptr);  // <- Output with "PrimaryVertex" label
       putWithRef<reco::Track, Run3ScoutingTrack>(iEvent, "Track", recoTrack_collection_ptr, scoutingTrackRef_collection_ptr);
     }
     else{
