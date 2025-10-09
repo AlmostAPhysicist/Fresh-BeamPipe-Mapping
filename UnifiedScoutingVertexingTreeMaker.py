@@ -154,18 +154,19 @@ process.MessageLogger.debugModules = cms.untracked.vstring()  # Disable debug fo
 
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True),
-    # TryToContinue = cms.untracked.vstring('ProductNotFound')
-    numberOfThreads = cms.untracked.uint32(4),     # adjust to machine cores
-    numberOfStreams = cms.untracked.uint32(0),     # let framework pick sensible streams
+    TryToContinue = cms.untracked.vstring('ProductNotFound')
+    # numberOfThreads = cms.untracked.uint32(4),     # adjust to machine cores
+    # numberOfStreams = cms.untracked.uint32(0),     # let framework pick sensible streams
 )
 
 process.maxEvents = cms.untracked.PSet(
-    # input = cms.untracked.int32(100)  # Limited events for testing
-    input = cms.untracked.int32(150000)  # Local
-    # input = cms.untracked.int32(500000)  # Process all events
+    # input = cms.untracked.int32(5000)  # Limited events for testing
+    # input = cms.untracked.int32(150000)  # Local
+    input = cms.untracked.int32(100000)  # Process all events
 )
 
-# Input source
+# -------------------------- INPUT PATH --------------------------------
+#-----------------------------------------------------------------------
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
         # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/130000/b7867cb3-0c5b-407f-a8c3-3edf960415e3.root"
@@ -176,7 +177,7 @@ process.source = cms.Source("PoolSource",
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/003ca643-43f8-40dd-92b3-4c6a4ccdc894.root", #EDM Number of events: 527035
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root",
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root", # Empty file
-    "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/013b488b-7af4-450f-b175-b39623c72ae2.root"
+    # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/013b488b-7af4-450f-b175-b39623c72ae2.root"
     )
 )
 
@@ -192,9 +193,11 @@ process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 
 # TFileService for output
+# -------------------------- OUTPUT PATH --------------------------------
+#-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/DY2M_ScoutingTree_Output_PV_Local_150k.root")
-    # fileName = cms.string("DY2M_ScoutingTree_Output_PV.root")  # This is the only output saved
+    # fileName = cms.string("test-outputs/DY2M_ScoutingTree_PV_Local_test_2.root")
+    fileName = cms.string("DY2M_ScoutingTree_Output_PV.root")  # This is the only output saved
 )
 
 # Step 1: HLT Scouting Unpacker
@@ -214,7 +217,7 @@ process.load("TrackingTools.TransientTrack.TransientTrackBuilder_cfi")
 
 process.Vertexer = cms.EDProducer('Vertexer',
     seed_tracks_src = cms.InputTag('hltScoutingUnpackProducer', 'Track'),
-    beamspot_src = cms.InputTag('offlineBeamSpot'),
+    primaryVertices_src = cms.InputTag("hltScoutingUnpackProducer", "PrimaryVertex"),  # vector of PVs; Vertexer will average them
     n_tracks_per_seed_vertex = cms.int32(2),
     max_seed_vertex_chi2 = cms.double(5),
     resolve_split_vertices_loose = cms.bool(False),
@@ -240,7 +243,6 @@ process.Vertexer = cms.EDProducer('Vertexer',
 )
 
 # Step 3: Scouting Tree Maker
-
 process.scoutingTree = cms.EDAnalyzer('ScoutingTreeMakerRun3',
     required_ntk_min = cms.int32(2),
     required_ntk_max = cms.int32(3),
@@ -255,9 +257,9 @@ process.scoutingTree = cms.EDAnalyzer('ScoutingTreeMakerRun3',
     PVBoundary1 = cms.int32(20),  # Re-enable PV regions
     PVBoundary2 = cms.int32(40),  # Re-enable PV regions
     displacedVertices = cms.InputTag("Vertexer"),
-    beamspot_src = cms.InputTag('offlineBeamSpot'),
+    beamspot_src = cms.InputTag('offlineBeamSpot'),  # Keep for comparison plots only
     tracks = cms.InputTag("hltScoutingUnpackProducer", "Track"),
-    primaryVertices = cms.InputTag("hltScoutingUnpackProducer", "PrimaryVertex")  # ✓ CORRECT - This is the right label
+    primaryVertices = cms.InputTag("hltScoutingUnpackProducer", "PrimaryVertex")
 )
 
 process.scoutingTrackCount = cms.EDFilter('ScoutingTrackCountFilter',
@@ -270,12 +272,12 @@ process.moduloEventFilter = cms.EDFilter('ModuloEventFilter',
     remainder = cms.untracked.uint32(1)                # keep events with eventNumber % 10 == 1
 )
 
-# Full chain schedule
+# Full chain: vertex production (avgPV seeding) without offlineBeamSpot in Vertex Reconstructions
 process.p = cms.Path(
     process.moduloEventFilter +
     process.scoutingTrackCount +
     process.hltScoutingUnpackProducer +
-    process.offlineBeamSpot +
+    process.offlineBeamSpot +  # only for debug plots in tree
     process.Vertexer +
     process.scoutingTree
 )

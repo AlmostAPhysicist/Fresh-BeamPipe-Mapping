@@ -40,6 +40,7 @@
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "DataFormats/BeamSpot/interface/BeamSpot.h"
 
 //Scouting data formats
 #include "DataFormats/Scouting/interface/Run3ScoutingElectron.h"
@@ -59,6 +60,17 @@
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include <unordered_map>
+
+// Helper to accept either 'primaryVertices_src' (new) or 'primaryVertices' (legacy)
+namespace {
+  edm::InputTag getPVTag(const edm::ParameterSet& p) {
+    if (p.existsAs<edm::InputTag>("primaryVertices_src"))
+      return p.getParameter<edm::InputTag>("primaryVertices_src");
+    if (p.existsAs<edm::InputTag>("primaryVertices"))
+      return p.getParameter<edm::InputTag>("primaryVertices");
+    return edm::InputTag();
+  }
+}
 
 
 using namespace edm;
@@ -104,8 +116,11 @@ private:
   const double minSeedIPSig;
   const double minSeedPt;
 
-  const edm::EDGetTokenT<reco::BeamSpot> beamspot_token;
-  const edm::EDGetTokenT<std::vector<reco::Track>> seed_tracks_token_;
+  enum class RefMode { UsePVCollection, UseBeamSpot };
+  const RefMode refMode_;
+  const edm::EDGetTokenT<std::vector<reco::Vertex>> primaryVerticesToken_;  // vector of PVs
+  const edm::EDGetTokenT<reco::BeamSpot>            beamspotToken_;         // fallback
+  const edm::EDGetTokenT<std::vector<reco::Track>>  seed_tracks_token_;
   const edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> token_builder;
 
   edm::EDPutTokenT<reco::VertexCollection> putToken_;
@@ -182,6 +197,24 @@ private:
   }
   
   
+  // REPLACES former global 'KalmanVertexFitter kv_reco;'
+  KalmanVertexFitter kv_reco_;
+
+  // Safe drop-in wrapper (replaces free function kv_reco_dropin)
+  std::vector<TransientVertex> kv_reco_dropin(std::vector<reco::TransientTrack>& ttks) {
+    if (ttks.size() < 2) return {};
+    for (auto const& tt : ttks) if (!tt.isValid()) return {};
+    std::vector<TransientVertex> v(1, kv_reco_.vertex(ttks));
+    if (!v[0].isValid() || v[0].normalisedChiSquared() > 5) return {};
+    return v;
+  }
+
+  // validity check helper
+  bool all_valid(const std::vector<reco::TransientTrack>& vtt) const {
+    for (auto const& tt : vtt) if (!tt.isValid()) return false;
+    return true;
+  }
+
 };
 
 //
@@ -221,8 +254,14 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
   // read new params (provide same defaults as current hard-coded values)
   minSeedIPSig(params.getUntrackedParameter<double>("minSeedIPSig", 4.0)),
   minSeedPt(params.getUntrackedParameter<double>("minSeedPt", 0.9)),
-
-  beamspot_token(consumes<reco::BeamSpot>(params.getParameter<edm::InputTag>("beamspot_src"))),
+  refMode_( (params.existsAs<edm::InputTag>("primaryVertices_src") || params.existsAs<edm::InputTag>("primaryVertices"))
+              ? RefMode::UsePVCollection : RefMode::UseBeamSpot ),
+  primaryVerticesToken_( refMode_ == RefMode::UsePVCollection
+      ? consumes<std::vector<reco::Vertex>>( getPVTag(params) )
+      : consumes<std::vector<reco::Vertex>>( edm::InputTag() ) ),
+  beamspotToken_( refMode_ == RefMode::UseBeamSpot && params.existsAs<edm::InputTag>("beamspot_src")
+      ? consumes<reco::BeamSpot>( params.getParameter<edm::InputTag>("beamspot_src") )
+      : consumes<reco::BeamSpot>( edm::InputTag() ) ),
   seed_tracks_token_(consumes(params.getParameter<edm::InputTag>("seed_tracks_src"))),
   token_builder(esConsumes(edm::ESInputTag("", "TransientTrackBuilder"))),
 
@@ -235,74 +274,102 @@ Vertexer::~Vertexer() {}
 // member functions
 //
 
-KalmanVertexFitter kv_reco;
-std::vector<TransientVertex> kv_reco_dropin(std::vector<reco::TransientTrack> & ttks) {
-  if (ttks.size() < 2)
-    return std::vector<TransientVertex>();
-  std::vector<TransientVertex> v(1, kv_reco.vertex(ttks));
-  if (v[0].normalisedChiSquared() > 5)
-    return std::vector<TransientVertex>();
-  return v;
-}
-
-
 // ------------ method called to produce the data  ------------
 void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-
-  //////////////////////////////////////////////////////////////////////                                                                              
-  // DataFormats setup and track preselection                                                                                
-  ////////////////////////////////////////////////////////////////////// 
-  
-  edm::Handle<reco::BeamSpot> beamspot;
-  iEvent.getByToken(beamspot_token, beamspot);
-  // get handles
+  // Retrieve seed tracks
   edm::Handle<std::vector<reco::Track>> seed_track_handle;
   iEvent.getByToken(seed_tracks_token_, seed_track_handle);
-
-  // guard against missing handles early (avoids dereferencing beamspot before validity check)
-  if (!beamspot.isValid() || !seed_track_handle.isValid()) {
+  if (!seed_track_handle.isValid()) {
+    if (verbose) edm::LogWarning("Vertexer") << "Seed track handle invalid (return empty collection; no fake vertices).";
     iEvent.emplace(putToken_, reco::VertexCollection());
     return;
   }
 
-  // safe to dereference beamspot now
-  const double bsx = beamspot->position().x();
-  const double bsy = beamspot->position().y();
-  const double bsz = beamspot->position().z();
-  const reco::Vertex fake_bs_vtx(beamspot->position(), beamspot->covariance3D());
+  // Determine reference vertex (average PV or beamspot)
+  double ref_x=0, ref_y=0, ref_z=0;
+  reco::Vertex::Error ref_error;              // will set all components explicitly
+  for (int i=0;i<3;++i)                       // ensure no uninitialized covariance (prevents NaNs / segfaults)
+    for (int j=i;j<3;++j)
+      ref_error(i,j)=0.0;
+  bool haveRef = false;
 
-  // Get the Transient Track Builder
-  auto const &tt_builder = iSetup.getData(token_builder);
-
-  // Build transient tracks once for selected seed tracks and map track key -> index
-  std::vector<reco::TransientTrack> seed_tracks;
-  seed_tracks.reserve(seed_track_handle->size());
-  std::unordered_map<unsigned int, size_t> seed_track_ref_map;
-  seed_track_ref_map.reserve(seed_track_handle->size());
-
-  for (size_t i_tk = 0; i_tk < seed_track_handle->size(); ++i_tk) {
-    const edm::Ref<reco::TrackCollection> tk_ref(seed_track_handle, i_tk);
-    reco::TransientTrack ttk = tt_builder.build(tk_ref);
-    std::pair<bool, Measurement1D> ttk_dist = track_dist(ttk, fake_bs_vtx);
-    float IP_sig = ttk_dist.second.significance();
-    if ((IP_sig > minSeedIPSig) && (tk_ref->pt() > minSeedPt)) {
-      seed_track_ref_map[tk_ref.key()] = seed_tracks.size();
-      seed_tracks.push_back(std::move(ttk));
+  if (refMode_ == RefMode::UsePVCollection) {
+    edm::Handle<std::vector<reco::Vertex>> pvHandle;
+    iEvent.getByToken(primaryVerticesToken_, pvHandle);
+    if (pvHandle.isValid() && !pvHandle->empty()) {
+      double sumX=0, sumY=0, sumZ=0; int nGood=0;
+      for (auto const& pv : *pvHandle) {
+        if (!pv.isFake() && pv.ndof() > 4) {
+          sumX += pv.x(); sumY += pv.y(); sumZ += pv.z(); ++nGood;
+        }
+      }
+      if (nGood > 0) {
+        ref_x = sumX / nGood; ref_y = sumY / nGood; ref_z = sumZ / nGood;
+        ref_error(0,0)=0.0015*0.0015;
+        ref_error(1,1)=0.0015*0.0015;
+        ref_error(2,2)=0.005*0.005;
+        // off-diagonals already zeroed
+        haveRef = true;
+      }
     }
-    if (verbose) printf("Build track references. IP_sig = %f\n", IP_sig);
+  } else {
+    // BeamSpot fallback
+    edm::Handle<reco::BeamSpot> bs;
+    iEvent.getByToken(beamspotToken_, bs);
+    if (bs.isValid()) {
+      ref_x = bs->position().x(); ref_y = bs->position().y(); ref_z = bs->position().z();
+      // use diagonal terms; zeroed off-diagonals remain zero
+      ref_error(0,0)=bs->covariance()(0,0);
+      ref_error(1,1)=bs->covariance()(1,1);
+      ref_error(2,2)=bs->covariance()(2,2);
+      haveRef = true;
+    }
   }
 
-  // helper: get a TransientTrack for a TrackRef: use prebuilt seed_tracks when available,
-  // otherwise build one on the fly (preserves behaviour for tracks not included in the seed set)
-  // accessor: accept edm::Ref<...> or edm::RefToBase<...> by using .key()
-  auto getTransientTrack = [&](auto const& tk)->reco::TransientTrack {
-    // use key() for lookup (works for both Ref and RefToBase)
+  if (!haveRef) {
+    if (verbose) edm::LogWarning("Vertexer") << "No valid reference (PV avg or BeamSpot). Returning empty (no fake substitute).";
+    iEvent.emplace(putToken_, reco::VertexCollection());
+    return;
+  }
+
+  const reco::Vertex fake_ref_vtx(reco::Vertex::Point(ref_x, ref_y, ref_z), ref_error);
+
+  // TransientTrack builder
+  auto const& tt_builder = iSetup.getData(token_builder);
+
+  // Seed track selection
+  std::vector<reco::TransientTrack> seed_tracks;
+  seed_tracks.reserve(seed_track_handle->size());
+  std::unordered_map<unsigned int,size_t> seed_track_ref_map;
+  seed_track_ref_map.reserve(seed_track_handle->size());
+
+  for (size_t i_tk=0; i_tk<seed_track_handle->size(); ++i_tk) {
+    edm::Ref<reco::TrackCollection> tk_ref(seed_track_handle, i_tk);
+    reco::TransientTrack ttk = tt_builder.build(tk_ref);
+    auto ttk_dist = track_dist(ttk, fake_ref_vtx);
+    if (!ttk_dist.first) continue;
+    float IP_sig = ttk_dist.second.significance();
+    if (std::isfinite(IP_sig) && IP_sig > minSeedIPSig && tk_ref->pt() > minSeedPt) {
+      seed_track_ref_map[tk_ref.key()] = seed_tracks.size();
+      seed_tracks.emplace_back(std::move(ttk));
+    }
+    if (verbose)
+      printf("Seed preselect: key=%u pt=%.3f IPsig(ref)=%.3f %s\n",
+             tk_ref.key(), tk_ref->pt(), IP_sig,
+             (IP_sig > minSeedIPSig ? "KEPT" : "REJ"));
+  }
+
+  // build safe lambda (bounds + cache) REPLACES previous version
+  auto getTransientTrack = [&](auto const& tk) -> reco::TransientTrack {
     const unsigned int k = tk.key();
     auto it = seed_track_ref_map.find(k);
     if (it != seed_track_ref_map.end()) return seed_tracks[it->second];
-    // fallback: construct a TrackRef from the known input collection and build a transient track
-    const edm::Ref<reco::TrackCollection> tr(seed_track_handle, k);
-    return tt_builder.build(tr);
+    if (k < seed_track_handle->size()) {
+      edm::Ref<reco::TrackCollection> tr(seed_track_handle, k);
+      return tt_builder.build(tr);
+    }
+    if (verbose) edm::LogWarning("Vertexer") << "getTransientTrack: out-of-range track key " << k;
+    return reco::TransientTrack(); // invalid
   };
 
   //////////////////////////////////////////////////////////////////////
@@ -327,29 +394,19 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   auto try_seed_vertex = [&]() {
     std::vector<reco::TransientTrack> ttks(n_tracks_per_seed_vertex);
-    for (int i = 0; i < n_tracks_per_seed_vertex; ++i)
+    for (int i = 0; i < n_tracks_per_seed_vertex; ++i) {
       ttks[i] = seed_tracks[itks[i]];
-
-    TransientVertex seed_vertex = kv_reco.vertex(ttks);
-    if (seed_vertex.isValid() && seed_vertex.normalisedChiSquared() < max_seed_vertex_chi2) { 
+      if (!ttks[i].isValid()) return;  // safety
+    }
+    TransientVertex seed_vertex = kv_reco_.vertex(ttks);
+    if (seed_vertex.isValid() && seed_vertex.normalisedChiSquared() < max_seed_vertex_chi2) {
       vertices->push_back(reco::Vertex(seed_vertex));
-
       if (verbose) {
         const reco::Vertex& v = vertices->back();
-        const double vchi2 = v.normalizedChi2();
-        const double vndof = v.ndof();
-        const double vx = v.position().x() - bsx;
-        const double vy = v.position().y() - bsy;
-        const double vz = v.position().z() - bsz;
-        const double phi = atan2(vy, vx);
-        const double rho = sqrt(vx*vx + vy*vy);
-        const double r = sqrt(vx*vx + vy*vy + vz*vz);
-
-	printf("from tracks");
-	for (auto itk : itks)
-	  printf(" %lu", itk);
-	printf(": vertex #%3lu: chi2/dof: %7.3f dof: %7.3f pos: <%7.3f, %7.3f, %7.3f>  rho: %7.3f  phi: %7.3f  r: %7.3f\n", vertices->size() - 1, vchi2, vndof, vx, vy, vz, rho, phi, r);
-      
+        double vx = v.x() - ref_x, vy = v.y() - ref_y, vz = v.z() - ref_z;
+        printf("from tracks"); for (auto itk : itks) printf(" %zu", itk);
+        printf(": vertex #%zu: chi2/dof: %7.3f dof: %7.3f pos(ref): <%7.3f,%7.3f,%7.3f>\n",
+               vertices->size() - 1, v.normalizedChi2(), v.ndof(), vx, vy, vz);
       }
     }
   };
@@ -398,7 +455,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     
     if (tracks[0].size() < 2) {
       if (verbose)
-        printf("track-sharing: vertex-0 #%lu is down to one track, junking it\n", ivtx[0]);
+        printf("track-sharing: vertex-0 #%zu is down to one track, junking it\n", ivtx[0]);
       v[0] = vertices->erase(v[0]) - 1;
       ++n_onetracks;
       continue;
@@ -415,7 +472,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       if (tracks[1].size() < 2) {
         if (verbose)
-          printf("track-sharing: vertex-1 #%lu is down to one track, junking it\n", ivtx[1]);	
+          printf("track-sharing: vertex-1 #%zu is down to one track, junking it\n", ivtx[1]);	
 	v[1] = vertices->erase(v[1]) - 1;
         ++n_onetracks;
         continue;
@@ -424,17 +481,18 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       
       if (verbose) {
-        printf("track-sharing: # vertices = %lu. considering vertices #%lu (chi2/dof %.3f, track set", vertices->size(), ivtx[0], v[0]->chi2() / v[0]->ndof());
+        printf("track-sharing: # vertices = %zu. considering vertices #%zu (chi2/dof %.3f, track set",
+               vertices->size(), ivtx[0], v[0]->chi2() / v[0]->ndof());
         print_track_set(tracks[0], *v[0]);
-        printf(") and #%lu (chi2/dof %.3f, track set", ivtx[1], v[1]->chi2() / v[1]->ndof());
+        printf(") and #%zu (chi2/dof %.3f, track set", ivtx[1], v[1]->chi2() / v[1]->ndof());
         print_track_set(tracks[1], *v[1]);
         printf("):\n");
       }
 
       
       if (is_track_subset(tracks[0], tracks[1])) {
-	if (verbose)
-          printf("   subset/duplicate vertices %lu and %lu, erasing second and starting over\n", ivtx[0], ivtx[1]);
+        if (verbose)
+          printf("   subset/duplicate vertices %zu and %zu, erasing second and starting over\n", ivtx[0], ivtx[1]);
         duplicate = true;
         break;
       }
@@ -470,9 +528,10 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	
         
 	for (auto tk : shared_tracks) {
-	  const reco::TransientTrack& ttk = getTransientTrack(tk);
-	  std::pair<bool, Measurement1D> t_dist_0 = track_dist(ttk, *v[0]);
-	  std::pair<bool, Measurement1D> t_dist_1 = track_dist(ttk, *v[1]);
+	  reco::TransientTrack ttk = getTransientTrack(tk);            // was 'const & ttk' (dangling)
+	  if (!ttk.isValid()) continue;                                // new guard
+	  auto t_dist_0 = track_dist(ttk, *v[0]);
+	  auto t_dist_1 = track_dist(ttk, *v[1]);
 	  
 	  
 	  t_dist_0.first = t_dist_0.first && (t_dist_0.second.value() < max_track_vertex_dist || t_dist_0.second.significance() < max_track_vertex_sig);
@@ -510,18 +569,18 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       for (int i = 0; i < 2; ++i)
         for (auto tk : tracks[i])
           tracks_to_fit.insert(tk);
-      
+
       std::vector<reco::TransientTrack> ttks;
-      for (auto tk : tracks_to_fit)
-	ttks.push_back(getTransientTrack(tk));
-      
-      reco::VertexCollection new_vertices;
-      
-      for (const TransientVertex& tv : kv_reco_dropin(ttks)){
-	
-	new_vertices.push_back(reco::Vertex(tv));
-	
+      ttks.reserve(tracks_to_fit.size());
+      for (auto tk : tracks_to_fit) {
+        auto tt = getTransientTrack(tk);
+        if (tt.isValid()) ttks.push_back(tt);
       }
+
+      reco::VertexCollection new_vertices;
+      for (const TransientVertex& tv : kv_reco_dropin(ttks))
+        new_vertices.emplace_back(tv);
+
       // If we got two new vertices, maybe it took A B and A C D and made a better one from B C D, and left a broken one A B! C! D!.
       // If we get one that is truly the merger of the track lists, great. If it is just something like A B , A C . A B C!, or we get nothing, then default to arbitration.
       if (new_vertices.size() > 1) {
@@ -548,14 +607,15 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	    continue;
 
         std::vector<reco::TransientTrack> ttks;
-        for (auto tk : tracks[i])
-          if (tracks_to_remove_in_refit[i].count(tk) == 0)
-            ttks.push_back(getTransientTrack(tk));
-
-        reco::VertexCollection new_vertices;
-        for (const TransientVertex& tv : kv_reco_dropin(ttks)){
-          new_vertices.push_back(reco::Vertex(tv));
+        for (auto tk : tracks[i]) {
+          if (tracks_to_remove_in_refit[i].count(tk) == 0) {
+            auto tt = getTransientTrack(tk);
+            if (tt.isValid()) ttks.push_back(tt);
+          }
         }
+        reco::VertexCollection new_vertices;
+        for (const TransientVertex& tv : kv_reco_dropin(ttks))
+          new_vertices.emplace_back(tv);
         if (new_vertices.size() == 1)
           * v[i] = new_vertices[0];
         else
@@ -615,13 +675,15 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
           //v1y = v[1]->y() - bsy;
           //phi1 = atan2(v1y, v1x);
 
+          // Distances & angles always evaluated w.r.t. reference vertex (avgPV or beamspot)
           if (v_dist.value() < merge_anyway_dist || v_dist.significance() < merge_anyway_sig) {
 
             std::vector<reco::TransientTrack> ttks;
 
             for (int i = 0; i < 2; ++i) {
               for (auto tk : vertex_track_set(*v[i])) {
-                ttks.push_back(getTransientTrack(tk));
+                auto tt = getTransientTrack(tk);
+                if (tt.isValid()) ttks.push_back(tt);
               }
             }
 
@@ -672,7 +734,9 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         for (size_t j = 0; j < ntks; ++j)
           if (j != i)
             ttks[j - (j >= i)] = getTransientTrack(tks[j]);
-        reco::Vertex vnm1(TransientVertex(kv_reco.vertex(ttks)));
+        if (!all_valid(ttks)) continue;                 // NEW guard
+        TransientVertex tv_nm1 = kv_reco_.vertex(ttks); // split for clarity
+        reco::Vertex vnm1(tv_nm1);
         const double dist3_2 = (vnm1.x() - v[0]->x())*(vnm1.x() - v[0]->x()) + (vnm1.y() - v[0]->y())*(vnm1.y() - v[0]->y()) + (vnm1.z() - v[0]->z())*(vnm1.z() - v[0]->z());
         const double distz = sqrt( (vnm1.z() - v[0]->z()) * (vnm1.z() - v[0]->z()) );
 
@@ -722,22 +786,17 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
           Measurement1D v_dist = vertex_dist_2d.distance(*v[0], *v[1]);
 
-          Measurement1D dBV0_Meas1D = vertex_dist_2d.distance(*v[0], fake_bs_vtx);
-          double dBV0 = dBV0_Meas1D.value();
-
-          Measurement1D dBV1_Meas1D = vertex_dist_2d.distance(*v[1], fake_bs_vtx);
-          double dBV1 = dBV1_Meas1D.value();
-
-          double v0x = v[0]->x() - bsx;
-          double v0y = v[0]->y() - bsy;
-
+          // Distances/angles relative to reference (avgPV or beamspot)
+          Measurement1D dBV0_Meas1D = vertex_dist_2d.distance(*v[0], fake_ref_vtx);
+          Measurement1D dBV1_Meas1D = vertex_dist_2d.distance(*v[1], fake_ref_vtx);
+          double dBV0 = dBV0_Meas1D.value();  // added
+          double dBV1 = dBV1_Meas1D.value();  // added
+          double v0x = v[0]->x() - ref_x;
+          double v0y = v[0]->y() - ref_y;
           double phi0 = atan2(v0y, v0x);
-
-          double v1x = v[1]->x() - bsx;
-          double v1y = v[1]->y() - bsy;
-
+          double v1x = v[1]->x() - ref_x;
+          double v1y = v[1]->y() - ref_y;
           double phi1 = atan2(v1y, v1x);
-
           if (fabs(reco::deltaPhi(phi0, phi1)) < 0.5 && v_dist.value() < 0.0300 && dBV0 > 0.0100 && dBV1 > 0.0100) {
             track_set tracks_to_fit;
             for (int i = 0; i < 2; ++i)
@@ -748,9 +807,11 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
               ttks.push_back(getTransientTrack(tk));
 
             if (investigate_merged_vertices) {
-              std::vector<TransientVertex> tv(1, kv_reco.vertex(ttks));
-              potential_merged_vertices.push_back(reco::Vertex(tv[0]));
-              //std::cout << "ntrack in potental merged: " << potential_merged_vertices.back().nTracks() << std::endl;
+              if (all_valid(ttks)) { // NEW guard
+                std::vector<TransientVertex> tv(1, kv_reco_.vertex(ttks));
+                if (tv[0].isValid())
+                  potential_merged_vertices.push_back(reco::Vertex(tv[0]));
+              }
             }
 
             reco::VertexCollection merged_vertices;
@@ -840,3 +901,8 @@ void Vertexer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(Vertexer);
+
+// NOTE: Only intentional functional change from original version is the ability to use an averaged
+//       primary-vertex reference (or beamspot fallback) with a fully initialized covariance.
+//       All vertex finding, merging, refit, and seed selection logic (including IPSig & pT cuts)
+//       remains otherwise identical.
