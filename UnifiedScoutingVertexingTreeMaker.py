@@ -161,8 +161,8 @@ process.options = cms.untracked.PSet(
 
 process.maxEvents = cms.untracked.PSet(
     # input = cms.untracked.int32(5000)  # Limited events for testing
-    # input = cms.untracked.int32(150000)  # Local
-    input = cms.untracked.int32(100000)  # Process all events
+    input = cms.untracked.int32(150000)  # Local
+    # input = cms.untracked.int32(100000)  # Process all events
 )
 
 # -------------------------- INPUT PATH --------------------------------
@@ -177,7 +177,10 @@ process.source = cms.Source("PoolSource",
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/003ca643-43f8-40dd-92b3-4c6a4ccdc894.root", #EDM Number of events: 527035
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root",
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root", # Empty file
-    # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/013b488b-7af4-450f-b175-b39623c72ae2.root"
+    # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/013b488b-7af4-450f-b175-b39623c72ae2.root",
+    # MC Files
+    "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/0639b06f-0a53-4150-ac4f-ffab0df5ef91.root",
+    "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/06a339e5-cb52-4e75-b0e4-91285db66993.root"
     )
 )
 
@@ -197,7 +200,8 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 #-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
     # fileName = cms.string("test-outputs/DY2M_ScoutingTree_PV_Local_test_2.root")
-    fileName = cms.string("DY2M_ScoutingTree_Output_PV.root")  # This is the only output saved
+    fileName = cms.string("outputs/MC_ScoutingTree_FullPV_Local_1.root")
+    # fileName = cms.string("DY2M_ScoutingTree_Output_PV.root")  # This is the only output saved
 )
 
 # Step 1: HLT Scouting Unpacker
