@@ -2,7 +2,7 @@ from CRABClient.UserUtilities import config
 config = config()
 
 # theTag = "Data_ScoutingPFRun3_FullPV_1mod20_v1"  # updated tag
-theTag = "MC_DYto2Mu_FullPV_1mod20_v1"  # updated tag
+theTag = "MC_DYto2Mu_FullPV_0mod3_v1"  # updated tag
 
 config.General.requestName = theTag
 config.General.transferOutputs = True
@@ -31,7 +31,7 @@ config.Data.inputDBS = 'global'
 # WARNING: check per-job runtime after a small test submission — may require unitsPerJob=1.
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1  # Number of files per job
-config.Data.totalUnits = 100
+config.Data.totalUnits = 1000
 
 # Info about /ScoutingPFRun3/Run2024H-v1/HLTSCOUT Dataset
 #nlumis:16134
@@ -56,7 +56,7 @@ config.Data.totalUnits = 100
 # config.Data.totalUnits = 10000  # Total number of files to process
 
 
-config.JobType.outputFiles = ["DY2M_ScoutingTree_Output_PV.root"]
+config.JobType.outputFiles = ["ScoutingTree_Output_PV.root"]
 
 
 config.Data.outputDatasetTag = theTag
