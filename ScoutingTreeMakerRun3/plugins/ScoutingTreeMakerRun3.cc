@@ -71,7 +71,8 @@ private:
     const int PVBoundary1;
     const int PVBoundary2;
 
-    const std::string refPreference;  // Reference vertex preference
+    enum class RefPreference { PreferPV, PreferBeamSpot };
+    const RefPreference refPreference_;
 
     // Input tokens
     const edm::EDGetTokenT<std::vector<reco::Vertex>> verticesToken;
@@ -197,7 +198,8 @@ ScoutingTreeMakerRun3::ScoutingTreeMakerRun3(const edm::ParameterSet& iConfig):
     required_dxy_error(iConfig.getParameter<double>("required_dxy_error")),
     PVBoundary1(iConfig.getParameter<int>("PVBoundary1")),
     PVBoundary2(iConfig.getParameter<int>("PVBoundary2")),
-    refPreference(iConfig.getUntrackedParameter<std::string>("refPreference", "BeamSpot")),
+    refPreference_(iConfig.getUntrackedParameter<std::string>("refPreference", "BeamSpot") == "PV" ? 
+                  RefPreference::PreferPV : RefPreference::PreferBeamSpot),
     verticesToken(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("displacedVertices"))),
     beamspot_token(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot_src"))),
     tracksToken(consumes<std::vector<reco::Track>>(iConfig.getParameter<edm::InputTag>("tracks"))),
@@ -307,33 +309,33 @@ void ScoutingTreeMakerRun3::beginJob() {
             regClabel << "Region C (nPV >= " << PVBoundary1 << ")";
         }
 
-        // Region A
+        // Region A - use consistent naming with reference
         region_A.xy_global = fs->make<TH2F>("vertex_xy_global_regionA",
             ("Vertex XY (Global, " + regAlabel.str() + "); X [cm]; Y [cm]").c_str(), 2000,-10,10,2000,-10,10);
-        region_A.xy_ref = fs->make<TH2F>("vertex_xy_avgPV_regionA",
-            ("Vertex XY (avgPV, " + regAlabel.str() + "); X-avgPV_x [cm]; Y-avgPV_y [cm]").c_str(), 2000,-10,10,2000,-10,10);
-        region_A.dBV = fs->make<TH1F>("vertex_dBV_regionA_avgPV",
-            ("Vertex d_{BV}^{avgPV} (" + regAlabel.str() + "); d_{BV}^{avgPV} [cm]; Vertices").c_str(), 200,0,10);
+        region_A.xy_ref = fs->make<TH2F>("vertex_xy_ref_regionA",
+            ("Vertex XY (ref-centered, " + regAlabel.str() + "); X-ref_x [cm]; Y-ref_y [cm]").c_str(), 2000,-10,10,2000,-10,10);
+        region_A.dBV = fs->make<TH1F>("vertex_dBVref_regionA",
+            ("Vertex d_{BV} (wrt ref, " + regAlabel.str() + "); d_{BV} [cm]; Vertices").c_str(), 200,0,10);
         region_A.mass = fs->make<TH1F>("vertex_mass_regionA",
             ("Vertex Mass (" + regAlabel.str() + "); mass [GeV/c^{2}]; Vertices").c_str(), 200,0,10);
 
         // Region B
         region_B.xy_global = fs->make<TH2F>("vertex_xy_global_regionB",
             ("Vertex XY (Global, " + regBlabel.str() + "); X [cm]; Y [cm]").c_str(), 2000,-10,10,2000,-10,10);
-        region_B.xy_ref = fs->make<TH2F>("vertex_xy_avgPV_regionB",
-            ("Vertex XY (avgPV, " + regBlabel.str() + "); X-avgPV_x [cm]; Y-avgPV_y [cm]").c_str(), 2000,-10,10,2000,-10,10);
-        region_B.dBV = fs->make<TH1F>("vertex_dBV_regionB_avgPV",
-            ("Vertex d_{BV}^{avgPV} (" + regBlabel.str() + "); d_{BV}^{avgPV} [cm]; Vertices").c_str(), 200,0,10);
+        region_B.xy_ref = fs->make<TH2F>("vertex_xy_ref_regionB",
+            ("Vertex XY (ref-centered, " + regBlabel.str() + "); X-ref_x [cm]; Y-ref_y [cm]").c_str(), 2000,-10,10,2000,-10,10);
+        region_B.dBV = fs->make<TH1F>("vertex_dBVref_regionB",
+            ("Vertex d_{BV} (wrt ref, " + regBlabel.str() + "); d_{BV} [cm]; Vertices").c_str(), 200,0,10);
         region_B.mass = fs->make<TH1F>("vertex_mass_regionB",
             ("Vertex Mass (" + regBlabel.str() + "); mass [GeV/c^{2}]; Vertices").c_str(), 200,0,10);
 
         // Region C
         region_C.xy_global = fs->make<TH2F>("vertex_xy_global_regionC",
             ("Vertex XY (Global, " + regClabel.str() + "); X [cm]; Y [cm]").c_str(), 2000,-10,10,2000,-10,10);
-        region_C.xy_ref = fs->make<TH2F>("vertex_xy_avgPV_regionC",
-            ("Vertex XY (avgPV, " + regClabel.str() + "); X-avgPV_x [cm]; Y-avgPV_y [cm]").c_str(), 2000,-10,10,2000,-10,10);
-        region_C.dBV = fs->make<TH1F>("vertex_dBV_regionC_avgPV",
-            ("Vertex d_{BV}^{avgPV} (" + regClabel.str() + "); d_{BV}^{avgPV} [cm]; Vertices").c_str(), 200,0,10);
+        region_C.xy_ref = fs->make<TH2F>("vertex_xy_ref_regionC",
+            ("Vertex XY (ref-centered, " + regClabel.str() + "); X-ref_x [cm]; Y-ref_y [cm]").c_str(), 2000,-10,10,2000,-10,10);
+        region_C.dBV = fs->make<TH1F>("vertex_dBVref_regionC",
+            ("Vertex d_{BV} (wrt ref, " + regClabel.str() + "); d_{BV} [cm]; Vertices").c_str(), 200,0,10);
         region_C.mass = fs->make<TH1F>("vertex_mass_regionC",
             ("Vertex Mass (" + regClabel.str() + "); mass [GeV/c^{2}]; Vertices").c_str(), 200,0,10);
     }
@@ -383,6 +385,17 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
     track_ref.dxy->SetTitle(("Track dxy w.r.t. " + refName + "; dxy_{" + refName + "} [cm]; Tracks").c_str());
     track_ref.dxySig->SetTitle(("Track |dxy_{" + refName + "}/err|; |dxy_{" + refName + "}/err|; Tracks").c_str());
     h_vertex_dBVref->SetTitle(("Vertex transverse distance d_{BV}^{" + refName + "} (wrt " + refName + "); d_{BV}^{" + refName + "} [cm]; Vertices / 0.05 cm").c_str());
+    
+    // Update region plot titles too
+    if (PVBoundary1 != -1) {
+        region_A.xy_ref->SetTitle(("Vertex XY (" + refName + "-centered, Region A); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
+        region_B.xy_ref->SetTitle(("Vertex XY (" + refName + "-centered, Region B); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
+        region_C.xy_ref->SetTitle(("Vertex XY (" + refName + "-centered, Region C); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
+        
+        region_A.dBV->SetTitle(("Vertex d_{BV}^{" + refName + "} (Region A); d_{BV}^{" + refName + "} [cm]; Vertices").c_str());
+        region_B.dBV->SetTitle(("Vertex d_{BV}^{" + refName + "} (Region B); d_{BV}^{" + refName + "} [cm]; Vertices").c_str());
+        region_C.dBV->SetTitle(("Vertex d_{BV}^{" + refName + "} (Region C); d_{BV}^{" + refName + "} [cm]; Vertices").c_str());
+    }
 
     // Fill beamspot comparisons if both available
     if (havePV && haveBS) {
@@ -448,11 +461,14 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
             
             // Calculate track distances to all reference points using IPTools
             const math::XYZPoint origin(0.,0.,0.);
-            reco::Vertex originVtx(origin, Vertex::Error()); // Simple origin vertex
+            reco::Vertex originVtx(origin, reco::Vertex::Error());
             
-            // Use IPTools for proper impact parameter calculations
-            std::pair<bool, Measurement1D> ip_00 = IPTools::absoluteTransverseImpactParameter(transientTrack, originVtx);
-            std::pair<bool, Measurement1D> ip_ref = IPTools::absoluteTransverseImpactParameter(transientTrack, refVtx);
+            // Define direction for signed impact parameter (track momentum direction)
+            GlobalVector direction(track->px(), track->py(), track->pz());
+            
+            // Use IPTools::signedTransverseImpactParameter with correct arguments
+            std::pair<bool, Measurement1D> ip_00 = IPTools::signedTransverseImpactParameter(transientTrack, direction, originVtx);
+            std::pair<bool, Measurement1D> ip_ref = IPTools::signedTransverseImpactParameter(transientTrack, direction, refVtx);
             double dxyErr = track->dxyError();
             
             // Track metrics for the main reference
@@ -460,7 +476,7 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
                 sum_dxy += ip_ref.second.value();
                 sum_dxyErr += ip_ref.second.error();
                 
-                // Fill histograms
+                // Fill histograms with signed dxy
                 track_ref.dxy->Fill(ip_ref.second.value());
                 if (ip_ref.second.error() > 0) {
                     track_ref.dxySig->Fill(std::fabs(ip_ref.second.significance()));
@@ -468,14 +484,14 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
             }
             
             // Fill simple track.dxy() for origin (historical comparison)
-            track_origin.dxy->Fill(track->dxy(origin));
+            track_origin.dxy->Fill(track->dxy(origin));  // This is already signed
             if (dxyErr > 0.0) {
                 track_origin.dxySig->Fill(std::fabs(track->dxy(origin) / dxyErr));
             }
             
             // Additional explicit measurements for all reference points
             if (havePV) {
-                std::pair<bool, Measurement1D> ip_avgPV = IPTools::absoluteTransverseImpactParameter(transientTrack, avgPVVtx);
+                std::pair<bool, Measurement1D> ip_avgPV = IPTools::signedTransverseImpactParameter(transientTrack, direction, avgPVVtx);
                 if (ip_avgPV.first) {
                     track_avgPV.dxy->Fill(ip_avgPV.second.value());
                     track_avgPV.dxySig->Fill(std::fabs(ip_avgPV.second.significance()));
@@ -483,7 +499,7 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
             }
             
             if (haveBS) {
-                std::pair<bool, Measurement1D> ip_bs = IPTools::absoluteTransverseImpactParameter(transientTrack, bsVtx);
+                std::pair<bool, Measurement1D> ip_bs = IPTools::signedTransverseImpactParameter(transientTrack, direction, bsVtx);
                 if (ip_bs.first) {
                     track_bs.dxy->Fill(ip_bs.second.value());
                     track_bs.dxySig->Fill(std::fabs(ip_bs.second.significance()));
@@ -491,7 +507,7 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
             }
             
             if (pmvtx) {
-                std::pair<bool, Measurement1D> ip_pmvtx = IPTools::absoluteTransverseImpactParameter(transientTrack, *pmvtx);
+                std::pair<bool, Measurement1D> ip_pmvtx = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pmvtx);
                 if (ip_pmvtx.first) {
                     track_pmvtx.dxy->Fill(ip_pmvtx.second.value());
                     track_pmvtx.dxySig->Fill(std::fabs(ip_pmvtx.second.significance()));
@@ -554,7 +570,7 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         h_vertex_dBV00->Fill(dBV00);
         h_vertex_dBV_error->Fill(dBV_err);
 
-        // Region histograms (reference-based for all)
+        // Region histograms - use the correct reference names
         if (PVBoundary1 != -1) {
             if (pvRegion == 0) {
                 region_A.xy_global->Fill(v.x(), v.y());
@@ -687,12 +703,12 @@ std::pair<bool, std::string> ScoutingTreeMakerRun3::determineReferenceVertex(
     }
     
     // Select reference based on preference and availability
-    if ((refPreference == "PrimaryVertex" || refPreference == "AvgPV") && havePV) {
+    if (refPreference_ == RefPreference::PreferPV && havePV) {
         refVtx = avgPVVtx;
         foundRef = true;
         refType = "avgPV";
         edm::LogInfo("ScoutingTreeMakerRun3") << "Using avgPV as reference point";
-    } else if ((refPreference == "BeamSpot" || refPreference == "BS") && haveBS) {
+    } else if (refPreference_ == RefPreference::PreferBeamSpot && haveBS) {
         refVtx = bsVtx;
         foundRef = true;
         refType = "beamspot";
@@ -741,8 +757,6 @@ void ScoutingTreeMakerRun3::fillDescriptions(edm::ConfigurationDescriptions& des
     descriptions.add("scoutingTreeMakerRun3", desc);
 }
 
-DEFINE_FWK_MODULE(ScoutingTreeMakerRun3);
-
 // Add these helper method implementations after the constructor/destructor but before analyze()
 
 // Implementation of vertex_track_set helper
@@ -762,3 +776,7 @@ ScoutingTreeMakerRun3::track_vec ScoutingTreeMakerRun3::vertex_track_vec(const r
     track_set s = vertex_track_set(v, min_weight);
     return track_vec(s.begin(), s.end());
 }
+
+// Make sure the module is registered with the framework correctly
+// This should be at the bottom of the file after all class implementations
+DEFINE_FWK_MODULE(ScoutingTreeMakerRun3);

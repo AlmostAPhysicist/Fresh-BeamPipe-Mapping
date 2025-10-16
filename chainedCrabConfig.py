@@ -1,8 +1,8 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-# theTag = "Data_ScoutingPFRun3_FullPV_1mod20_v1"  # updated tag
-theTag = "MC_DYto2Mu_FullPV_0mod3_v1"  # updated tag
+theTag = "ScoutingMC_Updated_1mod2_v1"  # updated tag
+# theTag = "ScoutingData_Updated_10mod15_v1"  # updated tag
 
 config.General.requestName = theTag
 config.General.transferOutputs = True
@@ -23,15 +23,21 @@ config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'
 # /DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24MiniAOD-140X_mcRun3_2024_realistic_v26_ext1-v2/MINIAODSIM
 # /DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24MiniAODv6-150X_mcRun3_2024_realistic_v2-v3/MINIAODSIM
 # config.Data.inputDataset = '/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24MiniAOD-140X_mcRun3_2024_realistic_v26-v2/MINIAODSIM'
+
+
+
 config.Data.inputDataset = '/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24MiniAOD-140X_mcRun3_2024_realistic_v26-v3/MINIAODSIM'
 # config.Data.inputDataset = '/ScoutingPFRun3/Run2024H-v1/HLTSCOUT'
 config.Data.inputDBS = 'global'
 
 # File-based splitting: 2 files per job (deterministic). 
 # WARNING: check per-job runtime after a small test submission — may require unitsPerJob=1.
+
 config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 1  # Number of files per job
-config.Data.totalUnits = 1000
+config.Data.unitsPerJob = 2  # Number of files per job
+# config.Data.totalUnits = 1000
+
+# config.Data.splitting = 'Automatic'
 
 # Info about /ScoutingPFRun3/Run2024H-v1/HLTSCOUT Dataset
 #nlumis:16134

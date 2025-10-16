@@ -2,9 +2,11 @@
 #include <TDirectory.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TH2D.h>
 #include <TList.h>
 #include <TKey.h>
 #include <TString.h>
+#include <TObject.h>
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -77,22 +79,32 @@ static void MergeBatchFiles(const std::vector<std::string>& batchFiles, const st
             delete file;
             continue;
         }
+        // iterate keys and use ReadObj() so we own the object and can delete it immediately
         TIter next(dir->GetListOfKeys());
         TKey* key;
         while ((key = (TKey*)next())) {
             TString histName = key->GetName();
             TString className = key->GetClassName();
-            TH1* hist = (TH1*)dir->Get(histName);
-            if (!hist) continue;
+
+            TObject* obj = key->ReadObj();            // caller owns obj
+            TH1* hist = dynamic_cast<TH1*>(obj);
+            if (!hist) { delete obj; continue; }
+
             std::string histNameStr = histName.Data();
             if (histMap.find(histNameStr) == histMap.end()) {
-                TH1* newHist = (TH1*)hist->Clone(histName);
-                newHist->SetDirectory(0);
+                TH1* newHist = nullptr;
+                if (className.BeginsWith("TH1I") || className.BeginsWith("TH2I")) {
+                    newHist = ConvertToDoubleHist(hist, TString::Format("%s_combined", histName.Data()));
+                } else {
+                    newHist = (TH1*)hist->Clone(TString::Format("%s_combined", histName.Data()));
+                    newHist->SetDirectory(0);
+                }
                 histMap[histNameStr] = newHist;
                 histOrder.push_back(histNameStr);
             } else {
                 histMap[histNameStr]->Add(hist);
             }
+            delete obj; // free the temporary object loaded from file immediately
         }
         file->Close();
         delete file;
@@ -168,8 +180,7 @@ void combineHistogramsFromFileList(const char* inputListFile, const char* combin
         // Prepare batch output file name
         TString tag = combinedFileName ? combinedFileName : "auto";
         TString batchFileName = TString::Format("%s/combined_histograms_%s_batch%d.root", outputDirName.Data(), tag.Data(), batchNum);
-        batchOutputFiles.push_back(batchFileName.Data());
-
+        // (do not push here; batchOutputFiles was already prefilled earlier)
         // Delete batch file if it exists
         std::remove(batchFileName.Data());
 
@@ -205,21 +216,16 @@ void combineHistogramsFromFileList(const char* inputListFile, const char* combin
                 continue;
             }
 
+            // iterate keys and ReadObj so we can delete the temporary object immediately
             TIter next(dir->GetListOfKeys());
             TKey *key;
             while ((key = (TKey*)next())) {
                 TString histName = key->GetName();
                 TString className = key->GetClassName();
 
-                TH1 *hist = nullptr;
-                if (className.BeginsWith("TH1") || className.BeginsWith("TH2")) {
-                    hist = (TH1*)dir->Get(histName);
-                } else if (className.BeginsWith("TProfile")) {
-                    hist = (TH1*)dir->Get(histName); // TProfile inherits TH1
-                } else {
-                    continue;
-                }
-                if (!hist) continue;
+                TObject* obj = key->ReadObj(); // we own this object and must delete it
+                TH1 *hist = dynamic_cast<TH1*>(obj);
+                if (!hist) { delete obj; continue; }
 
                 std::string histNameStr = histName.Data();
                 if (histMap.find(histNameStr) == histMap.end()) {
@@ -235,6 +241,7 @@ void combineHistogramsFromFileList(const char* inputListFile, const char* combin
                 } else {
                     histMap[histNameStr]->Add(hist);
                 }
+                delete obj; // free the temporary object loaded from file immediately
             }
 
             file->Close();

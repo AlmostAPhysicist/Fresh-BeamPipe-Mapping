@@ -719,3 +719,117 @@ INFO 2025-10-09 05:24:27.151 UTC: 	 				unsubmitted  		 76.2% (5256/6898)
 INFO 2025-10-09 05:24:27.151 UTC: 	 
 No publication information (publication has been disabled in the CRAB configuration file)
 INFO 2025-10-09 05:24:27.215 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_FullPV_1mod20_v1/crab.log
+DEBUG 2025-10-14 05:45:01.418 UTC: 	 CRAB Client version: v3.250820
+DEBUG 2025-10-14 05:45:01.419 UTC: 	 Running on: Linux lxplus9119.cern.ch 5.14.0-570.51.1.el9_6.x86_64 #1 SMP PREEMPT_DYNAMIC Sat Sep 27 01:10:11 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-10-14 05:45:01.419 UTC: 	 Not using Singularity
+DEBUG 2025-10-14 05:45:01.419 UTC: 	 Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+DEBUG 2025-10-14 05:45:01.419 UTC: 	 Executing command: 'kill'
+DEBUG 2025-10-14 05:45:01.439 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-10-14 05:45:01.804 UTC: 	 Checking credentials
+DEBUG 2025-10-14 05:45:01.805 UTC: 	 Proxy file /tmp/x509up_u180451 not found
+DEBUG 2025-10-14 05:45:01.805 UTC: 	 Creating new proxy for 172:00 hours
+DEBUG 2025-10-14 05:45:01.805 UTC: 	 Executing command :
+ voms-proxy-init --rfc --cert ~/.globus/usercert.pem --key ~/.globus/userkey.pem --out /tmp/x509up_u180451 --valid 192:00 --voms cms:/cms
+DEBUG 2025-10-14 05:45:05.993 UTC: 	 output : 
+ error: 
+ retcode : 0
+DEBUG 2025-10-14 05:45:05.993 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-10-14 05:45:06.019 UTC: 	 output : 691199
+691199
+
+ error: 
+ retcode : 0
+DEBUG 2025-10-14 05:45:06.019 UTC: 	 Proxy created.
+DEBUG 2025-10-14 05:45:06.020 UTC: 	 Encoded data for curl request: subresource=delegatedn
+DEBUG 2025-10-14 05:45:06.094 UTC: 	 Registering user credentials on myproxy for /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+DEBUG 2025-10-14 05:45:06.094 UTC: 	 Executing command :
+ voms-proxy-info --identity --file /tmp/x509up_u180451
+DEBUG 2025-10-14 05:45:06.124 UTC: 	 output : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+
+ error: 
+ retcode : 0
+DEBUG 2025-10-14 05:45:06.124 UTC: 	 Getting myproxy life time left for 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-10-14 05:45:06.124 UTC: 	 Executing command :
+ myproxy-info -s myproxy.cern.ch -l 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-10-14 05:45:06.446 UTC: 	 output : username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  timeleft: 695:03:35  (29.0 days)
+
+ error: 
+ retcode : 0
+DEBUG 2025-10-14 05:45:06.447 UTC: 	 Myproxy is valid: 2502180
+DEBUG 2025-10-14 05:45:06.447 UTC: 	 Result of myproxy credential check:
+  Credential exists on myproxy: username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6  - validity: 28 days, 23:03:00
+DEBUG 2025-10-14 05:45:06.448 UTC: 	 Command use: kill
+DEBUG 2025-10-14 05:45:06.448 UTC: 	 Options use: ['-d', 'crab_Data_ScoutingPFRun3_FullPV_1mod20_v1']
+DEBUG 2025-10-14 05:45:06.448 UTC: 	 Encoded data for curl request: subresource=version
+DEBUG 2025-10-14 05:45:06.492 UTC: 	 CRABClient version: v3.250820
+DEBUG 2025-10-14 05:45:06.492 UTC: 	 Instance is prod
+DEBUG 2025-10-14 05:45:06.492 UTC: 	 Server base url is cmsweb.cern.ch
+DEBUG 2025-10-14 05:45:06.492 UTC: 	 Command api workflow
+DEBUG 2025-10-14 05:45:06.492 UTC: 	 Killing task 251009_014918:amalhotr_crab_Data_ScoutingPFRun3_FullPV_1mod20_v1
+DEBUG 2025-10-14 05:45:06.493 UTC: 	 Encoded data for curl request: workflow=251009_014918%3Aamalhotr_crab_Data_ScoutingPFRun3_FullPV_1mod20_v1
+DEBUG 2025-10-14 05:45:06.691 UTC: 	 Result: {'desc': {'columns': ['tm_taskname', 'tm_task_status', 'tm_task_command', 'tm_user_role', 'tm_user_group', 'tm_task_failure', 'tm_split_algo', 'tm_split_args', 'tm_save_logs', 'tm_username', 'tm_user_dn', 'tm_arguments', 'tm_input_dataset', 'tm_dbs_url', 'tm_task_warnings', 'tm_publication', 'tm_user_webdir', 'tm_output_dataset', 'tm_collector', 'tm_schedd', 'tm_dry_run', 'clusterid', 'tm_start_time', 'tw_name', 'tm_dagman_status', 'tm_num_jobs', 'tm_uploaded']}, 'result': [{'result': 'ok'}]}
+INFO 2025-10-14 05:45:06.692 UTC: 	 Kill request successfully sent
+INFO 2025-10-14 05:45:06.793 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_FullPV_1mod20_v1/crab.log
+DEBUG 2025-10-14 05:46:40.947 UTC: 	 CRAB Client version: v3.250820
+DEBUG 2025-10-14 05:46:40.947 UTC: 	 Running on: Linux lxplus9119.cern.ch 5.14.0-570.51.1.el9_6.x86_64 #1 SMP PREEMPT_DYNAMIC Sat Sep 27 01:10:11 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-10-14 05:46:40.947 UTC: 	 Not using Singularity
+DEBUG 2025-10-14 05:46:40.947 UTC: 	 Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+DEBUG 2025-10-14 05:46:40.947 UTC: 	 Executing command: 'kill'
+DEBUG 2025-10-14 05:46:40.947 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+DEBUG 2025-10-14 05:46:40.996 UTC: 	 Checking credentials
+DEBUG 2025-10-14 05:46:40.996 UTC: 	 Found proxy file /tmp/x509up_u180451
+DEBUG 2025-10-14 05:46:40.996 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-10-14 05:46:40.996 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u180451
+DEBUG 2025-10-14 05:46:41.020 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-10-14 05:46:41.020 UTC: 	 Getting proxy life time left
+DEBUG 2025-10-14 05:46:41.020 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u180451
+DEBUG 2025-10-14 05:46:41.042 UTC: 	 output : 691104
+691104
+
+ error: 
+ retcode : 0
+DEBUG 2025-10-14 05:46:41.043 UTC: 	 Proxy valid for 191:58:24 hours
+DEBUG 2025-10-14 05:46:41.043 UTC: 	 Encoded data for curl request: subresource=delegatedn
+DEBUG 2025-10-14 05:46:41.090 UTC: 	 Registering user credentials on myproxy for /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+DEBUG 2025-10-14 05:46:41.091 UTC: 	 Executing command :
+ voms-proxy-info --identity --file /tmp/x509up_u180451
+DEBUG 2025-10-14 05:46:41.114 UTC: 	 output : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+
+ error: 
+ retcode : 0
+DEBUG 2025-10-14 05:46:41.114 UTC: 	 Getting myproxy life time left for 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-10-14 05:46:41.114 UTC: 	 Executing command :
+ myproxy-info -s myproxy.cern.ch -l 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+DEBUG 2025-10-14 05:46:41.416 UTC: 	 output : username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6
+owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=amalhotr/CN=884837/CN=Aryan Malhotra
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod)-tw(01|02).cern.ch|/DC=ch/DC=cern/OU=computers/CN=crab-dev-tw(01|02|03|04).cern.ch|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=cmscrab/CN=(817881|373708)/CN=Robot: cms crab|/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=crabint1/CN=373708/CN=Robot: CMS CRAB Integration 1
+  timeleft: 695:02:00  (29.0 days)
+
+ error: 
+ retcode : 0
+DEBUG 2025-10-14 05:46:41.416 UTC: 	 Myproxy is valid: 2502120
+DEBUG 2025-10-14 05:46:41.417 UTC: 	 Result of myproxy credential check:
+  Credential exists on myproxy: username: 2382a3cf28fdeacb1de9b039908761ea517a5ed6  - validity: 28 days, 23:02:00
+DEBUG 2025-10-14 05:46:41.417 UTC: 	 Command use: kill
+DEBUG 2025-10-14 05:46:41.417 UTC: 	 Options use: ['-d', 'crab_Data_ScoutingPFRun3_FullPV_1mod20_v1']
+DEBUG 2025-10-14 05:46:41.417 UTC: 	 Encoded data for curl request: subresource=version
+DEBUG 2025-10-14 05:46:41.460 UTC: 	 CRABClient version: v3.250820
+DEBUG 2025-10-14 05:46:41.461 UTC: 	 Instance is prod
+DEBUG 2025-10-14 05:46:41.461 UTC: 	 Server base url is cmsweb.cern.ch
+DEBUG 2025-10-14 05:46:41.461 UTC: 	 Command api workflow
+DEBUG 2025-10-14 05:46:41.461 UTC: 	 Killing task 251009_014918:amalhotr_crab_Data_ScoutingPFRun3_FullPV_1mod20_v1
+DEBUG 2025-10-14 05:46:41.461 UTC: 	 Encoded data for curl request: workflow=251009_014918%3Aamalhotr_crab_Data_ScoutingPFRun3_FullPV_1mod20_v1
+DEBUG 2025-10-14 05:46:41.664 UTC: 	 Result: {'desc': {'columns': ['tm_taskname', 'tm_task_status', 'tm_task_command', 'tm_user_role', 'tm_user_group', 'tm_task_failure', 'tm_split_algo', 'tm_split_args', 'tm_save_logs', 'tm_username', 'tm_user_dn', 'tm_arguments', 'tm_input_dataset', 'tm_dbs_url', 'tm_task_warnings', 'tm_publication', 'tm_user_webdir', 'tm_output_dataset', 'tm_collector', 'tm_schedd', 'tm_dry_run', 'clusterid', 'tm_start_time', 'tw_name', 'tm_dagman_status', 'tm_num_jobs', 'tm_uploaded']}, 'result': [{'result': 'ok'}]}
+INFO 2025-10-14 05:46:41.664 UTC: 	 Kill request successfully sent
+INFO 2025-10-14 05:46:41.666 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_Data_ScoutingPFRun3_FullPV_1mod20_v1/crab.log
