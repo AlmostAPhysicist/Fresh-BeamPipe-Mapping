@@ -20,6 +20,8 @@
 #include "TTree.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
+// Use ROOT TVector3 for opening-angle computations
+#include "TVector3.h"
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
@@ -98,6 +100,16 @@ private:
     TH1F* h_vertex_phi;
     TH1F* h_vertex_mass;
     TH1F* h_ntracks_global;
+
+    // --- NEW: normalized chi^2 histograms (all vertices & selected vertices) ---
+    TH1F* h_vertex_chi2norm_all;
+    TH1F* h_vertex_chi2norm_selected;
+
+    // --- NEW: Track opening-angle histograms ---
+    TH1F* h_track_opening_angle_pair; // pairwise opening angles (all vertices)
+    TH1F* h_vertex_openingAngle_mean; // per-vertex mean opening angle (selected vertices)
+    TH1F* h_vertex_openingAngle_min;  // per-vertex min opening angle (selected vertices)
+    TH1F* h_vertex_openingAngle_max;  // per-vertex max opening angle (selected vertices)
     
     // Vertex distance histograms (all reference frames)
     TH1F* h_vertex_dBV00;       // wrt (0,0)
@@ -232,6 +244,16 @@ void ScoutingTreeMakerRun3::beginJob() {
     h_vertex_phi = fs->make<TH1F>("vertex_phi","Vertex phi; phi; Vertices",200,-3.14,3.14);
     h_vertex_mass = fs->make<TH1F>("vertex_mass","Vertex mass; mass [GeV/c^2]; Vertices",200,0.,10.);
     h_ntracks_global = fs->make<TH1F>("ntracks_global","Number of Tracks; Number of Tracks; Vertices",200,0,100);
+
+    // --- NEW: create normalized chi^2 histograms (all vs selected) ---
+    h_vertex_chi2norm_all = fs->make<TH1F>("vertex_chi2norm_all","Vertex normalized #chi^{2} (all); normalized #chi^{2}; Vertices",200,0.,20.);
+    h_vertex_chi2norm_selected = fs->make<TH1F>("vertex_chi2norm_selected","Vertex normalized #chi^{2} (selected); normalized #chi^{2}; Selected Vertices",200,0.,20.);
+
+    // --- NEW: Opening-angle histograms (angles in radians: 0..pi) ---
+    h_track_opening_angle_pair = fs->make<TH1F>("track_opening_angle_pair","Track opening angle (pairwise); Opening angle [rad]; Pairs",180,0.,3.141592653589793);
+    h_vertex_openingAngle_mean = fs->make<TH1F>("vertex_openingAngle_mean","Vertex mean opening angle; mean opening angle [rad]; Vertices",180,0.,3.141592653589793);
+    h_vertex_openingAngle_min  = fs->make<TH1F>("vertex_openingAngle_min","Vertex min opening angle; min opening angle [rad]; Vertices",180,0.,3.141592653589793);
+    h_vertex_openingAngle_max  = fs->make<TH1F>("vertex_openingAngle_max","Vertex max opening angle; max opening angle [rad]; Vertices",180,0.,3.141592653589793);
 
     // Distance histograms
     h_vertex_dBV00 = fs->make<TH1F>("vertex_dBV00","Vertex transverse distance d_{BV}^{00} (wrt (0,0)); d_{BV}^{00} [cm]; Vertices / 0.05 cm",200,0,10);
@@ -442,9 +464,42 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         vector<TrackRef> tks = vertex_track_vec(v);
         int ntk = static_cast<int>(tks.size());
 
+        // --- NEW: compute pairwise opening angles and per-vertex stats ---
+        double meanAngle = 0.0, minAngle = 0.0, maxAngle = 0.0;
+        {
+            double sumAngles = 0.0;
+            int npairs = 0;
+            minAngle = 1e9; maxAngle = 0.0;
+            for (int i = 0; i < ntk; ++i) {
+                const auto& ti = tks[i];
+                if (!ti.isNonnull()) continue;
+                TVector3 vi(ti->px(), ti->py(), ti->pz());
+                if (vi.Mag2() <= 0) continue;
+                for (int j = i+1; j < ntk; ++j) {
+                    const auto& tj = tks[j];
+                    if (!tj.isNonnull()) continue;
+                    TVector3 vj(tj->px(), tj->py(), tj->pz());
+                    if (vj.Mag2() <= 0) continue;
+                    const double angle = vi.Angle(vj); // ROOT TVector3 handles normalization and acos internally
+                    h_track_opening_angle_pair->Fill(angle); // per-pair, all vertices
+                    sumAngles += angle;
+                    ++npairs;
+                    if (angle < minAngle) minAngle = angle;
+                    if (angle > maxAngle) maxAngle = angle;
+                }
+            }
+            meanAngle = (npairs > 0) ? (sumAngles / npairs) : 0.0;
+            if (npairs == 0) { minAngle = 0.0; maxAngle = 0.0; }
+        }
+        // --- END NEW ---
+
         // Create 4-vector for vertex mass calculation
         TLorentzVector sumVec(0,0,0,0);
         double sum_dxy = 0.0, sum_dxyErr = 0.0;
+
+        // --- NEW: fill chi2 (all vertices) before selection ---
+        h_vertex_chi2norm_all->Fill(v.normalizedChi2());
+        // --- END NEW ---
 
         // Process tracks using proper methods
         for(auto track : tks) {
@@ -560,6 +615,10 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         // Vertex accepted - fill histograms
         ++nSelVertices;
 
+        // --- NEW: fill chi2 (selected vertices) ---
+        h_vertex_chi2norm_selected->Fill(v.normalizedChi2());
+        // --- END NEW ---
+
         // Fill basic vertex histograms
         h_ntracks_global->Fill(ntk);
         h_vertex_xy_global->Fill(v.x(), v.y());
@@ -569,6 +628,12 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         h_vertex_dBVref->Fill(dBVref);
         h_vertex_dBV00->Fill(dBV00);
         h_vertex_dBV_error->Fill(dBV_err);
+
+        // --- NEW: fill per-vertex opening-angle summaries for accepted vertices ---
+        h_vertex_openingAngle_mean->Fill(meanAngle);
+        h_vertex_openingAngle_min->Fill(minAngle);
+        h_vertex_openingAngle_max->Fill(maxAngle);
+        // --- END NEW ---
 
         // Region histograms - use the correct reference names
         if (PVBoundary1 != -1) {
