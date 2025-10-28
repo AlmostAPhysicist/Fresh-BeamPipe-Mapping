@@ -18,13 +18,13 @@ process.MessageLogger.debugModules = cms.untracked.vstring()  # Disable debug fo
 
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True),
-    TryToContinue = cms.untracked.vstring('ProductNotFound')
-    # numberOfThreads = cms.untracked.uint32(4),     # adjust to machine cores
-    # numberOfStreams = cms.untracked.uint32(0),     # let framework pick sensible streams
+    TryToContinue = cms.untracked.vstring('ProductNotFound'),
+    numberOfThreads = cms.untracked.uint32(4),    # adjust to machine cores
+    numberOfStreams = cms.untracked.uint32(0),     # let framework pick sensible streams
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(5000)  # Limited events for testing
+    input = cms.untracked.int32(500)  # Limited events for testing
     # input = cms.untracked.int32(150000)  # Local
     # input = cms.untracked.int32(500000)  # Process all events
     # input = cms.untracked.int32(-1)  # Process all events
@@ -65,7 +65,7 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # -------------------------- OUTPUT PATH --------------------------------
 #-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/ScoutingTree_MC_Local_test_3.root")
+    fileName = cms.string("test-outputs/ScoutingTree_MC_Local_test_9.root")
     # fileName = cms.string("outputs/Data_ScoutingTree_FullPV_Local_4.root")
     # fileName = cms.string("ScoutingTree_Output_PV.root")  # This is the only output saved
 )
@@ -91,22 +91,26 @@ process.load("TrackingTools.TransientTrack.TransientTrackBuilder_cfi")
 # 'PrimaryVertex', 'AvgPV', or 'PV': Use average primary vertex as primary reference
 referencePreference = 'BS'  # Default to BeamSpot
 
-# Update Vertexer configuration with corrected parameter names
+# Update Vertexer configuration with synchronized parameters
 process.Vertexer = cms.EDProducer('Vertexer',
     seed_tracks_src = cms.InputTag('hltScoutingUnpackProducer', 'Track'),
     # Change to match the name in fillDescriptions (primaryVertices instead of primaryVertices_src)
     primaryVertices = cms.InputTag("hltScoutingUnpackProducer", "PrimaryVertex"),  # vector of PVs; Vertexer will average them
     beamspot_src = cms.InputTag('offlineBeamSpot'),
     refPreference = cms.untracked.string(referencePreference),
-    
-    # Track selection parameters - correct types
+
+    # RESTORE original seed thresholds (used internally by Vertexer)
+    minSeedIPSig = cms.untracked.double(4.0),
+    minSeedPt    = cms.untracked.double(0.9),
+
+    # Other parameters (kept for downstream, but not used in seed preselection)
     pt_min_cut = cms.double(0.9),
     dxySig_min_cut = cms.double(4.0),
     dxySig_max_cut = cms.double(100.0),
-    npixelHits_min_cut = cms.int32(2),
-    ntrackerLayers_min_cut = cms.int32(4),
-    
-    # Existing parameters
+    npixelHits_min_cut = cms.int32(1),
+    nstripHits_min_cut = cms.int32(0),
+    ntrackerLayers_min_cut = cms.int32(5),
+
     n_tracks_per_seed_vertex = cms.int32(2),
     max_seed_vertex_chi2 = cms.double(5),
     resolve_split_vertices_loose = cms.bool(False),
@@ -128,11 +132,6 @@ process.Vertexer = cms.EDProducer('Vertexer',
     verbose = cms.bool(False),
 )
 
-# Fix minSeedIPSig/minSeedPt since they're defined in the untracked parameters
-# Remove these unnecessary parameters
-# process.Vertexer.minSeedIPSig = cms.untracked.double(4.0) # REMOVE
-# process.Vertexer.minSeedPt = cms.untracked.double(0.9)    # REMOVE
-
 # Step 3: Scouting Tree Maker
 process.scoutingTree = cms.EDAnalyzer('ScoutingTreeMakerRun3',
     required_ntk_min = cms.int32(2),
@@ -145,9 +144,23 @@ process.scoutingTree = cms.EDAnalyzer('ScoutingTreeMakerRun3',
     required_dxy_max = cms.double(-1),
     required_dBV_error = cms.double(-1),
     required_dxy_error = cms.double(-1),
-    refPreference = cms.untracked.string(referencePreference),  # Same reference preference
-    PVBoundary1 = cms.int32(20),  # Re-enable PV regions
-    PVBoundary2 = cms.int32(40),  # Re-enable PV regions
+    refPreference = cms.untracked.string(referencePreference),
+
+    # Seed-like plots: mirror Vertexer’s thresholds and 2D/3D toggle (plots only; no selection)
+    seed_minIPSig        = cms.untracked.double(process.Vertexer.minSeedIPSig.value()),
+    seed_minPt           = cms.untracked.double(process.Vertexer.minSeedPt.value()),
+    seed_maxIPSig        = cms.untracked.double(process.Vertexer.dxySig_max_cut.value()),
+    seed_minPixelHits    = cms.untracked.int32(process.Vertexer.npixelHits_min_cut.value()),
+    seed_minStripHits    = cms.untracked.int32(process.Vertexer.nstripHits_min_cut.value()),
+    seed_minTrackerLayers= cms.untracked.int32(process.Vertexer.ntrackerLayers_min_cut.value()),
+    seed_use2DTrackDist  = cms.untracked.bool(process.Vertexer.use_2d_track_dist.value()),
+
+    # Shared toggles for consistent definitions
+    use_2d_track_dist   = cms.bool(process.Vertexer.use_2d_track_dist.value()),
+    use_2d_vertex_dist  = cms.bool(process.Vertexer.use_2d_vertex_dist.value()),
+
+    PVBoundary1 = cms.int32(20),
+    PVBoundary2 = cms.int32(40),
     displacedVertices = cms.InputTag("Vertexer"),
     beamspot_src = cms.InputTag('offlineBeamSpot'),  # Same beamspot source as Vertexer
     tracks = cms.InputTag("hltScoutingUnpackProducer", "Track"), # Same tracks as Vertexer's seed_tracks_src

@@ -38,8 +38,10 @@
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/TrackReco/interface/HitPattern.h"
 
 #include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
+#include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/Math/interface/Point3D.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
@@ -182,6 +184,33 @@ private:
     // Fix: ESGetTokenT -> ESGetToken
     edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> ttBuilderToken_;
 
+    // --- NEW: seed-like selection controls (to mirror Vertexer) ---
+    const double seed_minIPSig_;
+    const double seed_minPt_;
+    const bool   seed_use2DTrackDist_;
+    // NEW: mirror Vertexer’s vertex-distance choice (2D vs 3D) for dBV plots
+    const bool   use_2d_vertex_dist_;
+    // NEW: complete Vertexer-like cuts (max IP and hit/layer thresholds)
+    const double seed_maxIPSig_;
+    const int    seed_minPixelHits_;
+    const int    seed_minStripHits_;
+    const int    seed_minTrackerLayers_;
+
+    // --- NEW: debug histograms for IP significance populations ---
+    // A) All tracks
+    TH1F* h_allTracks_ipSig_ref;
+    TH1F* h_allTracks_simpleDxySig;
+    TH1F* h_allTracks_pt;            // NEW
+    // B) Tracks associated to vertices
+    TH1F* h_vertexTracks_ipSig_ref;
+    TH1F* h_vertexTracks_ipSig_vtx;
+    TH1F* h_vertexTracks_pt;         // NEW
+    // C) Tracks that pass Vertexer cuts (aka “seed-like”)
+    TH1F* h_seedTracks_ipSig_ref;
+    TH1F* h_seedTracks_pt;
+    TH1F* h_seedTracks_eta;          // NEW
+    TH1F* h_seedTracks_phi;          // NEW
+
     // Helper methods
     typedef std::set<reco::TrackRef> track_set;
     typedef std::vector<reco::TrackRef> track_vec;
@@ -216,7 +245,27 @@ ScoutingTreeMakerRun3::ScoutingTreeMakerRun3(const edm::ParameterSet& iConfig):
     beamspot_token(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot_src"))),
     tracksToken(consumes<std::vector<reco::Track>>(iConfig.getParameter<edm::InputTag>("tracks"))),
     primaryVerticesToken(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("primaryVertices"))),
-    ttBuilderToken_(esConsumes(edm::ESInputTag("", "TransientTrackBuilder")))
+    // Fix member init order: ttBuilderToken_ is declared before seed_* in the class
+    ttBuilderToken_(esConsumes(edm::ESInputTag("", "TransientTrackBuilder"))),
+    // --- Harmonize seed/IP thresholds with Vertexer naming; fall back to legacy analyzer names ---
+    seed_minIPSig_( iConfig.existsAs<double>("minSeedIPSig", true) ? 
+                    iConfig.getUntrackedParameter<double>("minSeedIPSig") :
+                    iConfig.getUntrackedParameter<double>("seed_minIPSig", 4.0) ),
+    seed_minPt_(    iConfig.existsAs<double>("minSeedPt", true) ? 
+                    iConfig.getUntrackedParameter<double>("minSeedPt") :
+                    iConfig.getUntrackedParameter<double>("seed_minPt", 0.9) ),
+    // Use the same 2D/3D toggle as Vertexer if provided; otherwise fall back to the analyzer param
+    seed_use2DTrackDist_( iConfig.existsAs<bool>("use_2d_track_dist", true) ?
+                          iConfig.getParameter<bool>("use_2d_track_dist") :
+                          iConfig.getUntrackedParameter<bool>("seed_use2DTrackDist", false) ),
+    use_2d_vertex_dist_( iConfig.existsAs<bool>("use_2d_vertex_dist", true) ?
+                         iConfig.getParameter<bool>("use_2d_vertex_dist") :
+                         false ),
+    // NEW: thresholds to fully mirror Vertexer’s seed selection
+    seed_maxIPSig_(        iConfig.getUntrackedParameter<double>("seed_maxIPSig", 1e9) ),
+    seed_minPixelHits_(    iConfig.getUntrackedParameter<int>("seed_minPixelHits", 0) ),
+    seed_minStripHits_(    iConfig.getUntrackedParameter<int>("seed_minStripHits", 0) ),
+    seed_minTrackerLayers_(iConfig.getUntrackedParameter<int>("seed_minTrackerLayers", 0) )
 {
     usesResource("TFileService");
 }
@@ -282,6 +331,21 @@ void ScoutingTreeMakerRun3::beginJob() {
     // Primary vertex
     track_pmvtx.dxy = fs->make<TH1F>("track_dxy_pmvtx","Track dxy w.r.t. primary vertex (pmvtx); dxy_{PV} [cm]; Tracks",1000,-5,5);
     track_pmvtx.dxySig = fs->make<TH1F>("track_dxySig_pmvtx","Track dxy significance |dxy_{PV}/err|; |dxy_{PV}/err|; Tracks",200,0,50);
+
+    // --- NEW: debug histograms for IP significance populations ---
+    // A) All tracks
+    h_allTracks_ipSig_ref    = fs->make<TH1F>("allTracks_ipSig_ref",    "All tracks |IP| significance wrt ref; |IP|/err (ref); Tracks", 200, 0, 50);
+    h_allTracks_simpleDxySig = fs->make<TH1F>("allTracks_simpleDxySig", "All tracks |dxy|/err wrt (0,0,0); |dxy|/err; Tracks",          200, 0, 50);
+    h_allTracks_pt          = fs->make<TH1F>("allTracks_pt",          "All tracks p_{T}; p_{T} [GeV]; Tracks", 200, 0, 100); // NEW
+    // B) Tracks associated to vertices (weight >= 0.5)
+    h_vertexTracks_ipSig_ref = fs->make<TH1F>("vertexTracks_ipSig_ref", "Tracks-in-vertex |IP| significance wrt ref; |IP|/err (ref); Tracks", 200, 0, 50);
+    h_vertexTracks_ipSig_vtx = fs->make<TH1F>("vertexTracks_ipSig_vtx", "Tracks-in-vertex |IP| significance wrt fitted vertex; |IP|/err (vtx); Tracks", 200, 0, 50);
+    h_vertexTracks_pt         = fs->make<TH1F>("vertexTracks_pt", "Tracks-in-vertex p_{T}; p_{T} [GeV]; Tracks", 200, 0, 100); // NEW
+    // C) Tracks passing Vertexer cuts (aka “seed-like”)
+    h_seedTracks_ipSig_ref   = fs->make<TH1F>("seedTracks_ipSig_ref",   "Seed-like tracks |IP| significance wrt ref; |IP|/err (ref); Tracks", 200, 0, 50);
+    h_seedTracks_pt          = fs->make<TH1F>("seedTracks_pt",          "Seed-like tracks p_{T}; p_{T} [GeV]; Tracks", 200, 0, 100);
+    h_seedTracks_eta          = fs->make<TH1F>("seedTracks_eta",          "Seed-like tracks #eta; #eta; Tracks", 200, -3.0, 3.0); // NEW
+    h_seedTracks_phi          = fs->make<TH1F>("seedTracks_phi",          "Seed-like tracks #phi; #phi; Tracks", 200, -3.142, 3.142); // NEW
 
     // Track error histograms
     h_track_dxyError = fs->make<TH1F>("track_dxyError","Track dxy Uncertainty; dxy Error [cm]; Tracks",1000,0,0.1);
@@ -366,6 +430,52 @@ void ScoutingTreeMakerRun3::beginJob() {
     h_nvertices_ntk = fs->make<TH1F>("nvertices_ntk","Number of Candidate Vertices (ntk within cut); Number of Vertices; Events",1000,0,1000);
 }
 
+/*
+Glossary (TreeMaker):
+
+- Reference vertex (refVtx):
+  The same concept as Vertexer’s fake_ref_vtx: either avgPV (fixed diag covariance) or
+  BeamSpot (diagonal terms from BeamSpot). Chosen by refPreference with fallbacks.
+  Used to compute dBV and IP significance for tracks.
+
+- Impact Parameter (IP) and IP significance:
+  We compute |IP|/err wrt the selected refVtx using IPTools and TransientTrack.
+  The definition (2D transverse or 3D) follows seed_use2DTrackDist to mirror Vertexer.
+
+- Normalized chi^2 (chi2/ndof):
+  Vertex fit quality from reco::Vertex::normalizedChi2(). We fill all-vertex and selected-vertex
+  histograms for monitoring.
+
+- dBV (vertex-to-reference distance):
+  Distance between each displaced vertex and the chosen reference (refVtx), in 2D or 3D
+  per use_2d_vertex_dist; errors are from VertexDistanceXY/3D Measurement1D.
+
+- Track categories (how histograms are filled):
+  * All tracks:
+      Loop over the full track collection; compute |IP|/err(refVtx) and pT for each track.
+  * Seed-like tracks:
+      Same loop, apply only the Vertexer seed logic:
+        - pt > seed_minPt_
+        - |IP|/err(refVtx) > seed_minIPSig_
+      No hit/layer cuts and no IP upper bound. Fills seedTracks_* histograms.
+  * Vertex tracks:
+      Loop over each output displaced vertex; for tracks with weight >= 0.5:
+        - Fill |IP|/err wrt refVtx (vertexTracks_ipSig_ref)
+        - Fill |IP|/err wrt the fitted vertex (vertexTracks_ipSig_vtx)
+        - Fill pT (vertexTracks_pt)
+
+- Signed vs Absolute IP:
+  For the categories above we use absolute significance (magnitude). Signed versions are used
+  where explicitly requested (e.g., signedTransverseImpactParameter for dxy value plots).
+
+- Opening angles:
+  Pairwise opening angle between track momentum vectors in a vertex (using TVector3::Angle),
+  summarized per vertex (mean/min/max) for accepted vertices.
+
+- Region/barrel/endcap splits:
+  Simple kinematic/topology splits for monitoring, independent of the seed selection.
+*/
+
 void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     using namespace edm; using namespace std; using namespace reco;
 
@@ -398,16 +508,21 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         return;
     }
     
-    // Use proper instance for 2D vertex distance calculations
+    // Use proper instances for vertex distance calculations (2D/3D match Vertexer)
     VertexDistanceXY vertexDist2D;
-    
+    VertexDistance3D vertexDist3D;
+
     // Update histogram titles with actual reference type
     std::string refName = (refType == "avgPV" || refType == "avgPV (fallback)") ? "avgPV" : "BS";
     h_vertex_xy_ref->SetTitle(("Vertex XY Position (wrt " + refName + "); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
     track_ref.dxy->SetTitle(("Track dxy w.r.t. " + refName + "; dxy_{" + refName + "} [cm]; Tracks").c_str());
     track_ref.dxySig->SetTitle(("Track |dxy_{" + refName + "}/err|; |dxy_{" + refName + "}/err|; Tracks").c_str());
     h_vertex_dBVref->SetTitle(("Vertex transverse distance d_{BV}^{" + refName + "} (wrt " + refName + "); d_{BV}^{" + refName + "} [cm]; Vertices / 0.05 cm").c_str());
-    
+    // --- NEW: dynamic titles for debug IP significance histos ---
+    h_allTracks_ipSig_ref->SetTitle(("All tracks |IP| significance wrt " + refName + "; |IP|/err (" + refName + "); Tracks").c_str());
+    h_vertexTracks_ipSig_ref->SetTitle(("Tracks-in-vertex |IP| significance wrt " + refName + "; |IP|/err (" + refName + "); Tracks").c_str());
+    h_seedTracks_ipSig_ref->SetTitle(("Seed-like tracks |IP| significance wrt " + refName + "; |IP|/err (" + refName + "); Tracks").c_str());
+
     // Update region plot titles too
     if (PVBoundary1 != -1) {
         region_A.xy_ref->SetTitle(("Vertex XY (" + refName + "-centered, Region A); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
@@ -419,9 +534,55 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         region_C.dBV->SetTitle(("Vertex d_{BV}^{" + refName + "} (Region C); d_{BV}^{" + refName + "} [cm]; Vertices").c_str());
     }
 
+    // --- NEW: helper to compute |IP| significance wrt a vertex in 2D or 3D (mirrors seed setting) ---
+    auto ipSigWrtVertex = [&](const reco::TransientTrack& ttk, const reco::Vertex& vtx) -> std::pair<bool,double> {
+        if (seed_use2DTrackDist_) {
+            auto ip = IPTools::absoluteTransverseImpactParameter(ttk, vtx);
+            return {ip.first, ip.first ? ip.second.significance() : 0.0};
+        } else {
+            auto ip = IPTools::absoluteImpactParameter3D(ttk, vtx);
+            return {ip.first, ip.first ? ip.second.significance() : 0.0};
+        }
+    };
+
     // Fill beamspot comparisons if both available
     if (havePV && haveBS) {
         h_avg_primary_vertex_vs_beamspot->Fill(avgPVVtx.x() - bsVtx.x(), avgPVVtx.y() - bsVtx.y());
+    }
+
+    // --- NEW: A) ALL TRACKS + C) TRACKS PASSING VERTEXER CUTS (global, not per-vertex) ---
+    {
+        const math::XYZPoint origin(0.,0.,0.);
+        for (size_t i = 0; i < tracksH->size(); ++i) {
+            reco::TrackRef trRef(tracksH, i);
+            if (!trRef.isNonnull()) continue;
+
+            reco::TransientTrack ttk = ttBuilder.build(trRef);
+            auto ip_ref = ipSigWrtVertex(ttk, refVtx);
+
+            // A) All tracks
+            if (ip_ref.first && std::isfinite(ip_ref.second)) {
+                h_allTracks_ipSig_ref->Fill(std::fabs(ip_ref.second));
+            }
+            h_allTracks_pt->Fill(trRef->pt());
+            const double dxyErr = trRef->dxyError();
+            if (dxyErr > 0) {
+                const double dxy0 = trRef->dxy(origin);
+                h_allTracks_simpleDxySig->Fill(std::fabs(dxy0 / dxyErr));
+            }
+
+            // C) Tracks passing Vertexer cuts (mirror Vertexer: only pt and IPsig lower bounds)
+            if (trRef->pt() <= seed_minPt_) continue;
+            if (!(ip_ref.first && std::isfinite(ip_ref.second))) continue;
+            const double ipSigAbs = std::fabs(ip_ref.second);
+            if (ipSigAbs <= seed_minIPSig_) continue;
+            // No upper IP bound and no hit/layer requirements in Vertexer seeds
+            // Passed Vertexer-like cuts: fill seed-like histos
+            h_seedTracks_ipSig_ref->Fill(ipSigAbs);
+            h_seedTracks_pt->Fill(trRef->pt());
+            h_seedTracks_eta->Fill(trRef->eta());
+            h_seedTracks_phi->Fill(trRef->phi());
+        }
     }
 
     // PV region classification
@@ -461,6 +622,30 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
     // Process each displaced vertex
     for (unsigned int t = 0; t < verticesH->size(); ++t) {
         const auto& v = verticesH->at(t);
+
+        // --- B) TRACKS IN THIS VERTEX (before selection), weight >= 0.5 ---
+        for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
+            reco::TrackRef tr = it->castTo<reco::TrackRef>();
+            if (!tr.isNonnull()) continue;
+            if (v.trackWeight(*it) < 0.5) continue;
+
+            reco::TransientTrack ttk = ttBuilder.build(tr);
+
+            auto ip_ref = ipSigWrtVertex(ttk, refVtx);
+            if (ip_ref.first && std::isfinite(ip_ref.second)) {
+                h_vertexTracks_ipSig_ref->Fill(std::fabs(ip_ref.second));
+            }
+
+            // Use the same absolute 2D/3D computation wrt the fitted displaced vertex
+            auto ip_v = ipSigWrtVertex(ttk, v);
+            if (ip_v.first && std::isfinite(ip_v.second)) {
+                h_vertexTracks_ipSig_vtx->Fill(std::fabs(ip_v.second));
+            }
+
+            // NEW: pT for tracks-in-vertex
+            h_vertexTracks_pt->Fill(tr->pt());
+        }
+
         vector<TrackRef> tks = vertex_track_vec(v);
         int ntk = static_cast<int>(tks.size());
 
@@ -580,23 +765,27 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         double avg_dxyErr = (ntk > 0 ? sum_dxyErr / ntk : 0.0);
 
         // Calculate vertex distances using VertexDistanceXY for proper error propagation
-        Measurement1D dBVref_meas = vertexDist2D.distance(v, refVtx);
+        Measurement1D dBVref_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, refVtx)
+                                                         : vertexDist3D.distance(v, refVtx);
         double dBVref = dBVref_meas.value();
         double dBV_err = dBVref_meas.error();
         
         // Calculate origin distance using same method for consistency
         Vertex originVtx(Vertex::Point(0,0,0), Vertex::Error());
-        Measurement1D dBV00_meas = vertexDist2D.distance(v, originVtx);
+        Measurement1D dBV00_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, originVtx)
+                                                        : vertexDist3D.distance(v, originVtx);
         double dBV00 = dBV00_meas.value();
-        
+
         // Calculate distances to all reference points with proper error propagation
         if (havePV) {
-            Measurement1D dBVavgPV_meas = vertexDist2D.distance(v, avgPVVtx);
+            Measurement1D dBVavgPV_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, avgPVVtx)
+                                                               : vertexDist3D.distance(v, avgPVVtx);
             h_vertex_dBVavgPV->Fill(dBVavgPV_meas.value());
         }
         
         if (haveBS) {
-            Measurement1D dBVbs_meas = vertexDist2D.distance(v, bsVtx);
+            Measurement1D dBVbs_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, bsVtx)
+                                                            : vertexDist3D.distance(v, bsVtx);
             h_vertex_dBVbs->Fill(dBVbs_meas.value());
         }
 
@@ -713,86 +902,65 @@ std::pair<bool, std::string> ScoutingTreeMakerRun3::determineReferenceVertex(
     bool& haveBS,
     reco::Vertex& bsVtx) {
     
-    // Default return - reference not found
-    bool foundRef = false;
     std::string refType = "none";
     havePV = false;
     haveBS = false;
-    
-    // Try to get primary vertices and compute average
+
+    // Compute average PV position; covariance is set to match Vertexer (fixed diag; off-diagonals = 0)
     edm::Handle<std::vector<reco::Vertex>> primaryVerticesH;
     iEvent.getByToken(primaryVerticesToken, primaryVerticesH);
     if (primaryVerticesH.isValid() && !primaryVerticesH->empty()) {
-        double sumX=0, sumY=0, sumZ=0;
-        reco::Vertex::Error avgError = reco::Vertex::Error();
-        int validPVs=0;
-        
+        double sumX=0, sumY=0, sumZ=0; int validPVs=0;
         for (const auto& pv : *primaryVerticesH) {
             if (!pv.isFake() && pv.ndof() > 4) {
                 sumX += pv.x(); sumY += pv.y(); sumZ += pv.z();
-                // Accumulate covariance matrices properly
-                for (int i = 0; i < 3; ++i) {
-                    for (int j = i; j < 3; ++j) {
-                        avgError(i,j) += pv.covariance(i,j);
-                    }
-                }
-                ++validPVs;
                 h_primaryVertices_xy_global->Fill(pv.x(), pv.y());
+                ++validPVs;
             }
         }
-        
         if (validPVs > 0) {
             reco::Vertex::Point avgPos(sumX/validPVs, sumY/validPVs, sumZ/validPVs);
-            // Properly propagate errors for the average
-            for (int i = 0; i < 3; ++i) {
-                for (int j = i; j < 3; ++j) {
-                    avgError(i,j) /= validPVs*validPVs; // Proper error propagation for average
-                }
-            }
-            avgPVVtx = reco::Vertex(avgPos, avgError);
+            reco::Vertex::Error avgErr; // zero-initialized off-diagonals
+            for (int i=0;i<3;++i) for (int j=i;j<3;++j) avgErr(i,j)=0.0;
+            // Match Vertexer fixed uncertainties
+            avgErr(0,0)=0.0015*0.0015; // x
+            avgErr(1,1)=0.0015*0.0015; // y
+            avgErr(2,2)=0.0050*0.0050; // z
+            avgPVVtx = reco::Vertex(avgPos, avgErr);
             havePV = true;
-            edm::LogInfo("ScoutingTreeMakerRun3") << "Found average PV from " << validPVs << " valid vertices with propagated covariance";
         }
     }
-    
-    // Try to get beamspot
+
+    // Build beamspot fake vertex with diagonal covariances only (match Vertexer; zero off-diagonals)
     edm::Handle<reco::BeamSpot> beamspot;
     iEvent.getByToken(beamspot_token, beamspot);
     if (beamspot.isValid()) {
-        // Properly create a fake vertex with full beamspot covariance
-        bsVtx = reco::Vertex(beamspot->position(), beamspot->covariance3D());
+        reco::Vertex::Error bsErr;
+        for (int i=0;i<3;++i) for (int j=i;j<3;++j) bsErr(i,j)=0.0;
+        bsErr(0,0)=beamspot->covariance()(0,0);
+        bsErr(1,1)=beamspot->covariance()(1,1);
+        bsErr(2,2)=beamspot->covariance()(2,2);
+        bsVtx = reco::Vertex(beamspot->position(), bsErr);
         h_beamspot_global->Fill(beamspot->x0(), beamspot->y0());
         haveBS = true;
-        edm::LogInfo("ScoutingTreeMakerRun3") << "Found valid beamspot at (" 
-            << beamspot->x0() << ", " << beamspot->y0() << ", " << beamspot->z0() << ")";
     }
-    
-    // Select reference based on preference and availability
+
+    // Match Vertexer preference/fallback logic
     if (refPreference_ == RefPreference::PreferPV && havePV) {
-        refVtx = avgPVVtx;
-        foundRef = true;
-        refType = "avgPV";
-        edm::LogInfo("ScoutingTreeMakerRun3") << "Using avgPV as reference point";
+        refVtx = avgPVVtx; 
+        return {true, "avgPV"};
     } else if (refPreference_ == RefPreference::PreferBeamSpot && haveBS) {
-        refVtx = bsVtx;
-        foundRef = true;
-        refType = "beamspot";
-        edm::LogInfo("ScoutingTreeMakerRun3") << "Using beamspot as reference point";
+        refVtx = bsVtx;    
+        return {true, "beamspot"};
     } else if (havePV) {
-        // Fallback to avgPV
-        refVtx = avgPVVtx;
-        foundRef = true;
-        refType = "avgPV (fallback)";
-        edm::LogInfo("ScoutingTreeMakerRun3") << "Using avgPV as fallback reference point";
+        refVtx = avgPVVtx; 
+        return {true, "avgPV (fallback)"};
     } else if (haveBS) {
-        // Fallback to beamspot
-        refVtx = bsVtx;
-        foundRef = true;
-        refType = "beamspot (fallback)";
-        edm::LogInfo("ScoutingTreeMakerRun3") << "Using beamspot as fallback reference point";
+        refVtx = bsVtx;    
+        return {true, "beamspot (fallback)"};
     }
-    
-    return {foundRef, refType};
+
+    return {false, "none"};
 }
 
 void ScoutingTreeMakerRun3::endJob() {
@@ -819,6 +987,18 @@ void ScoutingTreeMakerRun3::fillDescriptions(edm::ConfigurationDescriptions& des
     desc.add<edm::InputTag>("tracks", edm::InputTag("hltScoutingUnpackProducer", "Track"));
     desc.add<edm::InputTag>("primaryVertices", edm::InputTag("hltScoutingPrimaryVertexPacker", "primaryVtx"));
     desc.addUntracked<std::string>("refPreference", "BeamSpot"); // Default to BeamSpot
+    // --- NEW: seed-like selection controls for analyzer-side reproduction ---
+    desc.addUntracked<double>("seed_minIPSig", 4.0);
+    desc.addUntracked<double>("seed_minPt", 0.9);
+    desc.addUntracked<bool>("seed_use2DTrackDist", false);
+    // Allow toggles to match Vertexer; these are tracked to accept cms.bool in the config
+    desc.add<bool>("use_2d_track_dist", false);
+    desc.add<bool>("use_2d_vertex_dist", false);
+    // --- NEW: full Vertexer-like thresholds for seed-like plots (optional) ---
+    desc.addUntracked<double>("seed_maxIPSig", 1e9);
+    desc.addUntracked<int>("seed_minPixelHits", 0);
+    desc.addUntracked<int>("seed_minStripHits", 0);
+    desc.addUntracked<int>("seed_minTrackerLayers", 0);
     descriptions.add("scoutingTreeMakerRun3", desc);
 }
 

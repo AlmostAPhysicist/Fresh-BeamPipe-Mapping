@@ -112,7 +112,14 @@ private:
   const bool investigate_merged_vertices;
   const bool verbose;
 
-  // new, configurable seed thresholds (default values preserve current behaviour)
+  // REMOVE legacy-style seed knobs that changed physics
+  // const double pt_min_cut_;
+  // const double dxySig_min_cut_;
+  // const double dxySig_max_cut_;
+  // const int    npixelHits_min_cut_;
+  // const int    nstripHits_min_cut_;
+  // const int    ntrackerLayers_min_cut_;
+  // RESTORE original seed knobs
   const double minSeedIPSig;
   const double minSeedPt;
 
@@ -218,6 +225,66 @@ private:
 
 };
 
+/*
+Glossary (Vertexer):
+
+- Impact Parameter (IP):
+  The distance of closest approach (DCA) between a track and a reference point/vertex.
+  Two common definitions:
+    * Transverse IP (dxy): distance in the XY plane (perpendicular to beam).
+    * 3D IP: full 3D distance to the reference.
+
+- IP Significance:
+  The impact parameter divided by its estimated uncertainty: IP / sigma(IP).
+  We use IPTools to compute Measurement1D and take significance().
+  Larger significance means more inconsistent with originating at the reference.
+
+- Signed vs Absolute IP:
+  IPTools provides signedTransverseImpactParameter (with a sign from track direction)
+  and absolute(Transverse/3D)ImpactParameter (magnitude only). For seed selection we use
+  absolute IP significance (magnitude), via track_dist() which switches between 2D/3D
+  using the use_2d_track_dist configuration.
+
+- fake_ref_vtx (reference vertex):
+  A proxy reco::Vertex used for distances/IP:
+    * avgPV: average position of good primary vertices with fixed diagonal covariance
+      (0.0015^2, 0.0015^2, 0.005^2), off-diagonals = 0.
+    * BeamSpot: beam spot position with diagonal covariance terms from the BeamSpot;
+      off-diagonals = 0. Selected via refPreference (PV or BeamSpot) with fallback.
+
+- TransientTrack:
+  A wrapper (TrackingTools) around a reco::Track that provides trajectory state in the
+  magnetic field and extrapolation helpers. Required by IPTools to compute IP and its
+  uncertainty consistently.
+
+- VertexDistanceXY / VertexDistance3D:
+  Utilities to compute the distance and uncertainty between two vertices in XY (2D) or 3D.
+  We use these to compute dBV (vertex-to-reference distance) and to decide split-vertex merges.
+
+- Normalized chi^2 (chi2/ndof):
+  From KalmanVertexFitter. The vertex fit chi^2 divided by the number of degrees of freedom.
+  Lower is better; we keep seed vertices with normalizedChi2 < max_seed_vertex_chi2 (default 5).
+
+- dBV:
+  The distance between a displaced vertex and the chosen reference (avgPV or BeamSpot),
+  computed in XY (2D) or 3D consistently with configuration. Used in merging/plots.
+
+- Seed tracks vs Vertex tracks:
+  * Seed tracks: global preselection (pt > minSeedPt and |IP|/err(ref) > minSeedIPSig),
+    computed via track_dist and fake_ref_vtx. No hit/layer cuts and no IP upper bound.
+  * Vertex tracks: the tracks attached to final fitted vertices after sharing resolution
+    and merging; internally restricted by vertexing/arbitration logic.
+
+- Track weight in vertex:
+  reco::Vertex carries weights per track; analysis typically uses weight >= 0.5 as “in vertex”.
+
+- KalmanVertexFitter / TransientVertex:
+  The fitter returns TransientVertex objects; we accept vertices with normalisedChiSquared < 5
+  and then convert to reco::Vertex for output.
+*/
+
+// ...existing code...
+
 //
 // constants, enums and typedefs
 //
@@ -253,8 +320,19 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
   verbose(params.getParameter<bool>("verbose")),
   
   // read new params (provide same defaults as current hard-coded values)
+  // REMOVE these (do not read minSeed*)
+  // minSeedIPSig(params.getUntrackedParameter<double>("minSeedIPSig", 4.0)),
+  // minSeedPt(params.getUntrackedParameter<double>("minSeedPt", 0.9)),
+  // Keep only legacy-style cuts; defaults keep current behavior
+  // pt_min_cut_(             params.existsAs<double>("pt_min_cut")             ? params.getParameter<double>("pt_min_cut")             : -1.0),
+  // dxySig_min_cut_(         params.existsAs<double>("dxySig_min_cut")         ? params.getParameter<double>("dxySig_min_cut")         : -1.0),
+  // dxySig_max_cut_(         params.existsAs<double>("dxySig_max_cut")         ? params.getParameter<double>("dxySig_max_cut")         :  1e9),
+  // npixelHits_min_cut_(     params.existsAs<int>("npixelHits_min_cut")        ? params.getParameter<int>("npixelHits_min_cut")        :  0),
+  // nstripHits_min_cut_(     params.existsAs<int>("nstripHits_min_cut")        ? params.getParameter<int>("nstripHits_min_cut")        :  0),
+  // ntrackerLayers_min_cut_( params.existsAs<int>("ntrackerLayers_min_cut")    ? params.getParameter<int>("ntrackerLayers_min_cut")    :  0),
+  // RESTORE original seed thresholds (defaults match your working config)
   minSeedIPSig(params.getUntrackedParameter<double>("minSeedIPSig", 4.0)),
-  minSeedPt(params.getUntrackedParameter<double>("minSeedPt", 0.9)),
+  minSeedPt   (params.getUntrackedParameter<double>("minSeedPt",    0.9)),
   refPreference_(params.getUntrackedParameter<std::string>("refPreference", "BeamSpot") == "PV" ? 
                   RefPreference::PreferPV : RefPreference::PreferBeamSpot),
   primaryVerticesToken_((params.existsAs<edm::InputTag>("primaryVertices_src") || 
@@ -326,7 +404,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     iEvent.getByToken(beamspotToken_, bs);
     if (bs.isValid()) {
       ref_x = bs->position().x(); ref_y = bs->position().y(); ref_z = bs->position().z();
-      // use diagonal terms; zeroed off-diagonals remain zero
+      // RESTORE original: diagonal-only covariance (off-diagonals zero)
       ref_error(0,0)=bs->covariance()(0,0);
       ref_error(1,1)=bs->covariance()(1,1);
       ref_error(2,2)=bs->covariance()(2,2);
@@ -369,7 +447,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // TransientTrack builder
   auto const& tt_builder = iSetup.getData(token_builder);
 
-  // Seed track selection
+  // Seed track selection (apply each cut once)
   std::vector<reco::TransientTrack> seed_tracks;
   seed_tracks.reserve(seed_track_handle->size());
   std::unordered_map<unsigned int,size_t> seed_track_ref_map;
@@ -378,17 +456,24 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   for (size_t i_tk=0; i_tk<seed_track_handle->size(); ++i_tk) {
     edm::Ref<reco::TrackCollection> tk_ref(seed_track_handle, i_tk);
     reco::TransientTrack ttk = tt_builder.build(tk_ref);
+    // RESTORE original: use track_dist (2D/3D according to use_2d_track_dist)
     auto ttk_dist = track_dist(ttk, fake_ref_vtx);
     if (!ttk_dist.first) continue;
-    float IP_sig = ttk_dist.second.significance();
-    if (std::isfinite(IP_sig) && IP_sig > minSeedIPSig && tk_ref->pt() > minSeedPt) {
-      seed_track_ref_map[tk_ref.key()] = seed_tracks.size();
-      seed_tracks.emplace_back(std::move(ttk));
-    }
+
+    const float IP_sig = ttk_dist.second.significance();
+    if (!std::isfinite(IP_sig)) continue;
+
+    // RESTORE original seed preselection: only IPsig and pT
+    if (!(IP_sig > minSeedIPSig)) continue;
+    if (!(tk_ref->pt() > minSeedPt)) continue;
+
+    // Keep the seed
+    seed_track_ref_map[tk_ref.key()] = seed_tracks.size();
+    seed_tracks.emplace_back(std::move(ttk));
+
     if (verbose)
-      printf("Seed preselect: key=%u pt=%.3f IPsig(ref)=%.3f %s\n",
-             tk_ref.key(), tk_ref->pt(), IP_sig,
-             (IP_sig > minSeedIPSig ? "KEPT" : "REJ"));
+      printf("Seed preselect: key=%u pt=%.3f IPsig(ref)=%.3f KEPT\n",
+             tk_ref.key(), tk_ref->pt(), IP_sig);
   }
 
   // build safe lambda (bounds + cache) REPLACES previous version
@@ -821,14 +906,15 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
           // Distances/angles relative to reference (avgPV or beamspot)
           Measurement1D dBV0_Meas1D = vertex_dist_2d.distance(*v[0], fake_ref_vtx);
           Measurement1D dBV1_Meas1D = vertex_dist_2d.distance(*v[1], fake_ref_vtx);
-          double dBV0 = dBV0_Meas1D.value();  // added
-          double dBV1 = dBV1_Meas1D.value();  // added
+          double dBV0 = dBV0_Meas1D.value();
+          double dBV1 = dBV1_Meas1D.value();
           double v0x = v[0]->x() - ref_x;
           double v0y = v[0]->y() - ref_y;
           double phi0 = atan2(v0y, v0x);
           double v1x = v[1]->x() - ref_x;
           double v1y = v[1]->y() - ref_y;
           double phi1 = atan2(v1y, v1x);
+          // RESTORE original threshold: svdist2d < 0.0300
           if (fabs(reco::deltaPhi(phi0, phi1)) < 0.5 && v_dist.value() < 0.0300 && dBV0 > 0.0100 && dBV1 > 0.0100) {
             track_set tracks_to_fit;
             for (int i = 0; i < 2; ++i)
