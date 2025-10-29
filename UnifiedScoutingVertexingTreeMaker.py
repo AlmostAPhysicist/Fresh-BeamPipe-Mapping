@@ -65,7 +65,7 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # -------------------------- OUTPUT PATH --------------------------------
 #-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/ScoutingTree_MC_Local_test_9.root")
+    fileName = cms.string("test-outputs/ScoutingTree_MC_Local_test_10.root")
     # fileName = cms.string("outputs/Data_ScoutingTree_FullPV_Local_4.root")
     # fileName = cms.string("ScoutingTree_Output_PV.root")  # This is the only output saved
 )

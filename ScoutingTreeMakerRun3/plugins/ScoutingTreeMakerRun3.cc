@@ -84,102 +84,117 @@ private:
     const edm::EDGetTokenT<std::vector<reco::Track>> tracksToken;
     const edm::EDGetTokenT<std::vector<reco::Vertex>> primaryVerticesToken;
 
-    // ----- Histograms organized by category -----
+    // ----- Reorganized Histogram Structure -----
     
-    // Primary vertex and beamspot histograms
-    TH1F* h_nPrimaryVertices;
-    TH2F* h_primaryVertices_xy_global;
-    TH2F* h_beamspot_global;
-    TH2F* h_avg_primary_vertex_vs_beamspot;
-    
-    // Vertex position histograms
-    TH2F* h_vertex_xy_global;
-    TH2F* h_vertex_xy_ref; // Reference-centered
-    
-    // Vertex kinematic histograms
-    TH1F* h_vertex_pt;
-    TH1F* h_vertex_eta;
-    TH1F* h_vertex_phi;
-    TH1F* h_vertex_mass;
-    TH1F* h_ntracks_global;
+    // Event-level histograms
+    struct EventHistos {
+        TH1F* nPrimaryVertices;
+        TH1F* nSelectedVertices;
+        TH2F* primaryVertices_xy;
+        TH2F* beamspot_xy;
+        TH2F* avgPV_vs_beamspot;
+    } event_;
 
-    // --- NEW: normalized chi^2 histograms (all vertices & selected vertices) ---
-    TH1F* h_vertex_chi2norm_all;
-    TH1F* h_vertex_chi2norm_selected;
+    // Vertex histograms organized by category
+    struct VertexHistos {
+        // All vertices (before cuts)
+        struct {
+            TH1F* chi2norm;
+            TH1F* nTracks;
+        } all;
+        
+        // Selected vertices (after cuts)
+        struct {
+            TH1F* chi2norm;
+            TH1F* pt;
+            TH1F* eta;
+            TH1F* phi;
+            TH1F* mass;
+            TH1F* nTracks;
+            TH2F* xy_global;
+            TH2F* xy_ref;
+            
+            // Distance measurements
+            struct {
+                TH1F* dBV_origin;
+                TH1F* dBV_ref;
+                TH1F* dBV_beamspot;
+                TH1F* dBV_avgPV;
+                TH1F* dBV_error;
+            } distance;
+            
+            // Opening angles
+            struct {
+                TH1F* pairwise;
+                TH1F* mean;
+                TH1F* min;
+                TH1F* max;
+            } openingAngle;
+            
+            // Topology-based
+            struct {
+                TH1F* eta;
+                TH1F* mass;
+                TH1F* dBV;
+                TH2F* xy_global;
+                TH2F* xy_ref;
+            } barrel, endcap, leftEndcap, rightEndcap;
+            
+            // PV-region based
+            struct {
+                TH1F* mass;
+                TH1F* dBV;
+                TH2F* xy_global;
+                TH2F* xy_ref;
+            } regionA, regionB, regionC;
+        } selected;
+    } vertices_;
 
-    // --- NEW: Track opening-angle histograms ---
-    TH1F* h_track_opening_angle_pair; // pairwise opening angles (all vertices)
-    TH1F* h_vertex_openingAngle_mean; // per-vertex mean opening angle (selected vertices)
-    TH1F* h_vertex_openingAngle_min;  // per-vertex min opening angle (selected vertices)
-    TH1F* h_vertex_openingAngle_max;  // per-vertex max opening angle (selected vertices)
-    
-    // Vertex distance histograms (all reference frames)
-    TH1F* h_vertex_dBV00;       // wrt (0,0)
-    TH1F* h_vertex_dBVref;      // wrt selected reference
-    TH1F* h_vertex_dBVbs;       // wrt beamspot
-    TH1F* h_vertex_dBVavgPV;    // wrt avgPV
-    TH1F* h_vertex_dBV_error;   // distance uncertainty
-    
-    // Track measurement histograms (organized by reference point)
-    struct TrackMeasurements {
-        TH1F* dxy;        // Impact parameter
-        TH1F* dxySig;     // Impact parameter significance
-    };
-    
-    // All track measurements by reference point
-    TrackMeasurements track_origin;    // wrt (0,0)
-    TrackMeasurements track_ref;       // wrt selected reference
-    TrackMeasurements track_bs;        // wrt beamspot
-    TrackMeasurements track_avgPV;     // wrt avgPV
-    TrackMeasurements track_pmvtx;     // wrt primary vertex
-    
-    // Track error histograms
-    TH1F* h_track_dxyError;
-    TH1F* h_track_dxyError_barrel;
-    TH1F* h_track_dxyError_endcap;
-    
-    // Track property histograms
-    TH1F* h_track_momenta_global;
-    TH1F* h_eta_distribution_global;
-    TH1F* h_phi_distribution_global;
-    
-    // Barrel/Endcap histograms
-    struct BarrelEndcapHistos {
-        TH1F* eta;
-        TH1F* dBV;
-        TH1F* mass;
-        TH2F* xy_global;
-        TH2F* xy_ref;
-    };
-    
-    BarrelEndcapHistos barrel;
-    BarrelEndcapHistos endcap;
-    
-    // Endcap side-specific histograms
-    struct EndcapSideHistos {
-        TH1F* eta;
-        TH1F* dBV;
-        TH1F* mass;
-        TH2F* xy_global;
-    };
-    
-    EndcapSideHistos left_endcap;
-    EndcapSideHistos right_endcap;
-    
-    // Region-specific histograms (PV count regions)
-    struct RegionHistos {
-        TH2F* xy_global;
-        TH2F* xy_ref;
-        TH1F* dBV;
-        TH1F* mass;
-    };
-    
-    RegionHistos region_A;
-    RegionHistos region_B;
-    RegionHistos region_C;
-    
-    // Summary histograms
-    TH1F* h_nvertices_ntk;
+    // Track histograms organized by category
+    struct TrackHistos {
+        // All tracks
+        struct {
+            TH1F* pt;
+            TH1F* eta;
+            TH1F* phi;
+            TH1F* momentum;
+            
+            struct {
+                TH1F* ipSig_ref;
+                TH1F* dxy_origin;
+                TH1F* dxySig_origin;
+                TH1F* dxy_ref;
+                TH1F* dxySig_ref;
+                TH1F* dxy_beamspot;
+                TH1F* dxySig_beamspot;
+                TH1F* dxy_avgPV;
+                TH1F* dxySig_avgPV;
+                TH1F* dxyError;
+                TH1F* dxyError_barrel;
+                TH1F* dxyError_endcap;
+            } ip;
+        } all;
+        
+        // Seed-like tracks (passing Vertexer cuts)
+        struct {
+            TH1F* pt;
+            TH1F* eta;
+            TH1F* phi;
+            TH1F* ipSig_ref;
+        } seed;
+        
+        // Vertex-associated tracks
+        struct {
+            TH1F* pt;
+            TH1F* eta;
+            TH1F* phi;
+            TH1F* momentum;
+            TH1F* ipSig_ref;
+            TH1F* ipSig_vtx;
+            TH1F* dxy_primaryVtx;
+            TH1F* dxySig_primaryVtx;
+        } vertex;
+    } tracks_;
 
     // Fix: ESGetTokenT -> ESGetToken
     edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> ttBuilderToken_;
@@ -277,114 +292,87 @@ ScoutingTreeMakerRun3::~ScoutingTreeMakerRun3() {
 void ScoutingTreeMakerRun3::beginJob() {
     edm::Service<TFileService> fs;
     
-    // Primary vertex & beamspot histograms
-    h_nPrimaryVertices = fs->make<TH1F>("nPrimaryVertices","Number of Primary Vertices; Number of Primary Vertices; Events",100,0,100);
-    h_primaryVertices_xy_global = fs->make<TH2F>("primaryVertices_xy_global","Primary Vertices XY Position (Global); X [cm]; Y [cm]",400,-1,1,400,-1,1);
-    h_beamspot_global = fs->make<TH2F>("beamspot_global","Beamspot Position (Global ref = (0,0)); x0 [cm]; y0 [cm]",400,-1,1,400,-1,1);
-    h_avg_primary_vertex_vs_beamspot = fs->make<TH2F>("avg_primary_vertex_vs_beamspot","Average Primary Vertex - Beamspot; x_{avgPV}-x_{BS} [cm]; y_{avgPV}-y_{BS} [cm]",400,-1,1,400,-1,1);
+    // ==================== EVENT LEVEL ====================
+    TFileDirectory eventDir = fs->mkdir("Event");
+    event_.nPrimaryVertices = eventDir.make<TH1F>("nPrimaryVertices","Number of Primary Vertices; nPV; Events",100,0,100);
+    event_.nSelectedVertices = eventDir.make<TH1F>("nSelectedVertices","Number of Selected Vertices; N_{vtx}; Events",1000,0,1000);
+    event_.primaryVertices_xy = eventDir.make<TH2F>("primaryVertices_xy","Primary Vertices XY; X [cm]; Y [cm]",400,-1,1,400,-1,1);
+    event_.beamspot_xy = eventDir.make<TH2F>("beamspot_xy","Beamspot Position; x_{BS} [cm]; y_{BS} [cm]",400,-1,1,400,-1,1);
+    event_.avgPV_vs_beamspot = eventDir.make<TH2F>("avgPV_vs_beamspot","AvgPV - Beamspot; #Delta x [cm]; #Delta y [cm]",400,-1,1,400,-1,1);
 
-    // Vertex position histograms
-    h_vertex_xy_global = fs->make<TH2F>("vertex_xy_global","Vertex XY Position (Global); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
-    h_vertex_xy_ref = fs->make<TH2F>("vertex_xy_ref","Vertex XY Position (ref-centered); X-ref_x [cm]; Y-ref_y [cm]",2000,-10,10,2000,-10,10);
-
-    // Vertex kinematic histograms
-    h_vertex_pt = fs->make<TH1F>("vertex_pt","Vertex pT; pT [GeV/c]; Vertices",200,0.,100.);
-    h_vertex_eta = fs->make<TH1F>("vertex_eta","Vertex eta; eta; Vertices",200,-5.,5.);
-    h_vertex_phi = fs->make<TH1F>("vertex_phi","Vertex phi; phi; Vertices",200,-3.14,3.14);
-    h_vertex_mass = fs->make<TH1F>("vertex_mass","Vertex mass; mass [GeV/c^2]; Vertices",200,0.,10.);
-    h_ntracks_global = fs->make<TH1F>("ntracks_global","Number of Tracks; Number of Tracks; Vertices",200,0,100);
-
-    // --- NEW: create normalized chi^2 histograms (all vs selected) ---
-    h_vertex_chi2norm_all = fs->make<TH1F>("vertex_chi2norm_all","Vertex normalized #chi^{2} (all); normalized #chi^{2}; Vertices",200,0.,20.);
-    h_vertex_chi2norm_selected = fs->make<TH1F>("vertex_chi2norm_selected","Vertex normalized #chi^{2} (selected); normalized #chi^{2}; Selected Vertices",200,0.,20.);
-
-    // --- NEW: Opening-angle histograms (angles in radians: 0..pi) ---
-    h_track_opening_angle_pair = fs->make<TH1F>("track_opening_angle_pair","Track opening angle (pairwise); Opening angle [rad]; Pairs",180,0.,3.141592653589793);
-    h_vertex_openingAngle_mean = fs->make<TH1F>("vertex_openingAngle_mean","Vertex mean opening angle; mean opening angle [rad]; Vertices",180,0.,3.141592653589793);
-    h_vertex_openingAngle_min  = fs->make<TH1F>("vertex_openingAngle_min","Vertex min opening angle; min opening angle [rad]; Vertices",180,0.,3.141592653589793);
-    h_vertex_openingAngle_max  = fs->make<TH1F>("vertex_openingAngle_max","Vertex max opening angle; max opening angle [rad]; Vertices",180,0.,3.141592653589793);
-
-    // Distance histograms
-    h_vertex_dBV00 = fs->make<TH1F>("vertex_dBV00","Vertex transverse distance d_{BV}^{00} (wrt (0,0)); d_{BV}^{00} [cm]; Vertices / 0.05 cm",200,0,10);
-    h_vertex_dBVref = fs->make<TH1F>("vertex_dBVref","Vertex transverse distance (wrt reference); d_{BV} [cm]; Vertices / 0.05 cm",200,0,10);
-    h_vertex_dBVbs = fs->make<TH1F>("vertex_dBVbs","Vertex transverse distance (wrt BeamSpot); d_{BV}^{BS} [cm]; Vertices / 0.05 cm",200,0,10);
-    h_vertex_dBVavgPV = fs->make<TH1F>("vertex_dBVavgPV","Vertex transverse distance (wrt avgPV); d_{BV}^{avgPV} [cm]; Vertices / 0.05 cm",200,0,10);
-    h_vertex_dBV_error = fs->make<TH1F>("vertex_dBV_error_avgPV","Vertex d_{BV}^{avgPV} Uncertainty; d_{BV}^{avgPV} Unc [cm]; Entries",1000,0,0.1);
-
-    // Track measurements by reference point
-    // Origin (0,0)
-    track_origin.dxy = fs->make<TH1F>("track_dxy_00","Track dxy w.r.t. global origin (0,0); dxy_{00} [cm]; Tracks",1000,-5,5);
-    track_origin.dxySig = fs->make<TH1F>("track_dxySig_00","Track dxy significance |dxy_{00}/err|; |dxy_{00}/err|; Tracks",200,0,50);
+    // ==================== VERTICES ====================
+    TFileDirectory verticesDir = fs->mkdir("Vertices");
     
-    // Reference (will be updated at runtime)
-    track_ref.dxy = fs->make<TH1F>("track_dxy_ref","Track dxy w.r.t. reference; dxy [cm]; Tracks",1000,-5,5);
-    track_ref.dxySig = fs->make<TH1F>("track_dxySig_ref","Track |dxy/err| w.r.t. reference; |dxy/err|; Tracks",200,0,50);
+    // All vertices (before selection)
+    TFileDirectory vtxAllDir = verticesDir.mkdir("All");
+    vertices_.all.chi2norm = vtxAllDir.make<TH1F>("chi2norm","Vertex #chi^{2}/ndof (all); #chi^{2}/ndof; Vertices",200,0,20);
+    vertices_.all.nTracks = vtxAllDir.make<TH1F>("nTracks","Number of Tracks (all); N_{tracks}; Vertices",200,0,100);
     
-    // BeamSpot
-    track_bs.dxy = fs->make<TH1F>("track_dxy_bs","Track dxy w.r.t. BeamSpot; dxy_{BS} [cm]; Tracks",1000,-5,5);
-    track_bs.dxySig = fs->make<TH1F>("track_dxySig_bs","Track |dxy_{BS}/err|; |dxy_{BS}/err|; Tracks",200,0,50);
+    // Selected vertices
+    TFileDirectory vtxSelDir = verticesDir.mkdir("Selected");
     
-    // Average PV
-    track_avgPV.dxy = fs->make<TH1F>("track_dxy_avgPV","Track dxy w.r.t. avgPV; dxy_{avgPV} [cm]; Tracks",1000,-5,5);
-    track_avgPV.dxySig = fs->make<TH1F>("track_dxySig_avgPV","Track |dxy_{avgPV}/err|; |dxy_{avgPV}/err|; Tracks",200,0,50);
+    // Basic kinematics
+    TFileDirectory vtxKinDir = vtxSelDir.mkdir("Kinematics");
+    vertices_.selected.chi2norm = vtxKinDir.make<TH1F>("chi2norm","Vertex #chi^{2}/ndof; #chi^{2}/ndof; Vertices",200,0,20);
+    vertices_.selected.pt = vtxKinDir.make<TH1F>("pt","Vertex p_{T}; p_{T} [GeV]; Vertices",200,0,100);
+    vertices_.selected.eta = vtxKinDir.make<TH1F>("eta","Vertex #eta; #eta; Vertices",200,-5,5);
+    vertices_.selected.phi = vtxKinDir.make<TH1F>("phi","Vertex #phi; #phi; Vertices",200,-3.14,3.14);
+    vertices_.selected.mass = vtxKinDir.make<TH1F>("mass","Vertex Mass; Mass [GeV]; Vertices",200,0,10);
+    vertices_.selected.nTracks = vtxKinDir.make<TH1F>("nTracks","Number of Tracks; N_{tracks}; Vertices",200,0,100);
     
-    // Primary vertex
-    track_pmvtx.dxy = fs->make<TH1F>("track_dxy_pmvtx","Track dxy w.r.t. primary vertex (pmvtx); dxy_{PV} [cm]; Tracks",1000,-5,5);
-    track_pmvtx.dxySig = fs->make<TH1F>("track_dxySig_pmvtx","Track dxy significance |dxy_{PV}/err|; |dxy_{PV}/err|; Tracks",200,0,50);
-
-    // --- NEW: debug histograms for IP significance populations ---
-    // A) All tracks
-    h_allTracks_ipSig_ref    = fs->make<TH1F>("allTracks_ipSig_ref",    "All tracks |IP| significance wrt ref; |IP|/err (ref); Tracks", 200, 0, 50);
-    h_allTracks_simpleDxySig = fs->make<TH1F>("allTracks_simpleDxySig", "All tracks |dxy|/err wrt (0,0,0); |dxy|/err; Tracks",          200, 0, 50);
-    h_allTracks_pt          = fs->make<TH1F>("allTracks_pt",          "All tracks p_{T}; p_{T} [GeV]; Tracks", 200, 0, 100); // NEW
-    // B) Tracks associated to vertices (weight >= 0.5)
-    h_vertexTracks_ipSig_ref = fs->make<TH1F>("vertexTracks_ipSig_ref", "Tracks-in-vertex |IP| significance wrt ref; |IP|/err (ref); Tracks", 200, 0, 50);
-    h_vertexTracks_ipSig_vtx = fs->make<TH1F>("vertexTracks_ipSig_vtx", "Tracks-in-vertex |IP| significance wrt fitted vertex; |IP|/err (vtx); Tracks", 200, 0, 50);
-    h_vertexTracks_pt         = fs->make<TH1F>("vertexTracks_pt", "Tracks-in-vertex p_{T}; p_{T} [GeV]; Tracks", 200, 0, 100); // NEW
-    // C) Tracks passing Vertexer cuts (aka “seed-like”)
-    h_seedTracks_ipSig_ref   = fs->make<TH1F>("seedTracks_ipSig_ref",   "Seed-like tracks |IP| significance wrt ref; |IP|/err (ref); Tracks", 200, 0, 50);
-    h_seedTracks_pt          = fs->make<TH1F>("seedTracks_pt",          "Seed-like tracks p_{T}; p_{T} [GeV]; Tracks", 200, 0, 100);
-    h_seedTracks_eta          = fs->make<TH1F>("seedTracks_eta",          "Seed-like tracks #eta; #eta; Tracks", 200, -3.0, 3.0); // NEW
-    h_seedTracks_phi          = fs->make<TH1F>("seedTracks_phi",          "Seed-like tracks #phi; #phi; Tracks", 200, -3.142, 3.142); // NEW
-
-    // Track error histograms
-    h_track_dxyError = fs->make<TH1F>("track_dxyError","Track dxy Uncertainty; dxy Error [cm]; Tracks",1000,0,0.1);
-    h_track_dxyError_barrel = fs->make<TH1F>("track_dxyError_barrel","Track dxy Uncertainty (Barrel); dxy Error [cm]; Tracks",1000,0,0.1);
-    h_track_dxyError_endcap = fs->make<TH1F>("track_dxyError_endcap","Track dxy Uncertainty (Endcap); dxy Error [cm]; Tracks",1000,0,0.1);
+    // Spatial
+    TFileDirectory vtxSpatialDir = vtxSelDir.mkdir("Spatial");
+    vertices_.selected.xy_global = vtxSpatialDir.make<TH2F>("xy_global","Vertex XY (Global); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
+    vertices_.selected.xy_ref = vtxSpatialDir.make<TH2F>("xy_ref","Vertex XY (ref-centered); X-X_{ref} [cm]; Y-Y_{ref} [cm]",2000,-10,10,2000,-10,10);
     
-    // Track property histograms
-    h_track_momenta_global = fs->make<TH1F>("track_momenta_global","Track Momenta; Momentum [GeV/c]; Tracks",400,0,100);
-    h_eta_distribution_global = fs->make<TH1F>("eta_distribution_global","Eta Distribution; Eta; Tracks",400,-3,3);
-    h_phi_distribution_global = fs->make<TH1F>("phi_distribution_global","Phi Distribution; Phi; Tracks",400,-3.142,3.142);
-
-    // Barrel histograms
-    barrel.eta = fs->make<TH1F>("vertex_eta_barrel","Vertex Eta (Barrel); eta; Vertices",200,-3.0,3.0);
-    barrel.dBV = fs->make<TH1F>("vertex_dBV_barrel_avgPV","Vertex d_{BV}^{avgPV} (Barrel); d_{BV}^{avgPV} [cm]; Vertices",200,0,10);
-    barrel.mass = fs->make<TH1F>("vertex_mass_barrel","Vertex Mass (Barrel); mass [GeV/c^{2}]; Vertices",200,0,10);
-    barrel.xy_global = fs->make<TH2F>("vertex_xy_barrel_global","Vertex XY (Barrel, Global); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
-    barrel.xy_ref = fs->make<TH2F>("vertex_xy_barrel_avgPV","Vertex XY (Barrel, AvgPV-Centered); X-avgPV_x [cm]; Y-avgPV_y [cm]",2000,-10,10,2000,-10,10);
-
-    // Endcap histograms
-    endcap.eta = fs->make<TH1F>("vertex_eta_endcap","Vertex Eta (Endcap); eta; Vertices",200,-3.0,3.0);
-    endcap.dBV = fs->make<TH1F>("vertex_dBV_endcap_avgPV","Vertex d_{BV}^{avgPV} (Endcap); d_{BV}^{avgPV} [cm]; Vertices",200,0,10);
-    endcap.mass = fs->make<TH1F>("vertex_mass_endcap","Vertex Mass (Endcap); mass [GeV/c^{2}]; Vertices",200,0,10);
-    endcap.xy_global = fs->make<TH2F>("vertex_xy_endcap_global","Vertex XY (Endcap, Global); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
-    endcap.xy_ref = fs->make<TH2F>("vertex_xy_endcap_avgPV","Vertex XY (Endcap, AvgPV-Centered); X-avgPV_x [cm]; Y-avgPV_y [cm]",2000,-10,10,2000,-10,10);
-
-    // Left endcap histograms
-    left_endcap.eta = fs->make<TH1F>("vertex_eta_left_endcap","Vertex Eta (Left Endcap); eta; Vertices",200,-3.0,3.0);
-    left_endcap.dBV = fs->make<TH1F>("vertex_dBV_left_endcap_avgPV","Vertex d_{BV}^{avgPV} (Left Endcap); d_{BV}^{avgPV} [cm]; Vertices",200,0,10);
-    left_endcap.mass = fs->make<TH1F>("vertex_mass_left_endcap","Vertex Mass (Left Endcap); mass [GeV/c^{2}]; Vertices",200,0,10);
-    left_endcap.xy_global = fs->make<TH2F>("vertex_xy_left_endcap_global","Vertex XY (Left Endcap, Global); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
-
-    // Right endcap histograms
-    right_endcap.eta = fs->make<TH1F>("vertex_eta_right_endcap","Vertex Eta (Right Endcap); eta; Vertices",200,-3.0,3.0);
-    right_endcap.dBV = fs->make<TH1F>("vertex_dBV_right_endcap_avgPV","Vertex d_{BV}^{avgPV} (Right Endcap); d_{BV}^{avgPV} [cm]; Vertices",200,0,10);
-    right_endcap.mass = fs->make<TH1F>("vertex_mass_right_endcap","Vertex Mass (Right Endcap); mass [GeV/c^{2}]; Vertices",200,0,10);
-    right_endcap.xy_global = fs->make<TH2F>("vertex_xy_right_endcap_global","Vertex XY (Right Endcap, Global); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
-
-    // Region histograms (PV count regions)
+    // Distance measurements
+    TFileDirectory vtxDistDir = vtxSelDir.mkdir("Distance");
+    vertices_.selected.distance.dBV_origin = vtxDistDir.make<TH1F>("dBV_origin","d_{BV} wrt (0,0); d_{BV} [cm]; Vertices",200,0,10);
+    vertices_.selected.distance.dBV_ref = vtxDistDir.make<TH1F>("dBV_ref","d_{BV} wrt reference; d_{BV} [cm]; Vertices",200,0,10);
+    vertices_.selected.distance.dBV_beamspot = vtxDistDir.make<TH1F>("dBV_beamspot","d_{BV} wrt beamspot; d_{BV} [cm]; Vertices",200,0,10);
+    vertices_.selected.distance.dBV_avgPV = vtxDistDir.make<TH1F>("dBV_avgPV","d_{BV} wrt avgPV; d_{BV} [cm]; Vertices",200,0,10);
+    vertices_.selected.distance.dBV_error = vtxDistDir.make<TH1F>("dBV_error","d_{BV} Uncertainty; #sigma_{dBV} [cm]; Vertices",1000,0,0.1);
+    
+    // Opening angles
+    TFileDirectory vtxAngleDir = vtxSelDir.mkdir("OpeningAngles");
+    vertices_.selected.openingAngle.pairwise = vtxAngleDir.make<TH1F>("pairwise","Track Opening Angle (pairwise); Angle [rad]; Pairs",180,0,3.14159);
+    vertices_.selected.openingAngle.mean = vtxAngleDir.make<TH1F>("mean","Mean Opening Angle; <Angle> [rad]; Vertices",180,0,3.14159);
+    vertices_.selected.openingAngle.min = vtxAngleDir.make<TH1F>("min","Min Opening Angle; Min Angle [rad]; Vertices",180,0,3.14159);
+    vertices_.selected.openingAngle.max = vtxAngleDir.make<TH1F>("max","Max Opening Angle; Max Angle [rad]; Vertices",180,0,3.14159);
+    
+    // Topology subdivisions
+    TFileDirectory vtxTopoDir = vtxSelDir.mkdir("Topology");
+    
+    TFileDirectory barrelDir = vtxTopoDir.mkdir("Barrel");
+    vertices_.selected.barrel.eta = barrelDir.make<TH1F>("eta","#eta (Barrel); #eta; Vertices",200,-3,3);
+    vertices_.selected.barrel.mass = barrelDir.make<TH1F>("mass","Mass (Barrel); Mass [GeV]; Vertices",200,0,10);
+    vertices_.selected.barrel.dBV = barrelDir.make<TH1F>("dBV","d_{BV} (Barrel); d_{BV} [cm]; Vertices",200,0,10);
+    vertices_.selected.barrel.xy_global = barrelDir.make<TH2F>("xy_global","XY (Barrel, Global); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
+    vertices_.selected.barrel.xy_ref = barrelDir.make<TH2F>("xy_ref","XY (Barrel, ref-centered); X-X_{ref} [cm]; Y-Y_{ref} [cm]",2000,-10,10,2000,-10,10);
+    
+    TFileDirectory endcapDir = vtxTopoDir.mkdir("Endcap");
+    vertices_.selected.endcap.eta = endcapDir.make<TH1F>("eta","#eta (Endcap); #eta; Vertices",200,-3,3);
+    vertices_.selected.endcap.mass = endcapDir.make<TH1F>("mass","Mass (Endcap); Mass [GeV]; Vertices",200,0,10);
+    vertices_.selected.endcap.dBV = endcapDir.make<TH1F>("dBV","d_{BV} (Endcap); d_{BV} [cm]; Vertices",200,0,10);
+    vertices_.selected.endcap.xy_global = endcapDir.make<TH2F>("xy_global","XY (Endcap, Global); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
+    vertices_.selected.endcap.xy_ref = endcapDir.make<TH2F>("xy_ref","XY (Endcap, ref-centered); X-X_{ref} [cm]; Y-Y_{ref} [cm]",2000,-10,10,2000,-10,10);
+    
+    TFileDirectory leftEndcapDir = vtxTopoDir.mkdir("LeftEndcap");
+    vertices_.selected.leftEndcap.eta = leftEndcapDir.make<TH1F>("eta","#eta (Left Endcap); #eta; Vertices",200,-3,3);
+    vertices_.selected.leftEndcap.mass = leftEndcapDir.make<TH1F>("mass","Mass (Left Endcap); Mass [GeV]; Vertices",200,0,10);
+    vertices_.selected.leftEndcap.dBV = leftEndcapDir.make<TH1F>("dBV","d_{BV} (Left Endcap); d_{BV} [cm]; Vertices",200,0,10);
+    vertices_.selected.leftEndcap.xy_global = leftEndcapDir.make<TH2F>("xy_global","XY (Left Endcap); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
+    
+    TFileDirectory rightEndcapDir = vtxTopoDir.mkdir("RightEndcap");
+    vertices_.selected.rightEndcap.eta = rightEndcapDir.make<TH1F>("eta","#eta (Right Endcap); #eta; Vertices",200,-3,3);
+    vertices_.selected.rightEndcap.mass = rightEndcapDir.make<TH1F>("mass","Mass (Right Endcap); Mass [GeV]; Vertices",200,0,10);
+    vertices_.selected.rightEndcap.dBV = rightEndcapDir.make<TH1F>("dBV","d_{BV} (Right Endcap); d_{BV} [cm]; Vertices",200,0,10);
+    vertices_.selected.rightEndcap.xy_global = rightEndcapDir.make<TH2F>("xy_global","XY (Right Endcap); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
+    
+    // PV regions
     if (PVBoundary1 != -1) {
+        TFileDirectory vtxRegionDir = vtxSelDir.mkdir("PVRegions");
+        
         std::ostringstream regAlabel, regBlabel, regClabel;
         regAlabel << "Region A (0 <= nPV < " << PVBoundary1 << ")";
         if (PVBoundary2 != -1) {
@@ -394,87 +382,72 @@ void ScoutingTreeMakerRun3::beginJob() {
             regBlabel << "Region B (nPV >= " << PVBoundary1 << ")";
             regClabel << "Region C (nPV >= " << PVBoundary1 << ")";
         }
-
-        // Region A - use consistent naming with reference
-        region_A.xy_global = fs->make<TH2F>("vertex_xy_global_regionA",
-            ("Vertex XY (Global, " + regAlabel.str() + "); X [cm]; Y [cm]").c_str(), 2000,-10,10,2000,-10,10);
-        region_A.xy_ref = fs->make<TH2F>("vertex_xy_ref_regionA",
-            ("Vertex XY (ref-centered, " + regAlabel.str() + "); X-ref_x [cm]; Y-ref_y [cm]").c_str(), 2000,-10,10,2000,-10,10);
-        region_A.dBV = fs->make<TH1F>("vertex_dBVref_regionA",
-            ("Vertex d_{BV} (wrt ref, " + regAlabel.str() + "); d_{BV} [cm]; Vertices").c_str(), 200,0,10);
-        region_A.mass = fs->make<TH1F>("vertex_mass_regionA",
-            ("Vertex Mass (" + regAlabel.str() + "); mass [GeV/c^{2}]; Vertices").c_str(), 200,0,10);
-
-        // Region B
-        region_B.xy_global = fs->make<TH2F>("vertex_xy_global_regionB",
-            ("Vertex XY (Global, " + regBlabel.str() + "); X [cm]; Y [cm]").c_str(), 2000,-10,10,2000,-10,10);
-        region_B.xy_ref = fs->make<TH2F>("vertex_xy_ref_regionB",
-            ("Vertex XY (ref-centered, " + regBlabel.str() + "); X-ref_x [cm]; Y-ref_y [cm]").c_str(), 2000,-10,10,2000,-10,10);
-        region_B.dBV = fs->make<TH1F>("vertex_dBVref_regionB",
-            ("Vertex d_{BV} (wrt ref, " + regBlabel.str() + "); d_{BV} [cm]; Vertices").c_str(), 200,0,10);
-        region_B.mass = fs->make<TH1F>("vertex_mass_regionB",
-            ("Vertex Mass (" + regBlabel.str() + "); mass [GeV/c^{2}]; Vertices").c_str(), 200,0,10);
-
-        // Region C
-        region_C.xy_global = fs->make<TH2F>("vertex_xy_global_regionC",
-            ("Vertex XY (Global, " + regClabel.str() + "); X [cm]; Y [cm]").c_str(), 2000,-10,10,2000,-10,10);
-        region_C.xy_ref = fs->make<TH2F>("vertex_xy_ref_regionC",
-            ("Vertex XY (ref-centered, " + regClabel.str() + "); X-ref_x [cm]; Y-ref_y [cm]").c_str(), 2000,-10,10,2000,-10,10);
-        region_C.dBV = fs->make<TH1F>("vertex_dBVref_regionC",
-            ("Vertex d_{BV} (wrt ref, " + regClabel.str() + "); d_{BV} [cm]; Vertices").c_str(), 200,0,10);
-        region_C.mass = fs->make<TH1F>("vertex_mass_regionC",
-            ("Vertex Mass (" + regClabel.str() + "); mass [GeV/c^{2}]; Vertices").c_str(), 200,0,10);
+        
+        TFileDirectory regADir = vtxRegionDir.mkdir("RegionA");
+        vertices_.selected.regionA.mass = regADir.make<TH1F>("mass",("Mass " + regAlabel.str() + "; Mass [GeV]; Vertices").c_str(),200,0,10);
+        vertices_.selected.regionA.dBV = regADir.make<TH1F>("dBV",("d_{BV} " + regAlabel.str() + "; d_{BV} [cm]; Vertices").c_str(),200,0,10);
+        vertices_.selected.regionA.xy_global = regADir.make<TH2F>("xy_global",("XY Global " + regAlabel.str() + "; X [cm]; Y [cm]").c_str(),2000,-10,10,2000,-10,10);
+        vertices_.selected.regionA.xy_ref = regADir.make<TH2F>("xy_ref",("XY ref-centered " + regAlabel.str() + "; X-X_{ref} [cm]; Y-Y_{ref} [cm]").c_str(),2000,-10,10,2000,-10,10);
+        
+        TFileDirectory regBDir = vtxRegionDir.mkdir("RegionB");
+        vertices_.selected.regionB.mass = regBDir.make<TH1F>("mass",("Mass " + regBlabel.str() + "; Mass [GeV]; Vertices").c_str(),200,0,10);
+        vertices_.selected.regionB.dBV = regBDir.make<TH1F>("dBV",("d_{BV} " + regBlabel.str() + "; d_{BV} [cm]; Vertices").c_str(),200,0,10);
+        vertices_.selected.regionB.xy_global = regBDir.make<TH2F>("xy_global",("XY Global " + regBlabel.str() + "; X [cm]; Y [cm]").c_str(),2000,-10,10,2000,-10,10);
+        vertices_.selected.regionB.xy_ref = regBDir.make<TH2F>("xy_ref",("XY ref-centered " + regBlabel.str() + "; X-X_{ref} [cm]; Y-Y_{ref} [cm]").c_str(),2000,-10,10,2000,-10,10);
+        
+        TFileDirectory regCDir = vtxRegionDir.mkdir("RegionC");
+        vertices_.selected.regionC.mass = regCDir.make<TH1F>("mass",("Mass " + regClabel.str() + "; Mass [GeV]; Vertices").c_str(),200,0,10);
+        vertices_.selected.regionC.dBV = regCDir.make<TH1F>("dBV",("d_{BV} " + regClabel.str() + "; d_{BV} [cm]; Vertices").c_str(),200,0,10);
+        vertices_.selected.regionC.xy_global = regCDir.make<TH2F>("xy_global",("XY Global " + regClabel.str() + "; X [cm]; Y [cm]").c_str(),2000,-10,10,2000,-10,10);
+        vertices_.selected.regionC.xy_ref = regCDir.make<TH2F>("xy_ref",("XY ref-centered " + regClabel.str() + "; X-X_{ref} [cm]; Y-Y_{ref} [cm]").c_str(),2000,-10,10,2000,-10,10);
     }
 
-    // Summary histograms
-    h_nvertices_ntk = fs->make<TH1F>("nvertices_ntk","Number of Candidate Vertices (ntk within cut); Number of Vertices; Events",1000,0,1000);
+    // ==================== TRACKS ====================
+    TFileDirectory tracksDir = fs->mkdir("Tracks");
+    
+    // All tracks
+    TFileDirectory trkAllDir = tracksDir.mkdir("All");
+    TFileDirectory trkAllKinDir = trkAllDir.mkdir("Kinematics");
+    tracks_.all.pt = trkAllKinDir.make<TH1F>("pt","Track p_{T} (all); p_{T} [GeV]; Tracks",200,0,100);
+    tracks_.all.eta = trkAllKinDir.make<TH1F>("eta","Track #eta (all); #eta; Tracks",400,-3,3);
+    tracks_.all.phi = trkAllKinDir.make<TH1F>("phi","Track #phi (all); #phi; Tracks",400,-3.14,3.14);
+    tracks_.all.momentum = trkAllKinDir.make<TH1F>("momentum","Track Momentum (all); p [GeV]; Tracks",400,0,100);
+    
+    TFileDirectory trkAllIPDir = trkAllDir.mkdir("ImpactParameter");
+    tracks_.all.ip.ipSig_ref = trkAllIPDir.make<TH1F>("ipSig_ref","|IP|/err wrt ref (all); |IP|/err; Tracks",200,0,50);
+    tracks_.all.ip.dxy_origin = trkAllIPDir.make<TH1F>("dxy_origin","dxy wrt (0,0) (all); dxy [cm]; Tracks",1000,-5,5);
+    tracks_.all.ip.dxySig_origin = trkAllIPDir.make<TH1F>("dxySig_origin","|dxy|/err wrt (0,0) (all); |dxy|/err; Tracks",200,0,50);
+    tracks_.all.ip.dxy_ref = trkAllIPDir.make<TH1F>("dxy_ref","dxy wrt ref (all); dxy [cm]; Tracks",1000,-5,5);
+    tracks_.all.ip.dxySig_ref = trkAllIPDir.make<TH1F>("dxySig_ref","|dxy|/err wrt ref (all); |dxy|/err; Tracks",200,0,50);
+    tracks_.all.ip.dxy_beamspot = trkAllIPDir.make<TH1F>("dxy_beamspot","dxy wrt BS (all); dxy [cm]; Tracks",1000,-5,5);
+    tracks_.all.ip.dxySig_beamspot = trkAllIPDir.make<TH1F>("dxySig_beamspot","|dxy|/err wrt BS (all); |dxy|/err; Tracks",200,0,50);
+    tracks_.all.ip.dxy_avgPV = trkAllIPDir.make<TH1F>("dxy_avgPV","dxy wrt avgPV (all); dxy [cm]; Tracks",1000,-5,5);
+    tracks_.all.ip.dxySig_avgPV = trkAllIPDir.make<TH1F>("dxySig_avgPV","|dxy|/err wrt avgPV (all); |dxy|/err; Tracks",200,0,50);
+    tracks_.all.ip.dxyError = trkAllIPDir.make<TH1F>("dxyError","dxy Error (all); #sigma_{dxy} [cm]; Tracks",1000,0,0.1);
+    tracks_.all.ip.dxyError_barrel = trkAllIPDir.make<TH1F>("dxyError_barrel","dxy Error Barrel (all); #sigma_{dxy} [cm]; Tracks",1000,0,0.1);
+    tracks_.all.ip.dxyError_endcap = trkAllIPDir.make<TH1F>("dxyError_endcap","dxy Error Endcap (all); #sigma_{dxy} [cm]; Tracks",1000,0,0.1);
+    
+    // Seed-like tracks
+    TFileDirectory trkSeedDir = tracksDir.mkdir("SeedLike");
+    tracks_.seed.pt = trkSeedDir.make<TH1F>("pt","Track p_{T} (seed-like); p_{T} [GeV]; Tracks",200,0,100);
+    tracks_.seed.eta = trkSeedDir.make<TH1F>("eta","Track #eta (seed-like); #eta; Tracks",200,-3,3);
+    tracks_.seed.phi = trkSeedDir.make<TH1F>("phi","Track #phi (seed-like); #phi; Tracks",200,-3.14,3.14);
+    tracks_.seed.ipSig_ref = trkSeedDir.make<TH1F>("ipSig_ref","|IP|/err wrt ref (seed-like); |IP|/err; Tracks",200,0,50);
+    
+    // Vertex-associated tracks
+    TFileDirectory trkVtxDir = tracksDir.mkdir("VertexAssociated");
+    TFileDirectory trkVtxKinDir = trkVtxDir.mkdir("Kinematics");
+    tracks_.vertex.pt = trkVtxKinDir.make<TH1F>("pt","Track p_{T} (vertex); p_{T} [GeV]; Tracks",200,0,100);
+    tracks_.vertex.eta = trkVtxKinDir.make<TH1F>("eta","Track #eta (vertex); #eta; Tracks",400,-3,3);
+    tracks_.vertex.phi = trkVtxKinDir.make<TH1F>("phi","Track #phi (vertex); #phi; Tracks",400,-3.14,3.14);
+    tracks_.vertex.momentum = trkVtxKinDir.make<TH1F>("momentum","Track Momentum (vertex); p [GeV]; Tracks",400,0,100);
+    
+    TFileDirectory trkVtxIPDir = trkVtxDir.mkdir("ImpactParameter");
+    tracks_.vertex.ipSig_ref = trkVtxIPDir.make<TH1F>("ipSig_ref","|IP|/err wrt ref (vertex); |IP|/err; Tracks",200,0,50);
+    tracks_.vertex.ipSig_vtx = trkVtxIPDir.make<TH1F>("ipSig_vtx","|IP|/err wrt vertex (vertex); |IP|/err; Tracks",200,0,50);
+    tracks_.vertex.dxy_primaryVtx = trkVtxIPDir.make<TH1F>("dxy_primaryVtx","dxy wrt primary vertex; dxy [cm]; Tracks",1000,-5,5);
+    tracks_.vertex.dxySig_primaryVtx = trkVtxIPDir.make<TH1F>("dxySig_primaryVtx","|dxy|/err wrt primary vertex; |dxy|/err; Tracks",200,0,50);
 }
-
-/*
-Glossary (TreeMaker):
-
-- Reference vertex (refVtx):
-  The same concept as Vertexer’s fake_ref_vtx: either avgPV (fixed diag covariance) or
-  BeamSpot (diagonal terms from BeamSpot). Chosen by refPreference with fallbacks.
-  Used to compute dBV and IP significance for tracks.
-
-- Impact Parameter (IP) and IP significance:
-  We compute |IP|/err wrt the selected refVtx using IPTools and TransientTrack.
-  The definition (2D transverse or 3D) follows seed_use2DTrackDist to mirror Vertexer.
-
-- Normalized chi^2 (chi2/ndof):
-  Vertex fit quality from reco::Vertex::normalizedChi2(). We fill all-vertex and selected-vertex
-  histograms for monitoring.
-
-- dBV (vertex-to-reference distance):
-  Distance between each displaced vertex and the chosen reference (refVtx), in 2D or 3D
-  per use_2d_vertex_dist; errors are from VertexDistanceXY/3D Measurement1D.
-
-- Track categories (how histograms are filled):
-  * All tracks:
-      Loop over the full track collection; compute |IP|/err(refVtx) and pT for each track.
-  * Seed-like tracks:
-      Same loop, apply only the Vertexer seed logic:
-        - pt > seed_minPt_
-        - |IP|/err(refVtx) > seed_minIPSig_
-      No hit/layer cuts and no IP upper bound. Fills seedTracks_* histograms.
-  * Vertex tracks:
-      Loop over each output displaced vertex; for tracks with weight >= 0.5:
-        - Fill |IP|/err wrt refVtx (vertexTracks_ipSig_ref)
-        - Fill |IP|/err wrt the fitted vertex (vertexTracks_ipSig_vtx)
-        - Fill pT (vertexTracks_pt)
-
-- Signed vs Absolute IP:
-  For the categories above we use absolute significance (magnitude). Signed versions are used
-  where explicitly requested (e.g., signedTransverseImpactParameter for dxy value plots).
-
-- Opening angles:
-  Pairwise opening angle between track momentum vectors in a vertex (using TVector3::Angle),
-  summarized per vertex (mean/min/max) for accepted vertices.
-
-- Region/barrel/endcap splits:
-  Simple kinematic/topology splits for monitoring, independent of the seed selection.
-*/
 
 void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     using namespace edm; using namespace std; using namespace reco;
@@ -514,24 +487,23 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
 
     // Update histogram titles with actual reference type
     std::string refName = (refType == "avgPV" || refType == "avgPV (fallback)") ? "avgPV" : "BS";
-    h_vertex_xy_ref->SetTitle(("Vertex XY Position (wrt " + refName + "); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
-    track_ref.dxy->SetTitle(("Track dxy w.r.t. " + refName + "; dxy_{" + refName + "} [cm]; Tracks").c_str());
-    track_ref.dxySig->SetTitle(("Track |dxy_{" + refName + "}/err|; |dxy_{" + refName + "}/err|; Tracks").c_str());
-    h_vertex_dBVref->SetTitle(("Vertex transverse distance d_{BV}^{" + refName + "} (wrt " + refName + "); d_{BV}^{" + refName + "} [cm]; Vertices / 0.05 cm").c_str());
-    // --- NEW: dynamic titles for debug IP significance histos ---
-    h_allTracks_ipSig_ref->SetTitle(("All tracks |IP| significance wrt " + refName + "; |IP|/err (" + refName + "); Tracks").c_str());
-    h_vertexTracks_ipSig_ref->SetTitle(("Tracks-in-vertex |IP| significance wrt " + refName + "; |IP|/err (" + refName + "); Tracks").c_str());
-    h_seedTracks_ipSig_ref->SetTitle(("Seed-like tracks |IP| significance wrt " + refName + "; |IP|/err (" + refName + "); Tracks").c_str());
+    vertices_.selected.xy_ref->SetTitle(("Vertex XY (wrt " + refName + "); X-" + refName + " [cm]; Y-" + refName + " [cm]").c_str());
+    vertices_.selected.distance.dBV_ref->SetTitle(("d_{BV} wrt " + refName + "; d_{BV} [cm]; Vertices").c_str());
+    tracks_.all.ip.dxy_ref->SetTitle(("dxy wrt " + refName + " (all); dxy [cm]; Tracks").c_str());
+    tracks_.all.ip.dxySig_ref->SetTitle(("|dxy|/err wrt " + refName + " (all); |dxy|/err; Tracks").c_str());
+    tracks_.all.ip.ipSig_ref->SetTitle(("|IP|/err wrt " + refName + " (all); |IP|/err; Tracks").c_str());
+    tracks_.seed.ipSig_ref->SetTitle(("|IP|/err wrt " + refName + " (seed-like); |IP|/err; Tracks").c_str());
+    tracks_.vertex.ipSig_ref->SetTitle(("|IP|/err wrt " + refName + " (vertex); |IP|/err; Tracks").c_str());
 
     // Update region plot titles too
     if (PVBoundary1 != -1) {
-        region_A.xy_ref->SetTitle(("Vertex XY (" + refName + "-centered, Region A); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
-        region_B.xy_ref->SetTitle(("Vertex XY (" + refName + "-centered, Region B); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
-        region_C.xy_ref->SetTitle(("Vertex XY (" + refName + "-centered, Region C); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
+        vertices_.selected.regionA.xy_ref->SetTitle(("Vertex XY (" + refName + "-centered, Region A); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
+        vertices_.selected.regionB.xy_ref->SetTitle(("Vertex XY (" + refName + "-centered, Region B); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
+        vertices_.selected.regionC.xy_ref->SetTitle(("Vertex XY (" + refName + "-centered, Region C); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
         
-        region_A.dBV->SetTitle(("Vertex d_{BV}^{" + refName + "} (Region A); d_{BV}^{" + refName + "} [cm]; Vertices").c_str());
-        region_B.dBV->SetTitle(("Vertex d_{BV}^{" + refName + "} (Region B); d_{BV}^{" + refName + "} [cm]; Vertices").c_str());
-        region_C.dBV->SetTitle(("Vertex d_{BV}^{" + refName + "} (Region C); d_{BV}^{" + refName + "} [cm]; Vertices").c_str());
+        vertices_.selected.regionA.dBV->SetTitle(("Vertex d_{BV}^{" + refName + "} (Region A); d_{BV}^{" + refName + "} [cm]; Vertices").c_str());
+        vertices_.selected.regionB.dBV->SetTitle(("Vertex d_{BV}^{" + refName + "} (Region B); d_{BV}^{" + refName + "} [cm]; Vertices").c_str());
+        vertices_.selected.regionC.dBV->SetTitle(("Vertex d_{BV}^{" + refName + "} (Region C); d_{BV}^{" + refName + "} [cm]; Vertices").c_str());
     }
 
     // --- NEW: helper to compute |IP| significance wrt a vertex in 2D or 3D (mirrors seed setting) ---
@@ -545,12 +517,12 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         }
     };
 
-    // Fill beamspot comparisons if both available
+    // Fill beamspot comparisons
     if (havePV && haveBS) {
-        h_avg_primary_vertex_vs_beamspot->Fill(avgPVVtx.x() - bsVtx.x(), avgPVVtx.y() - bsVtx.y());
+        event_.avgPV_vs_beamspot->Fill(avgPVVtx.x() - bsVtx.x(), avgPVVtx.y() - bsVtx.y());
     }
 
-    // --- NEW: A) ALL TRACKS + C) TRACKS PASSING VERTEXER CUTS (global, not per-vertex) ---
+    // --- ALL TRACKS + SEED-LIKE TRACKS ---
     {
         const math::XYZPoint origin(0.,0.,0.);
         for (size_t i = 0; i < tracksH->size(); ++i) {
@@ -560,28 +532,36 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
             reco::TransientTrack ttk = ttBuilder.build(trRef);
             auto ip_ref = ipSigWrtVertex(ttk, refVtx);
 
-            // A) All tracks
+            // All tracks
+            tracks_.all.pt->Fill(trRef->pt());
+            tracks_.all.eta->Fill(trRef->eta());
+            tracks_.all.phi->Fill(trRef->phi());
+            tracks_.all.momentum->Fill(trRef->p());
+            
             if (ip_ref.first && std::isfinite(ip_ref.second)) {
-                h_allTracks_ipSig_ref->Fill(std::fabs(ip_ref.second));
+                tracks_.all.ip.ipSig_ref->Fill(std::fabs(ip_ref.second));
             }
-            h_allTracks_pt->Fill(trRef->pt());
+            
             const double dxyErr = trRef->dxyError();
+            const double dxy0 = trRef->dxy(origin);
+            tracks_.all.ip.dxy_origin->Fill(dxy0);
             if (dxyErr > 0) {
-                const double dxy0 = trRef->dxy(origin);
-                h_allTracks_simpleDxySig->Fill(std::fabs(dxy0 / dxyErr));
+                tracks_.all.ip.dxySig_origin->Fill(std::fabs(dxy0 / dxyErr));
             }
+            tracks_.all.ip.dxyError->Fill(dxyErr);
+            if (std::fabs(trRef->eta()) < 1.0) tracks_.all.ip.dxyError_barrel->Fill(dxyErr);
+            else tracks_.all.ip.dxyError_endcap->Fill(dxyErr);
 
-            // C) Tracks passing Vertexer cuts (mirror Vertexer: only pt and IPsig lower bounds)
+            // Seed-like tracks
             if (trRef->pt() <= seed_minPt_) continue;
             if (!(ip_ref.first && std::isfinite(ip_ref.second))) continue;
             const double ipSigAbs = std::fabs(ip_ref.second);
             if (ipSigAbs <= seed_minIPSig_) continue;
-            // No upper IP bound and no hit/layer requirements in Vertexer seeds
-            // Passed Vertexer-like cuts: fill seed-like histos
-            h_seedTracks_ipSig_ref->Fill(ipSigAbs);
-            h_seedTracks_pt->Fill(trRef->pt());
-            h_seedTracks_eta->Fill(trRef->eta());
-            h_seedTracks_phi->Fill(trRef->phi());
+            
+            tracks_.seed.ipSig_ref->Fill(ipSigAbs);
+            tracks_.seed.pt->Fill(trRef->pt());
+            tracks_.seed.eta->Fill(trRef->eta());
+            tracks_.seed.phi->Fill(trRef->phi());
         }
     }
 
@@ -592,7 +572,7 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         Handle<vector<Vertex>> primaryVerticesH;
         iEvent.getByToken(primaryVerticesToken, primaryVerticesH);
         nPV = primaryVerticesH->size();
-        h_nPrimaryVertices->Fill(nPV);
+        event_.nPrimaryVertices->Fill(nPV);
         
         if (nPV < PVBoundary1) pvRegion = 0;
         else if (PVBoundary2 != -1 && nPV < PVBoundary2) pvRegion = 1;
@@ -616,14 +596,13 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         if (bestSumPt >= 0) pmvtx = &verticesH->at(bestIdx);
     }
 
-    // Count selected vertices
     int nSelVertices = 0;
 
     // Process each displaced vertex
     for (unsigned int t = 0; t < verticesH->size(); ++t) {
         const auto& v = verticesH->at(t);
 
-        // --- B) TRACKS IN THIS VERTEX (before selection), weight >= 0.5 ---
+        // --- VERTEX-ASSOCIATED TRACKS (before selection) ---
         for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
             reco::TrackRef tr = it->castTo<reco::TrackRef>();
             if (!tr.isNonnull()) continue;
@@ -633,23 +612,24 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
 
             auto ip_ref = ipSigWrtVertex(ttk, refVtx);
             if (ip_ref.first && std::isfinite(ip_ref.second)) {
-                h_vertexTracks_ipSig_ref->Fill(std::fabs(ip_ref.second));
+                tracks_.vertex.ipSig_ref->Fill(std::fabs(ip_ref.second));
             }
 
-            // Use the same absolute 2D/3D computation wrt the fitted displaced vertex
             auto ip_v = ipSigWrtVertex(ttk, v);
             if (ip_v.first && std::isfinite(ip_v.second)) {
-                h_vertexTracks_ipSig_vtx->Fill(std::fabs(ip_v.second));
+                tracks_.vertex.ipSig_vtx->Fill(std::fabs(ip_v.second));
             }
 
-            // NEW: pT for tracks-in-vertex
-            h_vertexTracks_pt->Fill(tr->pt());
+            tracks_.vertex.pt->Fill(tr->pt());
+            tracks_.vertex.eta->Fill(tr->eta());
+            tracks_.vertex.phi->Fill(tr->phi());
+            tracks_.vertex.momentum->Fill(tr->p());
         }
 
         vector<TrackRef> tks = vertex_track_vec(v);
         int ntk = static_cast<int>(tks.size());
 
-        // --- NEW: compute pairwise opening angles and per-vertex stats ---
+        // --- Opening angles ---
         double meanAngle = 0.0, minAngle = 0.0, maxAngle = 0.0;
         {
             double sumAngles = 0.0;
@@ -665,8 +645,8 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
                     if (!tj.isNonnull()) continue;
                     TVector3 vj(tj->px(), tj->py(), tj->pz());
                     if (vj.Mag2() <= 0) continue;
-                    const double angle = vi.Angle(vj); // ROOT TVector3 handles normalization and acos internally
-                    h_track_opening_angle_pair->Fill(angle); // per-pair, all vertices
+                    const double angle = vi.Angle(vj);
+                    vertices_.selected.openingAngle.pairwise->Fill(angle);
                     sumAngles += angle;
                     ++npairs;
                     if (angle < minAngle) minAngle = angle;
@@ -676,15 +656,10 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
             meanAngle = (npairs > 0) ? (sumAngles / npairs) : 0.0;
             if (npairs == 0) { minAngle = 0.0; maxAngle = 0.0; }
         }
-        // --- END NEW ---
 
         // Create 4-vector for vertex mass calculation
         TLorentzVector sumVec(0,0,0,0);
         double sum_dxy = 0.0, sum_dxyErr = 0.0;
-
-        // --- NEW: fill chi2 (all vertices) before selection ---
-        h_vertex_chi2norm_all->Fill(v.normalizedChi2());
-        // --- END NEW ---
 
         // Process tracks using proper methods
         for(auto track : tks) {
@@ -699,64 +674,17 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
             // Create transient track for proper IP calculations
             reco::TransientTrack transientTrack = ttBuilder.build(track);
             
-            // Calculate track distances to all reference points using IPTools
-            const math::XYZPoint origin(0.,0.,0.);
-            reco::Vertex originVtx(origin, reco::Vertex::Error());
-            
             // Define direction for signed impact parameter (track momentum direction)
             GlobalVector direction(track->px(), track->py(), track->pz());
             
             // Use IPTools::signedTransverseImpactParameter with correct arguments
-            std::pair<bool, Measurement1D> ip_00 = IPTools::signedTransverseImpactParameter(transientTrack, direction, originVtx);
             std::pair<bool, Measurement1D> ip_ref = IPTools::signedTransverseImpactParameter(transientTrack, direction, refVtx);
-            double dxyErr = track->dxyError();
             
             // Track metrics for the main reference
             if (ip_ref.first) {
                 sum_dxy += ip_ref.second.value();
                 sum_dxyErr += ip_ref.second.error();
-                
-                // Fill histograms with signed dxy
-                track_ref.dxy->Fill(ip_ref.second.value());
-                if (ip_ref.second.error() > 0) {
-                    track_ref.dxySig->Fill(std::fabs(ip_ref.second.significance()));
-                }
             }
-            
-            // Fill simple track.dxy() for origin (historical comparison)
-            track_origin.dxy->Fill(track->dxy(origin));  // This is already signed
-            if (dxyErr > 0.0) {
-                track_origin.dxySig->Fill(std::fabs(track->dxy(origin) / dxyErr));
-            }
-            
-            // Additional explicit measurements for all reference points
-            if (havePV) {
-                std::pair<bool, Measurement1D> ip_avgPV = IPTools::signedTransverseImpactParameter(transientTrack, direction, avgPVVtx);
-                if (ip_avgPV.first) {
-                    track_avgPV.dxy->Fill(ip_avgPV.second.value());
-                    track_avgPV.dxySig->Fill(std::fabs(ip_avgPV.second.significance()));
-                }
-            }
-            
-            if (haveBS) {
-                std::pair<bool, Measurement1D> ip_bs = IPTools::signedTransverseImpactParameter(transientTrack, direction, bsVtx);
-                if (ip_bs.first) {
-                    track_bs.dxy->Fill(ip_bs.second.value());
-                    track_bs.dxySig->Fill(std::fabs(ip_bs.second.significance()));
-                }
-            }
-            
-            if (pmvtx) {
-                std::pair<bool, Measurement1D> ip_pmvtx = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pmvtx);
-                if (ip_pmvtx.first) {
-                    track_pmvtx.dxy->Fill(ip_pmvtx.second.value());
-                    track_pmvtx.dxySig->Fill(std::fabs(ip_pmvtx.second.significance()));
-                }
-            }
-            
-            h_track_dxyError->Fill(dxyErr);
-            if (std::fabs(track->eta()) < 1.0) h_track_dxyError_barrel->Fill(dxyErr);
-            else                               h_track_dxyError_endcap->Fill(dxyErr);
         }
 
         // Calculate vertex properties
@@ -764,7 +692,11 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         double avg_dxy = (ntk > 0 ? sum_dxy / ntk : 0.0);
         double avg_dxyErr = (ntk > 0 ? sum_dxyErr / ntk : 0.0);
 
-        // Calculate vertex distances using VertexDistanceXY for proper error propagation
+        vertices_.all.chi2norm->Fill(v.normalizedChi2());
+        vertices_.all.nTracks->Fill(ntk);
+
+        // --- Distance calculations ---
+        // Use proper instances for vertex distance calculations (2D/3D match Vertexer)
         Measurement1D dBVref_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, refVtx)
                                                          : vertexDist3D.distance(v, refVtx);
         double dBVref = dBVref_meas.value();
@@ -780,16 +712,16 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         if (havePV) {
             Measurement1D dBVavgPV_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, avgPVVtx)
                                                                : vertexDist3D.distance(v, avgPVVtx);
-            h_vertex_dBVavgPV->Fill(dBVavgPV_meas.value());
+            vertices_.selected.distance.dBV_avgPV->Fill(dBVavgPV_meas.value());
         }
         
         if (haveBS) {
             Measurement1D dBVbs_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, bsVtx)
                                                             : vertexDist3D.distance(v, bsVtx);
-            h_vertex_dBVbs->Fill(dBVbs_meas.value());
+            vertices_.selected.distance.dBV_beamspot->Fill(dBVbs_meas.value());
         }
 
-        // Apply all selection criteria
+        // Apply selection criteria
         if(required_ntk_min != -1 && ntk < required_ntk_min) continue;
         if(required_ntk_max != -1 && ntk > required_ntk_max) continue;
         if(required_invmass  != -1 && invMass < required_invmass) continue;
@@ -801,96 +733,130 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         if(required_dBV_error!= -1 && dBV_err > required_dBV_error) continue;
         if(required_dxy_error!= -1 && avg_dxyErr > required_dxy_error) continue;
 
-        // Vertex accepted - fill histograms
+        // Vertex accepted
         ++nSelVertices;
 
-        // --- NEW: fill chi2 (selected vertices) ---
-        h_vertex_chi2norm_selected->Fill(v.normalizedChi2());
-        // --- END NEW ---
+        vertices_.selected.chi2norm->Fill(v.normalizedChi2());
+        vertices_.selected.nTracks->Fill(ntk);
+        vertices_.selected.xy_global->Fill(v.x(), v.y());
+        vertices_.selected.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
 
-        // Fill basic vertex histograms
-        h_ntracks_global->Fill(ntk);
-        h_vertex_xy_global->Fill(v.x(), v.y());
-        h_vertex_xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+        vertices_.selected.distance.dBV_ref->Fill(dBVref);
+        vertices_.selected.distance.dBV_origin->Fill(dBV00);
+        vertices_.selected.distance.dBV_error->Fill(dBV_err);
 
-        // Fill distance histograms
-        h_vertex_dBVref->Fill(dBVref);
-        h_vertex_dBV00->Fill(dBV00);
-        h_vertex_dBV_error->Fill(dBV_err);
+        vertices_.selected.openingAngle.mean->Fill(meanAngle);
+        vertices_.selected.openingAngle.min->Fill(minAngle);
+        vertices_.selected.openingAngle.max->Fill(maxAngle);
 
-        // --- NEW: fill per-vertex opening-angle summaries for accepted vertices ---
-        h_vertex_openingAngle_mean->Fill(meanAngle);
-        h_vertex_openingAngle_min->Fill(minAngle);
-        h_vertex_openingAngle_max->Fill(maxAngle);
-        // --- END NEW ---
+        if (havePV) {
+            Measurement1D dBVavgPV_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, avgPVVtx)
+                                                               : vertexDist3D.distance(v, avgPVVtx);
+            vertices_.selected.distance.dBV_avgPV->Fill(dBVavgPV_meas.value());
+        }
+        
+        if (haveBS) {
+            Measurement1D dBVbs_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, bsVtx)
+                                                            : vertexDist3D.distance(v, bsVtx);
+            vertices_.selected.distance.dBV_beamspot->Fill(dBVbs_meas.value());
+        }
 
-        // Region histograms - use the correct reference names
+        // Region histograms
         if (PVBoundary1 != -1) {
             if (pvRegion == 0) {
-                region_A.xy_global->Fill(v.x(), v.y());
-                region_A.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
-                region_A.dBV->Fill(dBVref);
-                region_A.mass->Fill(invMass);
+                vertices_.selected.regionA.xy_global->Fill(v.x(), v.y());
+                vertices_.selected.regionA.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                vertices_.selected.regionA.dBV->Fill(dBVref);
+                vertices_.selected.regionA.mass->Fill(invMass);
             } else if (pvRegion == 1) {
-                region_B.xy_global->Fill(v.x(), v.y());
-                region_B.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
-                region_B.dBV->Fill(dBVref);
-                region_B.mass->Fill(invMass);
+                vertices_.selected.regionB.xy_global->Fill(v.x(), v.y());
+                vertices_.selected.regionB.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                vertices_.selected.regionB.dBV->Fill(dBVref);
+                vertices_.selected.regionB.mass->Fill(invMass);
             } else {
-                region_C.xy_global->Fill(v.x(), v.y());
-                region_C.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
-                region_C.dBV->Fill(dBVref);
-                region_C.mass->Fill(invMass);
+                vertices_.selected.regionC.xy_global->Fill(v.x(), v.y());
+                vertices_.selected.regionC.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                vertices_.selected.regionC.dBV->Fill(dBVref);
+                vertices_.selected.regionC.mass->Fill(invMass);
             }
         }
 
-        // Barrel / Endcap (reference-based)
+        // Barrel / Endcap
         if (std::fabs(sumVec.Eta()) < 1.0) {
-            barrel.eta->Fill(sumVec.Eta());
-            barrel.dBV->Fill(dBVref);
-            barrel.mass->Fill(invMass);
-            barrel.xy_global->Fill(v.x(), v.y());
-            barrel.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+            vertices_.selected.barrel.eta->Fill(sumVec.Eta());
+            vertices_.selected.barrel.dBV->Fill(dBVref);
+            vertices_.selected.barrel.mass->Fill(invMass);
+            vertices_.selected.barrel.xy_global->Fill(v.x(), v.y());
+            vertices_.selected.barrel.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
         } else {
-            endcap.eta->Fill(sumVec.Eta());
-            endcap.dBV->Fill(dBVref);
-            endcap.mass->Fill(invMass);
-            endcap.xy_global->Fill(v.x(), v.y());
-            endcap.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+            vertices_.selected.endcap.eta->Fill(sumVec.Eta());
+            vertices_.selected.endcap.dBV->Fill(dBVref);
+            vertices_.selected.endcap.mass->Fill(invMass);
+            vertices_.selected.endcap.xy_global->Fill(v.x(), v.y());
+            vertices_.selected.endcap.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
 
             if (sumVec.Eta() < -1.0) {
-                left_endcap.eta->Fill(sumVec.Eta());
-                left_endcap.dBV->Fill(dBVref);
-                left_endcap.mass->Fill(invMass);
-                left_endcap.xy_global->Fill(v.x(), v.y());
+                vertices_.selected.leftEndcap.eta->Fill(sumVec.Eta());
+                vertices_.selected.leftEndcap.dBV->Fill(dBVref);
+                vertices_.selected.leftEndcap.mass->Fill(invMass);
+                vertices_.selected.leftEndcap.xy_global->Fill(v.x(), v.y());
             } else if (sumVec.Eta() > 1.0) {
-                right_endcap.eta->Fill(sumVec.Eta());
-                right_endcap.dBV->Fill(dBVref);
-                right_endcap.mass->Fill(invMass);
-                right_endcap.xy_global->Fill(v.x(), v.y());
+                vertices_.selected.rightEndcap.eta->Fill(sumVec.Eta());
+                vertices_.selected.rightEndcap.dBV->Fill(dBVref);
+                vertices_.selected.rightEndcap.mass->Fill(invMass);
+                vertices_.selected.rightEndcap.xy_global->Fill(v.x(), v.y());
             }
         }
 
-        // Basic kinematic histograms
-        h_vertex_pt->Fill(sumVec.Pt());
-        h_vertex_eta->Fill(sumVec.Eta());
-        h_vertex_phi->Fill(sumVec.Phi());
-        h_vertex_mass->Fill(invMass);
+        vertices_.selected.pt->Fill(sumVec.Pt());
+        vertices_.selected.eta->Fill(sumVec.Eta());
+        vertices_.selected.phi->Fill(sumVec.Phi());
+        vertices_.selected.mass->Fill(invMass);
 
-        // Track histograms
+        // Track histograms (impact parameters for vertex-associated tracks)
         for(auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
             TrackRef track = it->castTo<TrackRef>();
-            if(!track.isNonnull()){
-                LogWarning("ScoutingTreeMakerRun3") << "Null track reference in vertex " << t;
-                continue;
+            if(!track.isNonnull()) continue;
+            
+            reco::TransientTrack transientTrack = ttBuilder.build(track);
+            GlobalVector direction(track->px(), track->py(), track->pz());
+            
+            std::pair<bool, Measurement1D> ip_ref = IPTools::signedTransverseImpactParameter(transientTrack, direction, refVtx);
+            
+            if (ip_ref.first) {
+                tracks_.all.ip.dxy_ref->Fill(ip_ref.second.value());
+                if (ip_ref.second.error() > 0) {
+                    tracks_.all.ip.dxySig_ref->Fill(std::fabs(ip_ref.second.significance()));
+                }
             }
-            h_track_momenta_global->Fill(track->p());
-            h_eta_distribution_global->Fill(track->eta());
-            h_phi_distribution_global->Fill(track->phi());
+            
+            if (havePV) {
+                std::pair<bool, Measurement1D> ip_avgPV = IPTools::signedTransverseImpactParameter(transientTrack, direction, avgPVVtx);
+                if (ip_avgPV.first) {
+                    tracks_.all.ip.dxy_avgPV->Fill(ip_avgPV.second.value());
+                    tracks_.all.ip.dxySig_avgPV->Fill(std::fabs(ip_avgPV.second.significance()));
+                }
+            }
+            
+            if (haveBS) {
+                std::pair<bool, Measurement1D> ip_bs = IPTools::signedTransverseImpactParameter(transientTrack, direction, bsVtx);
+                if (ip_bs.first) {
+                    tracks_.all.ip.dxy_beamspot->Fill(ip_bs.second.value());
+                    tracks_.all.ip.dxySig_beamspot->Fill(std::fabs(ip_bs.second.significance()));
+                }
+            }
+            
+            if (pmvtx) {
+                std::pair<bool, Measurement1D> ip_pmvtx = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pmvtx);
+                if (ip_pmvtx.first) {
+                    tracks_.vertex.dxy_primaryVtx->Fill(ip_pmvtx.second.value());
+                    tracks_.vertex.dxySig_primaryVtx->Fill(std::fabs(ip_pmvtx.second.significance()));
+                }
+            }
         }
     }
 
-    h_nvertices_ntk->Fill(static_cast<double>(nSelVertices));
+    event_.nSelectedVertices->Fill(static_cast<double>(nSelVertices));
 }
 
 // Helper method to determine the reference vertex based on preference and availability
@@ -914,7 +880,7 @@ std::pair<bool, std::string> ScoutingTreeMakerRun3::determineReferenceVertex(
         for (const auto& pv : *primaryVerticesH) {
             if (!pv.isFake() && pv.ndof() > 4) {
                 sumX += pv.x(); sumY += pv.y(); sumZ += pv.z();
-                h_primaryVertices_xy_global->Fill(pv.x(), pv.y());
+                event_.primaryVertices_xy->Fill(pv.x(), pv.y());
                 ++validPVs;
             }
         }
@@ -941,7 +907,7 @@ std::pair<bool, std::string> ScoutingTreeMakerRun3::determineReferenceVertex(
         bsErr(1,1)=beamspot->covariance()(1,1);
         bsErr(2,2)=beamspot->covariance()(2,2);
         bsVtx = reco::Vertex(beamspot->position(), bsErr);
-        h_beamspot_global->Fill(beamspot->x0(), beamspot->y0());
+        event_.beamspot_xy->Fill(beamspot->x0(), beamspot->y0());
         haveBS = true;
     }
 
