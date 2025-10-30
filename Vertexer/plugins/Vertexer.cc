@@ -449,9 +449,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // Seed track selection (apply each cut once)
   std::vector<reco::TransientTrack> seed_tracks;
-  seed_tracks.reserve(seed_track_handle->size());
   std::unordered_map<unsigned int,size_t> seed_track_ref_map;
-  seed_track_ref_map.reserve(seed_track_handle->size());
 
   for (size_t i_tk=0; i_tk<seed_track_handle->size(); ++i_tk) {
     edm::Ref<reco::TrackCollection> tk_ref(seed_track_handle, i_tk);
@@ -502,9 +500,6 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     iEvent.emplace(putToken_, std::move(*vertices));
     return;
   }
-
-  // reserve a reasonable amount to reduce reallocations
-  vertices->reserve(std::min<size_t>(ntk * (ntk - 1) / 2, 1024));
 
   
   std::vector<size_t> itks(n_tracks_per_seed_vertex, 0);

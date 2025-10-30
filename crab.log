@@ -99,3 +99,22 @@ Traceback (most recent call last):
     raise ConfigurationException(msg)
 CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: ./crab_ScoutingMc_Updated_1mod2_v1 is not a valid CRAB project directory.
 INFO 2025-10-13 05:03:26.521 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log
+DEBUG 2025-10-29 22:57:51.787 UTC: 	 CRAB Client version: v3.250820
+DEBUG 2025-10-29 22:57:51.788 UTC: 	 Running on: Linux lxplus911.cern.ch 5.14.0-570.51.1.el9_6.x86_64 #1 SMP PREEMPT_DYNAMIC Sat Sep 27 01:10:11 EDT 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-10-29 22:57:51.788 UTC: 	 Not using Singularity
+DEBUG 2025-10-29 22:57:51.788 UTC: 	 Operating System: Red Hat Enterprise Linux 9.6 (Plow)
+DEBUG 2025-10-29 22:57:51.788 UTC: 	 Executing command: 'kill'
+DEBUG 2025-10-29 22:57:51.788 UTC: 	 Found CRAB cache file /afs/cern.ch/user/a/amalhotr/.crab3
+ERROR 2025-10-29 22:57:51.789 UTC: 	 Error: crab_Data_ScoutingPFRun3_1mod10,crab_Data_ScoutingPFRun3_1mod10_single_file,crab_Data_ScoutingPFRun3_1mod10_v1,crab_Data_ScoutingPFRun3_2mod10_v1,crab_Data_ScoutingPFRun3_3mod10_v1,crab_Data_ScoutingPFRun3_4mod10_v1,crab_Data_ScoutingPFRun3_5mod10_v1,crab_Data_ScoutingPFRun3_6mod10_v1,crab_Data_ScoutingPFRun3_FullPV_1mod20_v1,crab_Data_ScoutingPFRun3_PV_1mod20_v1,crab_Data_ScoutingPFRun3_freshtestsubmission,crab_Data_ScoutingPFRun3_freshtestsubmission_small,crab_MC_DYto2Mu_FullPV_0mod1_v1,crab_MC_DYto2Mu_FullPV_0mod3_v1,crab_MC_DYto2Mu_FullPV_1mod1_v1,crab_MC_DYto2Mu_FullPV_1mod20_v1,crab_MC_DYto2Mu_FullPV_1mod2_v1,crab_ScoutingData_Updated_0mod15_v1,crab_ScoutingData_Updated_10mod15_v1,crab_ScoutingData_Updated_1mod15_v1,crab_ScoutingData_Updated_2mod15_v1,crab_ScoutingData_Updated_3mod15_v1,crab_ScoutingData_Updated_4mod15_v1,crab_ScoutingData_Updated_5mod15_v1,crab_ScoutingData_Updated_6mod15_v1,crab_ScoutingData_Updated_7mod15_v1,crab_ScoutingData_Updated_8mod15_v1,crab_ScoutingData_Updated_9mod15_v1,crab_ScoutingMC_FullPV_1mod2_v1 is not a valid CRAB project directory.
+ERROR 2025-10-29 22:57:51.789 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250820.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250820.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250820.00/lib/CRABClient/Commands/SubCommand.py", line 281, in __init__
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.250820.00/lib/CRABClient/Commands/SubCommand.py", line 691, in validateOptions
+    raise ConfigurationException(msg)
+CRABClient.ClientExceptions.ConfigurationException: [91mError[0m: crab_Data_ScoutingPFRun3_1mod10,crab_Data_ScoutingPFRun3_1mod10_single_file,crab_Data_ScoutingPFRun3_1mod10_v1,crab_Data_ScoutingPFRun3_2mod10_v1,crab_Data_ScoutingPFRun3_3mod10_v1,crab_Data_ScoutingPFRun3_4mod10_v1,crab_Data_ScoutingPFRun3_5mod10_v1,crab_Data_ScoutingPFRun3_6mod10_v1,crab_Data_ScoutingPFRun3_FullPV_1mod20_v1,crab_Data_ScoutingPFRun3_PV_1mod20_v1,crab_Data_ScoutingPFRun3_freshtestsubmission,crab_Data_ScoutingPFRun3_freshtestsubmission_small,crab_MC_DYto2Mu_FullPV_0mod1_v1,crab_MC_DYto2Mu_FullPV_0mod3_v1,crab_MC_DYto2Mu_FullPV_1mod1_v1,crab_MC_DYto2Mu_FullPV_1mod20_v1,crab_MC_DYto2Mu_FullPV_1mod2_v1,crab_ScoutingData_Updated_0mod15_v1,crab_ScoutingData_Updated_10mod15_v1,crab_ScoutingData_Updated_1mod15_v1,crab_ScoutingData_Updated_2mod15_v1,crab_ScoutingData_Updated_3mod15_v1,crab_ScoutingData_Updated_4mod15_v1,crab_ScoutingData_Updated_5mod15_v1,crab_ScoutingData_Updated_6mod15_v1,crab_ScoutingData_Updated_7mod15_v1,crab_ScoutingData_Updated_8mod15_v1,crab_ScoutingData_Updated_9mod15_v1,crab_ScoutingMC_FullPV_1mod2_v1 is not a valid CRAB project directory.
+INFO 2025-10-29 22:57:51.869 UTC: 	 Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab.log

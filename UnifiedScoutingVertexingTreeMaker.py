@@ -3,12 +3,12 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("CHAIN")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkSummary.reportEvery = 5
-process.MessageLogger.cerr.FwkReport.reportEvery = 5
+# process.MessageLogger.cerr.FwkSummary.reportEvery = 5
+# process.MessageLogger.cerr.FwkReport.reportEvery = 5
 # process.MessageLogger.cerr.FwkSummary.reportEvery = 100
 # process.MessageLogger.cerr.FwkReport.reportEvery = 100
-# process.MessageLogger.cerr.FwkSummary.reportEvery = 1000
-# process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkSummary.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 # process.MessageLogger.cerr.threshold = cms.untracked.string('DEBUG')
 # process.MessageLogger.debugModules = cms.untracked.vstring('hltScoutingUnpackProducer', 'Vertexer', 'scoutingTree')
@@ -19,14 +19,14 @@ process.MessageLogger.debugModules = cms.untracked.vstring()  # Disable debug fo
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True),
     TryToContinue = cms.untracked.vstring('ProductNotFound'),
-    numberOfThreads = cms.untracked.uint32(4),    # adjust to machine cores
-    numberOfStreams = cms.untracked.uint32(0),     # let framework pick sensible streams
+    # numberOfThreads = cms.untracked.uint32(4),    # adjust to machine cores
+    # numberOfStreams = cms.untracked.uint32(0),     # let framework pick sensible streams
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(500)  # Limited events for testing
+    # input = cms.untracked.int32(500)  # Limited events for testing
     # input = cms.untracked.int32(150000)  # Local
-    # input = cms.untracked.int32(500000)  # Process all events
+    input = cms.untracked.int32(250000)  # Process all events
     # input = cms.untracked.int32(-1)  # Process all events
 )
 
@@ -44,8 +44,8 @@ process.source = cms.Source("PoolSource",
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root", # Empty file
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/013b488b-7af4-450f-b175-b39623c72ae2.root",
     # MC Files
-    "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/0639b06f-0a53-4150-ac4f-ffab0df5ef91.root",
-    # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/06a339e5-cb52-4e75-b0e4-91285db66993.root"
+    # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/0639b06f-0a53-4150-ac4f-ffab0df5ef91.root",
+    "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/06a339e5-cb52-4e75-b0e4-91285db66993.root"
     )
 )
 
@@ -65,9 +65,9 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # -------------------------- OUTPUT PATH --------------------------------
 #-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/ScoutingTree_MC_Local_test_10.root")
-    # fileName = cms.string("outputs/Data_ScoutingTree_FullPV_Local_4.root")
-    # fileName = cms.string("ScoutingTree_Output_PV.root")  # This is the only output saved
+    # fileName = cms.string("test-outputs/ScoutingTree_MC_Local_test_13.root")
+    fileName = cms.string("outputs/MC_ScoutingTree_Local_8.root")
+    # fileName = cms.string("ScoutingTree_Output.root")  # This is the only output saved
 )
 #-----------------------------------------------------------------------
 
@@ -134,8 +134,18 @@ process.Vertexer = cms.EDProducer('Vertexer',
 
 # Step 3: Scouting Tree Maker
 process.scoutingTree = cms.EDAnalyzer('ScoutingTreeMakerRun3',
-    required_ntk_min = cms.int32(2),
-    required_ntk_max = cms.int32(3),
+    # Discrete ntk cuts - each creates a separate branch
+    cut_ntk = cms.VPSet(
+        cms.PSet(values = cms.vint32()),           # No cut (accept all ntk)
+        # cms.PSet(values = cms.vint32(2)),          # Only ntk=2
+        cms.PSet(values = cms.vint32(3)),          # Only ntk=3
+        cms.PSet(values = cms.vint32(2, 3))        # ntk=2 OR ntk=3
+    ),
+    
+    # Opening angle cuts - each creates a separate branch
+    cut_opening_angle_min = cms.vdouble(-1, 0.1, 0.25, 0.5),  # -1 = no cut, then 0.1 rad, 0.25 rad, 0.5 rad
+    
+    # Other (non-branching) cuts
     required_invmass = cms.double(-1),
     required_chi2 = cms.double(-1),
     required_dBV_min = cms.double(-1),
@@ -186,3 +196,32 @@ process.p = cms.Path(
     process.Vertexer +
     process.scoutingTree
 )
+
+
+
+
+#-----------------------------------------------------------------------
+# [amalhotr@lxplus948 Run3ScoutingAnalysisTools]$ tmux attach -t lxplus948_cern_ch
+# [detached (from session lxplus948_cern_ch)]
+# [amalhotr@lxplus948 Run3ScoutingAnalysisTools]$ tmux list-sessions 
+# another: 1 windows (created Thu Oct 30 06:20:48 2025)
+# lxplus948_cern_ch: 1 windows (created Thu Oct 30 06:03:06 2025)
+# [amalhotr@lxplus948 Run3ScoutingAnalysisTools]$ tmux attach -t another
+# [detached (from session another)]
+# [amalhotr@lxplus948 Run3ScoutingAnalysisTools]$ crab status -d ./crab_ScoutingData_Redone_0mod10_v3
+# Rucio client intialized for account amalhotr
+# CRAB project directory:         /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_ScoutingData_Redone_0mod10_v3
+# Task name:                      251030_050942:amalhotr_crab_ScoutingData_Redone_0mod10_v3
+# Grid scheduler - Task Worker:   crab3@vocms0144.cern.ch - crab-prod-tw01
+# Status on the CRAB server:      SUBMITTED
+# Task URL to use for HELP:       https://cmsweb.cern.ch/crabserver/ui/task/251030_050942%3Aamalhotr_crab_ScoutingData_Redone_0mod10_v3
+# Dashboard monitoring URL:       https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view?orgId=11&var-user=amalhotr&var-task=251030_050942%3Aamalhotr_crab_ScoutingData_Redone_0mod10_v3&from=1761797382000&to=now
+# Warning:                        Task requests 3000 MB of memory, but only 2500 are guaranteed to be available. Jobs may not find a site where to run and stay idle forever.
+# Status on the scheduler:        SUBMITTED
+
+# Jobs status:                    idle                     16.0% (1106/6898)
+#                                 running                   0.7% (  45/6898)
+#                                 unsubmitted              83.3% (5747/6898)
+
+# No publication information (publication has been disabled in the CRAB configuration file)
+# Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_ScoutingData_Redone_0mod10_v3/crab.log

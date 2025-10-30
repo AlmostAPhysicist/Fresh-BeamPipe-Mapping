@@ -62,8 +62,8 @@ private:
     void endJob() override;
 
     // Parameter declarations with cut values
-    const int required_ntk_min;
-    const int required_ntk_max;
+    const std::vector<std::vector<int>> cut_ntk_;       // NEW: vector of discrete ntk sets
+    const std::vector<double> cut_opening_angle_min_;   // NEW: vector of min angle cuts
     const double required_invmass;
     const double required_chi2;
     const double required_dBV_min;
@@ -84,8 +84,48 @@ private:
     const edm::EDGetTokenT<std::vector<reco::Track>> tracksToken;
     const edm::EDGetTokenT<std::vector<reco::Vertex>> primaryVerticesToken;
 
-    // ----- Reorganized Histogram Structure -----
-    
+    // Define branch histogram structure as a named type
+    struct BranchHistos {
+        TH1F* chi2norm;
+        TH1F* pt;
+        TH1F* eta;
+        TH1F* phi;
+        TH1F* mass;
+        TH1F* nTracks;
+        TH2F* xy_global;
+        TH2F* xy_ref;
+        
+        struct {
+            TH1F* dBV_origin;
+            TH1F* dBV_ref;
+            TH1F* dBV_beamspot;
+            TH1F* dBV_avgPV;
+            TH1F* dBV_error;
+        } distance;
+        
+        struct {
+            TH1F* pairwise;
+            TH1F* mean;
+            TH1F* min;
+            TH1F* max;
+        } openingAngle;
+        
+        struct {
+            TH1F* eta;
+            TH1F* mass;
+            TH1F* dBV;
+            TH2F* xy_global;
+            TH2F* xy_ref;
+        } barrel, endcap, leftEndcap, rightEndcap;
+        
+        struct {
+            TH1F* mass;
+            TH1F* dBV;
+            TH2F* xy_global;
+            TH2F* xy_ref;
+        } regionA, regionB, regionC;
+    };
+
     // Event-level histograms
     struct EventHistos {
         TH1F* nPrimaryVertices;
@@ -97,57 +137,12 @@ private:
 
     // Vertex histograms organized by category
     struct VertexHistos {
-        // All vertices (before cuts)
         struct {
             TH1F* chi2norm;
             TH1F* nTracks;
         } all;
         
-        // Selected vertices (after cuts)
-        struct {
-            TH1F* chi2norm;
-            TH1F* pt;
-            TH1F* eta;
-            TH1F* phi;
-            TH1F* mass;
-            TH1F* nTracks;
-            TH2F* xy_global;
-            TH2F* xy_ref;
-            
-            // Distance measurements
-            struct {
-                TH1F* dBV_origin;
-                TH1F* dBV_ref;
-                TH1F* dBV_beamspot;
-                TH1F* dBV_avgPV;
-                TH1F* dBV_error;
-            } distance;
-            
-            // Opening angles
-            struct {
-                TH1F* pairwise;
-                TH1F* mean;
-                TH1F* min;
-                TH1F* max;
-            } openingAngle;
-            
-            // Topology-based
-            struct {
-                TH1F* eta;
-                TH1F* mass;
-                TH1F* dBV;
-                TH2F* xy_global;
-                TH2F* xy_ref;
-            } barrel, endcap, leftEndcap, rightEndcap;
-            
-            // PV-region based
-            struct {
-                TH1F* mass;
-                TH1F* dBV;
-                TH2F* xy_global;
-                TH2F* xy_ref;
-            } regionA, regionB, regionC;
-        } selected;
+        std::map<std::string, BranchHistos> branches;  // NOW THIS WORKS!
     } vertices_;
 
     // Track histograms organized by category
@@ -242,8 +237,15 @@ private:
 };
 
 ScoutingTreeMakerRun3::ScoutingTreeMakerRun3(const edm::ParameterSet& iConfig):
-    required_ntk_min(iConfig.getParameter<int>("required_ntk_min")),
-    required_ntk_max(iConfig.getParameter<int>("required_ntk_max")),
+    cut_ntk_([&iConfig]() {
+        std::vector<std::vector<int>> result;
+        auto vpset = iConfig.getParameter<std::vector<edm::ParameterSet>>("cut_ntk");
+        for (const auto& pset : vpset) {
+            result.push_back(pset.getParameter<std::vector<int>>("values"));
+        }
+        return result;
+    }()),
+    cut_opening_angle_min_(iConfig.getParameter<std::vector<double>>("cut_opening_angle_min")),
     required_invmass(iConfig.getParameter<double>("required_invmass")),
     required_chi2(iConfig.getParameter<double>("required_chi2")),
     required_dBV_min(iConfig.getParameter<double>("required_dBV_min")),
@@ -295,10 +297,10 @@ void ScoutingTreeMakerRun3::beginJob() {
     // ==================== EVENT LEVEL ====================
     TFileDirectory eventDir = fs->mkdir("Event");
     event_.nPrimaryVertices = eventDir.make<TH1F>("nPrimaryVertices","Number of Primary Vertices; nPV; Events",100,0,100);
-    event_.nSelectedVertices = eventDir.make<TH1F>("nSelectedVertices","Number of Selected Vertices; N_{vtx}; Events",1000,0,1000);
-    event_.primaryVertices_xy = eventDir.make<TH2F>("primaryVertices_xy","Primary Vertices XY; X [cm]; Y [cm]",400,-1,1,400,-1,1);
-    event_.beamspot_xy = eventDir.make<TH2F>("beamspot_xy","Beamspot Position; x_{BS} [cm]; y_{BS} [cm]",400,-1,1,400,-1,1);
-    event_.avgPV_vs_beamspot = eventDir.make<TH2F>("avgPV_vs_beamspot","AvgPV - Beamspot; #Delta x [cm]; #Delta y [cm]",400,-1,1,400,-1,1);
+    event_.nSelectedVertices = eventDir.make<TH1F>("nSelectedVertices","Number of Selected Vertices; N_{vtx}; Events",200,0,1000); // reduced from 1000 bins
+    event_.primaryVertices_xy = eventDir.make<TH2F>("primaryVertices_xy","Primary Vertices XY; X [cm]; Y [cm]",200,-1,1,200,-1,1); // reduced from 400x400
+    event_.beamspot_xy = eventDir.make<TH2F>("beamspot_xy","Beamspot Position; x_{BS} [cm]; y_{BS} [cm]",200,-1,1,200,-1,1); // reduced from 400x400
+    event_.avgPV_vs_beamspot = eventDir.make<TH2F>("avgPV_vs_beamspot","AvgPV - Beamspot; #Delta x [cm]; #Delta y [cm]",200,-1,1,200,-1,1); // reduced from 400x400
 
     // ==================== VERTICES ====================
     TFileDirectory verticesDir = fs->mkdir("Vertices");
@@ -306,147 +308,173 @@ void ScoutingTreeMakerRun3::beginJob() {
     // All vertices (before selection)
     TFileDirectory vtxAllDir = verticesDir.mkdir("All");
     vertices_.all.chi2norm = vtxAllDir.make<TH1F>("chi2norm","Vertex #chi^{2}/ndof (all); #chi^{2}/ndof; Vertices",200,0,20);
-    vertices_.all.nTracks = vtxAllDir.make<TH1F>("nTracks","Number of Tracks (all); N_{tracks}; Vertices",200,0,100);
+    vertices_.all.nTracks = vtxAllDir.make<TH1F>("nTracks","Number of Tracks (all); N_{tracks}; Vertices",100,0,100); // reduced from 200 bins
     
-    // Selected vertices
+    // Create branches for each ntk × angle combination
     TFileDirectory vtxSelDir = verticesDir.mkdir("Selected");
     
-    // Basic kinematics
-    TFileDirectory vtxKinDir = vtxSelDir.mkdir("Kinematics");
-    vertices_.selected.chi2norm = vtxKinDir.make<TH1F>("chi2norm","Vertex #chi^{2}/ndof; #chi^{2}/ndof; Vertices",200,0,20);
-    vertices_.selected.pt = vtxKinDir.make<TH1F>("pt","Vertex p_{T}; p_{T} [GeV]; Vertices",200,0,100);
-    vertices_.selected.eta = vtxKinDir.make<TH1F>("eta","Vertex #eta; #eta; Vertices",200,-5,5);
-    vertices_.selected.phi = vtxKinDir.make<TH1F>("phi","Vertex #phi; #phi; Vertices",200,-3.14,3.14);
-    vertices_.selected.mass = vtxKinDir.make<TH1F>("mass","Vertex Mass; Mass [GeV]; Vertices",200,0,10);
-    vertices_.selected.nTracks = vtxKinDir.make<TH1F>("nTracks","Number of Tracks; N_{tracks}; Vertices",200,0,100);
-    
-    // Spatial
-    TFileDirectory vtxSpatialDir = vtxSelDir.mkdir("Spatial");
-    vertices_.selected.xy_global = vtxSpatialDir.make<TH2F>("xy_global","Vertex XY (Global); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
-    vertices_.selected.xy_ref = vtxSpatialDir.make<TH2F>("xy_ref","Vertex XY (ref-centered); X-X_{ref} [cm]; Y-Y_{ref} [cm]",2000,-10,10,2000,-10,10);
-    
-    // Distance measurements
-    TFileDirectory vtxDistDir = vtxSelDir.mkdir("Distance");
-    vertices_.selected.distance.dBV_origin = vtxDistDir.make<TH1F>("dBV_origin","d_{BV} wrt (0,0); d_{BV} [cm]; Vertices",200,0,10);
-    vertices_.selected.distance.dBV_ref = vtxDistDir.make<TH1F>("dBV_ref","d_{BV} wrt reference; d_{BV} [cm]; Vertices",200,0,10);
-    vertices_.selected.distance.dBV_beamspot = vtxDistDir.make<TH1F>("dBV_beamspot","d_{BV} wrt beamspot; d_{BV} [cm]; Vertices",200,0,10);
-    vertices_.selected.distance.dBV_avgPV = vtxDistDir.make<TH1F>("dBV_avgPV","d_{BV} wrt avgPV; d_{BV} [cm]; Vertices",200,0,10);
-    vertices_.selected.distance.dBV_error = vtxDistDir.make<TH1F>("dBV_error","d_{BV} Uncertainty; #sigma_{dBV} [cm]; Vertices",1000,0,0.1);
-    
-    // Opening angles
-    TFileDirectory vtxAngleDir = vtxSelDir.mkdir("OpeningAngles");
-    vertices_.selected.openingAngle.pairwise = vtxAngleDir.make<TH1F>("pairwise","Track Opening Angle (pairwise); Angle [rad]; Pairs",180,0,3.14159);
-    vertices_.selected.openingAngle.mean = vtxAngleDir.make<TH1F>("mean","Mean Opening Angle; <Angle> [rad]; Vertices",180,0,3.14159);
-    vertices_.selected.openingAngle.min = vtxAngleDir.make<TH1F>("min","Min Opening Angle; Min Angle [rad]; Vertices",180,0,3.14159);
-    vertices_.selected.openingAngle.max = vtxAngleDir.make<TH1F>("max","Max Opening Angle; Max Angle [rad]; Vertices",180,0,3.14159);
-    
-    // Topology subdivisions
-    TFileDirectory vtxTopoDir = vtxSelDir.mkdir("Topology");
-    
-    TFileDirectory barrelDir = vtxTopoDir.mkdir("Barrel");
-    vertices_.selected.barrel.eta = barrelDir.make<TH1F>("eta","#eta (Barrel); #eta; Vertices",200,-3,3);
-    vertices_.selected.barrel.mass = barrelDir.make<TH1F>("mass","Mass (Barrel); Mass [GeV]; Vertices",200,0,10);
-    vertices_.selected.barrel.dBV = barrelDir.make<TH1F>("dBV","d_{BV} (Barrel); d_{BV} [cm]; Vertices",200,0,10);
-    vertices_.selected.barrel.xy_global = barrelDir.make<TH2F>("xy_global","XY (Barrel, Global); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
-    vertices_.selected.barrel.xy_ref = barrelDir.make<TH2F>("xy_ref","XY (Barrel, ref-centered); X-X_{ref} [cm]; Y-Y_{ref} [cm]",2000,-10,10,2000,-10,10);
-    
-    TFileDirectory endcapDir = vtxTopoDir.mkdir("Endcap");
-    vertices_.selected.endcap.eta = endcapDir.make<TH1F>("eta","#eta (Endcap); #eta; Vertices",200,-3,3);
-    vertices_.selected.endcap.mass = endcapDir.make<TH1F>("mass","Mass (Endcap); Mass [GeV]; Vertices",200,0,10);
-    vertices_.selected.endcap.dBV = endcapDir.make<TH1F>("dBV","d_{BV} (Endcap); d_{BV} [cm]; Vertices",200,0,10);
-    vertices_.selected.endcap.xy_global = endcapDir.make<TH2F>("xy_global","XY (Endcap, Global); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
-    vertices_.selected.endcap.xy_ref = endcapDir.make<TH2F>("xy_ref","XY (Endcap, ref-centered); X-X_{ref} [cm]; Y-Y_{ref} [cm]",2000,-10,10,2000,-10,10);
-    
-    TFileDirectory leftEndcapDir = vtxTopoDir.mkdir("LeftEndcap");
-    vertices_.selected.leftEndcap.eta = leftEndcapDir.make<TH1F>("eta","#eta (Left Endcap); #eta; Vertices",200,-3,3);
-    vertices_.selected.leftEndcap.mass = leftEndcapDir.make<TH1F>("mass","Mass (Left Endcap); Mass [GeV]; Vertices",200,0,10);
-    vertices_.selected.leftEndcap.dBV = leftEndcapDir.make<TH1F>("dBV","d_{BV} (Left Endcap); d_{BV} [cm]; Vertices",200,0,10);
-    vertices_.selected.leftEndcap.xy_global = leftEndcapDir.make<TH2F>("xy_global","XY (Left Endcap); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
-    
-    TFileDirectory rightEndcapDir = vtxTopoDir.mkdir("RightEndcap");
-    vertices_.selected.rightEndcap.eta = rightEndcapDir.make<TH1F>("eta","#eta (Right Endcap); #eta; Vertices",200,-3,3);
-    vertices_.selected.rightEndcap.mass = rightEndcapDir.make<TH1F>("mass","Mass (Right Endcap); Mass [GeV]; Vertices",200,0,10);
-    vertices_.selected.rightEndcap.dBV = rightEndcapDir.make<TH1F>("dBV","d_{BV} (Right Endcap); d_{BV} [cm]; Vertices",200,0,10);
-    vertices_.selected.rightEndcap.xy_global = rightEndcapDir.make<TH2F>("xy_global","XY (Right Endcap); X [cm]; Y [cm]",2000,-10,10,2000,-10,10);
-    
-    // PV regions
-    if (PVBoundary1 != -1) {
-        TFileDirectory vtxRegionDir = vtxSelDir.mkdir("PVRegions");
+    for (size_t i_ntk = 0; i_ntk < cut_ntk_.size(); ++i_ntk) {
+        const auto& ntk_set = cut_ntk_[i_ntk];
         
-        std::ostringstream regAlabel, regBlabel, regClabel;
-        regAlabel << "Region A (0 <= nPV < " << PVBoundary1 << ")";
-        if (PVBoundary2 != -1) {
-            regBlabel << "Region B (" << PVBoundary1 << " <= nPV < " << PVBoundary2 << ")";
-            regClabel << "Region C (nPV >= " << PVBoundary2 << ")";
+        // Build ntk branch name
+        std::string ntkBranchName;
+        if (ntk_set.empty()) {
+            ntkBranchName = "ntk_any";
+        } else if (ntk_set.size() == 1) {
+            ntkBranchName = "ntk_" + std::to_string(ntk_set[0]);
         } else {
-            regBlabel << "Region B (nPV >= " << PVBoundary1 << ")";
-            regClabel << "Region C (nPV >= " << PVBoundary1 << ")";
+            ntkBranchName = "ntk";
+            for (size_t j = 0; j < ntk_set.size(); ++j) {
+                if (j > 0) ntkBranchName += "_or_";
+                ntkBranchName += std::to_string(ntk_set[j]);
+            }
         }
         
-        TFileDirectory regADir = vtxRegionDir.mkdir("RegionA");
-        vertices_.selected.regionA.mass = regADir.make<TH1F>("mass",("Mass " + regAlabel.str() + "; Mass [GeV]; Vertices").c_str(),200,0,10);
-        vertices_.selected.regionA.dBV = regADir.make<TH1F>("dBV",("d_{BV} " + regAlabel.str() + "; d_{BV} [cm]; Vertices").c_str(),200,0,10);
-        vertices_.selected.regionA.xy_global = regADir.make<TH2F>("xy_global",("XY Global " + regAlabel.str() + "; X [cm]; Y [cm]").c_str(),2000,-10,10,2000,-10,10);
-        vertices_.selected.regionA.xy_ref = regADir.make<TH2F>("xy_ref",("XY ref-centered " + regAlabel.str() + "; X-X_{ref} [cm]; Y-Y_{ref} [cm]").c_str(),2000,-10,10,2000,-10,10);
+        TFileDirectory ntkDir = vtxSelDir.mkdir(ntkBranchName);
         
-        TFileDirectory regBDir = vtxRegionDir.mkdir("RegionB");
-        vertices_.selected.regionB.mass = regBDir.make<TH1F>("mass",("Mass " + regBlabel.str() + "; Mass [GeV]; Vertices").c_str(),200,0,10);
-        vertices_.selected.regionB.dBV = regBDir.make<TH1F>("dBV",("d_{BV} " + regBlabel.str() + "; d_{BV} [cm]; Vertices").c_str(),200,0,10);
-        vertices_.selected.regionB.xy_global = regBDir.make<TH2F>("xy_global",("XY Global " + regBlabel.str() + "; X [cm]; Y [cm]").c_str(),2000,-10,10,2000,-10,10);
-        vertices_.selected.regionB.xy_ref = regBDir.make<TH2F>("xy_ref",("XY ref-centered " + regBlabel.str() + "; X-X_{ref} [cm]; Y-Y_{ref} [cm]").c_str(),2000,-10,10,2000,-10,10);
-        
-        TFileDirectory regCDir = vtxRegionDir.mkdir("RegionC");
-        vertices_.selected.regionC.mass = regCDir.make<TH1F>("mass",("Mass " + regClabel.str() + "; Mass [GeV]; Vertices").c_str(),200,0,10);
-        vertices_.selected.regionC.dBV = regCDir.make<TH1F>("dBV",("d_{BV} " + regClabel.str() + "; d_{BV} [cm]; Vertices").c_str(),200,0,10);
-        vertices_.selected.regionC.xy_global = regCDir.make<TH2F>("xy_global",("XY Global " + regClabel.str() + "; X [cm]; Y [cm]").c_str(),2000,-10,10,2000,-10,10);
-        vertices_.selected.regionC.xy_ref = regCDir.make<TH2F>("xy_ref",("XY ref-centered " + regClabel.str() + "; X-X_{ref} [cm]; Y-Y_{ref} [cm]").c_str(),2000,-10,10,2000,-10,10);
+        for (size_t i_angle = 0; i_angle < cut_opening_angle_min_.size(); ++i_angle) {
+            double angle_cut = cut_opening_angle_min_[i_angle];
+            
+            // Build angle branch name
+            std::string angleBranchName;
+            if (angle_cut < 0) {
+                angleBranchName = "angle_any";
+            } else {
+                std::ostringstream oss;
+                oss << "angle_gt_" << std::fixed << std::setprecision(2) << angle_cut;
+                angleBranchName = oss.str();
+                std::replace(angleBranchName.begin(), angleBranchName.end(), '.', 'p');
+            }
+            
+            std::string branchKey = ntkBranchName + "/" + angleBranchName;
+            TFileDirectory branchDir = ntkDir.mkdir(angleBranchName);
+            
+            auto& branch = vertices_.branches[branchKey];
+            
+            // Create all histograms for this branch (REDUCED BINNING)
+            TFileDirectory kinDir = branchDir.mkdir("Kinematics");
+            branch.chi2norm = kinDir.make<TH1F>("chi2norm","Vertex #chi^{2}/ndof; #chi^{2}/ndof; Vertices",200,0,20);
+            branch.pt = kinDir.make<TH1F>("pt","Vertex p_{T}; p_{T} [GeV]; Vertices",100,0,100); // reduced from 200
+            branch.eta = kinDir.make<TH1F>("eta","Vertex #eta; #eta; Vertices",100,-5,5); // reduced from 200
+            branch.phi = kinDir.make<TH1F>("phi","Vertex #phi; #phi; Vertices",100,-3.14,3.14); // reduced from 200
+            branch.mass = kinDir.make<TH1F>("mass","Vertex Mass; Mass [GeV]; Vertices",100,0,10); // reduced from 200
+            branch.nTracks = kinDir.make<TH1F>("nTracks","Number of Tracks; N_{tracks}; Vertices",50,0,50); // reduced from 200
+            
+            TFileDirectory spatialDir = branchDir.mkdir("Spatial");
+            branch.xy_global = spatialDir.make<TH2F>("xy_global","Vertex XY (Global); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            branch.xy_ref = spatialDir.make<TH2F>("xy_ref","Vertex XY (ref); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            
+            TFileDirectory distDir = branchDir.mkdir("Distance");
+            branch.distance.dBV_origin = distDir.make<TH1F>("dBV_origin","d_{BV} wrt (0,0); d_{BV} [cm]; Vertices",200,0,10);
+            branch.distance.dBV_ref = distDir.make<TH1F>("dBV_ref","d_{BV} wrt ref; d_{BV} [cm]; Vertices",200,0,10);
+            branch.distance.dBV_beamspot = distDir.make<TH1F>("dBV_beamspot","d_{BV} wrt BS; d_{BV} [cm]; Vertices",200,0,10);
+            branch.distance.dBV_avgPV = distDir.make<TH1F>("dBV_avgPV","d_{BV} wrt avgPV; d_{BV} [cm]; Vertices",200,0,10);
+            branch.distance.dBV_error = distDir.make<TH1F>("dBV_error","d_{BV} Uncertainty; #sigma_{dBV} [cm]; Vertices",1000,0,0.1);
+            
+            TFileDirectory angleDir = branchDir.mkdir("OpeningAngles");
+            branch.openingAngle.pairwise = angleDir.make<TH1F>("pairwise","Opening Angle (pairwise); Angle [rad]; Pairs",180,0,3.14159);
+            branch.openingAngle.mean = angleDir.make<TH1F>("mean","Mean Opening Angle; <Angle> [rad]; Vertices",180,0,3.14159);
+            branch.openingAngle.min = angleDir.make<TH1F>("min","Min Opening Angle; Min Angle [rad]; Vertices",180,0,3.14159);
+            branch.openingAngle.max = angleDir.make<TH1F>("max","Max Opening Angle; Max Angle [rad]; Vertices",180,0,3.14159);
+            
+            // Topology (REDUCED BINNING)
+            TFileDirectory topoDir = branchDir.mkdir("Topology");
+            TFileDirectory barrelDir = topoDir.mkdir("Barrel");
+            branch.barrel.eta = barrelDir.make<TH1F>("eta","#eta (Barrel); #eta; Vertices",100,-3,3); // reduced from 200
+            branch.barrel.mass = barrelDir.make<TH1F>("mass","Mass (Barrel); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+            branch.barrel.dBV = barrelDir.make<TH1F>("dBV","d_{BV} (Barrel); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+            branch.barrel.xy_global = barrelDir.make<TH2F>("xy_global","XY (Barrel); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            branch.barrel.xy_ref = barrelDir.make<TH2F>("xy_ref","XY (Barrel, ref); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            
+            TFileDirectory endcapDir = topoDir.mkdir("Endcap");
+            branch.endcap.eta = endcapDir.make<TH1F>("eta","#eta (Endcap); #eta; Vertices",100,-3,3); // reduced from 200
+            branch.endcap.mass = endcapDir.make<TH1F>("mass","Mass (Endcap); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+            branch.endcap.dBV = endcapDir.make<TH1F>("dBV","d_{BV} (Endcap); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+            branch.endcap.xy_global = endcapDir.make<TH2F>("xy_global","XY (Endcap); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            branch.endcap.xy_ref = endcapDir.make<TH2F>("xy_ref","XY (Endcap, ref); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+
+            TFileDirectory leftEndcapDir = topoDir.mkdir("LeftEndcap");
+            branch.leftEndcap.eta = leftEndcapDir.make<TH1F>("eta","#eta (Left Endcap); #eta; Vertices",100,-3,3); // reduced from 200
+            branch.leftEndcap.mass = leftEndcapDir.make<TH1F>("mass","Mass (Left Endcap); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+            branch.leftEndcap.dBV = leftEndcapDir.make<TH1F>("dBV","d_{BV} (Left Endcap); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+            branch.leftEndcap.xy_global = leftEndcapDir.make<TH2F>("xy_global","XY (Left Endcap); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            
+            TFileDirectory rightEndcapDir = topoDir.mkdir("RightEndcap");
+            branch.rightEndcap.eta = rightEndcapDir.make<TH1F>("eta","#eta (Right Endcap); #eta; Vertices",100,-3,3); // reduced from 200
+            branch.rightEndcap.mass = rightEndcapDir.make<TH1F>("mass","Mass (Right Endcap); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+            branch.rightEndcap.dBV = rightEndcapDir.make<TH1F>("dBV","d_{BV} (Right Endcap); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+            branch.rightEndcap.xy_global = rightEndcapDir.make<TH2F>("xy_global","XY (Right Endcap); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+
+            // PV regions (REDUCED BINNING)
+            if (PVBoundary1 != -1) {
+                TFileDirectory regionDir = branchDir.mkdir("PVRegions");
+                
+                TFileDirectory regADir = regionDir.mkdir("RegionA");
+                branch.regionA.mass = regADir.make<TH1F>("mass","Mass (Region A); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+                branch.regionA.dBV = regADir.make<TH1F>("dBV","d_{BV} (Region A); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+                branch.regionA.xy_global = regADir.make<TH2F>("xy_global","XY Global (Region A); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                branch.regionA.xy_ref = regADir.make<TH2F>("xy_ref","XY ref (Region A); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+
+                TFileDirectory regBDir = regionDir.mkdir("RegionB");
+                branch.regionB.mass = regBDir.make<TH1F>("mass","Mass (Region B); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+                branch.regionB.dBV = regBDir.make<TH1F>("dBV","d_{BV} (Region B); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+                branch.regionB.xy_global = regBDir.make<TH2F>("xy_global","XY Global (Region B); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                branch.regionB.xy_ref = regBDir.make<TH2F>("xy_ref","XY ref (Region B); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                
+                TFileDirectory regCDir = regionDir.mkdir("RegionC");
+                branch.regionC.mass = regCDir.make<TH1F>("mass","Mass (Region C); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+                branch.regionC.dBV = regCDir.make<TH1F>("dBV","d_{BV} (Region C); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+                branch.regionC.xy_global = regCDir.make<TH2F>("xy_global","XY Global (Region C); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                branch.regionC.xy_ref = regCDir.make<TH2F>("xy_ref","XY ref (Region C); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            }
+        }
     }
 
-    // ==================== TRACKS ====================
+    // ==================== TRACKS (REDUCED BINNING) ====================
     TFileDirectory tracksDir = fs->mkdir("Tracks");
     
     // All tracks
     TFileDirectory trkAllDir = tracksDir.mkdir("All");
     TFileDirectory trkAllKinDir = trkAllDir.mkdir("Kinematics");
-    tracks_.all.pt = trkAllKinDir.make<TH1F>("pt","Track p_{T} (all); p_{T} [GeV]; Tracks",200,0,100);
-    tracks_.all.eta = trkAllKinDir.make<TH1F>("eta","Track #eta (all); #eta; Tracks",400,-3,3);
-    tracks_.all.phi = trkAllKinDir.make<TH1F>("phi","Track #phi (all); #phi; Tracks",400,-3.14,3.14);
-    tracks_.all.momentum = trkAllKinDir.make<TH1F>("momentum","Track Momentum (all); p [GeV]; Tracks",400,0,100);
+    tracks_.all.pt = trkAllKinDir.make<TH1F>("pt","Track p_{T} (all); p_{T} [GeV]; Tracks",100,0,100); // reduced from 200
+    tracks_.all.eta = trkAllKinDir.make<TH1F>("eta","Track #eta (all); #eta; Tracks",200,-3,3); // reduced from 400
+    tracks_.all.phi = trkAllKinDir.make<TH1F>("phi","Track #phi (all); #phi; Tracks",200,-3.14,3.14); // reduced from 400
+    tracks_.all.momentum = trkAllKinDir.make<TH1F>("momentum","Track Momentum (all); p [GeV]; Tracks",200,0,100); // reduced from 400
     
     TFileDirectory trkAllIPDir = trkAllDir.mkdir("ImpactParameter");
-    tracks_.all.ip.ipSig_ref = trkAllIPDir.make<TH1F>("ipSig_ref","|IP|/err wrt ref (all); |IP|/err; Tracks",200,0,50);
-    tracks_.all.ip.dxy_origin = trkAllIPDir.make<TH1F>("dxy_origin","dxy wrt (0,0) (all); dxy [cm]; Tracks",1000,-5,5);
-    tracks_.all.ip.dxySig_origin = trkAllIPDir.make<TH1F>("dxySig_origin","|dxy|/err wrt (0,0) (all); |dxy|/err; Tracks",200,0,50);
-    tracks_.all.ip.dxy_ref = trkAllIPDir.make<TH1F>("dxy_ref","dxy wrt ref (all); dxy [cm]; Tracks",1000,-5,5);
-    tracks_.all.ip.dxySig_ref = trkAllIPDir.make<TH1F>("dxySig_ref","|dxy|/err wrt ref (all); |dxy|/err; Tracks",200,0,50);
-    tracks_.all.ip.dxy_beamspot = trkAllIPDir.make<TH1F>("dxy_beamspot","dxy wrt BS (all); dxy [cm]; Tracks",1000,-5,5);
-    tracks_.all.ip.dxySig_beamspot = trkAllIPDir.make<TH1F>("dxySig_beamspot","|dxy|/err wrt BS (all); |dxy|/err; Tracks",200,0,50);
-    tracks_.all.ip.dxy_avgPV = trkAllIPDir.make<TH1F>("dxy_avgPV","dxy wrt avgPV (all); dxy [cm]; Tracks",1000,-5,5);
-    tracks_.all.ip.dxySig_avgPV = trkAllIPDir.make<TH1F>("dxySig_avgPV","|dxy|/err wrt avgPV (all); |dxy|/err; Tracks",200,0,50);
-    tracks_.all.ip.dxyError = trkAllIPDir.make<TH1F>("dxyError","dxy Error (all); #sigma_{dxy} [cm]; Tracks",1000,0,0.1);
-    tracks_.all.ip.dxyError_barrel = trkAllIPDir.make<TH1F>("dxyError_barrel","dxy Error Barrel (all); #sigma_{dxy} [cm]; Tracks",1000,0,0.1);
-    tracks_.all.ip.dxyError_endcap = trkAllIPDir.make<TH1F>("dxyError_endcap","dxy Error Endcap (all); #sigma_{dxy} [cm]; Tracks",1000,0,0.1);
+    tracks_.all.ip.ipSig_ref = trkAllIPDir.make<TH1F>("ipSig_ref","|IP|/err wrt ref (all); |IP|/err; Tracks",100,0,50); // reduced from 200
+    tracks_.all.ip.dxy_origin = trkAllIPDir.make<TH1F>("dxy_origin","dxy wrt (0,0) (all); dxy [cm]; Tracks",500,-5,5); // reduced from 1000
+    tracks_.all.ip.dxySig_origin = trkAllIPDir.make<TH1F>("dxySig_origin","|dxy|/err wrt (0,0) (all); |dxy|/err; Tracks",100,0,50); // reduced from 200
+    tracks_.all.ip.dxy_ref = trkAllIPDir.make<TH1F>("dxy_ref","dxy wrt ref (all); dxy [cm]; Tracks",500,-5,5); // reduced from 1000
+    tracks_.all.ip.dxySig_ref = trkAllIPDir.make<TH1F>("dxySig_ref","|dxy|/err wrt ref (all); |dxy|/err; Tracks",100,0,50); // reduced from 200
+    tracks_.all.ip.dxy_beamspot = trkAllIPDir.make<TH1F>("dxy_beamspot","dxy wrt BS (all); dxy [cm]; Tracks",500,-5,5); // reduced from 1000
+    tracks_.all.ip.dxySig_beamspot = trkAllIPDir.make<TH1F>("dxySig_beamspot","|dxy|/err wrt BS (all); |dxy|/err; Tracks",100,0,50); // reduced from 200
+    tracks_.all.ip.dxy_avgPV = trkAllIPDir.make<TH1F>("dxy_avgPV","dxy wrt avgPV (all); dxy [cm]; Tracks",500,-5,5); // reduced from 1000
+    tracks_.all.ip.dxySig_avgPV = trkAllIPDir.make<TH1F>("dxySig_avgPV","|dxy|/err wrt avgPV (all); |dxy|/err; Tracks",100,0,50); // reduced from 200
+    tracks_.all.ip.dxyError = trkAllIPDir.make<TH1F>("dxyError","dxy Error (all); #sigma_{dxy} [cm]; Tracks",500,0,0.1); // reduced from 1000
+    tracks_.all.ip.dxyError_barrel = trkAllIPDir.make<TH1F>("dxyError_barrel","dxy Error Barrel (all); #sigma_{dxy} [cm]; Tracks",500,0,0.1); // reduced from 1000
+    tracks_.all.ip.dxyError_endcap = trkAllIPDir.make<TH1F>("dxyError_endcap","dxy Error Endcap (all); #sigma_{dxy} [cm]; Tracks",500,0,0.1); // reduced from 1000
     
     // Seed-like tracks
     TFileDirectory trkSeedDir = tracksDir.mkdir("SeedLike");
-    tracks_.seed.pt = trkSeedDir.make<TH1F>("pt","Track p_{T} (seed-like); p_{T} [GeV]; Tracks",200,0,100);
-    tracks_.seed.eta = trkSeedDir.make<TH1F>("eta","Track #eta (seed-like); #eta; Tracks",200,-3,3);
-    tracks_.seed.phi = trkSeedDir.make<TH1F>("phi","Track #phi (seed-like); #phi; Tracks",200,-3.14,3.14);
-    tracks_.seed.ipSig_ref = trkSeedDir.make<TH1F>("ipSig_ref","|IP|/err wrt ref (seed-like); |IP|/err; Tracks",200,0,50);
+    tracks_.seed.pt = trkSeedDir.make<TH1F>("pt","Track p_{T} (seed-like); p_{T} [GeV]; Tracks",100,0,100); // reduced from 200
+    tracks_.seed.eta = trkSeedDir.make<TH1F>("eta","Track #eta (seed-like); #eta; Tracks",100,-3,3); // reduced from 200
+    tracks_.seed.phi = trkSeedDir.make<TH1F>("phi","Track #phi (seed-like); #phi; Tracks",100,-3.14,3.14); // reduced from 200
+    tracks_.seed.ipSig_ref = trkSeedDir.make<TH1F>("ipSig_ref","|IP|/err wrt ref (seed-like); |IP|/err; Tracks",100,0,50); // reduced from 200
     
     // Vertex-associated tracks
     TFileDirectory trkVtxDir = tracksDir.mkdir("VertexAssociated");
     TFileDirectory trkVtxKinDir = trkVtxDir.mkdir("Kinematics");
-    tracks_.vertex.pt = trkVtxKinDir.make<TH1F>("pt","Track p_{T} (vertex); p_{T} [GeV]; Tracks",200,0,100);
-    tracks_.vertex.eta = trkVtxKinDir.make<TH1F>("eta","Track #eta (vertex); #eta; Tracks",400,-3,3);
-    tracks_.vertex.phi = trkVtxKinDir.make<TH1F>("phi","Track #phi (vertex); #phi; Tracks",400,-3.14,3.14);
-    tracks_.vertex.momentum = trkVtxKinDir.make<TH1F>("momentum","Track Momentum (vertex); p [GeV]; Tracks",400,0,100);
+    tracks_.vertex.pt = trkVtxKinDir.make<TH1F>("pt","Track p_{T} (vertex); p_{T} [GeV]; Tracks",100,0,100); // reduced from 200
+    tracks_.vertex.eta = trkVtxKinDir.make<TH1F>("eta","Track #eta (vertex); #eta; Tracks",200,-3,3); // reduced from 400
+    tracks_.vertex.phi = trkVtxKinDir.make<TH1F>("phi","Track #phi (vertex); #phi; Tracks",200,-3.14,3.14); // reduced from 400
+    tracks_.vertex.momentum = trkVtxKinDir.make<TH1F>("momentum","Track Momentum (vertex); p [GeV]; Tracks",200,0,100); // reduced from 400
     
     TFileDirectory trkVtxIPDir = trkVtxDir.mkdir("ImpactParameter");
-    tracks_.vertex.ipSig_ref = trkVtxIPDir.make<TH1F>("ipSig_ref","|IP|/err wrt ref (vertex); |IP|/err; Tracks",200,0,50);
-    tracks_.vertex.ipSig_vtx = trkVtxIPDir.make<TH1F>("ipSig_vtx","|IP|/err wrt vertex (vertex); |IP|/err; Tracks",200,0,50);
-    tracks_.vertex.dxy_primaryVtx = trkVtxIPDir.make<TH1F>("dxy_primaryVtx","dxy wrt primary vertex; dxy [cm]; Tracks",1000,-5,5);
-    tracks_.vertex.dxySig_primaryVtx = trkVtxIPDir.make<TH1F>("dxySig_primaryVtx","|dxy|/err wrt primary vertex; |dxy|/err; Tracks",200,0,50);
+    tracks_.vertex.ipSig_ref = trkVtxIPDir.make<TH1F>("ipSig_ref","|IP|/err wrt ref (vertex); |IP|/err; Tracks",100,0,50); // reduced from 200
+    tracks_.vertex.ipSig_vtx = trkVtxIPDir.make<TH1F>("ipSig_vtx","|IP|/err wrt vertex (vertex); |IP|/err; Tracks",100,0,50); // reduced from 200
+    tracks_.vertex.dxy_primaryVtx = trkVtxIPDir.make<TH1F>("dxy_primaryVtx","dxy wrt primary vertex; dxy [cm]; Tracks",500,-5,5); // reduced from 1000
+    tracks_.vertex.dxySig_primaryVtx = trkVtxIPDir.make<TH1F>("dxySig_primaryVtx","|dxy|/err wrt primary vertex; |dxy|/err; Tracks",100,0,50); // reduced from 200
 }
 
 void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -484,27 +512,6 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
     // Use proper instances for vertex distance calculations (2D/3D match Vertexer)
     VertexDistanceXY vertexDist2D;
     VertexDistance3D vertexDist3D;
-
-    // Update histogram titles with actual reference type
-    std::string refName = (refType == "avgPV" || refType == "avgPV (fallback)") ? "avgPV" : "BS";
-    vertices_.selected.xy_ref->SetTitle(("Vertex XY (wrt " + refName + "); X-" + refName + " [cm]; Y-" + refName + " [cm]").c_str());
-    vertices_.selected.distance.dBV_ref->SetTitle(("d_{BV} wrt " + refName + "; d_{BV} [cm]; Vertices").c_str());
-    tracks_.all.ip.dxy_ref->SetTitle(("dxy wrt " + refName + " (all); dxy [cm]; Tracks").c_str());
-    tracks_.all.ip.dxySig_ref->SetTitle(("|dxy|/err wrt " + refName + " (all); |dxy|/err; Tracks").c_str());
-    tracks_.all.ip.ipSig_ref->SetTitle(("|IP|/err wrt " + refName + " (all); |IP|/err; Tracks").c_str());
-    tracks_.seed.ipSig_ref->SetTitle(("|IP|/err wrt " + refName + " (seed-like); |IP|/err; Tracks").c_str());
-    tracks_.vertex.ipSig_ref->SetTitle(("|IP|/err wrt " + refName + " (vertex); |IP|/err; Tracks").c_str());
-
-    // Update region plot titles too
-    if (PVBoundary1 != -1) {
-        vertices_.selected.regionA.xy_ref->SetTitle(("Vertex XY (" + refName + "-centered, Region A); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
-        vertices_.selected.regionB.xy_ref->SetTitle(("Vertex XY (" + refName + "-centered, Region B); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
-        vertices_.selected.regionC.xy_ref->SetTitle(("Vertex XY (" + refName + "-centered, Region C); X-" + refName + "_x [cm]; Y-" + refName + "_y [cm]").c_str());
-        
-        vertices_.selected.regionA.dBV->SetTitle(("Vertex d_{BV}^{" + refName + "} (Region A); d_{BV}^{" + refName + "} [cm]; Vertices").c_str());
-        vertices_.selected.regionB.dBV->SetTitle(("Vertex d_{BV}^{" + refName + "} (Region B); d_{BV}^{" + refName + "} [cm]; Vertices").c_str());
-        vertices_.selected.regionC.dBV->SetTitle(("Vertex d_{BV}^{" + refName + "} (Region C); d_{BV}^{" + refName + "} [cm]; Vertices").c_str());
-    }
 
     // --- NEW: helper to compute |IP| significance wrt a vertex in 2D or 3D (mirrors seed setting) ---
     auto ipSigWrtVertex = [&](const reco::TransientTrack& ttk, const reco::Vertex& vtx) -> std::pair<bool,double> {
@@ -646,7 +653,6 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
                     TVector3 vj(tj->px(), tj->py(), tj->pz());
                     if (vj.Mag2() <= 0) continue;
                     const double angle = vi.Angle(vj);
-                    vertices_.selected.openingAngle.pairwise->Fill(angle);
                     sumAngles += angle;
                     ++npairs;
                     if (angle < minAngle) minAngle = angle;
@@ -708,110 +714,137 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
                                                         : vertexDist3D.distance(v, originVtx);
         double dBV00 = dBV00_meas.value();
 
-        // Calculate distances to all reference points with proper error propagation
-        if (havePV) {
-            Measurement1D dBVavgPV_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, avgPVVtx)
-                                                               : vertexDist3D.distance(v, avgPVVtx);
-            vertices_.selected.distance.dBV_avgPV->Fill(dBVavgPV_meas.value());
-        }
-        
-        if (haveBS) {
-            Measurement1D dBVbs_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, bsVtx)
-                                                            : vertexDist3D.distance(v, bsVtx);
-            vertices_.selected.distance.dBV_beamspot->Fill(dBVbs_meas.value());
-        }
-
-        // Apply selection criteria
-        if(required_ntk_min != -1 && ntk < required_ntk_min) continue;
-        if(required_ntk_max != -1 && ntk > required_ntk_max) continue;
-        if(required_invmass  != -1 && invMass < required_invmass) continue;
-        if(required_chi2     != -1 && v.normalizedChi2() > required_chi2) continue;
-        if(required_dBV_min  != -1 && dBVref < required_dBV_min) continue;
-        if(required_dBV_max  != -1 && dBVref > required_dBV_max) continue;
-        if(required_dxy_min  != -1 && avg_dxy < required_dxy_min) continue;
-        if(required_dxy_max  != -1 && avg_dxy > required_dxy_max) continue;
-        if(required_dBV_error!= -1 && dBV_err > required_dBV_error) continue;
-        if(required_dxy_error!= -1 && avg_dxyErr > required_dxy_error) continue;
-
-        // Vertex accepted
-        ++nSelVertices;
-
-        vertices_.selected.chi2norm->Fill(v.normalizedChi2());
-        vertices_.selected.nTracks->Fill(ntk);
-        vertices_.selected.xy_global->Fill(v.x(), v.y());
-        vertices_.selected.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
-
-        vertices_.selected.distance.dBV_ref->Fill(dBVref);
-        vertices_.selected.distance.dBV_origin->Fill(dBV00);
-        vertices_.selected.distance.dBV_error->Fill(dBV_err);
-
-        vertices_.selected.openingAngle.mean->Fill(meanAngle);
-        vertices_.selected.openingAngle.min->Fill(minAngle);
-        vertices_.selected.openingAngle.max->Fill(maxAngle);
-
-        if (havePV) {
-            Measurement1D dBVavgPV_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, avgPVVtx)
-                                                               : vertexDist3D.distance(v, avgPVVtx);
-            vertices_.selected.distance.dBV_avgPV->Fill(dBVavgPV_meas.value());
-        }
-        
-        if (haveBS) {
-            Measurement1D dBVbs_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, bsVtx)
-                                                            : vertexDist3D.distance(v, bsVtx);
-            vertices_.selected.distance.dBV_beamspot->Fill(dBVbs_meas.value());
-        }
-
-        // Region histograms
-        if (PVBoundary1 != -1) {
-            if (pvRegion == 0) {
-                vertices_.selected.regionA.xy_global->Fill(v.x(), v.y());
-                vertices_.selected.regionA.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
-                vertices_.selected.regionA.dBV->Fill(dBVref);
-                vertices_.selected.regionA.mass->Fill(invMass);
-            } else if (pvRegion == 1) {
-                vertices_.selected.regionB.xy_global->Fill(v.x(), v.y());
-                vertices_.selected.regionB.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
-                vertices_.selected.regionB.dBV->Fill(dBVref);
-                vertices_.selected.regionB.mass->Fill(invMass);
+        // Loop over all ntk × angle branches
+        for (size_t i_ntk = 0; i_ntk < cut_ntk_.size(); ++i_ntk) {
+            const auto& ntk_set = cut_ntk_[i_ntk];
+            
+            // Check ntk condition
+            bool ntk_pass = ntk_set.empty();
+            if (!ntk_pass) {
+                for (int allowed_ntk : ntk_set) {
+                    if (ntk == allowed_ntk) {
+                        ntk_pass = true;
+                        break;
+                    }
+                }
+            }
+            if (!ntk_pass) continue;
+            
+            // Build ntk branch name (same logic as beginJob)
+            std::string ntkBranchName;
+            if (ntk_set.empty()) {
+                ntkBranchName = "ntk_any";
+            } else if (ntk_set.size() == 1) {
+                ntkBranchName = "ntk_" + std::to_string(ntk_set[0]);
             } else {
-                vertices_.selected.regionC.xy_global->Fill(v.x(), v.y());
-                vertices_.selected.regionC.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
-                vertices_.selected.regionC.dBV->Fill(dBVref);
-                vertices_.selected.regionC.mass->Fill(invMass);
+                ntkBranchName = "ntk";
+                for (size_t j = 0; j < ntk_set.size(); ++j) {
+                    if (j > 0) ntkBranchName += "_or_";
+                    ntkBranchName += std::to_string(ntk_set[j]);
+                }
+            }
+            
+            for (size_t i_angle = 0; i_angle < cut_opening_angle_min_.size(); ++i_angle) {
+                double angle_cut = cut_opening_angle_min_[i_angle];
+                
+                // Check angle condition
+                if (angle_cut >= 0 && minAngle < angle_cut) continue;
+                
+                // Build angle branch name (same logic as beginJob)
+                std::string angleBranchName;
+                if (angle_cut < 0) {
+                    angleBranchName = "angle_any";
+                } else {
+                    std::ostringstream oss;
+                    oss << "angle_gt_" << std::fixed << std::setprecision(2) << angle_cut;
+                    angleBranchName = oss.str();
+                    std::replace(angleBranchName.begin(), angleBranchName.end(), '.', 'p');
+                }
+                
+                std::string branchKey = ntkBranchName + "/" + angleBranchName;
+                
+                // Apply other selection criteria
+                if(required_invmass  != -1 && invMass < required_invmass) continue;
+                if(required_chi2     != -1 && v.normalizedChi2() > required_chi2) continue;
+                if(required_dBV_min  != -1 && dBVref < required_dBV_min) continue;
+                if(required_dBV_max  != -1 && dBVref > required_dBV_max) continue;
+                if(required_dxy_min  != -1 && avg_dxy < required_dxy_min) continue;
+                if(required_dxy_max  != -1 && avg_dxy > required_dxy_max) continue;
+                if(required_dBV_error!= -1 && dBV_err > required_dBV_error) continue;
+                if(required_dxy_error!= -1 && avg_dxyErr > required_dxy_error) continue;
+
+                // Fill histograms for this branch
+                auto& branch = vertices_.branches[branchKey];
+                
+                branch.chi2norm->Fill(v.normalizedChi2());
+                branch.nTracks->Fill(ntk);
+                branch.xy_global->Fill(v.x(), v.y());
+                branch.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                branch.distance.dBV_ref->Fill(dBVref);
+                branch.distance.dBV_origin->Fill(dBV00);
+                branch.distance.dBV_error->Fill(dBV_err);
+                branch.openingAngle.mean->Fill(meanAngle);
+                branch.openingAngle.min->Fill(minAngle);
+                branch.openingAngle.max->Fill(maxAngle);
+                
+                if (havePV) branch.distance.dBV_avgPV->Fill(use_2d_vertex_dist_ ? vertexDist2D.distance(v, avgPVVtx).value() : vertexDist3D.distance(v, avgPVVtx).value());
+                if (haveBS) branch.distance.dBV_beamspot->Fill(use_2d_vertex_dist_ ? vertexDist2D.distance(v, bsVtx).value() : vertexDist3D.distance(v, bsVtx).value());
+                
+                branch.pt->Fill(sumVec.Pt());
+                branch.eta->Fill(sumVec.Eta());
+                branch.phi->Fill(sumVec.Phi());
+                branch.mass->Fill(invMass);
+                
+                // Topology
+                if (std::fabs(sumVec.Eta()) < 1.0) {
+                    branch.barrel.eta->Fill(sumVec.Eta());
+                    branch.barrel.dBV->Fill(dBVref);
+                    branch.barrel.mass->Fill(invMass);
+                    branch.barrel.xy_global->Fill(v.x(), v.y());
+                    branch.barrel.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                } else {
+                    branch.endcap.eta->Fill(sumVec.Eta());
+                    branch.endcap.dBV->Fill(dBVref);
+                    branch.endcap.mass->Fill(invMass);
+                    branch.endcap.xy_global->Fill(v.x(), v.y());
+                    branch.endcap.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                    
+                    if (sumVec.Eta() < -1.0) {
+                        branch.leftEndcap.eta->Fill(sumVec.Eta());
+                        branch.leftEndcap.dBV->Fill(dBVref);
+                        branch.leftEndcap.mass->Fill(invMass);
+                        branch.leftEndcap.xy_global->Fill(v.x(), v.y());
+                    } else if (sumVec.Eta() > 1.0) {
+                        branch.rightEndcap.eta->Fill(sumVec.Eta());
+                        branch.rightEndcap.dBV->Fill(dBVref);
+                        branch.rightEndcap.mass->Fill(invMass);
+                        branch.rightEndcap.xy_global->Fill(v.x(), v.y());
+                    }
+                }
+                
+                // PV regions
+                if (PVBoundary1 != -1) {
+                    if (pvRegion == 0) {
+                        branch.regionA.xy_global->Fill(v.x(), v.y());
+                        branch.regionA.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                        branch.regionA.dBV->Fill(dBVref);
+                        branch.regionA.mass->Fill(invMass);
+                    } else if (pvRegion == 1) {
+                        branch.regionB.xy_global->Fill(v.x(), v.y());
+                        branch.regionB.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                        branch.regionB.dBV->Fill(dBVref);
+                        branch.regionB.mass->Fill(invMass);
+                    } else {
+                        branch.regionC.xy_global->Fill(v.x(), v.y());
+                        branch.regionC.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                        branch.regionC.dBV->Fill(dBVref);
+                        branch.regionC.mass->Fill(invMass);
+                    }
+                }
+                
+                ++nSelVertices;  // Count each passing branch
             }
         }
-
-        // Barrel / Endcap
-        if (std::fabs(sumVec.Eta()) < 1.0) {
-            vertices_.selected.barrel.eta->Fill(sumVec.Eta());
-            vertices_.selected.barrel.dBV->Fill(dBVref);
-            vertices_.selected.barrel.mass->Fill(invMass);
-            vertices_.selected.barrel.xy_global->Fill(v.x(), v.y());
-            vertices_.selected.barrel.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
-        } else {
-            vertices_.selected.endcap.eta->Fill(sumVec.Eta());
-            vertices_.selected.endcap.dBV->Fill(dBVref);
-            vertices_.selected.endcap.mass->Fill(invMass);
-            vertices_.selected.endcap.xy_global->Fill(v.x(), v.y());
-            vertices_.selected.endcap.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
-
-            if (sumVec.Eta() < -1.0) {
-                vertices_.selected.leftEndcap.eta->Fill(sumVec.Eta());
-                vertices_.selected.leftEndcap.dBV->Fill(dBVref);
-                vertices_.selected.leftEndcap.mass->Fill(invMass);
-                vertices_.selected.leftEndcap.xy_global->Fill(v.x(), v.y());
-            } else if (sumVec.Eta() > 1.0) {
-                vertices_.selected.rightEndcap.eta->Fill(sumVec.Eta());
-                vertices_.selected.rightEndcap.dBV->Fill(dBVref);
-                vertices_.selected.rightEndcap.mass->Fill(invMass);
-                vertices_.selected.rightEndcap.xy_global->Fill(v.x(), v.y());
-            }
-        }
-
-        vertices_.selected.pt->Fill(sumVec.Pt());
-        vertices_.selected.eta->Fill(sumVec.Eta());
-        vertices_.selected.phi->Fill(sumVec.Phi());
-        vertices_.selected.mass->Fill(invMass);
 
         // Track histograms (impact parameters for vertex-associated tracks)
         for(auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
@@ -936,8 +969,13 @@ void ScoutingTreeMakerRun3::endJob() {
 
 void ScoutingTreeMakerRun3::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
     edm::ParameterSetDescription desc;
-    desc.add<int>("required_ntk_min", -1);
-    desc.add<int>("required_ntk_max", -1);
+    
+    // Discrete ntk as VPSet
+    edm::ParameterSetDescription ntkPSet;
+    ntkPSet.add<std::vector<int>>("values", {});
+    desc.addVPSet("cut_ntk", ntkPSet, {});
+    
+    desc.add<std::vector<double>>("cut_opening_angle_min", {-1.0});
     desc.add<double>("required_invmass", -1.0);
     desc.add<double>("required_chi2", -1.0);
     desc.add<double>("required_dBV_min", -1.0);
