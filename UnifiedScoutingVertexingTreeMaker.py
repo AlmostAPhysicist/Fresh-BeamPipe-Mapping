@@ -24,9 +24,9 @@ process.options = cms.untracked.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    # input = cms.untracked.int32(500)  # Limited events for testing
+    # input = cms.untracked.int32(2000)  # Limited events for testing
     # input = cms.untracked.int32(150000)  # Local
-    input = cms.untracked.int32(250000)  # Process all events
+    input = cms.untracked.int32(500000)  # Process all events
     # input = cms.untracked.int32(-1)  # Process all events
 )
 
@@ -45,7 +45,7 @@ process.source = cms.Source("PoolSource",
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/013b488b-7af4-450f-b175-b39623c72ae2.root",
     # MC Files
     # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/0639b06f-0a53-4150-ac4f-ffab0df5ef91.root",
-    "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/06a339e5-cb52-4e75-b0e4-91285db66993.root"
+    # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/06a339e5-cb52-4e75-b0e4-91285db66993.root"
     )
 )
 
@@ -54,8 +54,8 @@ process.source = cms.Source("PoolSource",
 # Global tag
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
-# process.GlobalTag = GlobalTag(process.GlobalTag, '140X_dataRun3_Prompt_v4', '')
-process.GlobalTag = GlobalTag(process.GlobalTag, '140X_mcRun3_2024_realistic_v26', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '140X_dataRun3_Prompt_v4', '')
+# process.GlobalTag = GlobalTag(process.GlobalTag, '140X_mcRun3_2024_realistic_v26', '')
 
 # Geometry and Magnetic Field
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
@@ -65,9 +65,9 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # -------------------------- OUTPUT PATH --------------------------------
 #-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    # fileName = cms.string("test-outputs/ScoutingTree_MC_Local_test_13.root")
-    fileName = cms.string("outputs/MC_ScoutingTree_Local_8.root")
-    # fileName = cms.string("ScoutingTree_Output.root")  # This is the only output saved
+    # fileName = cms.string("test-outputs/ScoutingTree_MC_Local_test_17.root")
+    # fileName = cms.string("outputs/MC_ScoutingTree_Local_8.root")
+    fileName = cms.string("ScoutingTree_Output.root")  # This is the only output saved
 )
 #-----------------------------------------------------------------------
 
@@ -116,8 +116,8 @@ process.Vertexer = cms.EDProducer('Vertexer',
     resolve_split_vertices_loose = cms.bool(False),
     resolve_split_vertices_tight = cms.bool(True),
     investigate_merged_vertices = cms.bool(False),
-    use_2d_vertex_dist = cms.bool(False),
-    use_2d_track_dist = cms.bool(False),
+    use_2d_vertex_dist = cms.bool(False), # Keep as 3D
+    use_2d_track_dist = cms.bool(True), # True
     merge_anyway_dist = cms.double(-1),
     merge_anyway_sig = cms.double(4),
     merge_shared_dist = cms.double(-1),
@@ -182,14 +182,14 @@ process.scoutingTrackCount = cms.EDFilter('ScoutingTrackCountFilter',
     minNumber = cms.untracked.uint32(1)                # require >=1 scouting track
 )
 
-process.moduloEventFilter = cms.EDFilter('ModuloEventFilter',
-    modulo = cms.uint32(1),                           # keep 1-in-1 events
-    remainder = cms.untracked.uint32(0)               # keep events with eventNumber % 1 == 0
-)
+# process.moduloEventFilter = cms.EDFilter('ModuloEventFilter',
+#     modulo = cms.uint32(10),                           # keep 1-in-10 events
+#     remainder = cms.untracked.uint32(9)               # keep events with eventNumber % 10 == 0
+# )
 
 # Full chain: vertex production (avgPV seeding) without offlineBeamSpot in Vertex Reconstructions
 process.p = cms.Path(
-    process.moduloEventFilter +
+    # process.moduloEventFilter +
     process.scoutingTrackCount +
     process.hltScoutingUnpackProducer +
     process.offlineBeamSpot +  # only for debug plots in tree

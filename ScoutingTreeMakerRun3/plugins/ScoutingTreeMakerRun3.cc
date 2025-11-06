@@ -155,7 +155,8 @@ private:
             TH1F* momentum;
             
             struct {
-                TH1F* ipSig_ref;
+                TH1F* IP_ref;
+                TH1F* IPSig_ref;
                 TH1F* dxy_origin;
                 TH1F* dxySig_origin;
                 TH1F* dxy_ref;
@@ -175,7 +176,23 @@ private:
             TH1F* pt;
             TH1F* eta;
             TH1F* phi;
-            TH1F* ipSig_ref;
+            TH1F* momentum;
+            
+            struct {
+                TH1F* IP_ref;
+                TH1F* IPSig_ref;
+                TH1F* dxy_origin;
+                TH1F* dxySig_origin;
+                TH1F* dxy_ref;
+                TH1F* dxySig_ref;
+                TH1F* dxy_beamspot;
+                TH1F* dxySig_beamspot;
+                TH1F* dxy_avgPV;
+                TH1F* dxySig_avgPV;
+                TH1F* dxyError;
+                TH1F* dxyError_barrel;
+                TH1F* dxyError_endcap;
+            } ip;
         } seed;
         
         // Vertex-associated tracks
@@ -184,10 +201,24 @@ private:
             TH1F* eta;
             TH1F* phi;
             TH1F* momentum;
-            TH1F* ipSig_ref;
-            TH1F* ipSig_vtx;
-            TH1F* dxy_primaryVtx;
-            TH1F* dxySig_primaryVtx;
+            
+            struct {
+                TH1F* IP_ref;
+                TH1F* IPSig_ref;
+                TH1F* dxy_origin;
+                TH1F* dxySig_origin;
+                TH1F* dxy_ref;
+                TH1F* dxySig_ref;
+                TH1F* dxy_beamspot;
+                TH1F* dxySig_beamspot;
+                TH1F* dxy_avgPV;
+                TH1F* dxySig_avgPV;
+                TH1F* dxy_primaryVtx;       // ADD these two
+                TH1F* dxySig_primaryVtx;    // ADD these two
+                TH1F* dxyError;
+                TH1F* dxyError_barrel;
+                TH1F* dxyError_endcap;
+            } ip;
         } vertex;
     } tracks_;
 
@@ -297,18 +328,13 @@ void ScoutingTreeMakerRun3::beginJob() {
     // ==================== EVENT LEVEL ====================
     TFileDirectory eventDir = fs->mkdir("Event");
     event_.nPrimaryVertices = eventDir.make<TH1F>("nPrimaryVertices","Number of Primary Vertices; nPV; Events",100,0,100);
-    event_.nSelectedVertices = eventDir.make<TH1F>("nSelectedVertices","Number of Selected Vertices; N_{vtx}; Events",200,0,1000); // reduced from 1000 bins
-    event_.primaryVertices_xy = eventDir.make<TH2F>("primaryVertices_xy","Primary Vertices XY; X [cm]; Y [cm]",200,-1,1,200,-1,1); // reduced from 400x400
-    event_.beamspot_xy = eventDir.make<TH2F>("beamspot_xy","Beamspot Position; x_{BS} [cm]; y_{BS} [cm]",200,-1,1,200,-1,1); // reduced from 400x400
-    event_.avgPV_vs_beamspot = eventDir.make<TH2F>("avgPV_vs_beamspot","AvgPV - Beamspot; #Delta x [cm]; #Delta y [cm]",200,-1,1,200,-1,1); // reduced from 400x400
+    event_.nSelectedVertices = eventDir.make<TH1F>("nSelectedVertices","Number of Selected Vertices; N_{vtx}; Events",200,0,1000);
+    event_.primaryVertices_xy = eventDir.make<TH2F>("primaryVertices_xy","Primary Vertices XY; X [cm]; Y [cm]",200,-1,1,200,-1,1);
+    event_.beamspot_xy = eventDir.make<TH2F>("beamspot_xy","Beamspot Position; x_{BS} [cm]; y_{BS} [cm]",200,-1,1,200,-1,1);
+    event_.avgPV_vs_beamspot = eventDir.make<TH2F>("avgPV_vs_beamspot","AvgPV - Beamspot; #Delta x [cm]; #Delta y [cm]",200,-1,1,200,-1,1);
 
     // ==================== VERTICES ====================
     TFileDirectory verticesDir = fs->mkdir("Vertices");
-    
-    // All vertices (before selection)
-    TFileDirectory vtxAllDir = verticesDir.mkdir("All");
-    vertices_.all.chi2norm = vtxAllDir.make<TH1F>("chi2norm","Vertex #chi^{2}/ndof (all); #chi^{2}/ndof; Vertices",200,0,20);
-    vertices_.all.nTracks = vtxAllDir.make<TH1F>("nTracks","Number of Tracks (all); N_{tracks}; Vertices",100,0,100); // reduced from 200 bins
     
     // Create branches for each ntk × angle combination
     TFileDirectory vtxSelDir = verticesDir.mkdir("Selected");
@@ -430,51 +456,79 @@ void ScoutingTreeMakerRun3::beginJob() {
         }
     }
 
-    // ==================== TRACKS (REDUCED BINNING) ====================
+    // ==================== TRACKS ====================
     TFileDirectory tracksDir = fs->mkdir("Tracks");
     
     // All tracks
     TFileDirectory trkAllDir = tracksDir.mkdir("All");
     TFileDirectory trkAllKinDir = trkAllDir.mkdir("Kinematics");
-    tracks_.all.pt = trkAllKinDir.make<TH1F>("pt","Track p_{T} (all); p_{T} [GeV]; Tracks",100,0,100); // reduced from 200
-    tracks_.all.eta = trkAllKinDir.make<TH1F>("eta","Track #eta (all); #eta; Tracks",200,-3,3); // reduced from 400
-    tracks_.all.phi = trkAllKinDir.make<TH1F>("phi","Track #phi (all); #phi; Tracks",200,-3.14,3.14); // reduced from 400
-    tracks_.all.momentum = trkAllKinDir.make<TH1F>("momentum","Track Momentum (all); p [GeV]; Tracks",200,0,100); // reduced from 400
+    tracks_.all.pt = trkAllKinDir.make<TH1F>("pt","Track p_{T} (all); Transverse Momentum p_{T} [GeV]; Tracks",100,0,100);
+    tracks_.all.eta = trkAllKinDir.make<TH1F>("eta","Track #eta (all); #eta; Tracks",100,-3,3);
+    tracks_.all.phi = trkAllKinDir.make<TH1F>("phi","Track #phi (all); #phi; Tracks",100,-3.14,3.14);
+    tracks_.all.momentum = trkAllKinDir.make<TH1F>("momentum","Track Momentum (all); Total Momentum p [GeV]; Tracks",100,0,100);
     
     TFileDirectory trkAllIPDir = trkAllDir.mkdir("ImpactParameter");
-    tracks_.all.ip.ipSig_ref = trkAllIPDir.make<TH1F>("ipSig_ref","|IP|/err wrt ref (all); |IP|/err; Tracks",100,0,50); // reduced from 200
-    tracks_.all.ip.dxy_origin = trkAllIPDir.make<TH1F>("dxy_origin","dxy wrt (0,0) (all); dxy [cm]; Tracks",500,-5,5); // reduced from 1000
-    tracks_.all.ip.dxySig_origin = trkAllIPDir.make<TH1F>("dxySig_origin","|dxy|/err wrt (0,0) (all); |dxy|/err; Tracks",100,0,50); // reduced from 200
-    tracks_.all.ip.dxy_ref = trkAllIPDir.make<TH1F>("dxy_ref","dxy wrt ref (all); dxy [cm]; Tracks",500,-5,5); // reduced from 1000
-    tracks_.all.ip.dxySig_ref = trkAllIPDir.make<TH1F>("dxySig_ref","|dxy|/err wrt ref (all); |dxy|/err; Tracks",100,0,50); // reduced from 200
-    tracks_.all.ip.dxy_beamspot = trkAllIPDir.make<TH1F>("dxy_beamspot","dxy wrt BS (all); dxy [cm]; Tracks",500,-5,5); // reduced from 1000
-    tracks_.all.ip.dxySig_beamspot = trkAllIPDir.make<TH1F>("dxySig_beamspot","|dxy|/err wrt BS (all); |dxy|/err; Tracks",100,0,50); // reduced from 200
-    tracks_.all.ip.dxy_avgPV = trkAllIPDir.make<TH1F>("dxy_avgPV","dxy wrt avgPV (all); dxy [cm]; Tracks",500,-5,5); // reduced from 1000
-    tracks_.all.ip.dxySig_avgPV = trkAllIPDir.make<TH1F>("dxySig_avgPV","|dxy|/err wrt avgPV (all); |dxy|/err; Tracks",100,0,50); // reduced from 200
-    tracks_.all.ip.dxyError = trkAllIPDir.make<TH1F>("dxyError","dxy Error (all); #sigma_{dxy} [cm]; Tracks",500,0,0.1); // reduced from 1000
-    tracks_.all.ip.dxyError_barrel = trkAllIPDir.make<TH1F>("dxyError_barrel","dxy Error Barrel (all); #sigma_{dxy} [cm]; Tracks",500,0,0.1); // reduced from 1000
-    tracks_.all.ip.dxyError_endcap = trkAllIPDir.make<TH1F>("dxyError_endcap","dxy Error Endcap (all); #sigma_{dxy} [cm]; Tracks",500,0,0.1); // reduced from 1000
+    tracks_.all.ip.IP_ref = trkAllIPDir.make<TH1F>("IP_ref","Impact Parameter wrt ref (all); IP [cm]; Tracks",500,0,5);
+    tracks_.all.ip.IPSig_ref = trkAllIPDir.make<TH1F>("IPSig_ref","|IP|/#sigma wrt ref (all); |IP|/#sigma; Tracks",100,0,50);
+    tracks_.all.ip.dxy_origin = trkAllIPDir.make<TH1F>("dxy_origin","dxy wrt (0,0) (all); dxy [cm]; Tracks",200,-2,2);
+    tracks_.all.ip.dxySig_origin = trkAllIPDir.make<TH1F>("dxySig_origin","|dxy|/#sigma wrt (0,0) (all); |dxy|/#sigma; Tracks",100,0,50);
+    tracks_.all.ip.dxy_ref = trkAllIPDir.make<TH1F>("dxy_ref","dxy wrt ref (all); dxy [cm]; Tracks",500,-5,5);
+    tracks_.all.ip.dxySig_ref = trkAllIPDir.make<TH1F>("dxySig_ref","|dxy|/#sigma wrt ref (all); |dxy|/#sigma; Tracks",100,0,50);
+    tracks_.all.ip.dxy_beamspot = trkAllIPDir.make<TH1F>("dxy_beamspot","dxy wrt BS (all); dxy [cm]; Tracks",200,-2,2);
+    tracks_.all.ip.dxySig_beamspot = trkAllIPDir.make<TH1F>("dxySig_beamspot","|dxy|/#sigma wrt BS (all); |dxy|/#sigma; Tracks",100,0,50);
+    tracks_.all.ip.dxy_avgPV = trkAllIPDir.make<TH1F>("dxy_avgPV","dxy wrt avgPV (all); dxy [cm]; Tracks",200,-2,2);
+    tracks_.all.ip.dxySig_avgPV = trkAllIPDir.make<TH1F>("dxySig_avgPV","|dxy|/#sigma wrt avgPV (all); |dxy|/#sigma; Tracks",100,0,50);
+    tracks_.all.ip.dxyError = trkAllIPDir.make<TH1F>("dxyError","dxy Error (all); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
+    tracks_.all.ip.dxyError_barrel = trkAllIPDir.make<TH1F>("dxyError_barrel","dxy Error Barrel (all); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
+    tracks_.all.ip.dxyError_endcap = trkAllIPDir.make<TH1F>("dxyError_endcap","dxy Error Endcap (all); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
     
     // Seed-like tracks
     TFileDirectory trkSeedDir = tracksDir.mkdir("SeedLike");
-    tracks_.seed.pt = trkSeedDir.make<TH1F>("pt","Track p_{T} (seed-like); p_{T} [GeV]; Tracks",100,0,100); // reduced from 200
-    tracks_.seed.eta = trkSeedDir.make<TH1F>("eta","Track #eta (seed-like); #eta; Tracks",100,-3,3); // reduced from 200
-    tracks_.seed.phi = trkSeedDir.make<TH1F>("phi","Track #phi (seed-like); #phi; Tracks",100,-3.14,3.14); // reduced from 200
-    tracks_.seed.ipSig_ref = trkSeedDir.make<TH1F>("ipSig_ref","|IP|/err wrt ref (seed-like); |IP|/err; Tracks",100,0,50); // reduced from 200
+    TFileDirectory trkSeedKinDir = trkSeedDir.mkdir("Kinematics");
+    tracks_.seed.pt = trkSeedKinDir.make<TH1F>("pt","Track p_{T} (seed-like); Transverse Momentum p_{T} [GeV]; Tracks",100,0,100);
+    tracks_.seed.eta = trkSeedKinDir.make<TH1F>("eta","Track #eta (seed-like); #eta; Tracks",100,-3,3);
+    tracks_.seed.phi = trkSeedKinDir.make<TH1F>("phi","Track #phi (seed-like); #phi; Tracks",100,-3.14,3.14);
+    tracks_.seed.momentum = trkSeedKinDir.make<TH1F>("momentum","Track Momentum (seed-like); Total Momentum p [GeV]; Tracks",100,0,100);
+    
+    TFileDirectory trkSeedIPDir = trkSeedDir.mkdir("ImpactParameter");
+    tracks_.seed.ip.IP_ref = trkSeedIPDir.make<TH1F>("IP_ref","Impact Parameter wrt ref (seed-like); IP [cm]; Tracks",500,0,5);
+    tracks_.seed.ip.IPSig_ref = trkSeedIPDir.make<TH1F>("IPSig_ref","|IP|/#sigma wrt ref (seed-like); |IP|/#sigma; Tracks",100,0,50);
+    tracks_.seed.ip.dxy_origin = trkSeedIPDir.make<TH1F>("dxy_origin","dxy wrt (0,0) (seed-like); dxy [cm]; Tracks",200,-2,2);
+    tracks_.seed.ip.dxySig_origin = trkSeedIPDir.make<TH1F>("dxySig_origin","|dxy|/#sigma wrt (0,0) (seed-like); |dxy|/#sigma; Tracks",100,0,50);
+    tracks_.seed.ip.dxy_ref = trkSeedIPDir.make<TH1F>("dxy_ref","dxy wrt ref (seed-like); dxy [cm]; Tracks",500,-5,5);
+    tracks_.seed.ip.dxySig_ref = trkSeedIPDir.make<TH1F>("dxySig_ref","|dxy|/#sigma wrt ref (seed-like); |dxy|/#sigma; Tracks",100,0,50);
+    tracks_.seed.ip.dxy_beamspot = trkSeedIPDir.make<TH1F>("dxy_beamspot","dxy wrt BS (seed-like); dxy [cm]; Tracks",200,-2,2);
+    tracks_.seed.ip.dxySig_beamspot = trkSeedIPDir.make<TH1F>("dxySig_beamspot","|dxy|/#sigma wrt BS (seed-like); |dxy|/#sigma; Tracks",100,0,50);
+    tracks_.seed.ip.dxy_avgPV = trkSeedIPDir.make<TH1F>("dxy_avgPV","dxy wrt avgPV (seed-like); dxy [cm]; Tracks",200,-2,2);
+    tracks_.seed.ip.dxySig_avgPV = trkSeedIPDir.make<TH1F>("dxySig_avgPV","|dxy|/#sigma wrt avgPV (seed-like); |dxy|/#sigma; Tracks",100,0,50);
+    tracks_.seed.ip.dxyError = trkSeedIPDir.make<TH1F>("dxyError","dxy Error (seed-like); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
+    tracks_.seed.ip.dxyError_barrel = trkSeedIPDir.make<TH1F>("dxyError_barrel","dxy Error Barrel (seed-like); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
+    tracks_.seed.ip.dxyError_endcap = trkSeedIPDir.make<TH1F>("dxyError_endcap","dxy Error Endcap (seed-like); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
     
     // Vertex-associated tracks
     TFileDirectory trkVtxDir = tracksDir.mkdir("VertexAssociated");
     TFileDirectory trkVtxKinDir = trkVtxDir.mkdir("Kinematics");
-    tracks_.vertex.pt = trkVtxKinDir.make<TH1F>("pt","Track p_{T} (vertex); p_{T} [GeV]; Tracks",100,0,100); // reduced from 200
-    tracks_.vertex.eta = trkVtxKinDir.make<TH1F>("eta","Track #eta (vertex); #eta; Tracks",200,-3,3); // reduced from 400
-    tracks_.vertex.phi = trkVtxKinDir.make<TH1F>("phi","Track #phi (vertex); #phi; Tracks",200,-3.14,3.14); // reduced from 400
-    tracks_.vertex.momentum = trkVtxKinDir.make<TH1F>("momentum","Track Momentum (vertex); p [GeV]; Tracks",200,0,100); // reduced from 400
+    tracks_.vertex.pt = trkVtxKinDir.make<TH1F>("pt","Track p_{T} (vertex); Transverse Momentum p_{T} [GeV]; Tracks",100,0,100);
+    tracks_.vertex.eta = trkVtxKinDir.make<TH1F>("eta","Track #eta (vertex); #eta; Tracks",100,-3,3);
+    tracks_.vertex.phi = trkVtxKinDir.make<TH1F>("phi","Track #phi (vertex); #phi; Tracks",100,-3.14,3.14);
+    tracks_.vertex.momentum = trkVtxKinDir.make<TH1F>("momentum","Track Momentum (vertex); Total Momentum p [GeV]; Tracks",100,0,100);
     
     TFileDirectory trkVtxIPDir = trkVtxDir.mkdir("ImpactParameter");
-    tracks_.vertex.ipSig_ref = trkVtxIPDir.make<TH1F>("ipSig_ref","|IP|/err wrt ref (vertex); |IP|/err; Tracks",100,0,50); // reduced from 200
-    tracks_.vertex.ipSig_vtx = trkVtxIPDir.make<TH1F>("ipSig_vtx","|IP|/err wrt vertex (vertex); |IP|/err; Tracks",100,0,50); // reduced from 200
-    tracks_.vertex.dxy_primaryVtx = trkVtxIPDir.make<TH1F>("dxy_primaryVtx","dxy wrt primary vertex; dxy [cm]; Tracks",500,-5,5); // reduced from 1000
-    tracks_.vertex.dxySig_primaryVtx = trkVtxIPDir.make<TH1F>("dxySig_primaryVtx","|dxy|/err wrt primary vertex; |dxy|/err; Tracks",100,0,50); // reduced from 200
+    tracks_.vertex.ip.IP_ref = trkVtxIPDir.make<TH1F>("IP_ref","Impact Parameter wrt ref (vertex); IP [cm]; Tracks",500,0,5);
+    tracks_.vertex.ip.IPSig_ref = trkVtxIPDir.make<TH1F>("IPSig_ref","|IP|/#sigma wrt ref (vertex); |IP|/#sigma; Tracks",100,0,50);
+    tracks_.vertex.ip.dxy_origin = trkVtxIPDir.make<TH1F>("dxy_origin","dxy wrt (0,0) (vertex); dxy [cm]; Tracks",200,-2,2);
+    tracks_.vertex.ip.dxySig_origin = trkVtxIPDir.make<TH1F>("dxySig_origin","|dxy|/#sigma wrt (0,0) (vertex); |dxy|/#sigma; Tracks",100,0,50);
+    tracks_.vertex.ip.dxy_ref = trkVtxIPDir.make<TH1F>("dxy_ref","dxy wrt ref (vertex); dxy [cm]; Tracks",500,-5,5);
+    tracks_.vertex.ip.dxySig_ref = trkVtxIPDir.make<TH1F>("dxySig_ref","|dxy|/#sigma wrt ref (vertex); |dxy|/#sigma; Tracks",100,0,50);
+    tracks_.vertex.ip.dxy_beamspot = trkVtxIPDir.make<TH1F>("dxy_beamspot","dxy wrt BS (vertex); dxy [cm]; Tracks",200,-2,2);
+    tracks_.vertex.ip.dxySig_beamspot = trkVtxIPDir.make<TH1F>("dxySig_beamspot","|dxy|/#sigma wrt BS (vertex); |dxy|/#sigma; Tracks",100,0,50);
+    tracks_.vertex.ip.dxy_avgPV = trkVtxIPDir.make<TH1F>("dxy_avgPV","dxy wrt avgPV (vertex); dxy [cm]; Tracks",200,-2,2);
+    tracks_.vertex.ip.dxySig_avgPV = trkVtxIPDir.make<TH1F>("dxySig_avgPV","|dxy|/#sigma wrt avgPV (vertex); |dxy|/#sigma; Tracks",100,0,50);
+    tracks_.vertex.ip.dxy_primaryVtx = trkVtxIPDir.make<TH1F>("dxy_primaryVtx","dxy wrt primary vertex; dxy [cm]; Tracks",200,-2,2);
+    tracks_.vertex.ip.dxySig_primaryVtx = trkVtxIPDir.make<TH1F>("dxySig_primaryVtx","|dxy|/#sigma wrt primary vertex; |dxy|/#sigma; Tracks",100,0,50);
+    tracks_.vertex.ip.dxyError = trkVtxIPDir.make<TH1F>("dxyError","dxy Error (vertex); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
+    tracks_.vertex.ip.dxyError_barrel = trkVtxIPDir.make<TH1F>("dxyError_barrel","dxy Error Barrel (vertex); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
+    tracks_.vertex.ip.dxyError_endcap = trkVtxIPDir.make<TH1F>("dxyError_endcap","dxy Error Endcap (vertex); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
 }
 
 void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -529,46 +583,132 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         event_.avgPV_vs_beamspot->Fill(avgPVVtx.x() - bsVtx.x(), avgPVVtx.y() - bsVtx.y());
     }
 
-    // --- ALL TRACKS + SEED-LIKE TRACKS ---
+    // --- ALL TRACKS (from unpacker) ---
     {
         const math::XYZPoint origin(0.,0.,0.);
         for (size_t i = 0; i < tracksH->size(); ++i) {
             reco::TrackRef trRef(tracksH, i);
             if (!trRef.isNonnull()) continue;
 
-            reco::TransientTrack ttk = ttBuilder.build(trRef);
-            auto ip_ref = ipSigWrtVertex(ttk, refVtx);
-
-            // All tracks
+            // Kinematics
             tracks_.all.pt->Fill(trRef->pt());
             tracks_.all.eta->Fill(trRef->eta());
             tracks_.all.phi->Fill(trRef->phi());
             tracks_.all.momentum->Fill(trRef->p());
             
+            // Build transient track for IP calculations
+            reco::TransientTrack ttk = ttBuilder.build(trRef);
+            GlobalVector direction(trRef->px(), trRef->py(), trRef->pz());
+            
+            // IP wrt reference
+            auto ip_ref = ipSigWrtVertex(ttk, refVtx);
             if (ip_ref.first && std::isfinite(ip_ref.second)) {
-                tracks_.all.ip.ipSig_ref->Fill(std::fabs(ip_ref.second));
+                tracks_.all.ip.IPSig_ref->Fill(std::fabs(ip_ref.second));
             }
             
+            // dxy wrt reference
+            auto signed_ip_ref = IPTools::signedTransverseImpactParameter(ttk, direction, refVtx);
+            if (signed_ip_ref.first) {
+                tracks_.all.ip.IP_ref->Fill(std::fabs(signed_ip_ref.second.value()));
+                tracks_.all.ip.dxy_ref->Fill(signed_ip_ref.second.value());
+                if (signed_ip_ref.second.error() > 0) {
+                    tracks_.all.ip.dxySig_ref->Fill(std::fabs(signed_ip_ref.second.significance()));
+                }
+            }
+            
+            // dxy wrt origin
             const double dxyErr = trRef->dxyError();
             const double dxy0 = trRef->dxy(origin);
             tracks_.all.ip.dxy_origin->Fill(dxy0);
             if (dxyErr > 0) {
                 tracks_.all.ip.dxySig_origin->Fill(std::fabs(dxy0 / dxyErr));
             }
+            
+            // dxy errors
             tracks_.all.ip.dxyError->Fill(dxyErr);
-            if (std::fabs(trRef->eta()) < 1.0) tracks_.all.ip.dxyError_barrel->Fill(dxyErr);
-            else tracks_.all.ip.dxyError_endcap->Fill(dxyErr);
+            if (std::fabs(trRef->eta()) < 1.0) {
+                tracks_.all.ip.dxyError_barrel->Fill(dxyErr);
+            } else {
+                tracks_.all.ip.dxyError_endcap->Fill(dxyErr);
+            }
+            
+            // dxy wrt beamspot
+            if (haveBS) {
+                auto ip_bs = IPTools::signedTransverseImpactParameter(ttk, direction, bsVtx);
+                if (ip_bs.first) {
+                    tracks_.all.ip.dxy_beamspot->Fill(ip_bs.second.value());
+                    if (ip_bs.second.error() > 0) {
+                        tracks_.all.ip.dxySig_beamspot->Fill(std::fabs(ip_bs.second.significance()));
+                    }
+                }
+            }
+            
+            // dxy wrt avgPV
+            if (havePV) {
+                auto ip_avgPV = IPTools::signedTransverseImpactParameter(ttk, direction, avgPVVtx);
+                if (ip_avgPV.first) {
+                    tracks_.all.ip.dxy_avgPV->Fill(ip_avgPV.second.value());
+                    if (ip_avgPV.second.error() > 0) {
+                        tracks_.all.ip.dxySig_avgPV->Fill(std::fabs(ip_avgPV.second.significance()));
+                    }
+                }
+            }
 
-            // Seed-like tracks
+            // --- SEED-LIKE TRACKS (apply Vertexer cuts) ---
             if (trRef->pt() <= seed_minPt_) continue;
             if (!(ip_ref.first && std::isfinite(ip_ref.second))) continue;
             const double ipSigAbs = std::fabs(ip_ref.second);
             if (ipSigAbs <= seed_minIPSig_) continue;
             
-            tracks_.seed.ipSig_ref->Fill(ipSigAbs);
+            // Kinematics
             tracks_.seed.pt->Fill(trRef->pt());
             tracks_.seed.eta->Fill(trRef->eta());
             tracks_.seed.phi->Fill(trRef->phi());
+            tracks_.seed.momentum->Fill(trRef->p());
+            
+            // Impact parameters (reuse variables from all-tracks section)
+            tracks_.seed.ip.IPSig_ref->Fill(ipSigAbs);
+            
+            if (signed_ip_ref.first) {
+                tracks_.seed.ip.IP_ref->Fill(std::fabs(signed_ip_ref.second.value()));
+                tracks_.seed.ip.dxy_ref->Fill(signed_ip_ref.second.value());
+                if (signed_ip_ref.second.error() > 0) {
+                    tracks_.seed.ip.dxySig_ref->Fill(std::fabs(signed_ip_ref.second.significance()));
+                }
+            }
+            
+            // dxy wrt origin (reuse dxy0 and dxyErr already computed above)
+            tracks_.seed.ip.dxy_origin->Fill(dxy0);
+            if (dxyErr > 0) {
+                tracks_.seed.ip.dxySig_origin->Fill(std::fabs(dxy0 / dxyErr));
+            }
+            
+            tracks_.seed.ip.dxyError->Fill(dxyErr);
+            if (std::fabs(trRef->eta()) < 1.0) {
+                tracks_.seed.ip.dxyError_barrel->Fill(dxyErr);
+            } else {
+                tracks_.seed.ip.dxyError_endcap->Fill(dxyErr);
+            }
+            
+            if (haveBS) {
+                auto ip_bs = IPTools::signedTransverseImpactParameter(ttk, direction, bsVtx);
+                if (ip_bs.first) {
+                    tracks_.seed.ip.dxy_beamspot->Fill(ip_bs.second.value());
+                    if (ip_bs.second.error() > 0) {
+                        tracks_.seed.ip.dxySig_beamspot->Fill(std::fabs(ip_bs.second.significance()));
+                    }
+                }
+            }
+            
+            if (havePV) {
+                auto ip_avgPV = IPTools::signedTransverseImpactParameter(ttk, direction, avgPVVtx);
+                if (ip_avgPV.first) {
+                    tracks_.seed.ip.dxy_avgPV->Fill(ip_avgPV.second.value());
+                    if (ip_avgPV.second.error() > 0) {
+                        tracks_.seed.ip.dxySig_avgPV->Fill(std::fabs(ip_avgPV.second.significance()));
+                    }
+                }
+            }
         }
     }
 
@@ -609,28 +749,87 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
     for (unsigned int t = 0; t < verticesH->size(); ++t) {
         const auto& v = verticesH->at(t);
 
-        // --- VERTEX-ASSOCIATED TRACKS (before selection) ---
+        // --- VERTEX-ASSOCIATED TRACKS (from vertex.tracks()) ---
         for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
             reco::TrackRef tr = it->castTo<reco::TrackRef>();
             if (!tr.isNonnull()) continue;
             if (v.trackWeight(*it) < 0.5) continue;
 
-            reco::TransientTrack ttk = ttBuilder.build(tr);
-
-            auto ip_ref = ipSigWrtVertex(ttk, refVtx);
-            if (ip_ref.first && std::isfinite(ip_ref.second)) {
-                tracks_.vertex.ipSig_ref->Fill(std::fabs(ip_ref.second));
-            }
-
-            auto ip_v = ipSigWrtVertex(ttk, v);
-            if (ip_v.first && std::isfinite(ip_v.second)) {
-                tracks_.vertex.ipSig_vtx->Fill(std::fabs(ip_v.second));
-            }
-
+            // Kinematics
             tracks_.vertex.pt->Fill(tr->pt());
             tracks_.vertex.eta->Fill(tr->eta());
             tracks_.vertex.phi->Fill(tr->phi());
             tracks_.vertex.momentum->Fill(tr->p());
+
+            // Build transient track
+            reco::TransientTrack ttk = ttBuilder.build(tr);
+            GlobalVector direction(tr->px(), tr->py(), tr->pz());
+            
+            // IP wrt reference
+            auto ip_ref = ipSigWrtVertex(ttk, refVtx);
+            if (ip_ref.first && std::isfinite(ip_ref.second)) {
+                tracks_.vertex.ip.IPSig_ref->Fill(std::fabs(ip_ref.second));
+            }
+            
+            // dxy wrt reference
+            auto signed_ip_ref = IPTools::signedTransverseImpactParameter(ttk, direction, refVtx);
+            if (signed_ip_ref.first) {
+                tracks_.vertex.ip.IP_ref->Fill(std::fabs(signed_ip_ref.second.value()));
+                tracks_.vertex.ip.dxy_ref->Fill(signed_ip_ref.second.value());
+                if (signed_ip_ref.second.error() > 0) {
+                    tracks_.vertex.ip.dxySig_ref->Fill(std::fabs(signed_ip_ref.second.significance()));
+                }
+            }
+            
+            // dxy wrt origin
+            const math::XYZPoint origin(0.,0.,0.);
+            const double dxyErr = tr->dxyError();
+            const double dxy0 = tr->dxy(origin);
+            tracks_.vertex.ip.dxy_origin->Fill(dxy0);
+            if (dxyErr > 0) {
+                tracks_.vertex.ip.dxySig_origin->Fill(std::fabs(dxy0 / dxyErr));
+            }
+            
+            // dxy errors
+            tracks_.vertex.ip.dxyError->Fill(dxyErr);
+            if (std::fabs(tr->eta()) < 1.0) {
+                tracks_.vertex.ip.dxyError_barrel->Fill(dxyErr);
+            } else {
+                tracks_.vertex.ip.dxyError_endcap->Fill(dxyErr);
+            }
+            
+            // dxy wrt beamspot
+            if (haveBS) {
+                auto ip_bs = IPTools::signedTransverseImpactParameter(ttk, direction, bsVtx);
+                if (ip_bs.first) {
+                    tracks_.vertex.ip.dxy_beamspot->Fill(ip_bs.second.value());
+                    if (ip_bs.second.error() > 0) {
+                        tracks_.vertex.ip.dxySig_beamspot->Fill(std::fabs(ip_bs.second.significance()));
+                    }
+                }
+            }
+            
+            // dxy wrt avgPV
+            if (havePV) {
+                auto ip_avgPV = IPTools::signedTransverseImpactParameter(ttk, direction, avgPVVtx);
+                if (ip_avgPV.first) {
+                    tracks_.vertex.ip.dxy_avgPV->Fill(ip_avgPV.second.value());
+                    if (ip_avgPV.second.error() > 0) {
+                        tracks_.vertex.ip.dxySig_avgPV->Fill(std::fabs(ip_avgPV.second.significance()));
+                    }
+                }
+            }
+            
+            // dxy wrt primary displaced vertex (highest sum pT^2)
+            if (pmvtx) {
+                auto ip_pmvtx = IPTools::signedTransverseImpactParameter(ttk, direction, *pmvtx);
+                if (ip_pmvtx.first) {
+                    tracks_.vertex.ip.dxy_primaryVtx->Fill(ip_pmvtx.second.value());
+                    if (ip_pmvtx.second.error() > 0) {
+                        tracks_.vertex.ip.dxySig_primaryVtx->Fill(std::fabs(ip_pmvtx.second.significance()));
+                    }
+                }
+            }
         }
 
         vector<TrackRef> tks = vertex_track_vec(v);
@@ -694,12 +893,9 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         }
 
         // Calculate vertex properties
-        double invMass = sumVec.M();  // Using correct relativistic mass from 4-vector
+        double invMass = sumVec.M();
         double avg_dxy = (ntk > 0 ? sum_dxy / ntk : 0.0);
         double avg_dxyErr = (ntk > 0 ? sum_dxyErr / ntk : 0.0);
-
-        vertices_.all.chi2norm->Fill(v.normalizedChi2());
-        vertices_.all.nTracks->Fill(ntk);
 
         // --- Distance calculations ---
         // Use proper instances for vertex distance calculations (2D/3D match Vertexer)
@@ -845,48 +1041,6 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
                 ++nSelVertices;  // Count each passing branch
             }
         }
-
-        // Track histograms (impact parameters for vertex-associated tracks)
-        for(auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
-            TrackRef track = it->castTo<TrackRef>();
-            if(!track.isNonnull()) continue;
-            
-            reco::TransientTrack transientTrack = ttBuilder.build(track);
-            GlobalVector direction(track->px(), track->py(), track->pz());
-            
-            std::pair<bool, Measurement1D> ip_ref = IPTools::signedTransverseImpactParameter(transientTrack, direction, refVtx);
-            
-            if (ip_ref.first) {
-                tracks_.all.ip.dxy_ref->Fill(ip_ref.second.value());
-                if (ip_ref.second.error() > 0) {
-                    tracks_.all.ip.dxySig_ref->Fill(std::fabs(ip_ref.second.significance()));
-                }
-            }
-            
-            if (havePV) {
-                std::pair<bool, Measurement1D> ip_avgPV = IPTools::signedTransverseImpactParameter(transientTrack, direction, avgPVVtx);
-                if (ip_avgPV.first) {
-                    tracks_.all.ip.dxy_avgPV->Fill(ip_avgPV.second.value());
-                    tracks_.all.ip.dxySig_avgPV->Fill(std::fabs(ip_avgPV.second.significance()));
-                }
-            }
-            
-            if (haveBS) {
-                std::pair<bool, Measurement1D> ip_bs = IPTools::signedTransverseImpactParameter(transientTrack, direction, bsVtx);
-                if (ip_bs.first) {
-                    tracks_.all.ip.dxy_beamspot->Fill(ip_bs.second.value());
-                    tracks_.all.ip.dxySig_beamspot->Fill(std::fabs(ip_bs.second.significance()));
-                }
-            }
-            
-            if (pmvtx) {
-                std::pair<bool, Measurement1D> ip_pmvtx = IPTools::signedTransverseImpactParameter(transientTrack, direction, *pmvtx);
-                if (ip_pmvtx.first) {
-                    tracks_.vertex.dxy_primaryVtx->Fill(ip_pmvtx.second.value());
-                    tracks_.vertex.dxySig_primaryVtx->Fill(std::fabs(ip_pmvtx.second.significance()));
-                }
-            }
-        }
     }
 
     event_.nSelectedVertices->Fill(static_cast<double>(nSelVertices));
@@ -977,7 +1131,7 @@ void ScoutingTreeMakerRun3::fillDescriptions(edm::ConfigurationDescriptions& des
     
     desc.add<std::vector<double>>("cut_opening_angle_min", {-1.0});
     desc.add<double>("required_invmass", -1.0);
-    desc.add<double>("required_chi2", -1.0);
+    desc.add<double>("required_chi2", -11.0);
     desc.add<double>("required_dBV_min", -1.0);
     desc.add<double>("required_dBV_max", -1.0);
     desc.add<double>("required_dxy_min", -1.0);

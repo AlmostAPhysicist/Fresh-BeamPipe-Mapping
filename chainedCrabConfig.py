@@ -1,7 +1,7 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-theTag = "ScoutingData_Redone_0mod10_v3"  # updated tag
+theTag = "ScoutingData_Redone_v5"  # updated tag
 # theTag = "ScoutingData_Updated_10mod15_v1"  # updated tag
 
 config.General.requestName = theTag
@@ -34,7 +34,7 @@ config.Data.inputDBS = 'global'
 # WARNING: check per-job runtime after a small test submission — may require unitsPerJob=1.
 
 config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 2  # Number of files per job
+config.Data.unitsPerJob = 30  # Number of files per job
 # config.Data.totalUnits = 1000
 
 # config.Data.splitting = 'Automatic'
