@@ -3,12 +3,12 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("CHAIN")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkSummary.reportEvery = 5
-process.MessageLogger.cerr.FwkReport.reportEvery = 5
+# process.MessageLogger.cerr.FwkSummary.reportEvery = 5
+# process.MessageLogger.cerr.FwkReport.reportEvery = 5
 # process.MessageLogger.cerr.FwkSummary.reportEvery = 100
 # process.MessageLogger.cerr.FwkReport.reportEvery = 100
-# process.MessageLogger.cerr.FwkSummary.reportEvery = 1000
-# process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkSummary.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 # process.MessageLogger.cerr.threshold = cms.untracked.string('DEBUG')
 # process.MessageLogger.debugModules = cms.untracked.vstring('hltScoutingUnpackProducer', 'Vertexer', 'scoutingTree')
@@ -19,15 +19,15 @@ process.MessageLogger.debugModules = cms.untracked.vstring()  # Disable debug fo
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True),
     TryToContinue = cms.untracked.vstring('ProductNotFound'),
-    # numberOfThreads = cms.untracked.uint32(4),    # adjust to machine cores
-    # numberOfStreams = cms.untracked.uint32(0),     # let framework pick sensible streams
+    numberOfThreads = cms.untracked.uint32(4),    # adjust to machine cores
+    numberOfStreams = cms.untracked.uint32(0),     # let framework pick sensible streams
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(2000)  # Limited events for testing
+    # input = cms.untracked.int32(20000)  # Limited events for testing
     # input = cms.untracked.int32(150000)  # Local
     # input = cms.untracked.int32(500000)  # Process all events
-    # input = cms.untracked.int32(-1)  # Process all events
+    input = cms.untracked.int32(-1)  # Process all events
 )
 
 # -------------------------- INPUT PATH --------------------------------
@@ -44,7 +44,7 @@ process.source = cms.Source("PoolSource",
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root", # Empty file
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/013b488b-7af4-450f-b175-b39623c72ae2.root",
     # MC Files
-    "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/0639b06f-0a53-4150-ac4f-ffab0df5ef91.root",
+    # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/0639b06f-0a53-4150-ac4f-ffab0df5ef91.root",
     # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/06a339e5-cb52-4e75-b0e4-91285db66993.root"
     )
 )
@@ -54,8 +54,8 @@ process.source = cms.Source("PoolSource",
 # Global tag
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
-# process.GlobalTag = GlobalTag(process.GlobalTag, '140X_dataRun3_Prompt_v4', '')
-process.GlobalTag = GlobalTag(process.GlobalTag, '140X_mcRun3_2024_realistic_v26', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '140X_dataRun3_Prompt_v4', '')
+# process.GlobalTag = GlobalTag(process.GlobalTag, '140X_mcRun3_2024_realistic_v26', '')
 
 # Geometry and Magnetic Field
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
@@ -65,9 +65,9 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # -------------------------- OUTPUT PATH --------------------------------
 #-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/ScoutingTree_MC_Local_test_18.root")
+    # fileName = cms.string("test-outputs/ScoutingTree_MC_Local_test_20.root")
     # fileName = cms.string("outputs/MC_ScoutingTree_Local_8.root")
-    # fileName = cms.string("ScoutingTree_Output.root")  # This is the only output saved
+    fileName = cms.string("ScoutingTree_Output.root")  # This is the only output saved
 )
 #-----------------------------------------------------------------------
 
@@ -103,20 +103,20 @@ process.Vertexer = cms.EDProducer('Vertexer',
     minSeedIPSig = cms.untracked.double(4.0),
     minSeedPt    = cms.untracked.double(0.9),
 
-    # Other parameters (kept for downstream, but not used in seed preselection)
-    # pt_min_cut = cms.double(0.9),
-    # dxySig_min_cut = cms.double(4.0),
-    # dxySig_max_cut = cms.double(100.0),
-    # npixelHits_min_cut = cms.int32(1),
-    # nstripHits_min_cut = cms.int32(0),
-    # ntrackerLayers_min_cut = cms.int32(5),
+    # Other parameters (kept for downstream, but not used in seed preselection) Again, NOTE: These are NOT used for seed selection within the Vertexer! These are only for ScoutingTreeMaker downstream (I should probably change this later for clarity)
+    pt_min_cut = cms.double(0.9),
+    dxySig_min_cut = cms.double(4.0),
+    dxySig_max_cut = cms.double(100.0),
+    npixelHits_min_cut = cms.int32(1),
+    nstripHits_min_cut = cms.int32(0),
+    ntrackerLayers_min_cut = cms.int32(5),
 
     n_tracks_per_seed_vertex = cms.int32(2),
     max_seed_vertex_chi2 = cms.double(5),
     resolve_split_vertices_loose = cms.bool(False),
     resolve_split_vertices_tight = cms.bool(True),
     investigate_merged_vertices = cms.bool(False),
-    use_2d_vertex_dist = cms.bool(False), # Keep as 3D
+    use_2d_vertex_dist = cms.bool(False), # Keep as 3D | Really this is not a good control since different parts of the algorithm require different kinds of distances.
     use_2d_track_dist = cms.bool(True), # Switched to using 2D track distance for IPsig (True)
     merge_anyway_dist = cms.double(-1),
     merge_anyway_sig = cms.double(4),
@@ -136,18 +136,19 @@ process.Vertexer = cms.EDProducer('Vertexer',
 process.scoutingTree = cms.EDAnalyzer('ScoutingTreeMakerRun3',
     # Discrete ntk cuts - each creates a separate branch
     cut_ntk = cms.VPSet(
-        cms.PSet(values = cms.vint32()),           # No cut (accept all ntk)
-        # cms.PSet(values = cms.vint32(2)),          # Only ntk=2
+        # cms.PSet(values = cms.vint32()),           # No cut (accept all ntk)
+        cms.PSet(values = cms.vint32(2)),          # Only ntk=2
         cms.PSet(values = cms.vint32(3)),          # Only ntk=3
-        cms.PSet(values = cms.vint32(2, 3))        # ntk=2 OR ntk=3
+        # cms.PSet(values = cms.vint32(2, 3))        # ntk=2 OR ntk=3
+        cms.PSet(values = cms.vint32(3, 4)),          # Only ntk=4
         # ntk = 3,4,5 maybe
     ),
     
     # Opening angle cuts - each creates a separate branch
-    cut_opening_angle_min = cms.vdouble(-1, 0.1, 0.25, 0.5),  # -1 = no cut, then 0.1 rad, 0.25 rad, 0.5 rad
+    cut_opening_angle_min = cms.vdouble(-1, 0.05, 0.1, 0.25, 0.5, 1.0),  # -1 = no cut, then 0.05 rad, 0.1 rad, 0.25 rad, 0.5 rad, 1.0 rad
     
     # Other (non-branching) cuts
-    required_invmass = cms.double(-1), # 2GeV  min
+    required_invmass = cms.double(2.0), # 2GeV  min
     required_chi2 = cms.double(-1),
     required_dBV_min = cms.double(-1),
     required_dBV_max = cms.double(-1),

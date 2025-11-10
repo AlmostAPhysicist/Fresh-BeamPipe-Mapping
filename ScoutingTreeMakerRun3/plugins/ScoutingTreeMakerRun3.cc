@@ -563,9 +563,8 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         return;
     }
     
-    // Use proper instances for vertex distance calculations (2D/3D match Vertexer)
+    // Use proper instance for 2D vertex distance calculations
     VertexDistanceXY vertexDist2D;
-    VertexDistance3D vertexDist3D;
 
     // --- NEW: helper to compute |IP| significance wrt a vertex in 2D or 3D (mirrors seed setting) ---
     auto ipSigWrtVertex = [&](const reco::TransientTrack& ttk, const reco::Vertex& vtx) -> std::pair<bool,double> {
@@ -897,18 +896,20 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         double avg_dxy = (ntk > 0 ? sum_dxy / ntk : 0.0);
         double avg_dxyErr = (ntk > 0 ? sum_dxyErr / ntk : 0.0);
 
-        // --- Distance calculations ---
-        // Use proper instances for vertex distance calculations (2D/3D match Vertexer)
-        Measurement1D dBVref_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, refVtx)
-                                                         : vertexDist3D.distance(v, refVtx);
+        // --- Distance calculations (ALWAYS 2D for consistency with Vertexer) ---
+        // Reference distance
+        Measurement1D dBVref_meas = vertexDist2D.distance(v, refVtx);
         double dBVref = dBVref_meas.value();
         double dBV_err = dBVref_meas.error();
         
-        // Calculate origin distance using same method for consistency
+        // Origin distance - use default-constructed Error (all zeros)
         Vertex originVtx(Vertex::Point(0,0,0), Vertex::Error());
-        Measurement1D dBV00_meas = use_2d_vertex_dist_ ? vertexDist2D.distance(v, originVtx)
-                                                        : vertexDist3D.distance(v, originVtx);
+        Measurement1D dBV00_meas = vertexDist2D.distance(v, originVtx);
         double dBV00 = dBV00_meas.value();
+
+        // REMOVE the duplicate calculation block that was here!
+        // The old code had a second calculation using use_2d_vertex_dist_ toggle
+        // which was overwriting these correct 2D values with 3D values.
 
         // Loop over all ntk × angle branches
         for (size_t i_ntk = 0; i_ntk < cut_ntk_.size(); ++i_ntk) {
@@ -983,8 +984,15 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
                 branch.openingAngle.min->Fill(minAngle);
                 branch.openingAngle.max->Fill(maxAngle);
                 
-                if (havePV) branch.distance.dBV_avgPV->Fill(use_2d_vertex_dist_ ? vertexDist2D.distance(v, avgPVVtx).value() : vertexDist3D.distance(v, avgPVVtx).value());
-                if (haveBS) branch.distance.dBV_beamspot->Fill(use_2d_vertex_dist_ ? vertexDist2D.distance(v, bsVtx).value() : vertexDist3D.distance(v, bsVtx).value());
+                // Additional reference distances (always 2D)
+                if (havePV) {
+                    Measurement1D dBVavgPV = vertexDist2D.distance(v, avgPVVtx);
+                    branch.distance.dBV_avgPV->Fill(dBVavgPV.value());
+                }
+                if (haveBS) {
+                    Measurement1D dBVbs = vertexDist2D.distance(v, bsVtx);
+                    branch.distance.dBV_beamspot->Fill(dBVbs.value());
+                }
                 
                 branch.pt->Fill(sumVec.Pt());
                 branch.eta->Fill(sumVec.Eta());
