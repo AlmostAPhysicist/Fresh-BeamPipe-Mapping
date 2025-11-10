@@ -2,25 +2,20 @@
 #include <TDirectory.h>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH2D.h>
 #include <TList.h>
 #include <TKey.h>
 #include <TString.h>
 #include <TObject.h>
 #include <iostream>
 #include <fstream>
-#include <map>
 #include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <TProfile.h>
-#include <TProfile2D.h>
 #include <vector>
 #include <unordered_map>
-#include <sstream>
-#include <cstdio> // for std::remove
+#include <cstdio>
 
-// Helper function to convert TH1/TH2 to TH1D/TH2D
+// Helper to convert TH1/TH2 to TH1D/TH2D for proper merging
 static TH1* ConvertToDoubleHist(TH1* hist, const TString& newName) {
     TString className = hist->ClassName();
     if (className.BeginsWith("TH2")) {
@@ -52,86 +47,91 @@ static TH1* ConvertToDoubleHist(TH1* hist, const TString& newName) {
     }
 }
 
-struct HistEntry {
-    std::string name;
-    TH1* hist;
-};
-
-// Helper to merge ROOT files (batch outputs) into a final output
-static void MergeBatchFiles(const std::vector<std::string>& batchFiles, const std::string& finalFile) {
-    TH1::AddDirectory(kFALSE);
-    std::unordered_map<std::string, TH1*> histMap;
-    std::vector<std::string> histOrder;
-
-    size_t totalBatches = batchFiles.size();
-    for (size_t i = 0; i < totalBatches; ++i) {
-        std::cout << "[Merge Progress] " << (int)((100.0 * (i+1)) / totalBatches + 0.5)
-                  << "% (" << (i+1) << "/" << totalBatches << " batch files processed)" << std::endl;
-        TFile* file = TFile::Open(batchFiles[i].c_str());
-        if (!file || file->IsZombie()) {
-            std::cerr << "Error: Cannot open batch file " << batchFiles[i] << std::endl;
+// Recursive function to collect all histograms from a directory (and subdirectories)
+// pathPrefix is the full path from root (e.g., "dir1/dir2/") to maintain structure
+static void CollectHistogramsRecursive(TDirectory* dir, const TString& pathPrefix,
+                                      std::unordered_map<std::string, TH1*>& histMap,
+                                      std::vector<std::string>& histOrder) {
+    if (!dir) return;
+    
+    TIter next(dir->GetListOfKeys());
+    TKey* key;
+    while ((key = (TKey*)next())) {
+        TString keyName = key->GetName();
+        TString className = key->GetClassName();
+        
+        TObject* obj = key->ReadObj();
+        if (!obj) continue;
+        
+        // Check if it's a directory
+        if (TDirectory* subdir = dynamic_cast<TDirectory*>(obj)) {
+            TString newPrefix = pathPrefix + keyName + "/";
+            CollectHistogramsRecursive(subdir, newPrefix, histMap, histOrder);
+            delete obj;
             continue;
         }
-        TDirectory* dir = (TDirectory*)file->Get("scoutingTree");
-        if (!dir) {
-            std::cerr << "Error: Cannot access scoutingTree in " << batchFiles[i] << std::endl;
-            file->Close();
-            delete file;
+        
+        // Check if it's a histogram
+        TH1* hist = dynamic_cast<TH1*>(obj);
+        if (!hist) {
+            delete obj;
             continue;
         }
-        // iterate keys and use ReadObj() so we own the object and can delete it immediately
-        TIter next(dir->GetListOfKeys());
-        TKey* key;
-        while ((key = (TKey*)next())) {
-            TString histName = key->GetName();
-            TString className = key->GetClassName();
-
-            TObject* obj = key->ReadObj();            // caller owns obj
-            TH1* hist = dynamic_cast<TH1*>(obj);
-            if (!hist) { delete obj; continue; }
-
-            std::string histNameStr = histName.Data();
-            if (histMap.find(histNameStr) == histMap.end()) {
-                TH1* newHist = nullptr;
-                if (className.BeginsWith("TH1I") || className.BeginsWith("TH2I")) {
-                    newHist = ConvertToDoubleHist(hist, TString::Format("%s_combined", histName.Data()));
-                } else {
-                    newHist = (TH1*)hist->Clone(TString::Format("%s_combined", histName.Data()));
-                    newHist->SetDirectory(0);
-                }
-                histMap[histNameStr] = newHist;
-                histOrder.push_back(histNameStr);
+        
+        // Build full path key
+        std::string fullPath = (pathPrefix + keyName).Data();
+        
+        if (histMap.find(fullPath) == histMap.end()) {
+            // First occurrence: create and store
+            TH1* newHist = nullptr;
+            if (className.BeginsWith("TH1I") || className.BeginsWith("TH2I")) {
+                newHist = ConvertToDoubleHist(hist, keyName);
             } else {
-                histMap[histNameStr]->Add(hist);
+                newHist = (TH1*)hist->Clone(keyName);
+                newHist->SetDirectory(0);
             }
-            delete obj; // free the temporary object loaded from file immediately
+            histMap[fullPath] = newHist;
+            histOrder.push_back(fullPath);
+        } else {
+            // Add to existing
+            histMap[fullPath]->Add(hist);
         }
-        file->Close();
-        delete file;
+        delete obj;
     }
-
-    TFile* outputFile = new TFile(finalFile.c_str(), "RECREATE");
-    TDirectory* outputDir = outputFile->mkdir("scoutingTree");
-    outputDir->cd();
-    for (size_t i = 0; i < histOrder.size(); ++i) {
-        histMap[histOrder[i]]->Write();
-        delete histMap[histOrder[i]];
-    }
-    outputFile->Close();
-    delete outputFile;
-    std::cout << "Final merge complete. Output: " << finalFile << std::endl;
-    std::cout << "Total unique histograms in final file: " << histOrder.size() << std::endl;
 }
 
-void combineHistogramsFromFileList(const char* inputListFile, const char* combinedFileName = nullptr, int batch_start = 1) {
+// Helper to recreate directory structure in output file
+static TDirectory* EnsureDirectoryPath(TDirectory* base, const TString& path) {
+    if (path.IsNull() || path == "") return base;
+    
+    TObjArray* tokens = path.Tokenize("/");
+    TDirectory* current = base;
+    for (Int_t i = 0; i < tokens->GetEntries(); ++i) {
+        TString dirName = ((TObjString*)tokens->At(i))->GetString();
+        if (dirName.IsNull()) continue;
+        
+        TDirectory* subdir = (TDirectory*)current->Get(dirName);
+        if (!subdir) {
+            subdir = current->mkdir(dirName);
+        }
+        current = subdir;
+    }
+    delete tokens;
+    return current;
+}
+
+// Main function: combine histograms from list of files
+// Creates output file with IDENTICAL structure to inputs, but with combined entries
+void combineHistogramsFromFileList(const char* inputListFile, const char* outputFileName = "combined_histograms.root") {
     TH1::AddDirectory(kFALSE);
 
-    // Read input file list into a vector
+    // Read input file list
     std::ifstream fileList(inputListFile);
     if (!fileList.is_open()) {
         std::cerr << "Error: Cannot open input file list " << inputListFile << std::endl;
         return;
     }
+    
     std::vector<std::string> allFiles;
     std::string tempFileName;
     while (std::getline(fileList, tempFileName)) {
@@ -139,139 +139,63 @@ void combineHistogramsFromFileList(const char* inputListFile, const char* combin
     }
     fileList.close();
 
-    int nFilesToProcess = allFiles.size();
-    int batchSize = 100;
-    int nBatches = (nFilesToProcess + batchSize - 1) / batchSize;
-    TString outputDirName = "outputs";
-    struct stat st = {0};
-    if (stat(outputDirName.Data(), &st) == -1) {
-        if (mkdir(outputDirName.Data(), 0755) != 0) {
-            std::cerr << "Error: Could not create output directory 'outputs'." << std::endl;
-            return;
-        }
-    }
-
-    std::vector<std::string> batchOutputFiles;
-    for (int batchIdx = 0; batchIdx < nBatches; ++batchIdx) {
-        int batchNum = batchIdx + 1;
-        TString tag = combinedFileName ? combinedFileName : "auto";
-        TString batchFileName = TString::Format("%s/combined_histograms_%s_batch%d.root", outputDirName.Data(), tag.Data(), batchNum);
-        batchOutputFiles.push_back(batchFileName.Data());
-    }
-
-    // If batch_start > nBatches or batch_start == -1, skip batch processing and just merge
-    if (batch_start > nBatches || batch_start == -1) {
-        std::cout << "Batch start (" << batch_start << ") is greater than number of batches (" << nBatches << ") or is -1. Skipping batch processing and merging batch files only." << std::endl;
-        TString tag = combinedFileName ? combinedFileName : "auto";
-        TString finalFileName = TString::Format("outputs/combined_histograms_%s_final.root", tag.Data());
-        MergeBatchFiles(batchOutputFiles, finalFileName.Data());
+    if (allFiles.empty()) {
+        std::cerr << "Error: No files in input list" << std::endl;
         return;
     }
 
-    for (int batchIdx = 0; batchIdx < nBatches; ++batchIdx) {
-        int batchNum = batchIdx + 1;
-        if (batchNum < batch_start) {
+    std::cout << "Combining " << allFiles.size() << " files..." << std::endl;
+
+    // Histogram containers
+    std::unordered_map<std::string, TH1*> histMap;
+    std::vector<std::string> histOrder;
+
+    // Process all files
+    for (size_t i = 0; i < allFiles.size(); ++i) {
+        const std::string& fileName = allFiles[i];
+        if (fileName.empty()) continue;
+        
+        TFile* file = TFile::Open(fileName.c_str());
+        if (!file || file->IsZombie()) {
+            std::cerr << "Error: Cannot open file " << fileName << std::endl;
             continue;
         }
 
-        int startIdx = batchIdx * batchSize;
-        int endIdx = std::min(startIdx + batchSize, nFilesToProcess);
+        // Recursively collect all histograms from entire file structure
+        CollectHistogramsRecursive(file, "", histMap, histOrder);
 
-        // Prepare batch output file name
-        TString tag = combinedFileName ? combinedFileName : "auto";
-        TString batchFileName = TString::Format("%s/combined_histograms_%s_batch%d.root", outputDirName.Data(), tag.Data(), batchNum);
-        // (do not push here; batchOutputFiles was already prefilled earlier)
-        // Delete batch file if it exists
-        std::remove(batchFileName.Data());
+        file->Close();
+        delete file;
 
-        // Progress print
-        std::cout << "Processing batch " << batchNum << "/" << nBatches
-                  << " (files " << (startIdx+1) << " to " << endIdx << ")" << std::endl;
-
-        // Histogram containers for this batch
-        std::unordered_map<std::string, TH1*> histMap;
-        std::vector<std::string> histOrder;
-        int skippedFiles = 0;
-        int totalFiles = 0;
-
-        for (int i = startIdx; i < endIdx; ++i) {
-            const std::string& fileName = allFiles[i];
-            if (fileName.empty()) continue;
-            totalFiles++;
-            TString fileNameTStr = fileName.c_str();
-            TFile *file = TFile::Open(fileNameTStr);
-
-            if (!file || file->IsZombie()) {
-                std::cerr << "Error: Cannot open file " << fileName << std::endl;
-                skippedFiles++;
-                continue;
-            }
-
-            TDirectory *dir = (TDirectory*)file->Get("scoutingTree");
-            if (!dir) {
-                std::cerr << "Error: Cannot access scoutingTree in " << fileName << std::endl;
-                file->Close();
-                delete file;
-                skippedFiles++;
-                continue;
-            }
-
-            // iterate keys and ReadObj so we can delete the temporary object immediately
-            TIter next(dir->GetListOfKeys());
-            TKey *key;
-            while ((key = (TKey*)next())) {
-                TString histName = key->GetName();
-                TString className = key->GetClassName();
-
-                TObject* obj = key->ReadObj(); // we own this object and must delete it
-                TH1 *hist = dynamic_cast<TH1*>(obj);
-                if (!hist) { delete obj; continue; }
-
-                std::string histNameStr = histName.Data();
-                if (histMap.find(histNameStr) == histMap.end()) {
-                    TH1* newHist = nullptr;
-                    if (className.BeginsWith("TH1I") || className.BeginsWith("TH2I")) {
-                        newHist = ConvertToDoubleHist(hist, TString::Format("%s_combined", histName.Data()));
-                    } else {
-                        newHist = (TH1*)hist->Clone(TString::Format("%s_combined", histName.Data()));
-                        newHist->SetDirectory(0);
-                    }
-                    histMap[histNameStr] = newHist;
-                    histOrder.push_back(histNameStr);
-                } else {
-                    histMap[histNameStr]->Add(hist);
-                }
-                delete obj; // free the temporary object loaded from file immediately
-            }
-
-            file->Close();
-            delete file;
-
-            if ((i - startIdx + 1) % 10 == 0 || (i == endIdx - 1)) {
-                int percent = (int)(100.0 * (i - startIdx + 1) / (endIdx - startIdx) + 0.5);
-                int mergerPercent = (int)(100.0 * (i + 1) / nFilesToProcess + 0.5);
-                std::cout << "\r  [Batch Progress] " << percent << "% | [Merger Progress] " << mergerPercent << "%" << std::flush;
-            }
+        if ((i + 1) % 10 == 0 || (i == allFiles.size() - 1)) {
+            int percent = (int)(100.0 * (i + 1) / allFiles.size() + 0.5);
+            std::cout << "\r[Progress] " << percent << "% (" << (i+1) << "/" << allFiles.size() << " files)" << std::flush;
         }
-
-        // Write batch output file
-        TFile *outputFile = new TFile(batchFileName, "RECREATE");
-        TDirectory *outputDir = outputFile->mkdir("scoutingTree");
-        outputDir->cd();
-        for (size_t i = 0; i < histOrder.size(); ++i) {
-            histMap[histOrder[i]]->Write();
-            delete histMap[histOrder[i]];
-        }
-        outputFile->Close();
-        delete outputFile;
-
-        std::cout << "\nBatch " << (batchIdx+1) << " complete. Output: " << batchFileName << std::endl;
-        std::cout << "  Files processed: " << (endIdx - startIdx) << ", Skipped: " << skippedFiles << std::endl;
-        std::cout << "  Unique histograms merged: " << histOrder.size() << std::endl;
     }
+    std::cout << std::endl;
 
-    // Automatically merge batch files into final output
-    TString tag = combinedFileName ? combinedFileName : "auto";
-    TString finalFileName = TString::Format("outputs/combined_histograms_%s_final.root", tag.Data());
-    MergeBatchFiles(batchOutputFiles, finalFileName.Data());
+    // Write output file with IDENTICAL structure to inputs
+    TFile* outputFile = new TFile(outputFileName, "RECREATE");
+    for (size_t i = 0; i < histOrder.size(); ++i) {
+        const std::string& fullPath = histOrder[i];
+        TH1* hist = histMap[fullPath];
+        
+        // Split path into directory and histogram name
+        TString pathStr = fullPath.c_str();
+        Ssiz_t lastSlash = pathStr.Last('/');
+        TString dirPath = (lastSlash >= 0) ? pathStr(0, lastSlash) : "";
+        TString histName = (lastSlash >= 0) ? pathStr(lastSlash+1, pathStr.Length()) : pathStr;
+        
+        // Navigate to correct directory (creates if needed)
+        TDirectory* targetDir = EnsureDirectoryPath(outputFile, dirPath);
+        targetDir->cd();
+        
+        hist->Write(histName);
+        delete hist;
+    }
+    outputFile->Close();
+    delete outputFile;
+    
+    std::cout << "Combined output saved to: " << outputFileName << std::endl;
+    std::cout << "Total histograms merged: " << histOrder.size() << std::endl;
 }
