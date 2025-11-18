@@ -1,7 +1,7 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-theTag = "ScoutingData_Redone_v5"  # updated tag
+theTag = "ScoutingData_2024G"  # updated tag
 # theTag = "ScoutingData_Updated_10mod15_v1"  # updated tag
 
 config.General.requestName = theTag
@@ -11,7 +11,7 @@ config.General.transferLogs = True
 # increased max run time and increased memory
 config.JobType.maxMemoryMB = 3000  # value in MB (max: 3000)
 # set to CRAB maximum since 2 files/job may be large for this dataset
-config.JobType.maxJobRuntimeMin = 2750  # value in minutes (max: 2750)
+# config.JobType.maxJobRuntimeMin = 2750  # value in minutes (max: 2750)
 
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'
@@ -27,17 +27,18 @@ config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'
 
 
 # config.Data.inputDataset = '/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24MiniAOD-140X_mcRun3_2024_realistic_v26-v3/MINIAODSIM'
-config.Data.inputDataset = '/ScoutingPFRun3/Run2024H-v1/HLTSCOUT'
+# config.Data.inputDataset = '/ScoutingPFRun3/Run2024H-v1/HLTSCOUT'# 91.5TB
+config.Data.inputDataset = '/ScoutingPFRun3/Run2024G-v1/HLTSCOUT' #673.1TB
 config.Data.inputDBS = 'global'
 
 # File-based splitting: 2 files per job (deterministic). 
 # WARNING: check per-job runtime after a small test submission — may require unitsPerJob=1.
 
-config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 30  # Number of files per job
+# config.Data.splitting = 'FileBased'
+# config.Data.unitsPerJob = 30  # Number of files per job
 # config.Data.totalUnits = 1000
 
-# config.Data.splitting = 'Automatic'
+config.Data.splitting = 'Automatic'
 
 # Info about /ScoutingPFRun3/Run2024H-v1/HLTSCOUT Dataset
 #nlumis:16134

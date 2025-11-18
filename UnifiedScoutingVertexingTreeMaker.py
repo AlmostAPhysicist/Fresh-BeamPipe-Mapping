@@ -19,8 +19,8 @@ process.MessageLogger.debugModules = cms.untracked.vstring()  # Disable debug fo
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True),
     TryToContinue = cms.untracked.vstring('ProductNotFound'),
-    numberOfThreads = cms.untracked.uint32(4),    # adjust to machine cores
-    numberOfStreams = cms.untracked.uint32(0),     # let framework pick sensible streams
+    # numberOfThreads = cms.untracked.uint32(4),    # adjust to machine cores
+    # numberOfStreams = cms.untracked.uint32(0),     # let framework pick sensible streams
 )
 
 process.maxEvents = cms.untracked.PSet(

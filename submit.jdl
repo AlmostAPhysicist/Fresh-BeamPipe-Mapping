@@ -1,0 +1,12 @@
+universe = vanilla
+log = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/log.$(Process)
+error = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/err.$(Process)
+output = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/out.$(Process)
+should_transfer_files = YES
+transfer_output_files = ""
+when_to_transfer_output = ON_EXIT_OR_EVICT
+executable = condorbash.bash
+RequestDisk = 5000000
+arguments = $(Process)
++JobFlavour = "tomorrow"
+queue 100
