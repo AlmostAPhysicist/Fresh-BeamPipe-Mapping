@@ -28,7 +28,7 @@ fi
 
 echo "Processing lines ${START_LINE} to ${END_LINE} of ${TOTAL_FILES}"
 
-# Extract the files for this job
+# Extract the files for this job - use /tmp for temporary file
 CHUNK_FILE="/tmp/chunk_${PROCESS}_$$.txt"
 sed -n "${START_LINE},${END_LINE}p" ${FILELIST} > ${CHUNK_FILE}
 
@@ -39,6 +39,9 @@ echo "Chunk contains ${CHUNK_SIZE} files"
 if [ -s ${CHUNK_FILE} ]; then
     OUTPUT_FILE="${OUTPUTDIR}/chunk_${PROCESS}.root"
     echo "Running hadd to create ${OUTPUT_FILE}"
+    
+    # Ensure output directory exists on EOS
+    mkdir -p ${OUTPUTDIR}
     
     # Use @ syntax if more than one file, direct if single file
     if [ ${CHUNK_SIZE} -eq 1 ]; then

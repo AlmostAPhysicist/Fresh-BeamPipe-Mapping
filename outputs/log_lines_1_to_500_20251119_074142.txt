@@ -1,0 +1,71 @@
+=== Recursive HADD Job Started ===
+Start time: Wed Nov 19 07:24:32 CET 2025
+Input file: outputs/dataRedone2024G.txt
+Lines to process: 1 to 500
+Files per job: 5
+Working directory: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/hadd_work_20251119_072432
+
+Total files to process: 500
+
+=== Iteration 1 ===
+Input files: 500
+Number of jobs: 100
+Submitting 100 jobs...
+Cluster ID: 13789429
+Waiting for jobs to complete...
+  [5s] Total: 100 | Idle: 100 | Running: 0 | Held: 0
+  [307s] Total: 98 | Idle: 1 | Running: 97 | Held: 0
+  [337s] Total: 95 | Idle: 0 | Running: 95 | Held: 0
+  [367s] Total: 84 | Idle: 0 | Running: 83 | Held: 0
+  [398s] Total: 19 | Idle: 0 | Running: 18 | Held: 0
+All jobs completed
+Jobs completed in 439 seconds
+Output files created: 100
+
+=== Iteration 2 ===
+Input files: 100
+Number of jobs: 20
+Submitting 20 jobs...
+Cluster ID: 13789430
+Waiting for jobs to complete...
+  [5s] Total: 20 | Idle: 20 | Running: 0 | Held: 0
+  [216s] Total: 4 | Idle: 0 | Running: 4 | Held: 0
+All jobs completed
+Jobs completed in 257 seconds
+Output files created: 20
+Cleaning up iteration 1...
+  Removed: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/hadd_work_20251119_072432/iteration_1
+
+=== Iteration 3 ===
+Input files: 20
+Number of jobs: 4
+Submitting 4 jobs...
+Cluster ID: 13789431
+Waiting for jobs to complete...
+  [5s] Total: 4 | Idle: 4 | Running: 0 | Held: 0
+All jobs completed
+Jobs completed in 226 seconds
+Output files created: 4
+Cleaning up iteration 2...
+  Removed: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/hadd_work_20251119_072432/iteration_2
+
+=== Iteration 4 ===
+Input files: 4
+Number of jobs: 1
+Submitting 1 jobs...
+Cluster ID: 13789432
+Waiting for jobs to complete...
+  [5s] Total: 1 | Idle: 1 | Running: 0 | Held: 0
+All jobs completed
+Jobs completed in 106 seconds
+Output files created: 1
+Final output ready: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/hadd_work_20251119_072432/iteration_4/chunk_0.root
+Cleaning up iteration 3...
+  Removed: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/hadd_work_20251119_072432/iteration_3
+
+Moving final output to outputs directory...
+=== Job Complete ===
+End time: Wed Nov 19 07:41:42 CET 2025
+Final output: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/outputs/combined_output_lines_1_to_500_20251119_074142.root
+
+Cleaning up work directory...

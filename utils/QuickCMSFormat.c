@@ -90,6 +90,7 @@ void QuickCMSFormat(TH2F* h, TString filename) {
         TString ztitle = h->GetZaxis()->GetTitle();
         h->GetZaxis()->SetTitle("");
         palette->SetTitle("");
+        h->SetContour(100); // to avoid z title reappearing on redraw
         // draw custom vertical Z title lower along the palette (NDC coords)
         TLatex* zt = new TLatex(0.9, 0.5, ztitle); // lowered y from ~0.66 to ~0.5
         zt->SetNDC();

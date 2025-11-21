@@ -1,0 +1,88 @@
+=== Recursive HADD Job Started ===
+Start time: Wed Nov 19 08:27:39 AM CET 2025
+Input file: outputs/dataRedone2024G.txt
+Total lines in file: 18771
+Lines to process: 1 to 18771
+Files per job: 500
+Working directory: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/hadd_work_20251119_082739
+
+Total files to process: 18771
+
+=== Iteration 1 ===
+Input files: 18771
+Number of jobs: 38
+Submitting 38 jobs...
+Cluster ID: 13789470
+Waiting for jobs to complete...
+  [6s] Total: 38 | Idle: 38 | Running: 0 | Held: 0
+  [3888s] Total: 37 | Idle: 0 | Running: 37 | Held: 0
+  [9820s] Total: 36 | Idle: 0 | Running: 36 | Held: 0
+  [10302s] Total: 35 | Idle: 0 | Running: 35 | Held: 0
+  [10393s] Total: 34 | Idle: 0 | Running: 34 | Held: 0
+  [10513s] Total: 32 | Idle: 0 | Running: 32 | Held: 0
+  [10845s] Total: 31 | Idle: 0 | Running: 31 | Held: 0
+  [10875s] Total: 30 | Idle: 0 | Running: 30 | Held: 0
+  [10905s] Total: 29 | Idle: 0 | Running: 29 | Held: 0
+  [10966s] Total: 28 | Idle: 0 | Running: 28 | Held: 0
+  [10996s] Total: 27 | Idle: 0 | Running: 27 | Held: 0
+  [11027s] Total: 26 | Idle: 0 | Running: 26 | Held: 0
+  [11057s] Total: 25 | Idle: 0 | Running: 25 | Held: 0
+  [11178s] Total: 19 | Idle: 0 | Running: 19 | Held: 0
+  [11209s] Total: 17 | Idle: 0 | Running: 17 | Held: 0
+  [11272s] Total: 14 | Idle: 0 | Running: 14 | Held: 0
+  [11302s] Total: 13 | Idle: 0 | Running: 13 | Held: 0
+  [11332s] Total: 10 | Idle: 0 | Running: 10 | Held: 0
+  [11484s] Total: 8 | Idle: 0 | Running: 8 | Held: 0
+  [11605s] Total: 5 | Idle: 0 | Running: 5 | Held: 0
+  [11635s] Total: 4 | Idle: 0 | Running: 4 | Held: 0
+  [11666s] Total: 3 | Idle: 0 | Running: 3 | Held: 0
+  [11726s] Total: 2 | Idle: 0 | Running: 2 | Held: 0
+  [11757s] Total: 1 | Idle: 0 | Running: 1 | Held: 0
+All jobs completed
+Jobs completed in 12099 seconds
+Output files created: 38
+
+=== Iteration 2 ===
+Input files: 38
+Number of jobs: 1
+Submitting 1 jobs...
+Cluster ID: 13790567
+Waiting for jobs to complete...
+  [5s] Total: 1 | Idle: 1 | Running: 0 | Held: 0
+All jobs completed
+Jobs completed in 1462 seconds
+Output files created: 1
+Final output ready: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/hadd_work_20251119_082739/iteration_2/chunk_0.root
+Cleaning up iteration 1...
+  Removed: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/hadd_work_20251119_082739/iteration_1
+
+Moving final output to outputs directory...
+
+=== Job Complete ===
+End time: Wed Nov 19 12:13:44 PM CET 2025
+
+======================================
+=== SUMMARY ===
+======================================
+
+Input Configuration:
+  - Input file: outputs/dataRedone2024G.txt
+  - Line range: 1 to 18771
+  - Total input files processed: 1
+  - Files per job: 500
+
+Processing Statistics:
+  - Total iterations: 2
+  - Working directory: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/hadd_work_20251119_082739
+
+Iteration Breakdown:
+  - Iteration 1: 38 jobs submitted
+  - Iteration 2: 1 jobs submitted
+
+Final Output:
+  - Location: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/outputs/combined_output_lines_1_to_18771_20251119_121344.root
+
+
+=== All Done! ====
+Final output: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/outputs/combined_output_lines_1_to_18771_20251119_121344.root
+Log and summary: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/outputs/logNsummary_lines_1_to_18771_20251119_121344.txt

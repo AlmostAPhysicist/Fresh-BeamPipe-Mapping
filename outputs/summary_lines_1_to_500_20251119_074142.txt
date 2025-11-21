@@ -1,0 +1,21 @@
+=== HADD JOB SUMMARY ===
+Job completed: Wed Nov 19 07:41:42 CET 2025
+
+Input Configuration:
+- Input file: outputs/dataRedone2024G.txt
+- Line range: 1 to 500
+- Total input files: 500
+- Files per job: 5
+
+Processing Statistics:
+- Total iterations: 4
+- Working directory: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/hadd_work_20251119_072432
+- Final output: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/outputs/combined_output_lines_1_to_500_20251119_074142.root
+
+Iteration Breakdown:
+  Iteration 1: 100 jobs submitted
+  Iteration 2: 20 jobs submitted
+  Iteration 3: 4 jobs submitted
+  Iteration 4: 1 jobs submitted
+
+Final output location: /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/outputs/combined_output_lines_1_to_500_20251119_074142.root
