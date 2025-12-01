@@ -5,10 +5,10 @@ process = cms.Process("CHAIN")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 # process.MessageLogger.cerr.FwkSummary.reportEvery = 5
 # process.MessageLogger.cerr.FwkReport.reportEvery = 5
-process.MessageLogger.cerr.FwkSummary.reportEvery = 100
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
-# process.MessageLogger.cerr.FwkSummary.reportEvery = 1000
-# process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+# process.MessageLogger.cerr.FwkSummary.reportEvery = 100
+# process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkSummary.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 # process.MessageLogger.cerr.threshold = cms.untracked.string('DEBUG')
 # process.MessageLogger.debugModules = cms.untracked.vstring('hltScoutingUnpackProducer', 'Vertexer', 'scoutingTree')
@@ -24,7 +24,7 @@ process.options = cms.untracked.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(20000)  # Limited events for testing
+    input = cms.untracked.int32(100000)  # Limited events for testing
     # input = cms.untracked.int32(150000)  # Local
     # input = cms.untracked.int32(500000)  # Process all events
     # input = cms.untracked.int32(-1)  # Process all events
@@ -65,7 +65,7 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # -------------------------- OUTPUT PATH --------------------------------
 #-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/ScoutingTreeTest_v2.root")
+    fileName = cms.string("test-outputs/ScoutingTreeTest_Size100k_incut.root")
     # fileName = cms.string("ScoutingTree_Output.root")  # TTree output (different from plots)
 )
 #-----------------------------------------------------------------------
@@ -138,8 +138,8 @@ process.Vertexer = cms.EDProducer('Vertexer',
 TREE_MIN_NTRACKS = 3           # changed from 3 -> store ntk=2 so plot branches match
 TREE_MAX_NTRACKS = 4         # Maximum tracks per vertex (-1 = no limit)
 TREE_MAX_CHI2NDOF = 10.0       # Maximum χ²/ndof (10 = loose quality cut)
-TREE_MIN_MASS = 1.0            # Minimum vertex mass [GeV] (1 GeV = very inclusive)
-TREE_MIN_DBV = -1              # changed from 0.1/0 to -1 => no dBV cut at storage
+TREE_MIN_MASS = 2.0            # Minimum vertex mass [GeV] (1 GeV = very inclusive)
+TREE_MIN_DBV = 0.2              # changed from 0.1/0 to -1 => no dBV cut at storage
 TREE_MAX_DBV = -1.0            # Maximum displacement [cm] (-1 = no limit, keep all LLPs)
 TREE_MAX_DBV_ERROR = 0.75       # Maximum dBV uncertainty [cm] (0.5 = reasonable precision)
 

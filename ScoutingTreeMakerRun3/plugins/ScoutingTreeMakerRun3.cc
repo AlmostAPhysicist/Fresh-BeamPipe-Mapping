@@ -28,10 +28,6 @@
 //      - Position (x, y, z) + errors
 //      - Fit quality (χ², ndof, χ²/ndof)
 //      - Number of tracks
-//      - 4-momentum (pt, eta, phi, mass) assuming pion mass
-//      - Displacement from origin, reference, beamspot, avgPV (dBV) + error
-//      - Opening angles (min, mean, max between track pairs)
-//      - PV region classification (A/B/C based on nPV boundaries)
 //
 //   3. TRACK-LEVEL INFO (nested vector per vertex):
 //      - Kinematics (pt, eta, phi)
@@ -79,6 +75,7 @@
 #include <cmath>
 #include <fstream>
 #include <sstream>
+#include <limits> // NEW: for std::numeric_limits
 
 #include "TFile.h"
 #include "TTree.h"
@@ -111,6 +108,12 @@
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "TrackingTools/IPTools/interface/IPTools.h"
+
+namespace {
+	// Named sentinel for missing float values stored in the TTree.
+	// Use a canonical NaN to indicate missing float values.
+	const float kMissingFloat = std::numeric_limits<float>::quiet_NaN();
+}
 
 class ScoutingTreeMakerRun3 : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 public:
@@ -168,22 +171,18 @@ private:
     Float_t avgPV_xErr_, avgPV_yErr_, avgPV_zErr_;
     Int_t refType_; // 0=none, 1=BS, 2=avgPV
     
-    // Vertex-level branches (vectors)
+    // Vertex-level branches (KEEP only primitives: position, errors, fit quality, ntracks)
     std::vector<float> vtx_x_, vtx_y_, vtx_z_;
     std::vector<float> vtx_xErr_, vtx_yErr_, vtx_zErr_;
     std::vector<float> vtx_chi2_, vtx_ndof_, vtx_chi2norm_;
     std::vector<int> vtx_ntracks_;
-    std::vector<float> vtx_pt_, vtx_eta_, vtx_phi_, vtx_mass_;
-    std::vector<float> vtx_dBV_origin_, vtx_dBV_ref_, vtx_dBV_bs_, vtx_dBV_avgPV_;
-    std::vector<float> vtx_dBV_err_;
-    std::vector<float> vtx_angleMin_, vtx_angleMean_, vtx_angleMax_;
     std::vector<int> vtx_pvRegion_; // 0=A, 1=B, 2=C
     
-    // Track-level branches (vectors of vectors - indexed by vertex)
+    // Track-level branches: per-vertex vectors of track primitives
     std::vector<std::vector<float>> trk_pt_, trk_eta_, trk_phi_;
-    std::vector<std::vector<float>> trk_dxy_origin_, trk_dxy_ref_, trk_dxy_bs_, trk_dxy_avgPV_;
-    std::vector<std::vector<float>> trk_dxyErr_;
-    std::vector<std::vector<float>> trk_dxySig_ref_;
+    std::vector<std::vector<float>> trk_dxy_origin_;    // dxy wrt global origin
+    std::vector<std::vector<float>> trk_dxyErr_;            // dxy uncertainty
+    std::vector<std::vector<float>> trk_dxySig_ref_;    // optional placeholder (may be -999)
     std::vector<std::vector<int>> trk_nPixelHits_, trk_nStripHits_, trk_nTrackerLayers_;
 
     // Helper methods
@@ -239,7 +238,7 @@ ScoutingTreeMakerRun3::~ScoutingTreeMakerRun3() {
 void ScoutingTreeMakerRun3::beginJob() {
     edm::Service<TFileService> fs;
     tree_ = fs->make<TTree>("vertexTree", "Displaced Vertex Tree");
-    
+
     // Event-level branches
     tree_->Branch("run", &run_);
     tree_->Branch("lumi", &lumi_);
@@ -259,7 +258,7 @@ void ScoutingTreeMakerRun3::beginJob() {
     tree_->Branch("avgPV_zErr", &avgPV_zErr_);
     tree_->Branch("refType", &refType_);
     
-    // Vertex-level branches
+    // Vertex-level branches (KEEP only primitives: position, errors, fit quality, ntracks)
     tree_->Branch("vtx_x", &vtx_x_);
     tree_->Branch("vtx_y", &vtx_y_);
     tree_->Branch("vtx_z", &vtx_z_);
@@ -270,30 +269,15 @@ void ScoutingTreeMakerRun3::beginJob() {
     tree_->Branch("vtx_ndof", &vtx_ndof_);
     tree_->Branch("vtx_chi2norm", &vtx_chi2norm_);
     tree_->Branch("vtx_ntracks", &vtx_ntracks_);
-    tree_->Branch("vtx_pt", &vtx_pt_);
-    tree_->Branch("vtx_eta", &vtx_eta_);
-    tree_->Branch("vtx_phi", &vtx_phi_);
-    tree_->Branch("vtx_mass", &vtx_mass_);
-    tree_->Branch("vtx_dBV_origin", &vtx_dBV_origin_);
-    tree_->Branch("vtx_dBV_ref", &vtx_dBV_ref_);
-    tree_->Branch("vtx_dBV_bs", &vtx_dBV_bs_);
-    tree_->Branch("vtx_dBV_avgPV", &vtx_dBV_avgPV_);
-    tree_->Branch("vtx_dBV_err", &vtx_dBV_err_);
-    tree_->Branch("vtx_angleMin", &vtx_angleMin_);
-    tree_->Branch("vtx_angleMean", &vtx_angleMean_);
-    tree_->Branch("vtx_angleMax", &vtx_angleMax_);
     tree_->Branch("vtx_pvRegion", &vtx_pvRegion_);
-    
-    // Track-level branches
+
+    // Track-level branches: per-vertex vectors of track primitives
     tree_->Branch("trk_pt", &trk_pt_);
     tree_->Branch("trk_eta", &trk_eta_);
     tree_->Branch("trk_phi", &trk_phi_);
-    tree_->Branch("trk_dxy_origin", &trk_dxy_origin_);
-    tree_->Branch("trk_dxy_ref", &trk_dxy_ref_);
-    tree_->Branch("trk_dxy_bs", &trk_dxy_bs_);
-    tree_->Branch("trk_dxy_avgPV", &trk_dxy_avgPV_);
-    tree_->Branch("trk_dxyErr", &trk_dxyErr_);
-    tree_->Branch("trk_dxySig_ref", &trk_dxySig_ref_);
+    tree_->Branch("trk_dxy_origin", &trk_dxy_origin_);    // dxy wrt global origin
+    tree_->Branch("trk_dxyErr", &trk_dxyErr_);            // dxy uncertainty
+    tree_->Branch("trk_dxySig_ref", &trk_dxySig_ref_);    // optional placeholder (may be -999)
     tree_->Branch("trk_nPixelHits", &trk_nPixelHits_);
     tree_->Branch("trk_nStripHits", &trk_nStripHits_);
     tree_->Branch("trk_nTrackerLayers", &trk_nTrackerLayers_);
@@ -304,15 +288,10 @@ void ScoutingTreeMakerRun3::clearVectors() {
     vtx_xErr_.clear(); vtx_yErr_.clear(); vtx_zErr_.clear();
     vtx_chi2_.clear(); vtx_ndof_.clear(); vtx_chi2norm_.clear();
     vtx_ntracks_.clear();
-    vtx_pt_.clear(); vtx_eta_.clear(); vtx_phi_.clear(); vtx_mass_.clear();
-    vtx_dBV_origin_.clear(); vtx_dBV_ref_.clear(); vtx_dBV_bs_.clear(); vtx_dBV_avgPV_.clear();
-    vtx_dBV_err_.clear();
-    vtx_angleMin_.clear(); vtx_angleMean_.clear(); vtx_angleMax_.clear();
     vtx_pvRegion_.clear();
     
     trk_pt_.clear(); trk_eta_.clear(); trk_phi_.clear();
-    trk_dxy_origin_.clear(); trk_dxy_ref_.clear(); trk_dxy_bs_.clear(); trk_dxy_avgPV_.clear();
-    trk_dxyErr_.clear(); trk_dxySig_ref_.clear();
+    trk_dxy_origin_.clear(); trk_dxyErr_.clear(); trk_dxySig_ref_.clear();
     trk_nPixelHits_.clear(); trk_nStripHits_.clear(); trk_nTrackerLayers_.clear();
 }
 
@@ -343,6 +322,7 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
     }
 
     auto const& ttBuilder = iSetup.getData(ttBuilderToken_);
+    (void)ttBuilder; // suppress unused-variable warning when not needed in this analyzer
     
     reco::Vertex refVtx, avgPVVtx, bsVtx;
     bool havePV = false, haveBS = false;
@@ -401,56 +381,29 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         // Apply simple quality cut
         if (max_chi2ndof_ > 0 && v.normalizedChi2() > max_chi2ndof_) continue;
 
-        // Calculate opening angles (for storage, not selection)
-        double meanAngle = 0.0, minAngle = 1e9, maxAngle = 0.0;
-        int npairs = 0;
-        for (int i = 0; i < ntk; ++i) {
-            const auto& ti = tks[i];
-            if (!ti.isNonnull()) continue;
-            TVector3 vi(ti->px(), ti->py(), ti->pz());
-            if (vi.Mag2() <= 0) continue;
-            for (int j = i+1; j < ntk; ++j) {
-                const auto& tj = tks[j];
-                if (!tj.isNonnull()) continue;
-                TVector3 vj(tj->px(), tj->py(), tj->pz());
-                if (vj.Mag2() <= 0) continue;
-                const double angle = vi.Angle(vj);
-                meanAngle += angle;
-                ++npairs;
-                if (angle < minAngle) minAngle = angle;
-                if (angle > maxAngle) maxAngle = angle;
-            }
-        }
-        meanAngle = (npairs > 0) ? (meanAngle / npairs) : 0.0;
-        if (npairs == 0) { minAngle = 0.0; maxAngle = 0.0; }
-
-        // Calculate 4-vector
+        // --- NEW: compute vertex invariant mass from constituent tracks (pion mass assumption)
         TLorentzVector sumVec(0,0,0,0);
-        for(auto track : tks) {
-            if(!track.isNonnull()) continue;
-            TLorentzVector trackVec;
-            constexpr double kPionMass = 0.13957;
-            trackVec.SetPtEtaPhiM(track->pt(), track->eta(), track->phi(), kPionMass);
-            sumVec += trackVec;
+        constexpr double kPionMass = 0.13957;
+        for (const auto& trRef : tks) {
+            if (!trRef.isNonnull()) continue;
+            TLorentzVector tv; tv.SetPtEtaPhiM(trRef->pt(), trRef->eta(), trRef->phi(), kPionMass);
+            sumVec += tv;
         }
-        double invMass = sumVec.M();
+        double invMass = static_cast<double>(sumVec.M());
         
-        // Apply loose mass cut
-        if (min_mass_ > 0 && invMass < min_mass_) continue;
-        
-        // Calculate distances
+        // --- NEW: compute 2D dBV (vertex -> reference) and its uncertainty
+        VertexDistanceXY vertexDist2D;
         Measurement1D dBVref_meas = vertexDist2D.distance(v, refVtx);
         double dBVref = dBVref_meas.value();
         double dBV_err = dBVref_meas.error();
-        Measurement1D dBV00_meas = vertexDist2D.distance(v, originVtx);
-        double dBV00 = dBV00_meas.value();
         
-        // Apply loose displacement cuts
-        if (min_dBV_ > 0 && dBVref < min_dBV_) continue;
-        if (max_dBV_ > 0 && dBVref > max_dBV_) continue;
-        if (max_dBV_error_ > 0 && dBV_err > max_dBV_error_) continue;
-        
-        // Store vertex info
+        // --- NEW: apply configured mass / dBV / dBV_error storage cuts (use -1 to disable)
+        if (min_mass_ > 0 && invMass < min_mass_) continue;
+        if (min_dBV_ > -1 && dBVref < min_dBV_) continue;
+        if (max_dBV_ > -1 && dBVref > max_dBV_) continue;
+        if (max_dBV_error_ > -1 && dBV_err > max_dBV_error_) continue;
+
+        // Store vertex primitives (position, errors, chi2, ndof, ntracks, pvRegion)
         vtx_x_.push_back(v.x());
         vtx_y_.push_back(v.y());
         vtx_z_.push_back(v.z());
@@ -461,89 +414,39 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         vtx_ndof_.push_back(v.ndof());
         vtx_chi2norm_.push_back(v.normalizedChi2());
         vtx_ntracks_.push_back(ntk);
-        vtx_pt_.push_back(sumVec.Pt());
-        vtx_eta_.push_back(sumVec.Eta());
-        vtx_phi_.push_back(sumVec.Phi());
-        vtx_mass_.push_back(invMass);
-        vtx_dBV_origin_.push_back(dBV00);
-        vtx_dBV_ref_.push_back(dBVref);
-        vtx_dBV_err_.push_back(dBV_err);
-        vtx_angleMin_.push_back(minAngle);
-        vtx_angleMean_.push_back(meanAngle);
-        vtx_angleMax_.push_back(maxAngle);
         vtx_pvRegion_.push_back(pvRegion);
-        
-        if (haveBS) {
-            Measurement1D dBVbs = vertexDist2D.distance(v, bsVtx);
-            vtx_dBV_bs_.push_back(dBVbs.value());
-        } else {
-            vtx_dBV_bs_.push_back(-999);
-        }
-        if (havePV) {
-            Measurement1D dBVavgPV = vertexDist2D.distance(v, avgPVVtx);
-            vtx_dBV_avgPV_.push_back(dBVavgPV.value());
-        } else {
-            vtx_dBV_avgPV_.push_back(-999);
-        }
-        
-        // Store ALL track info for this vertex (comprehensive for offline analysis)
+
+        // Store per-vertex track primitive arrays
         std::vector<float> vtx_trk_pt, vtx_trk_eta, vtx_trk_phi;
-        std::vector<float> vtx_trk_dxy_origin, vtx_trk_dxy_ref, vtx_trk_dxy_bs, vtx_trk_dxy_avgPV;
-        std::vector<float> vtx_trk_dxyErr, vtx_trk_dxySig_ref;
+        std::vector<float> vtx_trk_dxy_origin, vtx_trk_dxyErr, vtx_trk_dxySig_ref;
         std::vector<int> vtx_trk_nPixelHits, vtx_trk_nStripHits, vtx_trk_nTrackerLayers;
-        
+
         const math::XYZPoint origin(0.,0.,0.);
         for(auto track : tks) {
             if(!track.isNonnull()) continue;
-            
+
             vtx_trk_pt.push_back(track->pt());
             vtx_trk_eta.push_back(track->eta());
             vtx_trk_phi.push_back(track->phi());
-            vtx_trk_dxy_origin.push_back(track->dxy(origin));
+            vtx_trk_dxy_origin.push_back(track->dxy(origin));         // store dxy wrt origin
             vtx_trk_dxyErr.push_back(track->dxyError());
-            
-            reco::TransientTrack ttk = ttBuilder.build(track);
-            GlobalVector direction(track->px(), track->py(), track->pz());
-            auto ip_ref = IPTools::signedTransverseImpactParameter(ttk, direction, refVtx);
-            if (ip_ref.first) {
-                vtx_trk_dxy_ref.push_back(ip_ref.second.value());
-                vtx_trk_dxySig_ref.push_back(ip_ref.second.significance());
-            } else {
-                vtx_trk_dxy_ref.push_back(-999);
-                vtx_trk_dxySig_ref.push_back(-999);
-            }
-            
-            if (haveBS) {
-                auto ip_bs = IPTools::signedTransverseImpactParameter(ttk, direction, bsVtx);
-                vtx_trk_dxy_bs.push_back(ip_bs.first ? ip_bs.second.value() : -999);
-            } else {
-                vtx_trk_dxy_bs.push_back(-999);
-            }
-            
-            if (havePV) {
-                auto ip_avgPV = IPTools::signedTransverseImpactParameter(ttk, direction, avgPVVtx);
-                vtx_trk_dxy_avgPV.push_back(ip_avgPV.first ? ip_avgPV.second.value() : -999);
-            } else {
-                vtx_trk_dxy_avgPV.push_back(-999);
-            }
-            
+            // we do not store dBV wrt ref here; Tree2Plots will compute it from vtx_x/y and ref
+            vtx_trk_dxySig_ref.push_back(kMissingFloat); // placeholder sentinel (NaN) for "missing"
+
             vtx_trk_nPixelHits.push_back(track->hitPattern().numberOfValidPixelHits());
             vtx_trk_nStripHits.push_back(track->hitPattern().numberOfValidStripHits());
             vtx_trk_nTrackerLayers.push_back(track->hitPattern().trackerLayersWithMeasurement());
         }
-        
-        trk_pt_.push_back(vtx_trk_pt);
-        trk_eta_.push_back(vtx_trk_eta);
-        trk_phi_.push_back(vtx_trk_phi);
-        trk_dxy_origin_.push_back(vtx_trk_dxy_origin);
-        trk_dxy_ref_.push_back(vtx_trk_dxy_ref);
-        trk_dxy_bs_.push_back(vtx_trk_dxy_bs);
-        trk_dxy_avgPV_.push_back(vtx_trk_dxy_avgPV);
-        trk_dxyErr_.push_back(vtx_trk_dxyErr);
-        trk_dxySig_ref_.push_back(vtx_trk_dxySig_ref);
-        trk_nPixelHits_.push_back(vtx_trk_nPixelHits);
-        trk_nStripHits_.push_back(vtx_trk_nStripHits);
-        trk_nTrackerLayers_.push_back(vtx_trk_nTrackerLayers);
+
+        trk_pt_.push_back(std::move(vtx_trk_pt));
+        trk_eta_.push_back(std::move(vtx_trk_eta));
+        trk_phi_.push_back(std::move(vtx_trk_phi));
+        trk_dxy_origin_.push_back(std::move(vtx_trk_dxy_origin));
+        trk_dxyErr_.push_back(std::move(vtx_trk_dxyErr));
+        trk_dxySig_ref_.push_back(std::move(vtx_trk_dxySig_ref));
+        trk_nPixelHits_.push_back(std::move(vtx_trk_nPixelHits));
+        trk_nStripHits_.push_back(std::move(vtx_trk_nStripHits));
+        trk_nTrackerLayers_.push_back(std::move(vtx_trk_nTrackerLayers));
     }
     
     // Fill tree (even if no vertices passed)

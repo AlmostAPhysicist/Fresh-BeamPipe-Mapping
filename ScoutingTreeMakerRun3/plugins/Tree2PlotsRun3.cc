@@ -1,3 +1,62 @@
+/*
+===============================================================================
+Tree2PlotsRun3
+===============================================================================
+Description:
+  CMSSW EDAnalyzer that reads the TTree produced by ScoutingTreeMakerRun3
+  (vertexTree) and produces the same set of histograms as ScoutingPlotMakerRun3.
+  The module performs on-the-fly computations of derived quantities (vertex
+  pT/eta/phi/mass, dBV wrt chosen reference, opening angles, track IPs) from
+  the primitive information stored in the TTree.
+
+Purpose:
+  - Allow rapid re-analysis of the stored TTree with different cuts and branches.
+  - Reproduce PlotMaker histograms using only data stored in the TTree.
+  - Keep analysis logic in one place (Tree2Plots) so PlotMaker and TreeMaker
+    responsibilities are separated.
+
+What is read (input):
+  - ROOT file containing TDirectory "scoutingTree" and TTree "vertexTree".
+  - Event-level scalars: run, lumi, event, nPV, beamspot_x/y, avgPV_x/y, refType.
+  - Vertex-level primitive vectors: vtx_x/y/z, vtx_xErr/yErr/zErr, vtx_chi2norm,
+    vtx_ntracks, vtx_pvRegion.
+  - Track-level nested vectors per vertex: trk_pt, trk_eta, trk_phi,
+    trk_dxy_origin (dxy wrt global 0), trk_dxyErr, hit counts, etc.
+
+What is produced (output):
+  - Histograms organized under Vertices/Selected/<ntk branch>/<angle branch>/...
+    matching ScoutingPlotMakerRun3 layout (Kinematics, Spatial, Distance,
+    OpeningAngles, Topology, PVRegions).
+  - Event-level and track-level histograms (Event, Tracks directories).
+
+Selection & computation policy:
+  - Tree2Plots computes derived quantities from primitives:
+    * Vertex 4-vector and invariant mass from stored per-vertex track kinematics
+      (pion mass assumption).
+    * dBV wrt reference computed from stored vertex (x,y) and chosen ref (beamspot / avgPV).
+    * dBV uncertainty computed from stored vtx_xErr, vtx_yErr (propagated in 2D).
+    * Opening angles computed from per-track 3-vectors built from stored (pt,eta,phi).
+  - Cuts applied are fully configurable via the analyzer ParameterSet:
+    cut_ntk, cut_opening_angle_min, required_invmass, required_chi2,
+    required_dBV_min, required_dBV_max, PVBoundary1, PVBoundary2.
+  - The analyzer processes one TTree entry per framework analyze() call; use
+    process.maxEvents in the python config to control how many TTree entries are read.
+
+Usage:
+  - Configure Tree2PlotsRun3 via a CMSSW python config (Tree2PlotsConfig.py).
+  - Example: set process.source = EmptySource and process.maxEvents to the
+    number of TTree entries to process (one analyze() per entry).
+  - Ensure inputFile and inputTree parameters point to the correct file/path.
+
+Notes / Caveats:
+  - Some exact signed IP computations require full helix parameters; the TTree
+    stores a pragmatic set of track primitives. If exact IP reproduction is
+    required, consider adding track helix parameters to the TreeMaker (optional).
+  - All distance computations used for comparison with Vertexer are 2D (XY)
+    unless explicitly toggled; this matches Vertexer choices by default.
+===============================================================================
+*/
+
 // CMSSW EDAnalyzer that reads TTree from ScoutingTreeMakerRun3 and makes plots
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -12,10 +71,20 @@
 #include "TTree.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TLorentzVector.h"
+#include "TVector3.h"
+#include <cmath>
 #include <vector>
 #include <map>
 #include <string>
 #include <algorithm> // for std::find
+#include <limits>    // NEW: for quiet_NaN()
+#include <cstdlib>   // ADDED: for std::exit()
+
+// File-local sentinel for missing floats written by the TreeMaker (NaN)
+namespace {
+    constexpr float kMissingFloat = std::numeric_limits<float>::quiet_NaN();
+}
 
 class Tree2PlotsRun3 : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 public:
@@ -64,20 +133,32 @@ private:
 	// --- NEW: persistent branch variables (used for SetBranchAddress in beginJob)
 	Int_t nPV_br_; Int_t refType_br_;
 	Float_t beamspot_x_br_, beamspot_y_br_, avgPV_x_br_, avgPV_y_br_;
-	std::vector<float>* vtx_x_br = nullptr; std::vector<float>* vtx_y_br = nullptr;
-	std::vector<float>* vtx_chi2norm_br = nullptr; std::vector<int>* vtx_ntracks_br = nullptr;
-	std::vector<float>* vtx_pt_br = nullptr; std::vector<float>* vtx_eta_br = nullptr; std::vector<float>* vtx_phi_br = nullptr;
-	std::vector<float>* vtx_mass_br = nullptr;
-	std::vector<float>* vtx_dBV_origin_br = nullptr; std::vector<float>* vtx_dBV_ref_br = nullptr; std::vector<float>* vtx_dBV_err_br = nullptr;
-	std::vector<float>* vtx_angleMin_br = nullptr; std::vector<float>* vtx_angleMean_br = nullptr; std::vector<float>* vtx_angleMax_br = nullptr;
+
+	// --- persistent vertex branch pointers (only primitives that TreeMaker stores) ---
+	std::vector<float>* vtx_x_br = nullptr;
+	std::vector<float>* vtx_y_br = nullptr;
+	std::vector<float>* vtx_xErr_br = nullptr;
+	std::vector<float>* vtx_yErr_br = nullptr;
+	std::vector<float>* vtx_chi2norm_br = nullptr;
+	std::vector<int>*   vtx_ntracks_br = nullptr;
 	std::vector<int>*   vtx_pvRegion_br = nullptr;
 
-	// Event histograms
+	// Track nested pointers (one declaration only — removed duplicate declarations)
+	std::vector<std::vector<float>>* trk_pt_br = nullptr;
+	std::vector<std::vector<float>>* trk_eta_br = nullptr;
+	std::vector<std::vector<float>>* trk_phi_br = nullptr;
+	std::vector<std::vector<float>>* trk_dxy_origin_br = nullptr;
+	std::vector<std::vector<float>>* trk_dxyErr_br = nullptr;
+	std::vector<std::vector<int>>*   trk_nPixelHits_br = nullptr;
+	std::vector<std::vector<int>>*   trk_nStripHits_br = nullptr;
+	std::vector<std::vector<int>>*   trk_nTrackerLayers_br = nullptr;
+
+	// Event histograms (DECLARATIONS ADDED — required by beginJob())
 	TH1F* event_nPrimaryVertices = nullptr;
 	TH1F* event_nSelectedVertices = nullptr;
 	TH2F* event_avgPV_vs_beamspot = nullptr;
 
-	// Track-level histograms (vertex-associated tracks; TTree stores per-vertex track arrays)
+	// Histogram members (unchanged)
 	TH1F* trk_pt = nullptr;
 	TH1F* trk_eta = nullptr;
 	TH1F* trk_phi = nullptr;
@@ -87,21 +168,12 @@ private:
 	TH1F* trk_dxyErr_barrel = nullptr;
 	TH1F* trk_dxyErr_endcap = nullptr;
 
-	// Branch pointers for track-level nested vectors
-	std::vector<std::vector<float>>* trk_pt_br = nullptr;
-	std::vector<std::vector<float>>* trk_eta_br = nullptr;
-	std::vector<std::vector<float>>* trk_phi_br = nullptr;
-	std::vector<std::vector<float>>* trk_dxy_ref_br = nullptr;
-	std::vector<std::vector<float>>* trk_dxyErr_br = nullptr;
-	std::vector<std::vector<float>>* trk_dxySig_ref_br = nullptr;
-
 	void processEntry(Long64_t iEntry, Int_t refType, Float_t beamspot_x, Float_t beamspot_y, Float_t avgPV_x, Float_t avgPV_y,
-		std::vector<float>* vtx_x, std::vector<float>* vtx_y, std::vector<float>* vtx_chi2norm,
-		std::vector<int>* vtx_ntracks, std::vector<float>* vtx_pt, std::vector<float>* vtx_eta,
-		std::vector<float>* vtx_phi, std::vector<float>* vtx_mass, std::vector<float>* vtx_dBV_origin,
-		std::vector<float>* vtx_dBV_ref, std::vector<float>* vtx_dBV_err,
-		std::vector<float>* vtx_angleMin, std::vector<float>* vtx_angleMean, std::vector<float>* vtx_angleMax,
-		std::vector<int>* vtx_pvRegion);
+		std::vector<float>* vtx_x, std::vector<float>* vtx_y, std::vector<float>* vtx_xErr, std::vector<float>* vtx_yErr,
+		std::vector<float>* vtx_chi2norm, std::vector<int>* vtx_ntracks, std::vector<int>* vtx_pvRegion,
+		std::vector<std::vector<float>>* trk_pt_br_in, std::vector<std::vector<float>>* trk_eta_br_in, std::vector<std::vector<float>>* trk_phi_br_in,
+		std::vector<std::vector<float>>* trk_dxy_origin_br_in, std::vector<std::vector<float>>* trk_dxyErr_br_in,
+		std::vector<std::vector<int>>* trk_nPixelHits_br_in, std::vector<std::vector<int>>* trk_nStripHits_br_in, std::vector<std::vector<int>>* trk_nTrackerLayers_br_in);
 };
 
 Tree2PlotsRun3::Tree2PlotsRun3(const edm::ParameterSet& iConfig):
@@ -230,8 +302,6 @@ void Tree2PlotsRun3::beginJob() {
 		edm::LogError("Tree2PlotsRun3") << "Cannot open input file: " << inputFile_;
 		return;
 	}
-
-	// Try direct path first, then fallback
 	treePtr_ = dynamic_cast<TTree*>( file_->Get(inputTree_.c_str()) );
 	if (!treePtr_) {
 		TDirectory* dir = file_->GetDirectory("scoutingTree");
@@ -244,37 +314,32 @@ void Tree2PlotsRun3::beginJob() {
 		return;
 	}
 
-	// Set branch addresses ONCE and store pointers in member variables
+	// --- Set branch addresses only for branches that ScoutingTreeMakerRun3 actually writes ---
 	treePtr_->SetBranchAddress("nPV", &nPV_br_);
 	treePtr_->SetBranchAddress("refType", &refType_br_);
 	treePtr_->SetBranchAddress("beamspot_x", &beamspot_x_br_);
 	treePtr_->SetBranchAddress("beamspot_y", &beamspot_y_br_);
 	treePtr_->SetBranchAddress("avgPV_x", &avgPV_x_br_);
 	treePtr_->SetBranchAddress("avgPV_y", &avgPV_y_br_);
+
+	// Vertex primitives (match TreeMaker)
 	treePtr_->SetBranchAddress("vtx_x", &vtx_x_br);
 	treePtr_->SetBranchAddress("vtx_y", &vtx_y_br);
+	treePtr_->SetBranchAddress("vtx_xErr", &vtx_xErr_br);
+	treePtr_->SetBranchAddress("vtx_yErr", &vtx_yErr_br);
 	treePtr_->SetBranchAddress("vtx_chi2norm", &vtx_chi2norm_br);
 	treePtr_->SetBranchAddress("vtx_ntracks", &vtx_ntracks_br);
-	treePtr_->SetBranchAddress("vtx_pt", &vtx_pt_br);
-	treePtr_->SetBranchAddress("vtx_eta", &vtx_eta_br);
-	treePtr_->SetBranchAddress("vtx_phi", &vtx_phi_br);
-	treePtr_->SetBranchAddress("vtx_mass", &vtx_mass_br);
-	treePtr_->SetBranchAddress("vtx_dBV_origin", &vtx_dBV_origin_br);
-	treePtr_->SetBranchAddress("vtx_dBV_ref", &vtx_dBV_ref_br);
-	treePtr_->SetBranchAddress("vtx_dBV_err", &vtx_dBV_err_br);
-	treePtr_->SetBranchAddress("vtx_angleMin", &vtx_angleMin_br);
-	treePtr_->SetBranchAddress("vtx_angleMean", &vtx_angleMean_br);
-	treePtr_->SetBranchAddress("vtx_angleMax", &vtx_angleMax_br);
 	treePtr_->SetBranchAddress("vtx_pvRegion", &vtx_pvRegion_br);
 
-	// Add track-level branch addresses (nested vectors created by ScoutingTreeMakerRun3)
-	// these branches are vector<vector<float>> in the TTree
+	// Track nested vectors (match TreeMaker)
 	treePtr_->SetBranchAddress("trk_pt", &trk_pt_br);
 	treePtr_->SetBranchAddress("trk_eta", &trk_eta_br);
 	treePtr_->SetBranchAddress("trk_phi", &trk_phi_br);
-	treePtr_->SetBranchAddress("trk_dxy_ref", &trk_dxy_ref_br);
+	treePtr_->SetBranchAddress("trk_dxy_origin", &trk_dxy_origin_br);
 	treePtr_->SetBranchAddress("trk_dxyErr", &trk_dxyErr_br);
-	treePtr_->SetBranchAddress("trk_dxySig_ref", &trk_dxySig_ref_br);
+	treePtr_->SetBranchAddress("trk_nPixelHits", &trk_nPixelHits_br);
+	treePtr_->SetBranchAddress("trk_nStripHits", &trk_nStripHits_br);
+	treePtr_->SetBranchAddress("trk_nTrackerLayers", &trk_nTrackerLayers_br);
 
 	totalEntries_ = treePtr_->GetEntries();
 	currentEntry_ = 0;
@@ -285,167 +350,73 @@ void Tree2PlotsRun3::beginJob() {
 void Tree2PlotsRun3::analyze(const edm::Event&, const edm::EventSetup&) {
 	// Process exactly one TTree entry per framework analyze() call.
 	if (processed_) return;
-	if (!openedTree_ || !treePtr_) {
-		edm::LogError("Tree2PlotsRun3") << "Tree not opened; nothing to process.";
-		processed_ = true;
-		return;
-	}
+	if (!openedTree_ || !treePtr_) { processed_ = true; return; }
 
-	// If we've exhausted the TTree, mark done
-	if (currentEntry_ >= totalEntries_) {
-		edm::LogInfo("Tree2PlotsRun3") << "All TTree entries processed (" << totalEntries_ << ")";
-		processed_ = true;
-		return;
-	}
+	if (currentEntry_ >= totalEntries_) { processed_ = true; return; }
 
 	// Read a single TTree entry per framework analyze() call
 	treePtr_->GetEntry(currentEntry_);
 
-	// Process this entry
-	processEntry(currentEntry_, refType_br_, beamspot_x_br_, beamspot_y_br_, avgPV_x_br_, avgPV_y_br_,
-		vtx_x_br, vtx_y_br, vtx_chi2norm_br,
-		vtx_ntracks_br, vtx_pt_br, vtx_eta_br, vtx_phi_br, vtx_mass_br,
-		vtx_dBV_origin_br, vtx_dBV_ref_br, vtx_dBV_err_br,
-		vtx_angleMin_br, vtx_angleMean_br, vtx_angleMax_br,
-		vtx_pvRegion_br);
+	// SAFETY: pass only the branches we know exist (avoid dereferencing missing pointers)
+	processEntry(currentEntry_,
+	             refType_br_, beamspot_x_br_, beamspot_y_br_, avgPV_x_br_, avgPV_y_br_,
+	             vtx_x_br, vtx_y_br, vtx_xErr_br, vtx_yErr_br, vtx_chi2norm_br,
+	             vtx_ntracks_br, vtx_pvRegion_br,
+	             trk_pt_br, trk_eta_br, trk_phi_br, trk_dxy_origin_br, trk_dxyErr_br,
+	             trk_nPixelHits_br, trk_nStripHits_br, trk_nTrackerLayers_br);
 
 	++currentEntry_;
-
-	// If we reached the end, mark processed_ so further analyze() calls are no-ops
-	if (currentEntry_ >= totalEntries_) {
-		edm::LogInfo("Tree2PlotsRun3") << "Finished processing all TTree entries (" << totalEntries_ << ")";
+	if (currentEntry_ >= totalEntries_) { 
 		processed_ = true;
-	}
-}
 
-// processEntry: make sure ref_x/ref_y are computed locally
-void Tree2PlotsRun3::processEntry(Long64_t /*iEntry*/, Int_t refType, Float_t beamspot_x, Float_t beamspot_y, Float_t avgPV_x, Float_t avgPV_y,
-	std::vector<float>* vtx_x, std::vector<float>* vtx_y, std::vector<float>* vtx_chi2norm,
-	std::vector<int>* vtx_ntracks, std::vector<float>* vtx_pt, std::vector<float>* vtx_eta,
-	std::vector<float>* vtx_phi, std::vector<float>* vtx_mass, std::vector<float>* vtx_dBV_origin,
-	std::vector<float>* vtx_dBV_ref, std::vector<float>* vtx_dBV_err,
-	std::vector<float>* vtx_angleMin, std::vector<float>* vtx_angleMean, std::vector<float>* vtx_angleMax,
-	std::vector<int>* vtx_pvRegion)
-{
-	float ref_x = (refType == 1) ? beamspot_x : avgPV_x;
-	float ref_y = (refType == 1) ? beamspot_y : avgPV_y;
+		// --- FINALIZE: flush TFileService/ROOT output and exit when tree exhausted ---
+		// Minimal, explicit shutdown so framework run with maxEvents = -1 will stop
+		// as soon as all TTree entries have been consumed.
 
-	int nSelVertices = 0;
-
-	for (size_t iv = 0; iv < vtx_x->size(); ++iv) {
-		int ntk = (*vtx_ntracks)[iv];
-		float mass = (*vtx_mass)[iv];
-		float chi2 = (*vtx_chi2norm)[iv];
-		float dBV = (*vtx_dBV_ref)[iv];
-		float minAngle = (*vtx_angleMin)[iv];
-
-		bool vertexFilledAny = false; // track whether this vertex contributed to any branch
-
-		for (size_t i_ntk = 0; i_ntk < cut_ntk_.size(); ++i_ntk) {
-			const auto& ntk_set = cut_ntk_[i_ntk];
-			bool ntk_pass = ntk_set.empty() || std::find(ntk_set.begin(), ntk_set.end(), ntk) != ntk_set.end();
-			if (!ntk_pass) continue;
-
-			// Build SAME ntk name as in beginJob
-			std::string ntkName;
-			if (ntk_set.empty()) {
-				ntkName = "ntk_any";
-			} else if (ntk_set.size() == 1) {
-				ntkName = "ntk_" + std::to_string(ntk_set[0]);
-			} else {
-				ntkName = "ntk";
-				for (size_t j = 0; j < ntk_set.size(); ++j) {
-					if (j > 0) ntkName += "_or_";
-					ntkName += std::to_string(ntk_set[j]);
-				}
+		// --- REPLACED: avoid calling gFile->Write() because gFile may point to a
+		// file opened in READ mode (input TTree). Instead, flush the TFileService
+		// output file if available and safe to write.
+		{
+			edm::Service<TFileService> fs;
+			TFile* outFile = nullptr;
+			if (fs.isAvailable()) {
+				// TFileService::file() returns a TFile reference; take its address to get a TFile*
+				outFile = &(fs->file());
 			}
 
-			for (size_t i_angle = 0; i_angle < cut_opening_angle_min_.size(); ++i_angle) {
-				double angle_cut = cut_opening_angle_min_[i_angle];
-				if (angle_cut >= 0 && minAngle < angle_cut) continue;
+			// If both files exist and have the same name, do NOT attempt to write the file
+			// (this indicates the user is trying to read and write the same ROOT file in one job).
+			bool sameName = false;
+			if (outFile && file_) {
+				const char* outName = outFile->GetName();
+				const char* inName  = file_->GetName();
+				if (outName && inName && std::string(outName) == std::string(inName)) sameName = true;
+			}
 
-				if (required_invmass_ > 0 && mass < required_invmass_) continue;
-				if (required_chi2_ > 0 && chi2 > required_chi2_) continue;
-				if (required_dBV_min_ > 0 && dBV < required_dBV_min_) continue;
-				if (required_dBV_max_ > 0 && dBV > required_dBV_max_) continue;
-
-				std::string angleName = angle_cut < 0 ? "angle_any" : "angle_gt_" + std::to_string(int(angle_cut*100));
-				std::string key = ntkName + "/" + angleName;
-				auto& h = histMap_[key];
-
-				// Mark that this vertex passed at least one branch selection
-				vertexFilledAny = true;
-
-				h.chi2norm->Fill(chi2);
-				h.pt->Fill((*vtx_pt)[iv]);
-				h.eta->Fill((*vtx_eta)[iv]);
-				h.phi->Fill((*vtx_phi)[iv]);
-				h.mass->Fill(mass);
-				h.nTracks->Fill(ntk);
-				h.xy_global->Fill((*vtx_x)[iv], (*vtx_y)[iv]);
-				h.xy_ref->Fill((*vtx_x)[iv] - ref_x, (*vtx_y)[iv] - ref_y);
-				h.dBV_origin->Fill((*vtx_dBV_origin)[iv]);
-				h.dBV_ref->Fill(dBV);
-				h.dBV_error->Fill((*vtx_dBV_err)[iv]);
-				h.angleMin->Fill(minAngle);
-				h.angleMean->Fill((*vtx_angleMean)[iv]);
-				h.angleMax->Fill((*vtx_angleMax)[iv]);
-
-				if (std::fabs((*vtx_eta)[iv]) < 1.0) {
-					h.barrel_mass->Fill(mass);
-					h.barrel_dBV->Fill(dBV);
+			if (outFile) {
+				if (sameName) {
+					edm::LogError("Tree2PlotsRun3") << "Input file equals TFileService output file ('"
+						<< (outFile ? outFile->GetName() : std::string("unknown")) 
+						<< "'). Refusing to Write/Close the file to avoid ROOT write-on-read errors.";
 				} else {
-					h.endcap_mass->Fill(mass);
-					h.endcap_dBV->Fill(dBV);
+					edm::LogInfo("Tree2PlotsRun3") << "Flushing TFileService output file before exiting (processed all " << totalEntries_ << " entries).";
+					outFile->Write();
+					outFile->Close();
 				}
+			} else {
+				edm::LogInfo("Tree2PlotsRun3") << "No TFileService output file available to flush.";
+			}
 
-				int region = (*vtx_pvRegion)[iv];
-				if (region == 0) { h.regionA_mass->Fill(mass); h.regionA_dBV->Fill(dBV); }
-				else if (region == 1) { h.regionB_mass->Fill(mass); h.regionB_dBV->Fill(dBV); }
-				else { h.regionC_mass->Fill(mass); h.regionC_dBV->Fill(dBV); }
+			// Close the input file if open
+			if (file_) {
+				file_->Close();
+				file_ = nullptr;
+				treePtr_ = nullptr;
 			}
 		}
 
-		if (vertexFilledAny) ++nSelVertices;
-
-		// --- Fill vertex-associated track histograms using trk_* branches if available ---
-		if (trk_pt_br && trk_pt_br->size() > iv) {
-			const auto& vtrks_pt = (*trk_pt_br)[iv];
-			// safe-guard other track arrays sizes
-			bool has_eta = trk_eta_br && trk_eta_br->size() > iv;
-			bool has_phi = trk_phi_br && trk_phi_br->size() > iv;
-			bool has_dxy_ref = trk_dxy_ref_br && trk_dxy_ref_br->size() > iv;
-			bool has_dxyErr = trk_dxyErr_br && trk_dxyErr_br->size() > iv;
-			bool has_dxySig = trk_dxySig_ref_br && trk_dxySig_ref_br->size() > iv;
-
-			size_t ntrks = vtrks_pt.size();
-			for (size_t it = 0; it < ntrks; ++it) {
-				float pt = vtrks_pt[it];
-				float eta = (has_eta ? (*trk_eta_br)[iv][it] : 0.0f);
-				float phi = (has_phi ? (*trk_phi_br)[iv][it] : 0.0f);
-				float dxyRef = (has_dxy_ref ? (*trk_dxy_ref_br)[iv][it] : -999.0f);
-				float dxyErr = (has_dxyErr ? (*trk_dxyErr_br)[iv][it] : -999.0f);
-				float dxySig = (has_dxySig ? (*trk_dxySig_ref_br)[iv][it] : -999.0f);
-
-				trk_pt->Fill(pt);
-				trk_eta->Fill(eta);
-				trk_phi->Fill(phi);
-				if (has_dxy_ref) trk_dxy_ref->Fill(dxyRef);
-				if (has_dxySig) trk_dxySig_ref->Fill(dxySig);
-				if (has_dxyErr) {
-					trk_dxyErr->Fill(dxyErr);
-					if (std::fabs(eta) < 1.0) trk_dxyErr_barrel->Fill(dxyErr);
-					else trk_dxyErr_endcap->Fill(dxyErr);
-				}
-			}
-		}
-	} // end vertices loop
-
-	// Fill event-level histograms
-	event_nPrimaryVertices->Fill(static_cast<double>(nPV_br_));
-	event_nSelectedVertices->Fill(static_cast<double>(nSelVertices));
-	// avgPV - beamspot
-	event_avgPV_vs_beamspot->Fill(avgPV_x_br_ - beamspot_x_br_, avgPV_y_br_ - beamspot_y_br_);
+		std::exit(0); // immediate, controlled process termination
+	}
 }
 
 void Tree2PlotsRun3::endJob() {
@@ -473,4 +444,162 @@ void Tree2PlotsRun3::fillDescriptions(edm::ConfigurationDescriptions& descriptio
 	descriptions.add("tree2PlotsRun3", desc);
 }
 
+// define static const outside the class
+// const float Tree2PlotsRun3::kMissingFloat = std::numeric_limits<float>::quiet_NaN();
+
 DEFINE_FWK_MODULE(Tree2PlotsRun3);
+
+void Tree2PlotsRun3::processEntry(Long64_t /*iEntry*/, Int_t refType, Float_t beamspot_x, Float_t beamspot_y, Float_t avgPV_x, Float_t avgPV_y,
+                                  std::vector<float>* vtx_x, std::vector<float>* vtx_y,
+                                  std::vector<float>* vtx_xErr, std::vector<float>* vtx_yErr,
+                                  std::vector<float>* vtx_chi2norm,
+                                  std::vector<int>* vtx_ntracks, std::vector<int>* vtx_pvRegion,
+                                  std::vector<std::vector<float>>* trk_pt_br_in, std::vector<std::vector<float>>* trk_eta_br_in, std::vector<std::vector<float>>* trk_phi_br_in,
+                                  std::vector<std::vector<float>>* trk_dxy_origin_br_in, std::vector<std::vector<float>>* trk_dxyErr_br_in,
+                                  std::vector<std::vector<int>>* trk_nPixelHits_br_in, std::vector<std::vector<int>>* trk_nStripHits_br_in, std::vector<std::vector<int>>* trk_nTrackerLayers_br_in)
+ {
+	// Basic sanity checks: bail out early if fundamental branches are missing
+	if (!vtx_x || !vtx_y || !vtx_chi2norm || !vtx_ntracks) return;
+
+	const float ref_x = (refType == 1) ? beamspot_x : avgPV_x;
+	const float ref_y = (refType == 1) ? beamspot_y : avgPV_y;
+
+	// iterate over vertices safely
+	const size_t nV = vtx_x->size();
+	for (size_t iv = 0; iv < nV; ++iv) {
+		// guard against inconsistent vector sizes
+		if (iv >= vtx_y->size() || iv >= vtx_chi2norm->size() || iv >= vtx_ntracks->size()) continue;
+
+		int ntk = (*vtx_ntracks)[iv];
+		float chi2 = (*vtx_chi2norm)[iv];
+		float vx = (*vtx_x)[iv];
+		float vy = (*vtx_y)[iv];
+
+		// compute dBV wrt reference using vertex primitive coords (2D)
+		float dBV_ref = std::hypot(vx - ref_x, vy - ref_y);
+		// dBV_err from vertex x/y errors if present
+		float vxErr = (vtx_xErr && iv < vtx_xErr->size()) ? (*vtx_xErr)[iv] : 0.0f;
+		float vyErr = (vtx_yErr && iv < vtx_yErr->size()) ? (*vtx_yErr)[iv] : 0.0f;
+		float dBV_err = std::hypot(vxErr, vyErr);
+
+		// Build vertex 4-vector from per-vertex tracks (pion mass assumption)
+		TLorentzVector sumVec(0,0,0,0);
+		std::vector<TVector3> trackVecs;
+		if (trk_pt_br_in && trk_pt_br_in->size() > iv) {
+			const auto& pts = (*trk_pt_br_in)[iv];
+			const auto& etas = (trk_eta_br_in && trk_eta_br_in->size() > iv) ? (*trk_eta_br_in)[iv] : std::vector<float>();
+			const auto& phis = (trk_phi_br_in && trk_phi_br_in->size() > iv) ? (*trk_phi_br_in)[iv] : std::vector<float>();
+			for (size_t it = 0; it < pts.size(); ++it) {
+				double pt = pts[it];
+				double eta = (etas.size() > it) ? etas[it] : 0.0;
+				double phi = (phis.size() > it) ? phis[it] : 0.0;
+				TLorentzVector tv; tv.SetPtEtaPhiM(pt, eta, phi, 0.13957);
+				sumVec += tv;
+				trackVecs.emplace_back(tv.Px(), tv.Py(), tv.Pz());
+			}
+		}
+
+		float mass = static_cast<float>(sumVec.M());
+		float vpt = static_cast<float>(sumVec.Pt());
+		float veta = static_cast<float>(sumVec.Eta());
+		float vphi = static_cast<float>(sumVec.Phi());
+
+		// Opening angles
+		double minAngle = 0.0, meanAngle = 0.0, maxAngle = 0.0;
+		if (trackVecs.size() > 1) {
+			double sumAngles = 0.0; int npairs = 0;
+			minAngle = 1e9; maxAngle = 0.0;
+			for (size_t i=0;i<trackVecs.size();++i) for (size_t j=i+1;j<trackVecs.size();++j) {
+				double ang = trackVecs[i].Angle(trackVecs[j]);
+				sumAngles += ang; ++npairs;
+				minAngle = std::min(minAngle, ang);
+				maxAngle = std::max(maxAngle, ang);
+			}
+			meanAngle = (npairs>0) ? sumAngles/npairs : 0.0;
+		}
+
+		// Apply configured selection cuts (same as before)
+		bool filledAny = false;
+		for (size_t i_ntk = 0; i_ntk < cut_ntk_.size(); ++i_ntk) {
+			const auto& ntk_set = cut_ntk_[i_ntk];
+			bool ntk_pass = ntk_set.empty() || std::find(ntk_set.begin(), ntk_set.end(), ntk) != ntk_set.end();
+			if (!ntk_pass) continue;
+			for (size_t i_angle = 0; i_angle < cut_opening_angle_min_.size(); ++i_angle) {
+				double angle_cut = cut_opening_angle_min_[i_angle];
+				if (angle_cut >= 0 && meanAngle < angle_cut) continue;
+				if (required_invmass_ > 0 && mass < required_invmass_) continue;
+				if (required_chi2_ > 0 && chi2 > required_chi2_) continue;
+				if (required_dBV_min_ > 0 && dBV_ref < required_dBV_min_) continue;
+				if (required_dBV_max_ > 0 && dBV_ref > required_dBV_max_) continue;
+
+				std::string angleName = angle_cut < 0 ? "angle_any" : "angle_gt_" + std::to_string(int(angle_cut*100));
+				std::string ntkName;
+				if (ntk_set.empty()) ntkName = "ntk_any";
+				else if (ntk_set.size() == 1) ntkName = "ntk_" + std::to_string(ntk_set[0]);
+				else {
+					ntkName = "ntk";
+					for (size_t j = 0; j < ntk_set.size(); ++j) { if (j>0) ntkName += "_or_"; ntkName += std::to_string(ntk_set[j]); }
+				}
+				std::string key = ntkName + "/" + angleName;
+				auto& h = histMap_[key];
+
+				// Fill histos (same as before)
+				h.chi2norm->Fill(chi2);
+				h.pt->Fill(vpt);
+				h.eta->Fill(veta);
+				h.phi->Fill(vphi);
+				h.mass->Fill(mass);
+				h.nTracks->Fill(ntk);
+				h.xy_global->Fill(vx, vy);
+				h.xy_ref->Fill(vx - ref_x, vy - ref_y);
+				h.dBV_origin->Fill(std::hypot(vx, vy));
+				h.dBV_ref->Fill(dBV_ref);
+				h.dBV_error->Fill(dBV_err);
+				h.angleMin->Fill(minAngle);
+				h.angleMean->Fill(meanAngle);
+				h.angleMax->Fill(maxAngle);
+
+				if (std::fabs(veta) < 1.0) { h.barrel_mass->Fill(mass); h.barrel_dBV->Fill(dBV_ref); }
+				else { h.endcap_mass->Fill(mass); h.endcap_dBV->Fill(dBV_ref); }
+
+				int region = (vtx_pvRegion && iv < vtx_pvRegion->size()) ? (*vtx_pvRegion)[iv] : 0;
+				if (region == 0) { h.regionA_mass->Fill(mass); h.regionA_dBV->Fill(dBV_ref); }
+				else if (region == 1) { h.regionB_mass->Fill(mass); h.regionB_dBV->Fill(dBV_ref); }
+				else { h.regionC_mass->Fill(mass); h.regionC_dBV->Fill(dBV_ref); }
+
+				filledAny = true;
+			}
+		}
+
+		// mark 'filledAny' as intentionally unused for now (silence -Werror=unused-but-set-variable)
+		(void)filledAny;
+
+		// Fill per-vertex associated track histograms from nested track arrays (guarded)
+		if (trk_pt_br_in && trk_pt_br_in->size() > iv) {
+			const auto& vtrks_pt = (*trk_pt_br_in)[iv];
+			bool has_eta = trk_eta_br_in && trk_eta_br_in->size() > iv;
+			bool has_phi = trk_phi_br_in && trk_phi_br_in->size() > iv;
+			bool has_dxy_origin = trk_dxy_origin_br_in && trk_dxy_origin_br_in->size() > iv;
+			bool has_dxyErr = trk_dxyErr_br_in && trk_dxyErr_br_in->size() > iv;
+
+			for (size_t it = 0; it < vtrks_pt.size(); ++it) {
+				float pt = vtrks_pt[it];
+				float eta = (has_eta ? (*trk_eta_br_in)[iv][it] : 0.0f);
+				float phi = (has_phi ? (*trk_phi_br_in)[iv][it] : 0.0f);
+				float dxyOrigin = (has_dxy_origin ? (*trk_dxy_origin_br_in)[iv][it] : std::numeric_limits<float>::quiet_NaN());
+				float dxyErr = (has_dxyErr ? (*trk_dxyErr_br_in)[iv][it] : std::numeric_limits<float>::quiet_NaN());
+
+				// Fill the histogram members (trk_pt, trk_eta, trk_phi, ...), not the branch vectors
+				trk_pt->Fill(pt);
+				trk_eta->Fill(eta);
+				trk_phi->Fill(phi);
+				if (std::isfinite(dxyOrigin)) trk_dxy_ref->Fill(dxyOrigin);
+				if (std::isfinite(dxyErr) && dxyErr > 0.0f) {
+					trk_dxyErr->Fill(dxyErr);
+					if (std::fabs(eta) < 1.0) trk_dxyErr_barrel->Fill(dxyErr);
+					else trk_dxyErr_endcap->Fill(dxyErr);
+				}
+			}
+		}
+	} // end vertices
+}

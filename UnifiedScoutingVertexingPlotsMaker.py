@@ -5,10 +5,10 @@ process = cms.Process("CHAIN")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 # process.MessageLogger.cerr.FwkSummary.reportEvery = 5
 # process.MessageLogger.cerr.FwkReport.reportEvery = 5
-process.MessageLogger.cerr.FwkSummary.reportEvery = 100
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
-# process.MessageLogger.cerr.FwkSummary.reportEvery = 1000
-# process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+# process.MessageLogger.cerr.FwkSummary.reportEvery = 100
+# process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkSummary.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 # process.MessageLogger.cerr.threshold = cms.untracked.string('DEBUG')
 # process.MessageLogger.debugModules = cms.untracked.vstring('hltScoutingUnpackProducer', 'Vertexer', 'scoutingTree')
@@ -24,7 +24,7 @@ process.options = cms.untracked.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(20000)  # Limited events for testing
+    input = cms.untracked.int32(100000)  # Limited events for testing
     # input = cms.untracked.int32(150000)  # Local
     # input = cms.untracked.int32(500000)  # Process all events
     # input = cms.untracked.int32(-1)  # Process all events
@@ -65,7 +65,7 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # -------------------------- OUTPUT PATH --------------------------------
 #-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/ScoutingPlotsTest_v3.root")
+    fileName = cms.string("test-outputs/ScoutingPlotsTest_Size100k.root")
     # fileName = cms.string("ScoutingPlots_Output.root")  # Histogram/plot output
 )
 #-----------------------------------------------------------------------

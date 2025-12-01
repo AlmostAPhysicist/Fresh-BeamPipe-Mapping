@@ -6,6 +6,60 @@
 // Created:    Tue, 14 May 2024 14:23:11 GMT
 // Revised:    2025-09-09
 
+
+/*
+===============================================================================
+ScoutingPlotMakerRun3
+===============================================================================
+Description:
+  CMSSW EDAnalyzer that builds histograms from scouting unpacked data and
+  reconstructed displaced vertices produced by the Vertexer. This module
+  creates the canonical set of histograms used for monitoring and analysis:
+  vertex kinematics, spatial distributions, distances, opening angles,
+  event-level summaries, and comprehensive track-level IP distributions.
+
+Purpose:
+  - Produce final histograms at CMSSW runtime from unpacked scouting data.
+  - Provide the reference histogram set that Tree2PlotsRun3 can reproduce
+    using TTree input (for re-analysis).
+  - Compute seed-like track collections (Vertexer-like selection) and
+    produce seed vs all vs vertex-associated track plots.
+
+What is read (input):
+  - Displaced vertex collection (Vertexer output)
+  - BeamSpot
+  - Full track collection (unpacked scouting Track objects)
+  - Primary vertices (for avgPV computation)
+
+What is produced (output):
+  - Event-level histograms (nPrimaryVertices, nSelectedVertices, beamspot vs avgPV)
+  - Vertex histograms in branches defined by ntk × opening-angle categories
+  - Track histograms for: all tracks, seed-like tracks, vertex-associated tracks
+
+Selection & computation policy:
+  - Vertex selection and seed-like criteria mirror the Vertexer/TreeMaker
+    configuration where possible (pt thresholds, IP significance, hit counts).
+  - Impact parameters and IPSignificance are computed with TransientTrack
+    and IPTools for exact signed IP values (3D or 2D depending on toggles).
+  - Vertex mass computed by summing track four-vectors (pion mass assumption).
+  - Opening angles computed with TVector3 from track momentum vectors.
+
+Configuration:
+  - Configurable parameters include cut_ntk (VPSet), cut_opening_angle_min,
+    required_invmass, required_chi2, required_dBV_min/max, PVBoundary1/2,
+    and seed-like thresholds (seed_minIPSig, seed_minPt, seed_use2DTrackDist).
+  - Use process.maxEvents in the python config to limit the number of processed events.
+
+Notes / Caveats:
+  - This module depends on having the unpacked Track collection available;
+    Tree-based re-analysis (Tree2Plots) cannot reproduce "all-tracks" histograms
+    unless TreeMaker stored per-event track collections. Consider storing
+    event-level track arrays in the TreeMaker if you need full parity.
+  - Binning and naming in this module are authoritative for downstream
+    comparisons; Tree2Plots reproduces these when given the necessary primitives.
+===============================================================================
+*/
+
 #include <memory>
 #include <vector>
 #include <set>
