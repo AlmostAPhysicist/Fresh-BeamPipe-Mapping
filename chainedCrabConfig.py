@@ -1,7 +1,7 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-theTag = "ScoutingData_2024G"  # updated tag
+theTag = "ScoutingData_2024G_TreeMaker"  # updated tag
 # theTag = "ScoutingData_Updated_10mod15_v1"  # updated tag
 
 config.General.requestName = theTag
@@ -14,7 +14,8 @@ config.JobType.maxMemoryMB = 3000  # value in MB (max: 3000)
 # config.JobType.maxJobRuntimeMin = 2750  # value in minutes (max: 2750)
 
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'
+config.JobType.psetName = 'UnifiedScoutingVertexingPlotsMaker.py'  # RENAMED
+config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'  # RENAMED
 # config.JobType.numCores = 4
 
 
@@ -63,6 +64,12 @@ config.Data.splitting = 'Automatic'
 # config.Data.totalUnits = 10000  # Total number of files to process
 
 
+# Choose which config to use:
+# For histograms/plots:
+# config.JobType.outputFiles = ["ScoutingPlots_Output.root"]
+
+# For TTrees (when ready):
+# config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'
 config.JobType.outputFiles = ["ScoutingTree_Output.root"]
 
 
@@ -119,4 +126,4 @@ config.Site.storageSite = 'T3_CH_CERNBOX'
 
 # No publication information (publication has been disabled in the CRAB configuration file)
 # Log file is /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/crab_MC_DYto2Mu_FullPV_1mod20_v1/crab.log
-# [amalhotr@lxplus960 Run3ScoutingAnalysisTools]$ 
+# [amalhotr@lxplus960 Run3ScoutingAnalysisTools]$

@@ -65,8 +65,8 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # -------------------------- OUTPUT PATH --------------------------------
 #-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/ScoutingTreeTest_v2.root")
-    # fileName = cms.string("ScoutingTree_Output.root")  # TTree output (different from plots)
+    fileName = cms.string("test-outputs/ScoutingPlotsTest_v3.root")
+    # fileName = cms.string("ScoutingPlots_Output.root")  # Histogram/plot output
 )
 #-----------------------------------------------------------------------
 
@@ -131,61 +131,51 @@ process.Vertexer = cms.EDProducer('Vertexer',
     verbose = cms.bool(False),
 )
 
-# Step 3: Scouting Tree Maker (stores comprehensive vertex+track info)
-# ============================================================================
-# TREEMAKER SELECTION CUTS (adjust these to control what gets saved)
-# ============================================================================
-TREE_MIN_NTRACKS = 3           # changed from 3 -> store ntk=2 so plot branches match
-TREE_MAX_NTRACKS = 4         # Maximum tracks per vertex (-1 = no limit)
-TREE_MAX_CHI2NDOF = 10.0       # Maximum χ²/ndof (10 = loose quality cut)
-TREE_MIN_MASS = 1.0            # Minimum vertex mass [GeV] (1 GeV = very inclusive)
-TREE_MIN_DBV = -1              # changed from 0.1/0 to -1 => no dBV cut at storage
-TREE_MAX_DBV = -1.0            # Maximum displacement [cm] (-1 = no limit, keep all LLPs)
-TREE_MAX_DBV_ERROR = 0.75       # Maximum dBV uncertainty [cm] (0.5 = reasonable precision)
-
-# PV region boundaries for classification
-TREE_PV_BOUNDARY_1 = 20        # nPV < 20: Region A (low pileup)
-TREE_PV_BOUNDARY_2 = 40        # 20 ≤ nPV < 40: Region B, nPV ≥ 40: Region C (high pileup)
-
-process.scoutingTree = cms.EDAnalyzer('ScoutingTreeMakerRun3',
-    # TTree-specific selection: store vertices with 3+ tracks
-    min_ntracks = cms.int32(TREE_MIN_NTRACKS),
-    max_ntracks = cms.int32(TREE_MAX_NTRACKS),
+# Step 3: Scouting Plot Maker (RENAMED)
+process.scoutingPlots = cms.EDAnalyzer('ScoutingPlotMakerRun3',
+    # Discrete ntk cuts - each creates a separate branch
+    cut_ntk = cms.VPSet(
+        # cms.PSet(values = cms.vint32()),           # No cut (accept all ntk)
+        cms.PSet(values = cms.vint32(2)),          # Only ntk=2
+        cms.PSet(values = cms.vint32(3)),          # Only ntk=3
+        # cms.PSet(values = cms.vint32(2, 3))        # ntk=2 OR ntk=3
+        cms.PSet(values = cms.vint32(3, 4)),          # Only ntk=4
+        # ntk = 3,4,5 maybe
+    ),
     
-    # Loose quality cuts to keep most vertices for offline study
-    max_chi2ndof = cms.double(TREE_MAX_CHI2NDOF),
-    min_mass = cms.double(TREE_MIN_MASS),
-    min_dBV = cms.double(TREE_MIN_DBV),        # no dBV cut at storage
-    max_dBV = cms.double(TREE_MAX_DBV),
-    max_dBV_error = cms.double(TREE_MAX_DBV_ERROR),
+    # Opening angle cuts - each creates a separate branch
+    cut_opening_angle_min = cms.vdouble(-1, 0.05, 0.1, 0.25, 0.5, 1.0),  # -1 = no cut, then 0.05 rad, 0.1 rad, 0.25 rad, 0.5 rad, 1.0 rad
     
-    # Store all track information (no strict cuts)
-    store_all_vertex_tracks = cms.bool(True),  # Store all tracks in selected vertices
-    
-    # Reference vertex settings (same as PlotMaker for consistency)
+    # Other (non-branching) cuts
+    required_invmass = cms.double(2.0), # 2GeV  min
+    required_chi2 = cms.double(-1),
+    required_dBV_min = cms.double(-1),
+    required_dBV_max = cms.double(-1),
+    required_dxy_min = cms.double(-1),
+    required_dxy_max = cms.double(-1),
+    required_dBV_error = cms.double(-1),
+    required_dxy_error = cms.double(-1),
     refPreference = cms.untracked.string(referencePreference),
-    
-    # Input collections (same as Vertexer)
-    displacedVertices = cms.InputTag("Vertexer"),
-    beamspot_src = cms.InputTag('offlineBeamSpot'),
-    tracks = cms.InputTag("hltScoutingUnpackProducer", "Track"),
-    primaryVertices = cms.InputTag("hltScoutingUnpackProducer", "PrimaryVertex"),
-    
-    # PV region boundaries (for classification)
-    PVBoundary1 = cms.int32(TREE_PV_BOUNDARY_1),
-    PVBoundary2 = cms.int32(TREE_PV_BOUNDARY_2),
-    
-    # Seed-like track parameters (for reference, not used in TTree selection) - UNTRACKED
+
+    # Seed-like plots: mirror Vertexer’s thresholds and 2D/3D toggle (plots only; no selection)
     seed_minIPSig        = cms.untracked.double(process.Vertexer.minSeedIPSig.value()),
     seed_minPt           = cms.untracked.double(process.Vertexer.minSeedPt.value()),
     seed_maxIPSig        = cms.untracked.double(process.Vertexer.dxySig_max_cut.value()),
     seed_minPixelHits    = cms.untracked.int32(process.Vertexer.npixelHits_min_cut.value()),
     seed_minStripHits    = cms.untracked.int32(process.Vertexer.nstripHits_min_cut.value()),
     seed_minTrackerLayers= cms.untracked.int32(process.Vertexer.ntrackerLayers_min_cut.value()),
-    
-    # Distance calculation toggles (for consistency with Vertexer) - TRACKED (required for fillDescriptions)
+    seed_use2DTrackDist  = cms.untracked.bool(process.Vertexer.use_2d_track_dist.value()),
+
+    # Shared toggles for consistent definitions
     use_2d_track_dist   = cms.bool(process.Vertexer.use_2d_track_dist.value()),
-    use_2d_vertex_dist  = cms.bool(process.Vertexer.use_2d_vertex_dist.value())
+    use_2d_vertex_dist  = cms.bool(process.Vertexer.use_2d_vertex_dist.value()),
+
+    PVBoundary1 = cms.int32(20),
+    PVBoundary2 = cms.int32(40),
+    displacedVertices = cms.InputTag("Vertexer"),
+    beamspot_src = cms.InputTag('offlineBeamSpot'),  # Same beamspot source as Vertexer
+    tracks = cms.InputTag("hltScoutingUnpackProducer", "Track"), # Same tracks as Vertexer's seed_tracks_src
+    primaryVertices = cms.InputTag("hltScoutingUnpackProducer", "PrimaryVertex") # Same PVs as Vertexer's primaryVertices
 )
 
 process.scoutingTrackCount = cms.EDFilter('ScoutingTrackCountFilter',
@@ -198,13 +188,11 @@ process.scoutingTrackCount = cms.EDFilter('ScoutingTrackCountFilter',
 #     remainder = cms.untracked.uint32(9)               # keep events with eventNumber % 10 == 0
 # )
 
-# Full chain: vertex production (avgPV seeding) without offlineBeamSpot in Vertex Reconstructions
+# Full chain
 process.p = cms.Path(
-    # process.moduloEventFilter +
     process.scoutingTrackCount +
     process.hltScoutingUnpackProducer +
-    process.offlineBeamSpot +  # only for debug plots in tree
+    process.offlineBeamSpot +
     process.Vertexer +
-    process.scoutingTree
+    process.scoutingPlots  # RENAMED from scoutingTree
 )
-
