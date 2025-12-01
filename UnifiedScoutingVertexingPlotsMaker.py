@@ -136,7 +136,7 @@ process.scoutingPlots = cms.EDAnalyzer('ScoutingPlotMakerRun3',
     # Discrete ntk cuts - each creates a separate branch
     cut_ntk = cms.VPSet(
         # cms.PSet(values = cms.vint32()),           # No cut (accept all ntk)
-        cms.PSet(values = cms.vint32(2)),          # Only ntk=2
+        # cms.PSet(values = cms.vint32(2)),          # Only ntk=2
         cms.PSet(values = cms.vint32(3)),          # Only ntk=3
         # cms.PSet(values = cms.vint32(2, 3))        # ntk=2 OR ntk=3
         cms.PSet(values = cms.vint32(3, 4)),          # Only ntk=4

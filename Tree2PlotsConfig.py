@@ -13,40 +13,46 @@ process.options = cms.untracked.PSet(
     TryToContinue = cms.untracked.vstring('ProductNotFound'),
 )
 
-process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1)  # Only need 1 "event" since we process TTree in beginJob
-)
-
-# ========================== INPUT: TTREE FILE ==========================
+# Use EmptySource because we're not reading EDM events; framework maxEvents now controls
+# how many TTree entries are processed (one TTree entry per analyze() call).
 process.source = cms.Source("EmptySource")
 
-# ========================== OUTPUT: HISTOGRAMS =========================
+# Control how many TTree entries to process with framework maxEvents:
+# - set process.maxEvents.input to N to process N TTree entries (one TTree entry per analyze() call)
+# - set to -1 to allow the analyzer to run until the TTree is exhausted
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(20_000))  # set to N to limit entries
+
+
+# Output
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/Tree2Plots_Output_v2.root")
+    fileName = cms.string("test-outputs/Tree2Plots_Output_v4.root")
 )
 
-# ========================== TREE TO PLOTS ANALYZER =====================
-# Reads TTree from ScoutingTreeMakerRun3 and makes same plots as ScoutingPlotMakerRun3
+
 process.tree2plots = cms.EDAnalyzer('Tree2PlotsRun3',
-    # Input TTree file and tree name
+    # Path to the ROOT file and the TTree path inside it.
+    # Example: the tree was saved under TDirectory "scoutingTree" as "vertexTree" ->
+    # path = "scoutingTree/vertexTree".
     inputFile = cms.string("test-outputs/ScoutingTreeTest_v2.root"),
-    inputTree = cms.string("vertexTree"),
-    
-    # SAME CUTS AS UnifiedScoutingVertexingPlotsMaker.py
+    inputTree = cms.string("scoutingTree/vertexTree"),
+
+    # Branching & cuts (match UnifiedScoutingVertexingPlotsMaker)
     cut_ntk = cms.VPSet(
-        cms.PSet(values = cms.vint32(3)),      # Only ntk=3
-        cms.PSet(values = cms.vint32(3, 4)),   # ntk=3 OR ntk=4
+        # cms.PSet(values = cms.vint32(2)),
+        cms.PSet(values = cms.vint32(3)),
+        cms.PSet(values = cms.vint32(3, 4)),
     ),
-    
     cut_opening_angle_min = cms.vdouble(-1, 0.05, 0.1, 0.25, 0.5, 1.0),
-    
+
     required_invmass = cms.double(1.0),
     required_chi2 = cms.double(-1),
     required_dBV_min = cms.double(-1),
     required_dBV_max = cms.double(-1),
-    
+
     PVBoundary1 = cms.int32(20),
     PVBoundary2 = cms.int32(40),
+
+    # NOTE: do NOT add an analyzer-internal 'maxEntries' here — use process.maxEvents instead.
 )
 
 process.p = cms.Path(process.tree2plots)
