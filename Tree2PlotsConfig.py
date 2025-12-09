@@ -25,7 +25,7 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100000))  # s
 
 # Output
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/Tree2Plots_Output_Size100k_incut.root")
+    fileName = cms.string("test-outputs/Tree2Plots_Output_Size100k_new_incut.root")
 )
 
 
@@ -33,7 +33,7 @@ process.tree2plots = cms.EDAnalyzer('Tree2PlotsRun3',
     # Path to the ROOT file and the TTree path inside it.
     # Example: the tree was saved under TDirectory "scoutingTree" as "vertexTree" ->
     # path = "scoutingTree/vertexTree".
-    inputFile = cms.string("test-outputs/ScoutingTreeTest_Size100k_incut.root"),
+    inputFile = cms.string("test-outputs/ScoutingTreeTest_Size100k_new_incut.root"),
     inputTree = cms.string("scoutingTree/vertexTree"),
 
     # Branching & cuts (match UnifiedScoutingVertexingPlotsMaker)

@@ -113,11 +113,15 @@ private:
 	// Histogram structure (same as PlotMaker)
 	struct BranchHistos {
 		TH1F *chi2norm, *pt, *eta, *phi, *mass, *nTracks;
-		TH2F *xy_global, *xy_ref;
-		TH1F *dBV_origin, *dBV_ref, *dBV_beamspot, *dBV_avgPV, *dBV_error;
+		TH2F *xy_global, *xy_beamspot;
+		TH1F *dBV_origin, *dBV_beamspot, *dBV_error;
 		TH1F *angleMin, *angleMean, *angleMax;
-		TH1F *barrel_mass, *barrel_dBV, *endcap_mass, *endcap_dBV;
+		TH1F *barrel_mass, *barrel_eta, *barrel_dBV_origin, *barrel_dBV_beamspot;
+		TH1F *endcap_mass, *endcap_eta, *endcap_dBV_origin, *endcap_dBV_beamspot;
 		TH1F *regionA_mass, *regionA_dBV, *regionB_mass, *regionB_dBV, *regionC_mass, *regionC_dBV;
+		TH2F *regionA_xy_global, *regionA_xy_beamspot, *regionB_xy_global, *regionB_xy_beamspot, *regionC_xy_global, *regionC_xy_beamspot;
+		TH2F *barrel_xy_global, *barrel_xy_beamspot;
+		TH2F *endcap_xy_global, *endcap_xy_beamspot;
 	};
 
 	std::map<std::string, BranchHistos> histMap_;
@@ -131,15 +135,16 @@ private:
 	bool processed_ = false;
 
 	// --- NEW: persistent branch variables (used for SetBranchAddress in beginJob)
-	Int_t nPV_br_; Int_t refType_br_;
-	Float_t beamspot_x_br_, beamspot_y_br_, avgPV_x_br_, avgPV_y_br_;
+	Int_t nPV_br_;
+	Float_t beamspot_x_br_, beamspot_y_br_;
 
 	// --- persistent vertex branch pointers (only primitives that TreeMaker stores) ---
 	std::vector<float>* vtx_x_br = nullptr;
 	std::vector<float>* vtx_y_br = nullptr;
 	std::vector<float>* vtx_xErr_br = nullptr;
 	std::vector<float>* vtx_yErr_br = nullptr;
-	std::vector<float>* vtx_chi2norm_br = nullptr;
+	std::vector<float>* vtx_chi2_br = nullptr;
+	std::vector<float>* vtx_ndof_br = nullptr;
 	std::vector<int>*   vtx_ntracks_br = nullptr;
 	std::vector<int>*   vtx_pvRegion_br = nullptr;
 
@@ -148,31 +153,36 @@ private:
 	std::vector<std::vector<float>>* trk_eta_br = nullptr;
 	std::vector<std::vector<float>>* trk_phi_br = nullptr;
 	std::vector<std::vector<float>>* trk_dxy_origin_br = nullptr;
+	std::vector<std::vector<float>>* trk_dxy_beamspot_br = nullptr;
 	std::vector<std::vector<float>>* trk_dxyErr_br = nullptr;
 	std::vector<std::vector<int>>*   trk_nPixelHits_br = nullptr;
 	std::vector<std::vector<int>>*   trk_nStripHits_br = nullptr;
 	std::vector<std::vector<int>>*   trk_nTrackerLayers_br = nullptr;
 
-	// Event histograms (DECLARATIONS ADDED — required by beginJob())
+	// Event histograms
 	TH1F* event_nPrimaryVertices = nullptr;
 	TH1F* event_nSelectedVertices = nullptr;
-	TH2F* event_avgPV_vs_beamspot = nullptr;
+	TH2F* event_beamspot_xy = nullptr;
 
 	// Histogram members (unchanged)
 	TH1F* trk_pt = nullptr;
 	TH1F* trk_eta = nullptr;
 	TH1F* trk_phi = nullptr;
-	TH1F* trk_dxy_ref = nullptr;
-	TH1F* trk_dxySig_ref = nullptr;
+	TH1F* trk_momentum = nullptr;
+	TH1F* trk_dxy_origin = nullptr;
+	TH1F* trk_dxy_beamspot = nullptr;
+	TH1F* trk_dxySig_origin = nullptr;
+	TH1F* trk_dxySig_beamspot = nullptr;
 	TH1F* trk_dxyErr = nullptr;
 	TH1F* trk_dxyErr_barrel = nullptr;
 	TH1F* trk_dxyErr_endcap = nullptr;
 
-	void processEntry(Long64_t iEntry, Int_t refType, Float_t beamspot_x, Float_t beamspot_y, Float_t avgPV_x, Float_t avgPV_y,
+	void processEntry(Long64_t iEntry, Float_t beamspot_x, Float_t beamspot_y,
 		std::vector<float>* vtx_x, std::vector<float>* vtx_y, std::vector<float>* vtx_xErr, std::vector<float>* vtx_yErr,
-		std::vector<float>* vtx_chi2norm, std::vector<int>* vtx_ntracks, std::vector<int>* vtx_pvRegion,
+		std::vector<float>* vtx_chi2, std::vector<float>* vtx_ndof,
+		std::vector<int>* vtx_ntracks, std::vector<int>* vtx_pvRegion,
 		std::vector<std::vector<float>>* trk_pt_br_in, std::vector<std::vector<float>>* trk_eta_br_in, std::vector<std::vector<float>>* trk_phi_br_in,
-		std::vector<std::vector<float>>* trk_dxy_origin_br_in, std::vector<std::vector<float>>* trk_dxyErr_br_in,
+		std::vector<std::vector<float>>* trk_dxy_origin_br_in, std::vector<std::vector<float>>* trk_dxy_beamspot_br_in, std::vector<std::vector<float>>* trk_dxyErr_br_in,
 		std::vector<std::vector<int>>* trk_nPixelHits_br_in, std::vector<std::vector<int>>* trk_nStripHits_br_in, std::vector<std::vector<int>>* trk_nTrackerLayers_br_in);
 };
 
@@ -199,7 +209,8 @@ Tree2PlotsRun3::Tree2PlotsRun3(const edm::ParameterSet& iConfig):
 void Tree2PlotsRun3::beginJob() {
 	edm::Service<TFileService> fs;
 	TFileDirectory verticesDir = fs->mkdir("Vertices");
-	TFileDirectory vtxSelDir = verticesDir.mkdir("Selected");
+	// Use verticesDir directly (no Selected subfolder)
+	TFileDirectory vtxSelDir = verticesDir;
 
 	// Create histograms for each ntk × angle branch (EXACTLY matching PlotMaker naming)
 	for (size_t i_ntk = 0; i_ntk < cut_ntk_.size(); ++i_ntk) {
@@ -241,11 +252,11 @@ void Tree2PlotsRun3::beginJob() {
 
 			TFileDirectory spatialDir = branchDir.mkdir("Spatial");
 			h.xy_global = spatialDir.make<TH2F>("xy_global", "XY; X [cm]; Y [cm]", 800, -10, 10, 800, -10, 10);
-			h.xy_ref = spatialDir.make<TH2F>("xy_ref", "XY ref; X-X_{ref} [cm]; Y-Y_{ref} [cm]", 800, -10, 10, 800, -10, 10);
+			h.xy_beamspot = spatialDir.make<TH2F>("xy_beamspot", "XY wrt beamspot; X-X_{BS} [cm]; Y-Y_{BS} [cm]", 800, -10, 10, 800, -10, 10);
 
 			TFileDirectory distDir = branchDir.mkdir("Distance");
 			h.dBV_origin = distDir.make<TH1F>("dBV_origin", "d_{BV} (origin); d_{BV} [cm]; Vertices", 200, 0, 10);
-			h.dBV_ref = distDir.make<TH1F>("dBV_ref", "d_{BV} (ref); d_{BV} [cm]; Vertices", 200, 0, 10);
+			h.dBV_beamspot = distDir.make<TH1F>("dBV_beamspot", "d_{BV} (beamspot); d_{BV} [cm]; Vertices", 200, 0, 10);
 			h.dBV_error = distDir.make<TH1F>("dBV_error", "#sigma_{dBV}; #sigma_{dBV} [cm]; Vertices", 1000, 0, 0.1);
 
 			TFileDirectory angleDir = branchDir.mkdir("OpeningAngles");
@@ -256,42 +267,59 @@ void Tree2PlotsRun3::beginJob() {
 			TFileDirectory topoDir = branchDir.mkdir("Topology");
 			TFileDirectory barrelDir = topoDir.mkdir("Barrel");
 			h.barrel_mass = barrelDir.make<TH1F>("mass", "Mass (Barrel); Mass [GeV]; Vertices", 100, 0, 10);
-			h.barrel_dBV = barrelDir.make<TH1F>("dBV", "d_{BV} (Barrel); d_{BV} [cm]; Vertices", 100, 0, 10);
+			h.barrel_eta  = barrelDir.make<TH1F>("eta", "#eta (Barrel); #eta; Vertices", 100, -5, 5);
+			h.barrel_dBV_origin = barrelDir.make<TH1F>("dBV_origin", "d_{BV} origin (Barrel); d_{BV} [cm]; Vertices", 100, 0, 10);
+			h.barrel_dBV_beamspot = barrelDir.make<TH1F>("dBV_beamspot", "d_{BV} beamspot (Barrel); d_{BV} [cm]; Vertices", 100, 0, 10);
+			h.barrel_xy_global = barrelDir.make<TH2F>("xy_global", "XY Global (Barrel); X [cm]; Y [cm]", 800, -10, 10, 800, -10, 10);
+			h.barrel_xy_beamspot = barrelDir.make<TH2F>("xy_beamspot", "XY wrt beamspot (Barrel); X-X_{BS} [cm]; Y-Y_{BS} [cm]", 800, -10, 10, 800, -10, 10);
 
 			TFileDirectory endcapDir = topoDir.mkdir("Endcap");
 			h.endcap_mass = endcapDir.make<TH1F>("mass", "Mass (Endcap); Mass [GeV]; Vertices", 100, 0, 10);
-			h.endcap_dBV = endcapDir.make<TH1F>("dBV", "d_{BV} (Endcap); d_{BV} [cm]; Vertices", 100, 0, 10);
+			h.endcap_eta  = endcapDir.make<TH1F>("eta", "#eta (Endcap); #eta; Vertices", 100, -5, 5);
+			h.endcap_dBV_origin = endcapDir.make<TH1F>("dBV_origin", "d_{BV} origin (Endcap); d_{BV} [cm]; Vertices", 100, 0, 10);
+			h.endcap_dBV_beamspot = endcapDir.make<TH1F>("dBV_beamspot", "d_{BV} beamspot (Endcap); d_{BV} [cm]; Vertices", 100, 0, 10);
+			h.endcap_xy_global = endcapDir.make<TH2F>("xy_global", "XY Global (Endcap); X [cm]; Y [cm]", 800, -10, 10, 800, -10, 10);
+			h.endcap_xy_beamspot = endcapDir.make<TH2F>("xy_beamspot", "XY wrt beamspot (Endcap); X-X_{BS} [cm]; Y-Y_{BS} [cm]", 800, -10, 10, 800, -10, 10);
 
 			if (PVBoundary1_ != -1) {
+				std::string regA_title = (PVBoundary1_>0) ? ("nPV < " + std::to_string(PVBoundary1_)) : "nPV region A";
+				std::string regB_title = (PVBoundary2_>0) ? ("nPV in [" + std::to_string(PVBoundary1_) + "," + std::to_string(PVBoundary2_) + ")") : "nPV region B";
+				std::string regC_title = (PVBoundary2_>0) ? ("nPV >= " + std::to_string(PVBoundary2_)) : "nPV region C";
 				TFileDirectory regionDir = branchDir.mkdir("PVRegions");
 				TFileDirectory regADir = regionDir.mkdir("RegionA");
-				h.regionA_mass = regADir.make<TH1F>("mass", "Mass (Region A); Mass [GeV]; Vertices", 100, 0, 10);
-				h.regionA_dBV = regADir.make<TH1F>("dBV", "d_{BV} (Region A); d_{BV} [cm]; Vertices", 100, 0, 10);
-
+				h.regionA_mass = regADir.make<TH1F>("mass", ("Mass ("+regA_title+"); Mass [GeV]; Vertices").c_str(), 100, 0, 10);
+				h.regionA_dBV = regADir.make<TH1F>("dBV", ("d_{BV} ("+regA_title+"); d_{BV} [cm]; Vertices").c_str(), 100, 0, 10);
+				h.regionA_xy_global = regADir.make<TH2F>("xy_global", ("XY Global ("+regA_title+"); X [cm]; Y [cm]").c_str(), 800, -10, 10, 800, -10, 10);
+				h.regionA_xy_beamspot = regADir.make<TH2F>("xy_beamspot", ("XY wrt beamspot ("+regA_title+"); X-X_{BS} [cm]; Y-Y_{BS} [cm]").c_str(), 800, -10, 10, 800, -10, 10);
 				TFileDirectory regBDir = regionDir.mkdir("RegionB");
-				h.regionB_mass = regBDir.make<TH1F>("mass", "Mass (Region B); Mass [GeV]; Vertices", 100, 0, 10);
-				h.regionB_dBV = regBDir.make<TH1F>("dBV", "d_{BV} (Region B); d_{BV} [cm]; Vertices", 100, 0, 10);
-
+				h.regionB_mass = regBDir.make<TH1F>("mass", ("Mass ("+regB_title+"); Mass [GeV]; Vertices").c_str(), 100, 0, 10);
+				h.regionB_dBV = regBDir.make<TH1F>("dBV", ("d_{BV} ("+regB_title+"); d_{BV} [cm]; Vertices").c_str(), 100, 0, 10);
+				h.regionB_xy_global = regBDir.make<TH2F>("xy_global", ("XY Global ("+regB_title+"); X [cm]; Y [cm]").c_str(), 800, -10, 10, 800, -10, 10);
+				h.regionB_xy_beamspot = regBDir.make<TH2F>("xy_beamspot", ("XY wrt beamspot ("+regB_title+"); X-X_{BS} [cm]; Y-Y_{BS} [cm]").c_str(), 800, -10, 10, 800, -10, 10);
 				TFileDirectory regCDir = regionDir.mkdir("RegionC");
-				h.regionC_mass = regCDir.make<TH1F>("mass", "Mass (Region C); Mass [GeV]; Vertices", 100, 0, 10);
-				h.regionC_dBV = regCDir.make<TH1F>("dBV", "d_{BV} (Region C); d_{BV} [cm]; Vertices", 100, 0, 10);
+				h.regionC_mass = regCDir.make<TH1F>("mass", ("Mass ("+regC_title+"); Mass [GeV]; Vertices").c_str(), 100, 0, 10);
+				h.regionC_dBV = regCDir.make<TH1F>("dBV", ("d_{BV} ("+regC_title+"); d_{BV} [cm]; Vertices").c_str(), 100, 0, 10);
+				h.regionC_xy_global = regCDir.make<TH2F>("xy_global", ("XY Global ("+regC_title+"); X [cm]; Y [cm]").c_str(), 800, -10, 10, 800, -10, 10);
+				h.regionC_xy_beamspot = regCDir.make<TH2F>("xy_beamspot", ("XY wrt beamspot ("+regC_title+"); X-X_{BS} [cm]; Y-Y_{BS} [cm]").c_str(), 800, -10, 10, 800, -10, 10);
 			}
 		}
 	}
-
 	// === Event histograms ===
 	TFileDirectory eventDir = fs->mkdir("Event");
 	event_nPrimaryVertices = eventDir.make<TH1F>("nPrimaryVertices", "Number of Primary Vertices; nPV; Events", 100, 0, 100);
-	event_nSelectedVertices = eventDir.make<TH1F>("nSelectedVertices", "Number of Selected Vertices; N_{vtx}; Events", 200, 0, 200);
-	event_avgPV_vs_beamspot = eventDir.make<TH2F>("avgPV_vs_beamspot", "AvgPV - Beamspot; #Delta x [cm]; #Delta y [cm]", 200, -0.5, 0.5, 200, -0.5, 0.5);
+	event_nSelectedVertices = eventDir.make<TH1F>("nSelectedVertices", "Number of Selected Vertices; N_{vtx}; Events", 100, 0, 100);
+	event_beamspot_xy = eventDir.make<TH2F>("beamspot_xy", "Beamspot Position; x_{BS} [cm]; y_{BS} [cm]", 200, -1, 1, 200, -1, 1);
 
-	// === Track histograms (vertex-associated tracks only, from the TTree) ===
+	// === Track histograms ===
 	TFileDirectory tracksDir = fs->mkdir("Tracks");
 	trk_pt = tracksDir.make<TH1F>("pt", "Track p_{T} (vertex-associated); p_{T} [GeV]; Tracks", 100, 0, 100);
 	trk_eta = tracksDir.make<TH1F>("eta", "Track #eta (vertex-associated); #eta; Tracks", 100, -3, 3);
 	trk_phi = tracksDir.make<TH1F>("phi", "Track #phi (vertex-associated); #phi; Tracks", 100, -3.14, 3.14);
-	trk_dxy_ref = tracksDir.make<TH1F>("dxy_ref", "Track dxy wrt ref (vertex-associated); dxy [cm]; Tracks", 500, -5, 5);
-	trk_dxySig_ref = tracksDir.make<TH1F>("dxySig_ref", "|dxy|/#sigma wrt ref (vertex-associated); |dxy|/#sigma; Tracks", 100, 0, 50);
+	trk_momentum = tracksDir.make<TH1F>("momentum", "Track p (vertex-associated); p [GeV]; Tracks", 100, 0, 200);
+	trk_dxy_origin = tracksDir.make<TH1F>("dxy_origin", "Track dxy wrt (0,0); dxy [cm]; Tracks", 500, -5, 5);
+	trk_dxy_beamspot = tracksDir.make<TH1F>("dxy_beamspot", "Track dxy wrt beamspot; dxy [cm]; Tracks", 500, -5, 5);
+	trk_dxySig_origin = tracksDir.make<TH1F>("dxySig_origin", "|dxy|/#sigma wrt (0,0); |dxy|/#sigma; Tracks", 100, 0, 50);
+	trk_dxySig_beamspot = tracksDir.make<TH1F>("dxySig_beamspot", "|dxy|/#sigma wrt beamspot; |dxy|/#sigma; Tracks", 100, 0, 50);
 	trk_dxyErr = tracksDir.make<TH1F>("dxyErr", "Track dxy Error (vertex-associated); #sigma_{dxy} [cm]; Tracks", 200, 0, 0.05);
 	trk_dxyErr_barrel = tracksDir.make<TH1F>("dxyErr_barrel", "dxy Error Barrel; #sigma_{dxy} [cm]; Tracks", 200, 0, 0.05);
 	trk_dxyErr_endcap = tracksDir.make<TH1F>("dxyErr_endcap", "dxy Error Endcap; #sigma_{dxy} [cm]; Tracks", 200, 0, 0.05);
@@ -316,18 +344,16 @@ void Tree2PlotsRun3::beginJob() {
 
 	// --- Set branch addresses only for branches that ScoutingTreeMakerRun3 actually writes ---
 	treePtr_->SetBranchAddress("nPV", &nPV_br_);
-	treePtr_->SetBranchAddress("refType", &refType_br_);
 	treePtr_->SetBranchAddress("beamspot_x", &beamspot_x_br_);
 	treePtr_->SetBranchAddress("beamspot_y", &beamspot_y_br_);
-	treePtr_->SetBranchAddress("avgPV_x", &avgPV_x_br_);
-	treePtr_->SetBranchAddress("avgPV_y", &avgPV_y_br_);
 
 	// Vertex primitives (match TreeMaker)
 	treePtr_->SetBranchAddress("vtx_x", &vtx_x_br);
 	treePtr_->SetBranchAddress("vtx_y", &vtx_y_br);
 	treePtr_->SetBranchAddress("vtx_xErr", &vtx_xErr_br);
 	treePtr_->SetBranchAddress("vtx_yErr", &vtx_yErr_br);
-	treePtr_->SetBranchAddress("vtx_chi2norm", &vtx_chi2norm_br);
+	treePtr_->SetBranchAddress("vtx_chi2", &vtx_chi2_br);
+	treePtr_->SetBranchAddress("vtx_ndof", &vtx_ndof_br);
 	treePtr_->SetBranchAddress("vtx_ntracks", &vtx_ntracks_br);
 	treePtr_->SetBranchAddress("vtx_pvRegion", &vtx_pvRegion_br);
 
@@ -336,6 +362,7 @@ void Tree2PlotsRun3::beginJob() {
 	treePtr_->SetBranchAddress("trk_eta", &trk_eta_br);
 	treePtr_->SetBranchAddress("trk_phi", &trk_phi_br);
 	treePtr_->SetBranchAddress("trk_dxy_origin", &trk_dxy_origin_br);
+	treePtr_->SetBranchAddress("trk_dxy_beamspot", &trk_dxy_beamspot_br);
 	treePtr_->SetBranchAddress("trk_dxyErr", &trk_dxyErr_br);
 	treePtr_->SetBranchAddress("trk_nPixelHits", &trk_nPixelHits_br);
 	treePtr_->SetBranchAddress("trk_nStripHits", &trk_nStripHits_br);
@@ -356,13 +383,13 @@ void Tree2PlotsRun3::analyze(const edm::Event&, const edm::EventSetup&) {
 
 	// Read a single TTree entry per framework analyze() call
 	treePtr_->GetEntry(currentEntry_);
-
-	// SAFETY: pass only the branches we know exist (avoid dereferencing missing pointers)
+	if (event_nPrimaryVertices) event_nPrimaryVertices->Fill(nPV_br_);
+	if (event_beamspot_xy) event_beamspot_xy->Fill(beamspot_x_br_, beamspot_y_br_);
 	processEntry(currentEntry_,
-	             refType_br_, beamspot_x_br_, beamspot_y_br_, avgPV_x_br_, avgPV_y_br_,
-	             vtx_x_br, vtx_y_br, vtx_xErr_br, vtx_yErr_br, vtx_chi2norm_br,
+	             beamspot_x_br_, beamspot_y_br_,
+	             vtx_x_br, vtx_y_br, vtx_xErr_br, vtx_yErr_br, vtx_chi2_br, vtx_ndof_br,
 	             vtx_ntracks_br, vtx_pvRegion_br,
-	             trk_pt_br, trk_eta_br, trk_phi_br, trk_dxy_origin_br, trk_dxyErr_br,
+	             trk_pt_br, trk_eta_br, trk_phi_br, trk_dxy_origin_br, trk_dxy_beamspot_br, trk_dxyErr_br,
 	             trk_nPixelHits_br, trk_nStripHits_br, trk_nTrackerLayers_br);
 
 	++currentEntry_;
@@ -449,34 +476,35 @@ void Tree2PlotsRun3::fillDescriptions(edm::ConfigurationDescriptions& descriptio
 
 DEFINE_FWK_MODULE(Tree2PlotsRun3);
 
-void Tree2PlotsRun3::processEntry(Long64_t /*iEntry*/, Int_t refType, Float_t beamspot_x, Float_t beamspot_y, Float_t avgPV_x, Float_t avgPV_y,
+void Tree2PlotsRun3::processEntry(Long64_t /*iEntry*/, Float_t beamspot_x, Float_t beamspot_y,
                                   std::vector<float>* vtx_x, std::vector<float>* vtx_y,
                                   std::vector<float>* vtx_xErr, std::vector<float>* vtx_yErr,
-                                  std::vector<float>* vtx_chi2norm,
+                                  std::vector<float>* vtx_chi2, std::vector<float>* vtx_ndof,
                                   std::vector<int>* vtx_ntracks, std::vector<int>* vtx_pvRegion,
                                   std::vector<std::vector<float>>* trk_pt_br_in, std::vector<std::vector<float>>* trk_eta_br_in, std::vector<std::vector<float>>* trk_phi_br_in,
-                                  std::vector<std::vector<float>>* trk_dxy_origin_br_in, std::vector<std::vector<float>>* trk_dxyErr_br_in,
+                                  std::vector<std::vector<float>>* trk_dxy_origin_br_in, std::vector<std::vector<float>>* trk_dxy_beamspot_br_in, std::vector<std::vector<float>>* trk_dxyErr_br_in,
                                   std::vector<std::vector<int>>* trk_nPixelHits_br_in, std::vector<std::vector<int>>* trk_nStripHits_br_in, std::vector<std::vector<int>>* trk_nTrackerLayers_br_in)
- {
+{
 	// Basic sanity checks: bail out early if fundamental branches are missing
-	if (!vtx_x || !vtx_y || !vtx_chi2norm || !vtx_ntracks) return;
-
-	const float ref_x = (refType == 1) ? beamspot_x : avgPV_x;
-	const float ref_y = (refType == 1) ? beamspot_y : avgPV_y;
+	if (!vtx_x || !vtx_y || !vtx_ntracks) return;
 
 	// iterate over vertices safely
 	const size_t nV = vtx_x->size();
+	int nSelectedVertices = 0;
 	for (size_t iv = 0; iv < nV; ++iv) {
-		// guard against inconsistent vector sizes
-		if (iv >= vtx_y->size() || iv >= vtx_chi2norm->size() || iv >= vtx_ntracks->size()) continue;
+		if (iv >= vtx_y->size() || iv >= vtx_ntracks->size()) continue;
 
 		int ntk = (*vtx_ntracks)[iv];
-		float chi2 = (*vtx_chi2norm)[iv];
+		float chi2 = (vtx_chi2 && iv < vtx_chi2->size()) ? (*vtx_chi2)[iv] : 0.0f;
+		float ndof = (vtx_ndof && iv < vtx_ndof->size()) ? (*vtx_ndof)[iv] : 0.0f;
+		float chi2norm = (ndof > 0.0f) ? (chi2 / ndof) : 0.0f;
 		float vx = (*vtx_x)[iv];
 		float vy = (*vtx_y)[iv];
 
-		// compute dBV wrt reference using vertex primitive coords (2D)
-		float dBV_ref = std::hypot(vx - ref_x, vy - ref_y);
+		// compute dBV wrt beamspot using vertex primitive coords (2D)
+		float dBV_ref = std::hypot(vx - beamspot_x, vy - beamspot_y);
+		float dBV_bs = dBV_ref;
+		float dBV_origin = std::hypot(vx, vy);
 		// dBV_err from vertex x/y errors if present
 		float vxErr = (vtx_xErr && iv < vtx_xErr->size()) ? (*vtx_xErr)[iv] : 0.0f;
 		float vyErr = (vtx_yErr && iv < vtx_yErr->size()) ? (*vtx_yErr)[iv] : 0.0f;
@@ -544,32 +572,52 @@ void Tree2PlotsRun3::processEntry(Long64_t /*iEntry*/, Int_t refType, Float_t be
 				auto& h = histMap_[key];
 
 				// Fill histos (same as before)
-				h.chi2norm->Fill(chi2);
+				h.chi2norm->Fill(chi2norm);
 				h.pt->Fill(vpt);
 				h.eta->Fill(veta);
 				h.phi->Fill(vphi);
 				h.mass->Fill(mass);
 				h.nTracks->Fill(ntk);
 				h.xy_global->Fill(vx, vy);
-				h.xy_ref->Fill(vx - ref_x, vy - ref_y);
-				h.dBV_origin->Fill(std::hypot(vx, vy));
-				h.dBV_ref->Fill(dBV_ref);
+				h.xy_beamspot->Fill(vx - beamspot_x, vy - beamspot_y);
+				h.dBV_origin->Fill(dBV_origin);
+				h.dBV_beamspot->Fill(dBV_bs);
 				h.dBV_error->Fill(dBV_err);
 				h.angleMin->Fill(minAngle);
 				h.angleMean->Fill(meanAngle);
 				h.angleMax->Fill(maxAngle);
 
-				if (std::fabs(veta) < 1.0) { h.barrel_mass->Fill(mass); h.barrel_dBV->Fill(dBV_ref); }
-				else { h.endcap_mass->Fill(mass); h.endcap_dBV->Fill(dBV_ref); }
-
+				if (std::fabs(veta) < 1.0) {
+					h.barrel_eta->Fill(veta);
+					h.barrel_mass->Fill(mass);
+					h.barrel_dBV_origin->Fill(dBV_origin);
+					h.barrel_dBV_beamspot->Fill(dBV_bs);
+					h.barrel_xy_global->Fill(vx, vy);
+					h.barrel_xy_beamspot->Fill(vx - beamspot_x, vy - beamspot_y);
+				} else {
+					h.endcap_eta->Fill(veta);
+					h.endcap_mass->Fill(mass);
+					h.endcap_dBV_origin->Fill(dBV_origin);
+					h.endcap_dBV_beamspot->Fill(dBV_bs);
+					h.endcap_xy_global->Fill(vx, vy);
+					h.endcap_xy_beamspot->Fill(vx - beamspot_x, vy - beamspot_y);
+				}
 				int region = (vtx_pvRegion && iv < vtx_pvRegion->size()) ? (*vtx_pvRegion)[iv] : 0;
-				if (region == 0) { h.regionA_mass->Fill(mass); h.regionA_dBV->Fill(dBV_ref); }
-				else if (region == 1) { h.regionB_mass->Fill(mass); h.regionB_dBV->Fill(dBV_ref); }
-				else { h.regionC_mass->Fill(mass); h.regionC_dBV->Fill(dBV_ref); }
+				if (region == 0) {
+					h.regionA_mass->Fill(mass); h.regionA_dBV->Fill(dBV_bs);
+					h.regionA_xy_global->Fill(vx, vy); h.regionA_xy_beamspot->Fill(vx - beamspot_x, vy - beamspot_y);
+				} else if (region == 1) {
+					h.regionB_mass->Fill(mass); h.regionB_dBV->Fill(dBV_bs);
+					h.regionB_xy_global->Fill(vx, vy); h.regionB_xy_beamspot->Fill(vx - beamspot_x, vy - beamspot_y);
+				} else {
+					h.regionC_mass->Fill(mass); h.regionC_dBV->Fill(dBV_bs);
+					h.regionC_xy_global->Fill(vx, vy); h.regionC_xy_beamspot->Fill(vx - beamspot_x, vy - beamspot_y);
+				}
 
 				filledAny = true;
 			}
 		}
+		if (filledAny) ++nSelectedVertices;
 
 		// mark 'filledAny' as intentionally unused for now (silence -Werror=unused-but-set-variable)
 		(void)filledAny;
@@ -580,21 +628,30 @@ void Tree2PlotsRun3::processEntry(Long64_t /*iEntry*/, Int_t refType, Float_t be
 			bool has_eta = trk_eta_br_in && trk_eta_br_in->size() > iv;
 			bool has_phi = trk_phi_br_in && trk_phi_br_in->size() > iv;
 			bool has_dxy_origin = trk_dxy_origin_br_in && trk_dxy_origin_br_in->size() > iv;
+			bool has_dxy_bs = trk_dxy_beamspot_br_in && trk_dxy_beamspot_br_in->size() > iv;
 			bool has_dxyErr = trk_dxyErr_br_in && trk_dxyErr_br_in->size() > iv;
 
 			for (size_t it = 0; it < vtrks_pt.size(); ++it) {
 				float pt = vtrks_pt[it];
 				float eta = (has_eta ? (*trk_eta_br_in)[iv][it] : 0.0f);
 				float phi = (has_phi ? (*trk_phi_br_in)[iv][it] : 0.0f);
+				float p = pt * std::cosh(eta);  // total momentum
 				float dxyOrigin = (has_dxy_origin ? (*trk_dxy_origin_br_in)[iv][it] : std::numeric_limits<float>::quiet_NaN());
+				float dxyBS = (has_dxy_bs ? (*trk_dxy_beamspot_br_in)[iv][it] : std::numeric_limits<float>::quiet_NaN());
 				float dxyErr = (has_dxyErr ? (*trk_dxyErr_br_in)[iv][it] : std::numeric_limits<float>::quiet_NaN());
 
 				// Fill the histogram members (trk_pt, trk_eta, trk_phi, ...), not the branch vectors
 				trk_pt->Fill(pt);
 				trk_eta->Fill(eta);
 				trk_phi->Fill(phi);
-				if (std::isfinite(dxyOrigin)) trk_dxy_ref->Fill(dxyOrigin);
+				trk_momentum->Fill(p);
+				if (std::isfinite(dxyOrigin)) trk_dxy_origin->Fill(dxyOrigin);
+				if (std::isfinite(dxyBS)) {
+					trk_dxy_beamspot->Fill(dxyBS);
+				}
 				if (std::isfinite(dxyErr) && dxyErr > 0.0f) {
+					if (std::isfinite(dxyOrigin)) trk_dxySig_origin->Fill(std::fabs(dxyOrigin) / dxyErr);
+					if (std::isfinite(dxyBS)) trk_dxySig_beamspot->Fill(std::fabs(dxyBS) / dxyErr);
 					trk_dxyErr->Fill(dxyErr);
 					if (std::fabs(eta) < 1.0) trk_dxyErr_barrel->Fill(dxyErr);
 					else trk_dxyErr_endcap->Fill(dxyErr);
@@ -602,4 +659,5 @@ void Tree2PlotsRun3::processEntry(Long64_t /*iEntry*/, Int_t refType, Float_t be
 			}
 		}
 	} // end vertices
+	if (event_nSelectedVertices) event_nSelectedVertices->Fill(nSelectedVertices);
 }

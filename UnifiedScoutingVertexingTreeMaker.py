@@ -24,10 +24,10 @@ process.options = cms.untracked.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100000)  # Limited events for testing
+    # input = cms.untracked.int32(100000)  # Limited events for testing
     # input = cms.untracked.int32(150000)  # Local
     # input = cms.untracked.int32(500000)  # Process all events
-    # input = cms.untracked.int32(-1)  # Process all events
+    input = cms.untracked.int32(-1)  # Process all events
 )
 
 # -------------------------- INPUT PATH --------------------------------
@@ -37,7 +37,7 @@ process.source = cms.Source("PoolSource",
         # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/130000/b7867cb3-0c5b-407f-a8c3-3edf960415e3.root"
     # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/000e726a-ca68-420b-b531-23f6733ba1e4.root"
     # "file:/tmp/test.root"
-    "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/02fa9546-0c14-45e9-906a-ddd16bdd30ba.root",
+    # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/02fa9546-0c14-45e9-906a-ddd16bdd30ba.root",
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/dc76810a-c42b-4f76-b965-7475a9b4fb96.root",
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/003ca643-43f8-40dd-92b3-4c6a4ccdc894.root", #EDM Number of events: 527035
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root",
@@ -65,8 +65,8 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # -------------------------- OUTPUT PATH --------------------------------
 #-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/ScoutingTreeTest_Size100k_incut.root")
-    # fileName = cms.string("ScoutingTree_Output.root")  # TTree output (different from plots)
+    # fileName = cms.string("test-outputs/ScoutingTreeTest_Size100k_new_incut.root")
+    fileName = cms.string("ScoutingTree_Output.root")  # TTree output (different from plots)
 )
 #-----------------------------------------------------------------------
 
@@ -136,12 +136,12 @@ process.Vertexer = cms.EDProducer('Vertexer',
 # TREEMAKER SELECTION CUTS (adjust these to control what gets saved)
 # ============================================================================
 TREE_MIN_NTRACKS = 3           # changed from 3 -> store ntk=2 so plot branches match
-TREE_MAX_NTRACKS = 4         # Maximum tracks per vertex (-1 = no limit)
+TREE_MAX_NTRACKS = -1         # Maximum tracks per vertex (-1 = no limit)
 TREE_MAX_CHI2NDOF = 10.0       # Maximum χ²/ndof (10 = loose quality cut)
 TREE_MIN_MASS = 2.0            # Minimum vertex mass [GeV] (1 GeV = very inclusive)
 TREE_MIN_DBV = 0.2              # changed from 0.1/0 to -1 => no dBV cut at storage
 TREE_MAX_DBV = -1.0            # Maximum displacement [cm] (-1 = no limit, keep all LLPs)
-TREE_MAX_DBV_ERROR = 0.75       # Maximum dBV uncertainty [cm] (0.5 = reasonable precision)
+TREE_MAX_DBV_ERROR = 1.0       # Maximum dBV uncertainty [cm] (0.5 = reasonable precision)
 
 # PV region boundaries for classification
 TREE_PV_BOUNDARY_1 = 20        # nPV < 20: Region A (low pileup)
@@ -161,20 +161,14 @@ process.scoutingTree = cms.EDAnalyzer('ScoutingTreeMakerRun3',
     
     # Store all track information (no strict cuts)
     store_all_vertex_tracks = cms.bool(True),  # Store all tracks in selected vertices
-    
-    # Reference vertex settings (same as PlotMaker for consistency)
-    refPreference = cms.untracked.string(referencePreference),
-    
     # Input collections (same as Vertexer)
     displacedVertices = cms.InputTag("Vertexer"),
     beamspot_src = cms.InputTag('offlineBeamSpot'),
     tracks = cms.InputTag("hltScoutingUnpackProducer", "Track"),
     primaryVertices = cms.InputTag("hltScoutingUnpackProducer", "PrimaryVertex"),
-    
     # PV region boundaries (for classification)
     PVBoundary1 = cms.int32(TREE_PV_BOUNDARY_1),
     PVBoundary2 = cms.int32(TREE_PV_BOUNDARY_2),
-    
     # Seed-like track parameters (for reference, not used in TTree selection) - UNTRACKED
     seed_minIPSig        = cms.untracked.double(process.Vertexer.minSeedIPSig.value()),
     seed_minPt           = cms.untracked.double(process.Vertexer.minSeedPt.value()),
@@ -182,8 +176,7 @@ process.scoutingTree = cms.EDAnalyzer('ScoutingTreeMakerRun3',
     seed_minPixelHits    = cms.untracked.int32(process.Vertexer.npixelHits_min_cut.value()),
     seed_minStripHits    = cms.untracked.int32(process.Vertexer.nstripHits_min_cut.value()),
     seed_minTrackerLayers= cms.untracked.int32(process.Vertexer.ntrackerLayers_min_cut.value()),
-    
-    # Distance calculation toggles (for consistency with Vertexer) - TRACKED (required for fillDescriptions)
+    # Distance calculation toggles (kept for compatibility)
     use_2d_track_dist   = cms.bool(process.Vertexer.use_2d_track_dist.value()),
     use_2d_vertex_dist  = cms.bool(process.Vertexer.use_2d_vertex_dist.value())
 )
