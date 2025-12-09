@@ -21,19 +21,21 @@
 //      - Run, luminosity section, event number
 //      - Number of primary vertices (nPV)
 //      - Beamspot position (x, y, z) + errors
-//      - Average PV position (x, y, z) + errors
-//      - Reference type used (beamspot or avgPV)
+//      - Average PV position (x, y, z) + errors # to be discarded
+//      - Reference type used (beamspot or avgPV) # to be discarded
 //
 //   2. VERTEX-LEVEL INFO (vector per vertex passing cuts):
 //      - Position (x, y, z) + errors
-//      - Fit quality (χ², ndof, χ²/ndof)
+//      - Fit quality (χ², ndof, χ²/ndof) # χ²/ndof can be computed in the Tree2PlotsMaker
 //      - Number of tracks
 //
 //   3. TRACK-LEVEL INFO (nested vector per vertex):
 //      - Kinematics (pt, eta, phi)
-//      - Impact parameters: dxy wrt origin, reference, beamspot, avgPV + errors
-//      - IP significance wrt reference
+//      - Impact parameters: dxy wrt origin, reference, beamspot, avgPV + errors # wrt origin and beamspot are enough
+//      - IP significance wrt reference # since, mentioned above, we are saving the IP and its uncertainty, this can be discarded as it is just the ratio between the two
 //      - Hit information: pixel hits, strip hits, tracker layers
+
+// I am not saving dz right now, nor the 3D track distance
 //
 // SELECTION CUTS APPLIED (configurable via Python config):
 //   - min_ntracks:     Minimum tracks per vertex (default: 3)
