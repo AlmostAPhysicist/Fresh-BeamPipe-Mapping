@@ -1,0 +1,215 @@
+000 (14418663.000.000) 01/25 23:10:41 Job submitted from host: <188.184.90.62:9618?addrs=188.184.90.62-9618+[2001-1458-201-e4--100-238]-9618&alias=bigbird16.cern.ch&noUDP&sock=schedd_5196_9a2f>
+...
+000 (14418663.001.000) 01/25 23:10:41 Job submitted from host: <188.184.90.62:9618?addrs=188.184.90.62-9618+[2001-1458-201-e4--100-238]-9618&alias=bigbird16.cern.ch&noUDP&sock=schedd_5196_9a2f>
+...
+000 (14418663.002.000) 01/25 23:10:41 Job submitted from host: <188.184.90.62:9618?addrs=188.184.90.62-9618+[2001-1458-201-e4--100-238]-9618&alias=bigbird16.cern.ch&noUDP&sock=schedd_5196_9a2f>
+...
+000 (14418663.003.000) 01/25 23:10:41 Job submitted from host: <188.184.90.62:9618?addrs=188.184.90.62-9618+[2001-1458-201-e4--100-238]-9618&alias=bigbird16.cern.ch&noUDP&sock=schedd_5196_9a2f>
+...
+000 (14418663.004.000) 01/25 23:10:41 Job submitted from host: <188.184.90.62:9618?addrs=188.184.90.62-9618+[2001-1458-201-e4--100-238]-9618&alias=bigbird16.cern.ch&noUDP&sock=schedd_5196_9a2f>
+...
+040 (14418663.001.000) 01/25 23:14:29 Started transferring input files
+	Transferring to host: <188.185.213.178:9618?addrs=188.185.213.178-9618+[2001-1458-303-1b--100-2e]-9618&alias=b9p28p3786.cern.ch&noUDP&sock=slot1_5_6885_daf1_108139>
+...
+040 (14418663.001.000) 01/25 23:14:29 Finished transferring input files
+...
+001 (14418663.001.000) 01/25 23:14:30 Job executing on host: <188.185.213.178:9618?addrs=188.185.213.178-9618+[2001-1458-303-1b--100-2e]-9618&alias=b9p28p3786.cern.ch&noUDP&sock=startd_5987_2999>
+	SlotName: slot1_5@b9p28p3786.cern.ch
+	CondorScratchDir = "/pool/condor/dir_2251667"
+	Cpus = 1
+	Disk = 3819
+	GPUs = 0
+	Memory = 3000
+...
+040 (14418663.000.000) 01/25 23:14:30 Started transferring input files
+	Transferring to host: <188.185.213.214:9618?addrs=188.185.213.214-9618+[2001-1458-303-1b--100-52]-9618&alias=b9p28p1203.cern.ch&noUDP&sock=slot1_24_2657592_bb1f_94122>
+...
+040 (14418663.000.000) 01/25 23:14:30 Finished transferring input files
+...
+040 (14418663.003.000) 01/25 23:14:30 Started transferring input files
+	Transferring to host: <188.185.212.232:9618?addrs=188.185.212.232-9618+[2001-1458-303-19--100-64]-9618&alias=b9p26p1694.cern.ch&noUDP&sock=slot1_41_8025_169f_104790>
+...
+040 (14418663.003.000) 01/25 23:14:30 Finished transferring input files
+...
+040 (14418663.004.000) 01/25 23:14:30 Started transferring input files
+	Transferring to host: <188.185.213.195:9618?addrs=188.185.213.195-9618+[2001-1458-303-1b--100-3f]-9618&alias=b9p28p7318.cern.ch&noUDP&sock=slot1_34_4586_0074_41430>
+...
+040 (14418663.004.000) 01/25 23:14:30 Finished transferring input files
+...
+001 (14418663.000.000) 01/25 23:14:31 Job executing on host: <188.185.213.214:9618?addrs=188.185.213.214-9618+[2001-1458-303-1b--100-52]-9618&alias=b9p28p1203.cern.ch&noUDP&sock=startd_3873_2263>
+	SlotName: slot1_24@b9p28p1203.cern.ch
+	CondorScratchDir = "/pool/condor/dir_3239902"
+	Cpus = 1
+	Disk = 3813
+	GPUs = 0
+	Memory = 3000
+...
+040 (14418663.002.000) 01/25 23:14:31 Started transferring input files
+	Transferring to host: <188.185.212.197:9618?addrs=188.185.212.197-9618+[2001-1458-303-19--100-41]-9618&alias=b9p26p6528.cern.ch&noUDP&sock=slot1_32_1271493_97d2_40160>
+...
+040 (14418663.002.000) 01/25 23:14:31 Finished transferring input files
+...
+001 (14418663.003.000) 01/25 23:14:31 Job executing on host: <188.185.212.232:9618?addrs=188.185.212.232-9618+[2001-1458-303-19--100-64]-9618&alias=b9p26p1694.cern.ch&noUDP&sock=startd_7207_fb24>
+	SlotName: slot1_41@b9p26p1694.cern.ch
+	CondorScratchDir = "/pool/condor/dir_2654265"
+	Cpus = 1
+	Disk = 3777
+	GPUs = 0
+	Memory = 3000
+...
+001 (14418663.004.000) 01/25 23:14:31 Job executing on host: <188.185.213.195:9618?addrs=188.185.213.195-9618+[2001-1458-303-1b--100-3f]-9618&alias=b9p28p7318.cern.ch&noUDP&sock=startd_3879_3ff5>
+	SlotName: slot1_34@b9p28p7318.cern.ch
+	CondorScratchDir = "/pool/condor/dir_1081211"
+	Cpus = 1
+	Disk = 3853
+	GPUs = 0
+	Memory = 3000
+...
+001 (14418663.002.000) 01/25 23:14:32 Job executing on host: <188.185.212.197:9618?addrs=188.185.212.197-9618+[2001-1458-303-19--100-41]-9618&alias=b9p26p6528.cern.ch&noUDP&sock=startd_4058_0769>
+	SlotName: slot1_32@b9p26p6528.cern.ch
+	CondorScratchDir = "/pool/condor/dir_3829045"
+	Cpus = 1
+	Disk = 3906
+	GPUs = 0
+	Memory = 3000
+...
+006 (14418663.001.000) 01/25 23:14:36 Image size of job updated: 60
+	0  -  MemoryUsage of job (MB)
+	0  -  ResidentSetSize of job (KB)
+...
+040 (14418663.001.000) 01/25 23:14:36 Started transferring output files
+...
+040 (14418663.001.000) 01/25 23:14:36 Finished transferring output files
+...
+005 (14418663.001.000) 01/25 23:14:36 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	4953  -  Run Bytes Sent By Job
+	481  -  Run Bytes Received By Job
+	4953  -  Total Bytes Sent By Job
+	481  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated 
+	   Cpus                 :        0        1         1 
+	   Disk (KB)            :       28        1      3819 
+	   GPUs                 :                           0 
+	   Memory (MB)          :        0     3000      3000 
+	   TimeExecute (s)      :        6                    
+	   TimeSlotBusy (s)     :        8                    
+
+	Job terminated of its own accord at 2026-01-25T22:14:36Z with exit-code 0.
+...
+006 (14418663.000.000) 01/25 23:14:37 Image size of job updated: 148
+	0  -  MemoryUsage of job (MB)
+	0  -  ResidentSetSize of job (KB)
+...
+040 (14418663.000.000) 01/25 23:14:37 Started transferring output files
+...
+006 (14418663.003.000) 01/25 23:14:37 Image size of job updated: 196
+	0  -  MemoryUsage of job (MB)
+	0  -  ResidentSetSize of job (KB)
+...
+040 (14418663.000.000) 01/25 23:14:37 Finished transferring output files
+...
+040 (14418663.003.000) 01/25 23:14:37 Started transferring output files
+...
+040 (14418663.003.000) 01/25 23:14:37 Finished transferring output files
+...
+005 (14418663.000.000) 01/25 23:14:37 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	4953  -  Run Bytes Sent By Job
+	481  -  Run Bytes Received By Job
+	4953  -  Total Bytes Sent By Job
+	481  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated 
+	   Cpus                 :        0        1         1 
+	   Disk (KB)            :       28        1      3813 
+	   GPUs                 :                           0 
+	   Memory (MB)          :        0     3000      3000 
+	   TimeExecute (s)      :        6                    
+	   TimeSlotBusy (s)     :        8                    
+
+	Job terminated of its own accord at 2026-01-25T22:14:37Z with exit-code 0.
+...
+006 (14418663.004.000) 01/25 23:14:37 Image size of job updated: 64
+	0  -  MemoryUsage of job (MB)
+	0  -  ResidentSetSize of job (KB)
+...
+005 (14418663.003.000) 01/25 23:14:37 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	4953  -  Run Bytes Sent By Job
+	481  -  Run Bytes Received By Job
+	4953  -  Total Bytes Sent By Job
+	481  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated 
+	   Cpus                 :        0        1         1 
+	   Disk (KB)            :       28        1      3777 
+	   GPUs                 :                           0 
+	   Memory (MB)          :        0     3000      3000 
+	   TimeExecute (s)      :        6                    
+	   TimeSlotBusy (s)     :        8                    
+
+	Job terminated of its own accord at 2026-01-25T22:14:37Z with exit-code 0.
+...
+040 (14418663.004.000) 01/25 23:14:37 Started transferring output files
+...
+040 (14418663.004.000) 01/25 23:14:37 Finished transferring output files
+...
+005 (14418663.004.000) 01/25 23:14:37 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	4953  -  Run Bytes Sent By Job
+	481  -  Run Bytes Received By Job
+	4953  -  Total Bytes Sent By Job
+	481  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated 
+	   Cpus                 :        0        1         1 
+	   Disk (KB)            :       28        1      3853 
+	   GPUs                 :                           0 
+	   Memory (MB)          :        0     3000      3000 
+	   TimeExecute (s)      :        6                    
+	   TimeSlotBusy (s)     :        8                    
+
+	Job terminated of its own accord at 2026-01-25T22:14:37Z with exit-code 0.
+...
+006 (14418663.002.000) 01/25 23:14:38 Image size of job updated: 60
+	0  -  MemoryUsage of job (MB)
+	0  -  ResidentSetSize of job (KB)
+...
+040 (14418663.002.000) 01/25 23:14:38 Started transferring output files
+...
+040 (14418663.002.000) 01/25 23:14:38 Finished transferring output files
+...
+005 (14418663.002.000) 01/25 23:14:38 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	4953  -  Run Bytes Sent By Job
+	481  -  Run Bytes Received By Job
+	4953  -  Total Bytes Sent By Job
+	481  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated 
+	   Cpus                 :        0        1         1 
+	   Disk (KB)            :       28        1      3906 
+	   GPUs                 :                           0 
+	   Memory (MB)          :        0     3000      3000 
+	   TimeExecute (s)      :        6                    
+	   TimeSlotBusy (s)     :        8                    
+
+	Job terminated of its own accord at 2026-01-25T22:14:38Z with exit-code 0.
+...

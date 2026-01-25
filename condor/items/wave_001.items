@@ -1,0 +1,5 @@
+root://eosuser.cern.ch///eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_1.root outputs/batch_merge_test/ScoutingTree_Output_1_plots.root scoutingTree/vertexTree wave_001
+root://eosuser.cern.ch///eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_10.root outputs/batch_merge_test/ScoutingTree_Output_10_plots.root scoutingTree/vertexTree wave_001
+root://eosuser.cern.ch///eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_100.root outputs/batch_merge_test/ScoutingTree_Output_100_plots.root scoutingTree/vertexTree wave_001
+root://eosuser.cern.ch///eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_101.root outputs/batch_merge_test/ScoutingTree_Output_101_plots.root scoutingTree/vertexTree wave_001
+root://eosuser.cern.ch///eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_102.root outputs/batch_merge_test/ScoutingTree_Output_102_plots.root scoutingTree/vertexTree wave_001

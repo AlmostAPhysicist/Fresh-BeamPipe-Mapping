@@ -3,8 +3,8 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("TREE2PLOTS")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkSummary.reportEvery = 1000
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkSummary.reportEvery = 100000
+process.MessageLogger.cerr.FwkReport.reportEvery = 100000
 process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
 process.MessageLogger.debugModules = cms.untracked.vstring()
 
@@ -20,21 +20,29 @@ process.source = cms.Source("EmptySource")
 # Control how many TTree entries to process with framework maxEvents:
 # - set process.maxEvents.input to N to process N TTree entries (one TTree entry per analyze() call)
 # - set to -1 to allow the analyzer to run until the TTree is exhausted
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100000))  # set to N to limit entries
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))  # set to N to limit entries
 
 
-# Output
+#---------
+# INPUT 
+# inputFile = "test-outputs/ScoutingTreeTest_Size100k_new_incut.root"
+inputFile = "/eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_18.root"
+inputTree = "scoutingTree/vertexTree"
+#---------
+# OUTPUT
+# outputFile = "test-outputs/Tree2Plots_Output_Size100k_new_incut.root"
+outputFile = "outputs/TreeMakerData_test.root"
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/Tree2Plots_Output_Size100k_new_incut.root")
+    fileName = cms.string(outputFile)
 )
-
+#--------
 
 process.tree2plots = cms.EDAnalyzer('Tree2PlotsRun3',
     # Path to the ROOT file and the TTree path inside it.
     # Example: the tree was saved under TDirectory "scoutingTree" as "vertexTree" ->
     # path = "scoutingTree/vertexTree".
-    inputFile = cms.string("test-outputs/ScoutingTreeTest_Size100k_new_incut.root"),
-    inputTree = cms.string("scoutingTree/vertexTree"),
+    inputFile = cms.string(inputFile),
+    inputTree = cms.string(inputTree),
 
     # Branching & cuts (match UnifiedScoutingVertexingPlotsMaker)
     cut_ntk = cms.VPSet(

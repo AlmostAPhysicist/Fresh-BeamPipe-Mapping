@@ -1,0 +1,4 @@
+Running cmsRun with:
+  inputFile  = root://eosuser.cern.ch///eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_100.root
+  inputTree  = scoutingTree/vertexTree
+  outputFile = outputs/batch_merge_test/ScoutingTree_Output_100_plots.root

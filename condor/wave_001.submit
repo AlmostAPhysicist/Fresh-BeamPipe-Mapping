@@ -1,0 +1,18 @@
+universe        = vanilla
+executable      = scripts/run_tree2plots.sh
+arguments       = $(in) $(out) $(tree)
+should_transfer_files = NO
+
+# Logs
+output          = logs/$(wave).$(ClusterId).$(ProcId).out
+error           = logs/$(wave).$(ClusterId).$(ProcId).err
+log             = logs/$(wave).log
+
+request_cpus    = 1
+request_memory  = 2000
++JobFlavour     = "espresso"
+
+# Pass CMSSW base path as environment variable
+environment = "CMSSW_BASE_PATH=/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1"
+
+queue in, out, tree, wave from /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor/items/wave_001.items

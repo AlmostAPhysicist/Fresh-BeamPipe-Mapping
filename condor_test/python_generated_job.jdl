@@ -1,0 +1,16 @@
+universe = vanilla
+
+executable = python_generated_job.sh
+arguments = $(Process) $(ClusterId) $(ProcId)
+
+log    = logs/job.$(ClusterId).log
+output = logs/job.$(ClusterId).$(Process).out
+error  = logs/job.$(ClusterId).$(Process).err
+
+customAttribute = myID
+
+should_transfer_files = NO
+
++JobFlavour = "microcentury"
+
+queue 5

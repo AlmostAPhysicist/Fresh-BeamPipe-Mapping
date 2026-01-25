@@ -1,0 +1,14 @@
+universe = vanilla
+
+executable = run.sh
+arguments  = $(Process) $(ClusterId) $(ProcId)
+
+log    = logs/job.$(ClusterId).log
+output = logs/job.$(ClusterId).$(Process).out
+error  = logs/job.$(ClusterId).$(Process).err
+
+should_transfer_files = NO
+
++JobFlavour = "microcentury"
+
+queue 1

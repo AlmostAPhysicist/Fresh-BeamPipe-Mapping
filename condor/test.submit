@@ -1,0 +1,15 @@
+universe        = vanilla
+executable      = ../scripts/run_tree2plots.sh
+should_transfer_files = NO
+
+# Logs
+
+
+request_cpus    = 1
+request_memory  = 2000
++JobFlavour     = "longlunch"
+
+# Pass CMSSW base path as environment variable
+environment = "CMSSW_BASE_PATH=/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1"
+
+queue 1
