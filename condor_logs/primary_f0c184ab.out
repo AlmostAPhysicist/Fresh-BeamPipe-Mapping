@@ -1,0 +1,85 @@
+/pool/condor/dir_272756
+
+Opening file: /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_19.root
+Opened file /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_19.root with 8085379 entries.
+Tree opened successfully.
+Total entries = 8085379
+
+=====================================
+=== Progress: 10% reached at entry 808537 ===
+=====================================
+
+=====================================
+=== Progress: 20% reached at entry 1617075 ===
+=====================================
+
+=====================================
+=== Progress: 30% reached at entry 2425613 ===
+=====================================
+
+=====================================
+=== Progress: 40% reached at entry 3234151 ===
+=====================================
+
+=====================================
+=== Progress: 50% reached at entry 4042689 ===
+=====================================
+
+=====================================
+=== Progress: 60% reached at entry 4851227 ===
+=====================================
+
+=====================================
+=== Progress: 70% reached at entry 5659765 ===
+=====================================
+
+=====================================
+=== Progress: 80% reached at entry 6468303 ===
+=====================================
+
+=====================================
+=== Progress: 90% reached at entry 7276841 ===
+=====================================
+
+Opening file: /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_20.root
+Opened file /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_20.root with 8353520 entries.
+Tree opened successfully.
+Total entries = 8353520
+
+=====================================
+=== Progress: 10% reached at entry 835352 ===
+=====================================
+
+=====================================
+=== Progress: 20% reached at entry 1670704 ===
+=====================================
+
+=====================================
+=== Progress: 30% reached at entry 2506056 ===
+=====================================
+
+=====================================
+=== Progress: 40% reached at entry 3341408 ===
+=====================================
+
+=====================================
+=== Progress: 50% reached at entry 4176760 ===
+=====================================
+
+=====================================
+=== Progress: 60% reached at entry 5012112 ===
+=====================================
+
+=====================================
+=== Progress: 70% reached at entry 5847464 ===
+=====================================
+
+=====================================
+=== Progress: 80% reached at entry 6682816 ===
+=====================================
+
+=====================================
+=== Progress: 90% reached at entry 7518168 ===
+=====================================
+
+Finished Tree2PlotsRun3 scan.
