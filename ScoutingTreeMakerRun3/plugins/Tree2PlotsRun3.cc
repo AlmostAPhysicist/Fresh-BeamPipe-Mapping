@@ -59,7 +59,6 @@ Notes / Caveats:
 
 // CMSSW EDAnalyzer that reads TTree from ScoutingTreeMakerRun3 and makes plots
 
-#include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -79,7 +78,8 @@ Notes / Caveats:
 #include <string>
 #include <algorithm> // for std::find
 #include <limits>    // NEW: for quiet_NaN()
-#include <cstdlib>   // ADDED: for std::exit()
+#include <iostream>
+#include <csignal>
 
 // File-local sentinel for missing floats written by the TreeMaker (NaN)
 namespace {
@@ -99,16 +99,24 @@ private:
 	void endJob() override;
 
 	// Config parameters
-	const std::string inputFile_;
+	const std::vector<std::string> inputFiles_;
 	const std::string inputTree_;
+	const int milestoneStepPercent_;
 	const std::vector<std::vector<int>> cut_ntk_;
 	const std::vector<double> cut_opening_angle_min_;
 	const double required_invmass_;
-	const double required_chi2_;
+	const double required_chi2_max_;
+	const double required_chi2norm_max_;
 	const double required_dBV_min_;
 	const double required_dBV_max_;
 	const int PVBoundary1_;
 	const int PVBoundary2_;
+	const bool verbose_;
+
+	static bool stopRequested_;
+	static void handleSigint(int) { stopRequested_ = true; }
+	// const int maxEntries_;
+	// LongLong_t entriesProcessed_ = 0;
 
 	// Histogram structure (same as PlotMaker)
 	struct BranchHistos {
@@ -127,12 +135,12 @@ private:
 	std::map<std::string, BranchHistos> histMap_;
 
 	// File/tree state for processing
-	TFile* file_ = nullptr;
-	TTree* treePtr_ = nullptr;
-	Long64_t totalEntries_ = 0;
-	Long64_t currentEntry_ = 0;
+ 	TFile* file_ = nullptr;
+ 	TTree* treePtr_ = nullptr;
 	bool openedTree_ = false;
 	bool processed_ = false;
+	size_t currentFileIndex_ = 0;
+	bool openCurrentFile();
 
 	// --- NEW: persistent branch variables (used for SetBranchAddress in beginJob)
 	Int_t nPV_br_;
@@ -186,9 +194,12 @@ private:
 		std::vector<std::vector<int>>* trk_nPixelHits_br_in, std::vector<std::vector<int>>* trk_nStripHits_br_in, std::vector<std::vector<int>>* trk_nTrackerLayers_br_in);
 };
 
+bool Tree2PlotsRun3::stopRequested_ = false;
+
 Tree2PlotsRun3::Tree2PlotsRun3(const edm::ParameterSet& iConfig):
-	inputFile_(iConfig.getParameter<std::string>("inputFile")),
+	inputFiles_(iConfig.getParameter<std::vector<std::string>>("inputFiles")),
 	inputTree_(iConfig.getParameter<std::string>("inputTree")),
+	milestoneStepPercent_(iConfig.getUntrackedParameter<int>("progressEveryPercent", 10)),
 	cut_ntk_([&iConfig]() {
 		std::vector<std::vector<int>> result;
 		auto vpset = iConfig.getParameter<std::vector<edm::ParameterSet>>("cut_ntk");
@@ -197,11 +208,13 @@ Tree2PlotsRun3::Tree2PlotsRun3(const edm::ParameterSet& iConfig):
 	}()),
 	cut_opening_angle_min_(iConfig.getParameter<std::vector<double>>("cut_opening_angle_min")),
 	required_invmass_(iConfig.getParameter<double>("required_invmass")),
-	required_chi2_(iConfig.getParameter<double>("required_chi2")),
+	required_chi2_max_(iConfig.getParameter<double>("required_chi2_max")),
+	required_chi2norm_max_(iConfig.getParameter<double>("required_chi2norm_max")),
 	required_dBV_min_(iConfig.getParameter<double>("required_dBV_min")),
 	required_dBV_max_(iConfig.getParameter<double>("required_dBV_max")),
 	PVBoundary1_(iConfig.getParameter<int>("PVBoundary1")),
-	PVBoundary2_(iConfig.getParameter<int>("PVBoundary2"))
+	PVBoundary2_(iConfig.getParameter<int>("PVBoundary2")),
+	verbose_(iConfig.getUntrackedParameter<bool>("verbose", true))
 {
 	usesResource("TFileService");
 }
@@ -251,7 +264,7 @@ void Tree2PlotsRun3::beginJob() {
 			h.nTracks = kinDir.make<TH1F>("nTracks", "N_{tracks}; N_{tracks}; Vertices", 50, 0, 50);
 
 			TFileDirectory spatialDir = branchDir.mkdir("Spatial");
-			h.xy_global = spatialDir.make<TH2F>("xy_global", "XY; X [cm]; Y [cm]", 800, -10, 10, 800, -10, 10);
+			h.xy_global = spatialDir.make<TH2F>("xy_global", "XY; X [cm]; Y [cm]", 8000, -10, 10, 8000, -10, 10);
 			h.xy_beamspot = spatialDir.make<TH2F>("xy_beamspot", "XY wrt beamspot; X-X_{BS} [cm]; Y-Y_{BS} [cm]", 800, -10, 10, 800, -10, 10);
 
 			TFileDirectory distDir = branchDir.mkdir("Distance");
@@ -324,30 +337,31 @@ void Tree2PlotsRun3::beginJob() {
 	trk_dxyErr_barrel = tracksDir.make<TH1F>("dxyErr_barrel", "dxy Error Barrel; #sigma_{dxy} [cm]; Tracks", 200, 0, 0.05);
 	trk_dxyErr_endcap = tracksDir.make<TH1F>("dxyErr_endcap", "dxy Error Endcap; #sigma_{dxy} [cm]; Tracks", 200, 0, 0.05);
 
-	// Open ROOT file and locate TTree here (setup only; do not loop)
-	file_ = TFile::Open(inputFile_.c_str(), "READ");
+	// Defer file opening to analyze() via openCurrentFile()
+}
+
+bool Tree2PlotsRun3::openCurrentFile() {
+	if (currentFileIndex_ >= inputFiles_.size()) return false;
+	file_ = TFile::Open(inputFiles_[currentFileIndex_].c_str(), "READ");
 	if (!file_ || file_->IsZombie()) {
-		edm::LogError("Tree2PlotsRun3") << "Cannot open input file: " << inputFile_;
-		return;
+		std::cerr << "ERROR: cannot open file: " << inputFiles_[currentFileIndex_] << "\n";
+		file_ = nullptr;
+		return false;
 	}
-	treePtr_ = dynamic_cast<TTree*>( file_->Get(inputTree_.c_str()) );
+	treePtr_ = dynamic_cast<TTree*>(file_->Get(inputTree_.c_str()));
 	if (!treePtr_) {
 		TDirectory* dir = file_->GetDirectory("scoutingTree");
 		if (dir) treePtr_ = dynamic_cast<TTree*>(dir->Get("vertexTree"));
 	}
 	if (!treePtr_) {
-		edm::LogError("Tree2PlotsRun3") << "Cannot find tree: " << inputTree_ << " (fallback tried scoutingTree/vertexTree)";
-		file_->ls();
-		openedTree_ = false;
-		return;
+		std::cerr << "ERROR: cannot find tree: " << inputTree_
+		          << " in file " << inputFiles_[currentFileIndex_] << "\n";
+		file_->Close(); file_ = nullptr;
+		return false;
 	}
-
-	// --- Set branch addresses only for branches that ScoutingTreeMakerRun3 actually writes ---
 	treePtr_->SetBranchAddress("nPV", &nPV_br_);
 	treePtr_->SetBranchAddress("beamspot_x", &beamspot_x_br_);
 	treePtr_->SetBranchAddress("beamspot_y", &beamspot_y_br_);
-
-	// Vertex primitives (match TreeMaker)
 	treePtr_->SetBranchAddress("vtx_x", &vtx_x_br);
 	treePtr_->SetBranchAddress("vtx_y", &vtx_y_br);
 	treePtr_->SetBranchAddress("vtx_xErr", &vtx_xErr_br);
@@ -356,8 +370,6 @@ void Tree2PlotsRun3::beginJob() {
 	treePtr_->SetBranchAddress("vtx_ndof", &vtx_ndof_br);
 	treePtr_->SetBranchAddress("vtx_ntracks", &vtx_ntracks_br);
 	treePtr_->SetBranchAddress("vtx_pvRegion", &vtx_pvRegion_br);
-
-	// Track nested vectors (match TreeMaker)
 	treePtr_->SetBranchAddress("trk_pt", &trk_pt_br);
 	treePtr_->SetBranchAddress("trk_eta", &trk_eta_br);
 	treePtr_->SetBranchAddress("trk_phi", &trk_phi_br);
@@ -367,82 +379,100 @@ void Tree2PlotsRun3::beginJob() {
 	treePtr_->SetBranchAddress("trk_nPixelHits", &trk_nPixelHits_br);
 	treePtr_->SetBranchAddress("trk_nStripHits", &trk_nStripHits_br);
 	treePtr_->SetBranchAddress("trk_nTrackerLayers", &trk_nTrackerLayers_br);
-
-	totalEntries_ = treePtr_->GetEntries();
-	currentEntry_ = 0;
 	openedTree_ = true;
-	edm::LogInfo("Tree2PlotsRun3") << "Opened tree with " << totalEntries_ << " entries";
+	Long64_t entriesInFile = treePtr_->GetEntries();
+	if (verbose_) {
+		std::cout << "Opened file " << inputFiles_[currentFileIndex_]
+		          << " with " << entriesInFile << " entries.\n";
+	}
+	return true;
 }
 
 void Tree2PlotsRun3::analyze(const edm::Event&, const edm::EventSetup&) {
-	// Process exactly one TTree entry per framework analyze() call.
 	if (processed_) return;
-	if (!openedTree_ || !treePtr_) { processed_ = true; return; }
+	processed_ = true;
 
-	if (currentEntry_ >= totalEntries_) { processed_ = true; return; }
+	std::signal(SIGINT, Tree2PlotsRun3::handleSigint);
 
-	// Read a single TTree entry per framework analyze() call
-	treePtr_->GetEntry(currentEntry_);
-	if (event_nPrimaryVertices) event_nPrimaryVertices->Fill(nPV_br_);
-	if (event_beamspot_xy) event_beamspot_xy->Fill(beamspot_x_br_, beamspot_y_br_);
-	processEntry(currentEntry_,
-	             beamspot_x_br_, beamspot_y_br_,
-	             vtx_x_br, vtx_y_br, vtx_xErr_br, vtx_yErr_br, vtx_chi2_br, vtx_ndof_br,
-	             vtx_ntracks_br, vtx_pvRegion_br,
-	             trk_pt_br, trk_eta_br, trk_phi_br, trk_dxy_origin_br, trk_dxy_beamspot_br, trk_dxyErr_br,
-	             trk_nPixelHits_br, trk_nStripHits_br, trk_nTrackerLayers_br);
+	for (currentFileIndex_ = 0; currentFileIndex_ < inputFiles_.size(); ++currentFileIndex_) {
+		if (verbose_) {
+			std::cout << "\nOpening file: " << inputFiles_[currentFileIndex_] << std::endl;
+		}
+		if (!openCurrentFile()) continue;
 
-	++currentEntry_;
-	if (currentEntry_ >= totalEntries_) { 
-		processed_ = true;
-
-		// --- FINALIZE: flush TFileService/ROOT output and exit when tree exhausted ---
-		// Minimal, explicit shutdown so framework run with maxEvents = -1 will stop
-		// as soon as all TTree entries have been consumed.
-
-		// --- REPLACED: avoid calling gFile->Write() because gFile may point to a
-		// file opened in READ mode (input TTree). Instead, flush the TFileService
-		// output file if available and safe to write.
-		{
-			edm::Service<TFileService> fs;
-			TFile* outFile = nullptr;
-			if (fs.isAvailable()) {
-				// TFileService::file() returns a TFile reference; take its address to get a TFile*
-				outFile = &(fs->file());
-			}
-
-			// If both files exist and have the same name, do NOT attempt to write the file
-			// (this indicates the user is trying to read and write the same ROOT file in one job).
-			bool sameName = false;
-			if (outFile && file_) {
-				const char* outName = outFile->GetName();
-				const char* inName  = file_->GetName();
-				if (outName && inName && std::string(outName) == std::string(inName)) sameName = true;
-			}
-
-			if (outFile) {
-				if (sameName) {
-					edm::LogError("Tree2PlotsRun3") << "Input file equals TFileService output file ('"
-						<< (outFile ? outFile->GetName() : std::string("unknown")) 
-						<< "'). Refusing to Write/Close the file to avoid ROOT write-on-read errors.";
-				} else {
-					edm::LogInfo("Tree2PlotsRun3") << "Flushing TFileService output file before exiting (processed all " << totalEntries_ << " entries).";
-					outFile->Write();
-					outFile->Close();
-				}
-			} else {
-				edm::LogInfo("Tree2PlotsRun3") << "No TFileService output file available to flush.";
-			}
-
-			// Close the input file if open
-			if (file_) {
-				file_->Close();
-				file_ = nullptr;
-				treePtr_ = nullptr;
-			}
+		Long64_t nEntries = treePtr_->GetEntries();
+		if (verbose_) {
+			std::cout << "Tree opened successfully.\n";
+			std::cout << "Total entries = " << nEntries << "\n";
 		}
 
-		std::exit(0); // immediate, controlled process termination
+		int milestonePercent = milestoneStepPercent_;
+		Long64_t nextMilestone = (milestonePercent * nEntries) / 100;
+
+		Long64_t globalVertex = 0;
+
+		for (Long64_t i = 0; i < nEntries; ++i) {
+
+			if (stopRequested_) {
+				std::cout << "\nCtrl+C received. Stopping at entry "
+				          << i << " (globalVertex=" << globalVertex << ")\n";
+				break;
+			}
+
+			treePtr_->GetEntry(i);
+
+			if (verbose_ && i >= nextMilestone) {
+
+				std::cout << "\n=====================================\n";
+				std::cout << "=== Progress: " << milestonePercent
+				          << "% reached at entry " << i << " ===\n";
+
+				// Search forward for an entry with vertices
+				bool printed = false;
+				for (Long64_t j = i; j < nEntries && j < i + 10000; j++) {
+					treePtr_->GetEntry(j);
+					if (vtx_ntracks_br && vtx_ntracks_br->size() > 0) {
+						// std::cout << "Found vertices at entry " << j << "\n";
+						// size_t nPrint = std::min((size_t)5, vtx_ntracks_br->size());
+						// for (size_t iv = 0; iv < nPrint; iv++) {
+						// 	std::cout << "  Vertex " << (globalVertex + iv)
+						// 	          << "  nTracks = " << (*vtx_ntracks_br)[iv] << "\n";
+						// }
+						printed = true;
+						break;
+					}
+				}
+				if (!printed) {
+					std::cout << "(No vertices found in next 10k entries)\n";
+				}
+
+				std::cout << "=====================================\n";
+
+				milestonePercent += milestoneStepPercent_;
+				nextMilestone = (milestonePercent * nEntries) / 100;
+
+				if (milestonePercent > 100) break;
+			}
+
+			if (event_nPrimaryVertices) event_nPrimaryVertices->Fill(nPV_br_);
+			if (event_beamspot_xy) event_beamspot_xy->Fill(beamspot_x_br_, beamspot_y_br_);
+			processEntry(i,
+			             beamspot_x_br_, beamspot_y_br_,
+			             vtx_x_br, vtx_y_br, vtx_xErr_br, vtx_yErr_br, vtx_chi2_br, vtx_ndof_br,
+			             vtx_ntracks_br, vtx_pvRegion_br,
+			             trk_pt_br, trk_eta_br, trk_phi_br, trk_dxy_origin_br, trk_dxy_beamspot_br, trk_dxyErr_br,
+			             trk_nPixelHits_br, trk_nStripHits_br, trk_nTrackerLayers_br);
+
+			if (vtx_ntracks_br) {
+				globalVertex += vtx_ntracks_br->size();
+			}
+		}
+		if (file_) { file_->Close(); file_ = nullptr; }
+		treePtr_ = nullptr;
+		openedTree_ = false;
+	}
+	if (verbose_) {
+		std::cout << "\nFinished Tree2PlotsRun3 scan.\n";
 	}
 }
 
@@ -456,18 +486,21 @@ void Tree2PlotsRun3::endJob() {
 
 void Tree2PlotsRun3::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
 	edm::ParameterSetDescription desc;
-	desc.add<std::string>("inputFile", "ScoutingTree_Output.root");
+	desc.add<std::vector<std::string>>("inputFiles", {"ScoutingTree_Output.root"});
 	desc.add<std::string>("inputTree", "scoutingTree/vertexTree");
 	edm::ParameterSetDescription ntkPSet;
 	ntkPSet.add<std::vector<int>>("values", {});
 	desc.addVPSet("cut_ntk", ntkPSet, {});
 	desc.add<std::vector<double>>("cut_opening_angle_min", {-1.0});
 	desc.add<double>("required_invmass", -1.0);
-	desc.add<double>("required_chi2", -1.0);
+	desc.add<double>("required_chi2_max", -1.0);
+	desc.add<double>("required_chi2norm_max", -1.0);
 	desc.add<double>("required_dBV_min", -1.0);
 	desc.add<double>("required_dBV_max", -1.0);
 	desc.add<int>("PVBoundary1", -1);
 	desc.add<int>("PVBoundary2", -1);
+	desc.addUntracked<int>("progressEveryPercent", 10);
+	desc.addUntracked<bool>("verbose", true);
 	descriptions.add("tree2PlotsRun3", desc);
 }
 
@@ -556,7 +589,8 @@ void Tree2PlotsRun3::processEntry(Long64_t /*iEntry*/, Float_t beamspot_x, Float
 				double angle_cut = cut_opening_angle_min_[i_angle];
 				if (angle_cut >= 0 && meanAngle < angle_cut) continue;
 				if (required_invmass_ > 0 && mass < required_invmass_) continue;
-				if (required_chi2_ > 0 && chi2 > required_chi2_) continue;
+				if (required_chi2_max_ > 0 && chi2 > required_chi2_max_) continue;
+				if (required_chi2norm_max_ > 0 && chi2norm > required_chi2norm_max_) continue;
 				if (required_dBV_min_ > 0 && dBV_ref < required_dBV_min_) continue;
 				if (required_dBV_max_ > 0 && dBV_ref > required_dBV_max_) continue;
 

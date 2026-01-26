@@ -1,0 +1,10 @@
+/eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_1.root
+/eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_2.root
+/eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_3.root
+/eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_4.root
+/eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_5.root
+/eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_6.root
+/eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_7.root
+/eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_8.root
+/eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_9.root
+/eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_10.root

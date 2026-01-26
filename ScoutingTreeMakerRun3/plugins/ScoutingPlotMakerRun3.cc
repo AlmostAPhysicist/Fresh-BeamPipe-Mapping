@@ -799,10 +799,15 @@ void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
     int nSelVertices = 0;
 
     // Process each displaced vertex
+    // Vertex Loop
     for (unsigned int t = 0; t < verticesH->size(); ++t) {
         const auto& v = verticesH->at(t);
 
+        bool vertexSelected = false; 
+
+        
         // --- VERTEX-ASSOCIATED TRACKS (from vertex.tracks()) ---
+        // Loop over tracks associated to vertex
         for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
             reco::TrackRef tr = it->castTo<reco::TrackRef>();
             if (!tr.isNonnull()) continue;
@@ -1024,8 +1029,11 @@ void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
                 if(required_dBV_error!= -1 && dBV_err > required_dBV_error) continue;
                 if(required_dxy_error!= -1 && avg_dxyErr > required_dxy_error) continue;
 
+                vertexSelected = true;  // Vertex succeeded selection for at least one branch
+
                 // Fill histograms for this branch
                 auto& branch = vertices_.branches[branchKey];
+
                 
                 branch.chi2norm->Fill(v.normalizedChi2());
                 branch.nTracks->Fill(ntk);
@@ -1100,8 +1108,11 @@ void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
                     }
                 }
                 
-                ++nSelVertices;  // Count each passing branch
+
             }
+        }
+        if (vertexSelected) {
+            ++nSelVertices;
         }
     }
 
