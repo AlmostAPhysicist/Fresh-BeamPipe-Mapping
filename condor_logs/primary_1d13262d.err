@@ -1,0 +1,60 @@
+Begin processing the 1st record. Run 1, Event 1, LumiSection 1 on stream 0 at 26-Jan-2026 10:14:22.875 CET
+
+TrigReport ---------- Event  Summary ------------
+TrigReport Events total = 1 passed = 1 failed = 0
+
+TrigReport ---------- Path   Summary ------------
+TrigReport  Trig Bit#   Executed     Passed     Failed      Error Name
+TrigReport     1    0          1          1          0          0 p
+
+
+TrigReport -------End-Path   Summary ------------
+TrigReport  Trig Bit#   Executed     Passed     Failed      Error Name
+
+
+TrigReport ---------- Modules in Path: p ------------
+TrigReport  Trig Bit#    Visited     Passed     Failed      Error Name
+TrigReport     1    0          1          1          0          0 tree2plots
+
+
+TrigReport ---------- Module Summary ------------
+TrigReport    Visited   Executed     Passed     Failed      Error Name
+TrigReport          1          1          1          0          0 TriggerResults
+TrigReport          1          1          1          0          0 p
+TrigReport          1          1          1          0          0 tree2plots
+
+
+TimeReport ---------- Event  Summary ---[sec]----
+TimeReport       event loop CPU/event = 191.066853
+TimeReport      event loop Real/event = 262.729286
+TimeReport     sum Streams Real/event = 262.728425
+TimeReport efficiency CPU/Real/thread = 0.727239
+
+TimeReport ---------- Path   Summary ---[Real sec]----
+TimeReport  per event     per exec  Name
+TimeReport 262.728030   262.728030  p
+
+TimeReport  per event     per exec  Name
+
+TimeReport -------End-Path   Summary ---[Real sec]----
+TimeReport  per event     per exec  Name
+
+TimeReport  per event     per exec  Name
+
+TimeReport ---------- Modules in Path: p ---[Real sec]----
+TimeReport  per event    per visit  Name
+TimeReport 262.727810   262.727810  tree2plots
+
+TimeReport  per event    per visit  Name
+
+TimeReport ---------- Module Summary ---[Real sec]----
+TimeReport  per event     per exec    per visit  Name
+TimeReport   0.000002     0.000002     0.000002  TriggerResults
+TimeReport   0.000056     0.000056     0.000056  p
+TimeReport 262.727810   262.727810   262.727810  tree2plots
+
+TimeReport  per event     per exec    per visit  Name
+
+T---Report end!
+
+

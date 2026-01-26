@@ -1,0 +1,59 @@
+/pool/condor/dir_2611722
+
+Opening file: /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_919.root
+Opened file /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_919.root with 0 entries.
+Tree opened successfully.
+Total entries = 0
+
+Opening file: /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_91.root
+Opened file /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_91.root with 8333119 entries.
+Tree opened successfully.
+Total entries = 8333119
+
+=====================================
+=== Progress: 10% reached at entry 833311 ===
+=====================================
+
+=====================================
+=== Progress: 20% reached at entry 1666623 ===
+=====================================
+
+=====================================
+=== Progress: 30% reached at entry 2499935 ===
+=====================================
+
+=====================================
+=== Progress: 40% reached at entry 3333247 ===
+=====================================
+
+=====================================
+=== Progress: 50% reached at entry 4166559 ===
+=====================================
+
+=====================================
+=== Progress: 60% reached at entry 4999871 ===
+=====================================
+
+=====================================
+=== Progress: 70% reached at entry 5833183 ===
+=====================================
+
+=====================================
+=== Progress: 80% reached at entry 6666495 ===
+=====================================
+
+=====================================
+=== Progress: 90% reached at entry 7499807 ===
+=====================================
+
+Opening file: /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_920.root
+Opened file /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_920.root with 0 entries.
+Tree opened successfully.
+Total entries = 0
+
+Opening file: /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_921.root
+Opened file /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_921.root with 0 entries.
+Tree opened successfully.
+Total entries = 0
+
+Finished Tree2PlotsRun3 scan.

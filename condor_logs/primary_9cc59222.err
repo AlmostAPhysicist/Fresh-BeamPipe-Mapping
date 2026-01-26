@@ -1,0 +1,63 @@
+Begin processing the 1st record. Run 1, Event 1, LumiSection 1 on stream 0 at 26-Jan-2026 11:05:40.657 CET
+%MSG-w XrdAdaptorLvl3:  Tree2PlotsRun3:tree2plots 26-Jan-2026 11:08:13 CET  Run: 1 Event: 1
+Deactivating eosfst-umbriel.cern.ch from active sources because its quality (832) is higher than 260 and 4 times larger than the other active server st-h01-paris.cern.ch (0) 
+%MSG
+
+TrigReport ---------- Event  Summary ------------
+TrigReport Events total = 1 passed = 1 failed = 0
+
+TrigReport ---------- Path   Summary ------------
+TrigReport  Trig Bit#   Executed     Passed     Failed      Error Name
+TrigReport     1    0          1          1          0          0 p
+
+
+TrigReport -------End-Path   Summary ------------
+TrigReport  Trig Bit#   Executed     Passed     Failed      Error Name
+
+
+TrigReport ---------- Modules in Path: p ------------
+TrigReport  Trig Bit#    Visited     Passed     Failed      Error Name
+TrigReport     1    0          1          1          0          0 tree2plots
+
+
+TrigReport ---------- Module Summary ------------
+TrigReport    Visited   Executed     Passed     Failed      Error Name
+TrigReport          1          1          1          0          0 TriggerResults
+TrigReport          1          1          1          0          0 p
+TrigReport          1          1          1          0          0 tree2plots
+
+
+TimeReport ---------- Event  Summary ---[sec]----
+TimeReport       event loop CPU/event = 275.585758
+TimeReport      event loop Real/event = 371.040264
+TimeReport     sum Streams Real/event = 371.039313
+TimeReport efficiency CPU/Real/thread = 0.742738
+
+TimeReport ---------- Path   Summary ---[Real sec]----
+TimeReport  per event     per exec  Name
+TimeReport 371.038970   371.038970  p
+
+TimeReport  per event     per exec  Name
+
+TimeReport -------End-Path   Summary ---[Real sec]----
+TimeReport  per event     per exec  Name
+
+TimeReport  per event     per exec  Name
+
+TimeReport ---------- Modules in Path: p ---[Real sec]----
+TimeReport  per event    per visit  Name
+TimeReport 371.038754   371.038754  tree2plots
+
+TimeReport  per event    per visit  Name
+
+TimeReport ---------- Module Summary ---[Real sec]----
+TimeReport  per event     per exec    per visit  Name
+TimeReport   0.000004     0.000004     0.000004  TriggerResults
+TimeReport   0.000042     0.000042     0.000042  p
+TimeReport 371.038754   371.038754   371.038754  tree2plots
+
+TimeReport  per event     per exec    per visit  Name
+
+T---Report end!
+
+

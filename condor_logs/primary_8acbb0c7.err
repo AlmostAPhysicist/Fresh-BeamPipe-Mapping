@@ -1,0 +1,65 @@
+Begin processing the 1st record. Run 1, Event 1, LumiSection 1 on stream 0 at 26-Jan-2026 11:41:09.397 CET
+%MSG-w XrdAdaptorLvl3:  Tree2PlotsRun3:tree2plots 26-Jan-2026 11:43:21 CET  Run: 1 Event: 1
+Deactivating st-h01-hades.cern.ch from active sources because its quality (498) is higher than 260 and 4 times larger than the other active server st-h01-apollo.cern.ch (8) 
+%MSG
+[2026-01-26 11:48:48.982239 +0100][Error  ][PostMaster        ] [st-h01-hades.cern.ch:1103] Forcing error on disconnect: [ERROR] Operation interrupted.
+[2026-01-26 11:48:48.987363 +0100][Error  ][PostMaster        ] [st-h01-apollo.cern.ch:1101] Forcing error on disconnect: [ERROR] Operation interrupted.
+
+TrigReport ---------- Event  Summary ------------
+TrigReport Events total = 1 passed = 1 failed = 0
+
+TrigReport ---------- Path   Summary ------------
+TrigReport  Trig Bit#   Executed     Passed     Failed      Error Name
+TrigReport     1    0          1          1          0          0 p
+
+
+TrigReport -------End-Path   Summary ------------
+TrigReport  Trig Bit#   Executed     Passed     Failed      Error Name
+
+
+TrigReport ---------- Modules in Path: p ------------
+TrigReport  Trig Bit#    Visited     Passed     Failed      Error Name
+TrigReport     1    0          1          1          0          0 tree2plots
+
+
+TrigReport ---------- Module Summary ------------
+TrigReport    Visited   Executed     Passed     Failed      Error Name
+TrigReport          1          1          1          0          0 TriggerResults
+TrigReport          1          1          1          0          0 p
+TrigReport          1          1          1          0          0 tree2plots
+
+
+TimeReport ---------- Event  Summary ---[sec]----
+TimeReport       event loop CPU/event = 282.460781
+TimeReport      event loop Real/event = 622.292688
+TimeReport     sum Streams Real/event = 622.288291
+TimeReport efficiency CPU/Real/thread = 0.453903
+
+TimeReport ---------- Path   Summary ---[Real sec]----
+TimeReport  per event     per exec  Name
+TimeReport 622.287993   622.287993  p
+
+TimeReport  per event     per exec  Name
+
+TimeReport -------End-Path   Summary ---[Real sec]----
+TimeReport  per event     per exec  Name
+
+TimeReport  per event     per exec  Name
+
+TimeReport ---------- Modules in Path: p ---[Real sec]----
+TimeReport  per event    per visit  Name
+TimeReport 622.287814   622.287814  tree2plots
+
+TimeReport  per event    per visit  Name
+
+TimeReport ---------- Module Summary ---[Real sec]----
+TimeReport  per event     per exec    per visit  Name
+TimeReport   0.000005     0.000005     0.000005  TriggerResults
+TimeReport   0.000035     0.000035     0.000035  p
+TimeReport 622.287814   622.287814   622.287814  tree2plots
+
+TimeReport  per event     per exec    per visit  Name
+
+T---Report end!
+
+

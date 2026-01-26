@@ -1,0 +1,64 @@
+Begin processing the 1st record. Run 1, Event 1, LumiSection 1 on stream 0 at 26-Jan-2026 11:19:51.039 CET
+[2026-01-26 11:27:51.998351 +0100][Error  ][PostMaster        ] [st-h01-hefesto.cern.ch:1102] Forcing error on disconnect: [ERROR] Operation interrupted.
+[2026-01-26 11:27:52.001091 +0100][Error  ][PostMaster        ] [eosfst-umbriel.cern.ch:1101] Forcing error on disconnect: [ERROR] Operation interrupted.
+[2026-01-26 11:30:46.008171 +0100][Error  ][PostMaster        ] [st-h01-paris.cern.ch:1102] Forcing error on disconnect: [ERROR] Operation interrupted.
+[2026-01-26 11:30:46.012076 +0100][Error  ][PostMaster        ] [st-h01-apollo.cern.ch:1101] Forcing error on disconnect: [ERROR] Operation interrupted.
+
+TrigReport ---------- Event  Summary ------------
+TrigReport Events total = 1 passed = 1 failed = 0
+
+TrigReport ---------- Path   Summary ------------
+TrigReport  Trig Bit#   Executed     Passed     Failed      Error Name
+TrigReport     1    0          1          1          0          0 p
+
+
+TrigReport -------End-Path   Summary ------------
+TrigReport  Trig Bit#   Executed     Passed     Failed      Error Name
+
+
+TrigReport ---------- Modules in Path: p ------------
+TrigReport  Trig Bit#    Visited     Passed     Failed      Error Name
+TrigReport     1    0          1          1          0          0 tree2plots
+
+
+TrigReport ---------- Module Summary ------------
+TrigReport    Visited   Executed     Passed     Failed      Error Name
+TrigReport          1          1          1          0          0 TriggerResults
+TrigReport          1          1          1          0          0 p
+TrigReport          1          1          1          0          0 tree2plots
+
+
+TimeReport ---------- Event  Summary ---[sec]----
+TimeReport       event loop CPU/event = 541.083651
+TimeReport      event loop Real/event = 708.213959
+TimeReport     sum Streams Real/event = 708.213131
+TimeReport efficiency CPU/Real/thread = 0.764012
+
+TimeReport ---------- Path   Summary ---[Real sec]----
+TimeReport  per event     per exec  Name
+TimeReport 708.212593   708.212593  p
+
+TimeReport  per event     per exec  Name
+
+TimeReport -------End-Path   Summary ---[Real sec]----
+TimeReport  per event     per exec  Name
+
+TimeReport  per event     per exec  Name
+
+TimeReport ---------- Modules in Path: p ---[Real sec]----
+TimeReport  per event    per visit  Name
+TimeReport 708.212234   708.212234  tree2plots
+
+TimeReport  per event    per visit  Name
+
+TimeReport ---------- Module Summary ---[Real sec]----
+TimeReport  per event     per exec    per visit  Name
+TimeReport   0.000007     0.000007     0.000007  TriggerResults
+TimeReport   0.000074     0.000074     0.000074  p
+TimeReport 708.212234   708.212234   708.212234  tree2plots
+
+TimeReport  per event     per exec    per visit  Name
+
+T---Report end!
+
+

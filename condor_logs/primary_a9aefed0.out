@@ -1,0 +1,95 @@
+/pool/condor/dir_64476
+
+Opening file: /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_511.root
+Opened file /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_511.root with 0 entries.
+Tree opened successfully.
+Total entries = 0
+
+Opening file: /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_512.root
+Opened file /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_512.root with 0 entries.
+Tree opened successfully.
+Total entries = 0
+
+Opening file: /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_513.root
+Opened file /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_513.root with 7992610 entries.
+Tree opened successfully.
+Total entries = 7992610
+
+=====================================
+=== Progress: 10% reached at entry 799261 ===
+=====================================
+
+=====================================
+=== Progress: 20% reached at entry 1598522 ===
+=====================================
+
+=====================================
+=== Progress: 30% reached at entry 2397783 ===
+=====================================
+
+=====================================
+=== Progress: 40% reached at entry 3197044 ===
+=====================================
+
+=====================================
+=== Progress: 50% reached at entry 3996305 ===
+=====================================
+
+=====================================
+=== Progress: 60% reached at entry 4795566 ===
+=====================================
+
+=====================================
+=== Progress: 70% reached at entry 5594827 ===
+=====================================
+
+=====================================
+=== Progress: 80% reached at entry 6394088 ===
+=====================================
+
+=====================================
+=== Progress: 90% reached at entry 7193349 ===
+=====================================
+
+Opening file: /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_514.root
+Opened file /eos/user/a/amalhotr/ScoutingPFRun3/ScoutingData_2024H_TreeMakerRedone/251209_202708/0000/ScoutingTree_Output_514.root with 8390450 entries.
+Tree opened successfully.
+Total entries = 8390450
+
+=====================================
+=== Progress: 10% reached at entry 839045 ===
+=====================================
+
+=====================================
+=== Progress: 20% reached at entry 1678090 ===
+=====================================
+
+=====================================
+=== Progress: 30% reached at entry 2517135 ===
+=====================================
+
+=====================================
+=== Progress: 40% reached at entry 3356180 ===
+=====================================
+
+=====================================
+=== Progress: 50% reached at entry 4195225 ===
+=====================================
+
+=====================================
+=== Progress: 60% reached at entry 5034270 ===
+=====================================
+
+=====================================
+=== Progress: 70% reached at entry 5873315 ===
+=====================================
+
+=====================================
+=== Progress: 80% reached at entry 6712360 ===
+=====================================
+
+=====================================
+=== Progress: 90% reached at entry 7551405 ===
+=====================================
+
+Finished Tree2PlotsRun3 scan.
