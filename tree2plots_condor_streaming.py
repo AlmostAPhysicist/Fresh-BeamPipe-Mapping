@@ -9,6 +9,7 @@ Fully streaming Condor pipeline (CERN + CMSSW compliant)
 - Explicit CMSSW bootstrap inside jobs
 - Streaming primaries + hadds
 - Uses condor_status.py for monitoring
+- Cleans up consumed intermediates (EOS + AFS)
 """
 
 import subprocess
@@ -24,11 +25,11 @@ from condor_test.condor_status import check_cluster_status
 # PARAMETERS
 # ============================================================
 
-INPUT_LIST = Path("test_input.txt").resolve()
+INPUT_LIST = Path("path-text-files/TreeMakerOutputs.txt").resolve()
 
-PRIMARY_FILES_PER_JOB = 3
-MAX_PRIMARY_JOBS_IN_FLIGHT = 5 # Maximum number of primary jobs in flight at any time, i.e. number of primary jobs running simultaneously (idle + running)
-HADD_FILES_PER_JOB = 5
+PRIMARY_FILES_PER_JOB = 4
+MAX_PRIMARY_JOBS_IN_FLIGHT = 30  # idle + running primaries
+HADD_FILES_PER_JOB = 12
 
 CMSSW_BASE = Path("/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src").resolve()
 TREE2PLOTS_CFG = CMSSW_BASE / "Run3ScoutingAnalysisTools/Tree2PlotsConfig.py"
@@ -45,7 +46,7 @@ LOG_DIR = LOCAL_BASE / "condor_logs"
 TMP_DIR = LOCAL_BASE / "condor_tmp"
 
 JOB_FLAVOUR = "longlunch"
-POLL_INTERVAL = 20
+POLL_INTERVAL = 60
 
 # ============================================================
 # SETUP
@@ -80,7 +81,8 @@ def submit(jdl: Path, dry_run: bool) -> str:
 
 def safe_unlink(p: Path):
     try:
-        p.unlink()
+        if p.exists():
+            p.unlink()
     except Exception:
         pass
 
@@ -182,8 +184,10 @@ def main(dry_run: bool):
 
     while source_files or active or len(ready_files) > 1:
 
+        # ---------------- submit primaries ----------------
         while source_files and inflight_primaries < MAX_PRIMARY_JOBS_IN_FLIGHT:
-            batch = [source_files.popleft() for _ in range(min(PRIMARY_FILES_PER_JOB, len(source_files)))]
+            batch = [source_files.popleft()
+                     for _ in range(min(PRIMARY_FILES_PER_JOB, len(source_files)))]
             jdl, out, cleanup = make_primary_job(batch)
             cid = submit(jdl, dry_run)
 
@@ -191,6 +195,7 @@ def main(dry_run: bool):
             active[cid] = dict(type="primary", output=out, inputs=[], cleanup=cleanup)
             inflight_primaries += 1
 
+        # ---------------- poll completions ----------------
         finished = []
         for cid, meta in active.items():
             if dry_run or check_cluster_status(cid, LOG_DIR)["state"] == "finished":
@@ -199,11 +204,20 @@ def main(dry_run: bool):
         for cid in finished:
             meta = active.pop(cid)
             ready_files.append(meta["output"])
+
             if meta["type"] == "primary":
                 inflight_primaries -= 1
+
+            # ✅ SAFE EOS CLEANUP: only AFTER hadd finished
+            if meta["type"] == "hadd":
+                for f in meta["inputs"]:
+                    safe_unlink(f)
+
+            # cleanup AFS artifacts
             for f in meta["cleanup"]:
                 safe_unlink(f)
 
+        # ---------------- submit hadds ----------------
         def nhadd():
             if len(ready_files) >= HADD_FILES_PER_JOB:
                 return HADD_FILES_PER_JOB
@@ -212,13 +226,20 @@ def main(dry_run: bool):
             return 0
 
         while nhadd():
-            inputs = [ready_files.popleft() for _ in range(nhadd())]
+            n = nhadd()
+            inputs = [ready_files.popleft() for _ in range(n)]
             jdl, out, cleanup = make_hadd_job(inputs)
             cid = submit(jdl, dry_run)
 
             print("HADD SUBMITTED:", out)
-            active[cid] = dict(type="hadd", output=out, inputs=inputs, cleanup=cleanup)
+            active[cid] = dict(
+                type="hadd",
+                output=out,
+                inputs=inputs,
+                cleanup=cleanup
+            )
 
+        # ---------------- status ----------------
         if not dry_run:
             now = time.time()
             if now - last_report > POLL_INTERVAL:
@@ -231,6 +252,7 @@ def main(dry_run: bool):
                 print("-----------------------")
             time.sleep(POLL_INTERVAL)
 
+    # ---------------- final ----------------
     final = FINAL_DIR / "Tree2Plots_FINAL.root"
     print("\n=== FINAL OUTPUT ===")
     if dry_run:
