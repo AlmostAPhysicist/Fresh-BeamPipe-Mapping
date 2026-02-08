@@ -11,7 +11,7 @@ void QuickCMSFormat(TH2F* h, TString filename) {
     h->SetTitle(""); // Remove any histogram title to avoid duplicate
     h->GetXaxis()->SetTitle("x (cm)");
     h->GetYaxis()->SetTitle("y (cm)");
-    h->GetZaxis()->SetTitle("Entries/(0.1#times0.1 mm^{2})"); // Include bin area
+    h->GetZaxis()->SetTitle("Entries/(0.025#times0.025 mm^{2})"); // Include bin area
     h->GetXaxis()->SetTitleFont(42);
     h->GetYaxis()->SetTitleFont(42);
     h->GetZaxis()->SetTitleFont(42);
@@ -82,7 +82,7 @@ void QuickCMSFormat(TH2F* h, TString filename) {
     TPaletteAxis* palette = (TPaletteAxis*)gPad->GetPrimitive("palette");
     if (!palette && h->GetListOfFunctions()) palette = (TPaletteAxis*)h->GetListOfFunctions()->FindObject("palette");
     if (palette) {
-        palette->SetNdivisions(510); // more divisions/labels
+        palette->SetNdivisions(1024); // more divisions/labels
         palette->SetLabelSize(0.035);
         c->Update();
 
@@ -118,12 +118,12 @@ void QuickCMSFormat(TH2F* h, TString filename) {
     stats->Draw();
 
     // Title: top center, slightly down
-    TLatex* title = new TLatex(0.5, 0.96, "Vertex XY Position Global, Region C (40 <= nPV)");
-    title->SetNDC();
-    title->SetTextFont(42);
-    title->SetTextSize(0.04);
-    title->SetTextAlign(21); // Center
-    title->Draw();
+    // TLatex* title = new TLatex(0.5, 0.96, "Vertex XY Position Global, Region C (40 <= nPV)");
+    // title->SetNDC();
+    // title->SetTextFont(42);
+    // title->SetTextSize(0.04);
+    // title->SetTextAlign(21); // Center
+    // title->Draw();
 
     // CMS: top left, above plot
     TLatex* cms = new TLatex(0.15, 0.93, "CMS");
@@ -134,15 +134,15 @@ void QuickCMSFormat(TH2F* h, TString filename) {
     cms->Draw();
 
     // Preliminary: right of CMS
-    TLatex* prelim = new TLatex(0.32, 0.93, "Preliminary");
-    prelim->SetNDC();
-    prelim->SetTextFont(52);
-    prelim->SetTextSize(0.04);
-    prelim->SetTextAlign(13);
-    prelim->Draw();
+    // TLatex* prelim = new TLatex(0.32, 0.93, "Preliminary");
+    // prelim->SetNDC();
+    // prelim->SetTextFont(52);
+    // prelim->SetTextSize(0.04);
+    // prelim->SetTextAlign(13);
+    // prelim->Draw();
 
     // Data/energy: below CMS, left aligned
-    TLatex* data = new TLatex(0.15, 0.88, "Data 2024, 13.6 TeV");
+    TLatex* data = new TLatex(0.15, 0.88, "2024H Tree -> Plot");
     data->SetNDC();
     data->SetTextFont(42);
     data->SetTextSize(0.04);
@@ -150,7 +150,7 @@ void QuickCMSFormat(TH2F* h, TString filename) {
     data->Draw();
 
     // Binning info: left side, below data
-    TLatex* bin = new TLatex(0.15, 0.83, "100 #mu m #times 100 #mu m");
+    TLatex* bin = new TLatex(0.15, 0.83, "25 #mu m #times 25 #mu m");
     bin->SetNDC();
     bin->SetTextSize(0.035);
     bin->SetTextFont(42);
@@ -168,3 +168,9 @@ void QuickCMSFormat(TH2F* h, TString filename) {
     c->SaveAs(filename);
     delete c;
 }
+
+// Usage:
+// TFile* f = TFile::Open("file.root");
+// TH2F* h = (TH2F*)f->Get("histname");
+// .L utils/QuickCMSFormat.c
+// QuickCMSFormat(h, "output.png");

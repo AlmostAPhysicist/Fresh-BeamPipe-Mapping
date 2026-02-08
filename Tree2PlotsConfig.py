@@ -55,9 +55,9 @@ process.tree2plots = cms.EDAnalyzer('Tree2PlotsRun3',
     ),
     cut_opening_angle_min = cms.vdouble(-1, 0.05, 0.1, 0.25, 0.5, 1.0),
 
-    required_invmass = cms.double(2.0),
+    required_invmass = cms.double(-1), # turn it off, was 2.0
     required_chi2_max = cms.double(-1),
-    required_chi2norm_max = cms.double(-1),
+    required_chi2norm_max = cms.double(1), # turned on to less than 1
     required_dBV_min = cms.double(-1),
     required_dBV_max = cms.double(-1),
 

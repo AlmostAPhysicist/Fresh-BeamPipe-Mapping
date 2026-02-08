@@ -28,7 +28,7 @@ from condor_test.condor_status import check_cluster_status
 INPUT_LIST = Path("path-text-files/TreeMakerOutputs.txt").resolve()
 
 PRIMARY_FILES_PER_JOB = 4
-MAX_PRIMARY_JOBS_IN_FLIGHT = 30  # idle + running primaries
+MAX_PRIMARY_JOBS_IN_FLIGHT = 60  # idle + running primaries
 HADD_FILES_PER_JOB = 12
 
 CMSSW_BASE = Path("/afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src").resolve()
@@ -253,7 +253,7 @@ def main(dry_run: bool):
             time.sleep(POLL_INTERVAL)
 
     # ---------------- final ----------------
-    final = FINAL_DIR / "Tree2Plots_FINAL.root"
+    final = FINAL_DIR / "Tree2Plots_FINAL_chi2normCut.root"
     print("\n=== FINAL OUTPUT ===")
     if dry_run:
         print(f"[DRY RUN] would produce: {final}")
@@ -270,3 +270,7 @@ if __name__ == "__main__":
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     main(args.dry_run)
+
+# To run:
+# python3 tree2plots_condor_streaming.py --dry-run
+# python3 tree2plots_condor_streaming.py
