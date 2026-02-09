@@ -768,12 +768,20 @@ void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
     // PV region classification
     int pvRegion = 0;
     int nPV = 0;
-    if (PVBoundary1 != -1 && havePV) {
-        Handle<vector<Vertex>> primaryVerticesH;
+
+    // Always fill nPrimaryVertices when PVs exist (decoupled from region logic)
+    if (havePV) {
+        edm::Handle<std::vector<reco::Vertex>> primaryVerticesH;
         iEvent.getByToken(primaryVerticesToken, primaryVerticesH);
-        nPV = primaryVerticesH->size();
-        event_.nPrimaryVertices->Fill(nPV);
-        
+
+        if (primaryVerticesH.isValid()) {
+            nPV = primaryVerticesH->size();
+            event_.nPrimaryVertices->Fill(nPV);
+        }
+    }
+
+    // PV region classification is optional (depends on config)
+    if (PVBoundary1 != -1 && havePV) {
         if (nPV < PVBoundary1) pvRegion = 0;
         else if (PVBoundary2 != -1 && nPV < PVBoundary2) pvRegion = 1;
         else pvRegion = 2;

@@ -57,7 +57,7 @@ process.tree2plots = cms.EDAnalyzer('Tree2PlotsRun3',
 
     required_invmass = cms.double(-1), # turn it off, was 2.0
     required_chi2_max = cms.double(-1),
-    required_chi2norm_max = cms.double(1), # turned on to less than 1
+    required_chi2norm_max = cms.double(2), # turned on to less than 1
     required_dBV_min = cms.double(-1),
     required_dBV_max = cms.double(-1),
 

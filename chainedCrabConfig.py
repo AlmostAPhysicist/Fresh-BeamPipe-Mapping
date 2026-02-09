@@ -1,21 +1,23 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-theTag = "ScoutingData_2024H_TreeMakerRedone"  # updated tag
+# theTag = "ScoutingData_2024H_TreeMakerRedone"  # updated tag
 # theTag = "ScoutingData_Updated_10mod15_v1"  # updated tag
+theTag = "OfflineData_DYto2Mu_MINIAODSIM_v1"  # updated tag, for offline data 
 
 config.General.requestName = theTag
 config.General.transferOutputs = True
 config.General.transferLogs = True
 
 # increased max run time and increased memory
-config.JobType.maxMemoryMB = 3000  # value in MB (max: 3000)
+config.JobType.maxMemoryMB = 2500 # value in MB (max: 3000)
 # set to CRAB maximum since 2 files/job may be large for this dataset
 # config.JobType.maxJobRuntimeMin = 2750  # value in minutes (max: 2750)
 
 config.JobType.pluginName = 'Analysis'
 # config.JobType.psetName = 'UnifiedScoutingVertexingPlotsMaker.py'  # RENAMED
-config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'  # RENAMED
+# config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'  # RENAMED
+config.JobType.psetName = 'UnifiedOfflineVertexingPlotMaker.py'  # RENAMED, for offline data
 # config.JobType.numCores = 4
 
 
@@ -26,9 +28,8 @@ config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'  # RENAMED
 # config.Data.inputDataset = '/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24MiniAOD-140X_mcRun3_2024_realistic_v26-v2/MINIAODSIM'
 
 
-
-# config.Data.inputDataset = '/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24MiniAOD-140X_mcRun3_2024_realistic_v26-v3/MINIAODSIM'
-config.Data.inputDataset = '/ScoutingPFRun3/Run2024H-v1/HLTSCOUT'# 91.5TB
+config.Data.inputDataset = '/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24MiniAOD-140X_mcRun3_2024_realistic_v26-v3/MINIAODSIM' # updated to v3, for valid offline data
+# config.Data.inputDataset = '/ScoutingPFRun3/Run2024H-v1/HLTSCOUT'# 91.5TB
 # config.Data.inputDataset = '/ScoutingPFRun3/Run2024G-v1/HLTSCOUT' #673.1TB
 config.Data.inputDBS = 'global'
 
@@ -36,8 +37,8 @@ config.Data.inputDBS = 'global'
 # WARNING: check per-job runtime after a small test submission — may require unitsPerJob=1.
 
 config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 15  # Number of files per job
-# config.Data.totalUnits = 1000
+config.Data.unitsPerJob = 5  # Number of files per job
+config.Data.totalUnits = 10000
 
 # config.Data.splitting = 'Automatic'
 
@@ -70,7 +71,8 @@ config.Data.unitsPerJob = 15  # Number of files per job
 
 # For TTrees (when ready):
 # config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'
-config.JobType.outputFiles = ["ScoutingTree_Output.root"]
+# config.JobType.outputFiles = ["ScoutingTree_Output.root"]
+config.JobType.outputFiles = ["OfflineData_VertexingPlots_DYto2Mu_MINIAODSIM.root"]
 
 
 config.Data.outputDatasetTag = theTag
