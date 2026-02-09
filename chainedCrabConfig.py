@@ -3,7 +3,7 @@ config = config()
 
 # theTag = "ScoutingData_2024H_TreeMakerRedone"  # updated tag
 # theTag = "ScoutingData_Updated_10mod15_v1"  # updated tag
-theTag = "OfflineData_DYto2Mu_MINIAODSIM_v1"  # updated tag, for offline data 
+theTag = "OfflineData_DYto2Mu_MINIAODSIM_v2-hardcuts"  # updated tag, for offline data 
 
 config.General.requestName = theTag
 config.General.transferOutputs = True
@@ -38,7 +38,7 @@ config.Data.inputDBS = 'global'
 
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 5  # Number of files per job
-config.Data.totalUnits = 10000
+# config.Data.totalUnits = 10000 # This time, I run over the whole dataset.
 
 # config.Data.splitting = 'Automatic'
 

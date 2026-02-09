@@ -6,6 +6,10 @@
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/TrackReco/interface/HitPattern.h"
+#include "DataFormats/SiPixelDetId/interface/PixelSubdetector.h"
+
+#include <cmath>
 
 class PackedCandidateToTrackProducer : public edm::stream::EDProducer<> {
 public:
@@ -16,6 +20,8 @@ public:
 
 private:
   const edm::EDGetTokenT<pat::PackedCandidateCollection> packedCandToken_;
+
+  bool pass_tk(const reco::Track& tk) const;
 };
 
 PackedCandidateToTrackProducer::PackedCandidateToTrackProducer(
@@ -25,6 +31,29 @@ PackedCandidateToTrackProducer::PackedCandidateToTrackProducer(
             iConfig.getParameter<edm::InputTag>("src"))) {
 
   produces<reco::TrackCollection>("Track");
+}
+
+bool PackedCandidateToTrackProducer::pass_tk(const reco::Track& tk) const {
+  // pT and hit requirements
+  if (tk.pt() < 1.0) return false;
+  if (tk.hitPattern().pixelLayersWithMeasurement() < 2) return false;
+  if (tk.hitPattern().stripLayersWithMeasurement() < 6) return false;
+
+  // Innermost pixel layer logic
+  const bool hasLayer1 =
+    tk.hitPattern().hasValidHitInPixelLayer(PixelSubdetector::PixelBarrel, 1);
+
+  const bool hasLayer2NoMissingInner =
+    tk.hitPattern().hasValidHitInPixelLayer(PixelSubdetector::PixelBarrel, 2) &&
+    tk.hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) == 0;
+
+  if (!(hasLayer1 || hasLayer2NoMissingInner)) return false;
+
+  // dxy significance
+  if (tk.dxyError() <= 0) return false;
+  if (std::abs(tk.dxy() / tk.dxyError()) <= 4.0) return false;
+
+  return true;
 }
 
 void PackedCandidateToTrackProducer::produce(
@@ -44,11 +73,14 @@ void PackedCandidateToTrackProducer::produce(
     if (cand.charge() == 0) continue;
     if (!cand.hasTrackDetails()) continue;
 
-    // THIS is the crucial type conversion
+    // PackedCandidate → reco::Track
     reco::Track tk = cand.pseudoTrack();
 
-    // Minimal sanity guard
+    // Safety guard
     if (!std::isfinite(tk.pt())) continue;
+
+    // Apply Joey's cuts
+    if (!pass_tk(tk)) continue;
 
     outTracks->push_back(tk);
   }
