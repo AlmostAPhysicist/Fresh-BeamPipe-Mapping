@@ -41,6 +41,10 @@ JOB_STATUS_MAP = {
     7: "SUSPENDED",
 }
 
+# Retry settings for cluster status checks (tunable)
+STATUS_RETRY_TIMEOUT = 120  # seconds
+STATUS_RETRY_INTERVAL = 5  # seconds
+
 
 # -------------------------
 # Utility helpers
@@ -49,11 +53,13 @@ def _now_iso() -> str:
     return datetime.now().isoformat()
 
 
-def run_command(cmd: List[str]) -> Optional[str]:
-    """Run command, return stdout (str) or None if failed."""
+def run_command(cmd: List[str], timeout: int = 8) -> Optional[str]:
+    """Run command, return stdout (str) or None if failed/timeout."""
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        r = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=timeout)
         return r.stdout.strip()
+    except subprocess.TimeoutExpired:
+        return None
     except subprocess.CalledProcessError:
         return None
     except FileNotFoundError:
@@ -70,7 +76,8 @@ def find_log_file(cluster_id: Union[int, str], log_folders: Optional[List[Union[
       - <cluster>.log
       - any *.log that contains the cluster id
     """
-    cid = str(cluster_id)
+    cid_full = str(cluster_id)
+    cid = cid_full.split(".")[0]
     search_dirs = []
 
     if log_folders:
@@ -176,43 +183,32 @@ def parse_condor_log(path: Path) -> Dict[str, Any]:
 # -------------------------
 # Core API
 # -------------------------
-def check_cluster_status(cluster_id: Union[int, str],
-                         log_folder: Optional[Union[str, Path, List[Union[str, Path]]]] = None) -> Dict[str, Any]:
+def _check_cluster_status_once(cluster_id: str,
+                               log_folder: Optional[Union[str, Path, List[Union[str, Path]]]] = None
+                               ) -> Dict[str, Any]:
     """
-    Check cluster status and return a standardized dict with keys:
-      state: "active" | "finished" | "not_found"
-      timestamp: ISO timestamp
-      total, idle, running, completed, held, failed, exitcodes, unknown
-
-    Behavior:
-      1) Run condor_q (fast). If active jobs are found -> return 'active' with counts.
-      2) If no active jobs:
-          a) If log_folder provided -> look for job.<cluster>.log there first (fast).
-          b) Else search DEFAULT_LOG_DIRS for a matching log file.
-          c) If log found -> parse it heuristically and return 'finished' with parsed totals.
-          d) If no log found -> finally run condor_history (slower) to obtain authoritative info.
+    Single attempt at checking cluster status.
+    DOES NOT retry.
     """
     ts = _now_iso()
-    cid = str(cluster_id)
+    cid = str(cluster_id).split(".")[0]
 
-    # default return template (guarantees consistent keys)
     result = {
         "state": "not_found",
         "timestamp": ts,
         "total": 0,
         "idle": 0,
         "running": 0,
-        "completed": 0,   # completed (= success exit code 0)
+        "completed": 0,
         "held": 0,
         "failed": 0,
         "exitcodes": [],
         "unknown": 0,
     }
 
-    # 1) Query condor_q for live jobs (fast)
+    # --- condor_q ---
     q_out = run_command(["condor_q", cid, "-af", "ProcId", "JobStatus"])
     if q_out and q_out.strip():
-        # parse lines like: "0 1" or "ProcId JobStatus"
         idle = running = held = unknown = total = 0
         for line in q_out.splitlines():
             parts = line.strip().split()
@@ -234,29 +230,16 @@ def check_cluster_status(cluster_id: Union[int, str],
 
         result.update({
             "state": "active",
-            "timestamp": ts,
             "total": total,
             "idle": idle,
             "running": running,
-            "completed": 0,
             "held": held,
-            "failed": 0,
-            "exitcodes": [],
             "unknown": unknown,
         })
-        # Print a short human-readable summary as before
-        print(f"\n=== Cluster {cid} Status ===")
-        print("ACTIVE JOBS:")
-        print(f"  IDLE:    {idle}")
-        print(f"  RUNNING: {running}")
-        print(f"  HELD:    {held}")
-        print(f"  UNKNOWN: {unknown}")
-        print(f"  TOTAL:   {total}")
         return result
 
-    # 2) No active jobs found -> attempt to find log files first (fast)
-    # Normalize log_folder param to list
-    log_dirs: Optional[List[Path]] = None
+    # --- logs ---
+    log_dirs = None
     if log_folder:
         if isinstance(log_folder, (list, tuple)):
             log_dirs = [Path(p).expanduser() for p in log_folder]
@@ -266,40 +249,27 @@ def check_cluster_status(cluster_id: Union[int, str],
     log_path = find_log_file(cid, log_dirs)
     if log_path:
         parsed = parse_condor_log(log_path)
-        completed = int(parsed.get("completed", 0))
-        failed = int(parsed.get("failed", 0))
-        held = int(parsed.get("held", 0))
+        completed = parsed.get("completed", 0)
+        failed = parsed.get("failed", 0)
         exitcodes = parsed.get("exitcodes", [])
-        total = completed + failed
         result.update({
             "state": "finished",
-            "timestamp": ts,
-            "total": total,
-            "idle": 0,
-            "running": 0,
+            "total": completed + failed,
             "completed": completed,
-            "held": held,
             "failed": failed,
             "exitcodes": exitcodes,
-            "unknown": 0,
         })
-        print(f"\n=== Cluster {cid} Status (from log: {log_path}) ===")
-        print(f"FINISHED JOBS (heuristic from log):")
-        print(f"  COMPLETED: {completed}")
-        print(f"  FAILED:    {failed}")
-        print(f"  HELD:      {held}")
         return result
 
-    # 3) No log found -> fall back to condor_history (slower but authoritative)
+    # --- history ---
     hist_out = run_command(["condor_history", cid, "-af", "ProcId", "ExitCode"])
     if hist_out and hist_out.strip():
-        exitcodes: List[int] = []
+        exitcodes = []
         success = failed = 0
         for line in hist_out.splitlines():
             parts = line.strip().split()
             if not parts:
                 continue
-            # last token expected to be exitcode (or only token)
             try:
                 code = int(parts[-1])
             except Exception:
@@ -309,30 +279,62 @@ def check_cluster_status(cluster_id: Union[int, str],
                 success += 1
             else:
                 failed += 1
-        total = success + failed
+
         result.update({
             "state": "finished",
-            "timestamp": ts,
-            "total": total,
-            "idle": 0,
-            "running": 0,
+            "total": success + failed,
             "completed": success,
-            "held": 0,
             "failed": failed,
             "exitcodes": exitcodes,
-            "unknown": 0,
         })
-        print(f"\n=== Cluster {cid} Status (from condor_history) ===")
-        print("FINISHED JOBS:")
-        print(f"  COMPLETED: {success}")
-        print(f"  FAILED:    {failed}")
-        print(f"  TOTAL:     {total}")
         return result
 
-    # 4) Nothing found anywhere
-    print(f"\n=== Cluster {cid} Status ===")
-    print("No jobs found in queue, logs, or history.")
     return result
+
+
+def check_cluster_status(cluster_id: Union[int, str],
+                         log_folder: Optional[Union[str, Path, List[Union[str, Path]]]] = None
+                         ) -> Dict[str, Any]:
+    """
+    Retry-aware cluster status check.
+    Retries for up to STATUS_RETRY_TIMEOUT seconds before giving up.
+    """
+    start = time.time()
+    cid = str(cluster_id).split(".")[0]
+
+    while True:
+        info = _check_cluster_status_once(cid, log_folder=log_folder)
+
+        # Any meaningful signal -> return immediately
+        if info["state"] in ("active", "finished"):
+            # print human-friendly summary
+            if info["state"] == "active":
+                print(f"\n=== Cluster {cid} Status ===")
+                print("ACTIVE JOBS:")
+                print(f"  IDLE:    {info.get('idle', 0)}")
+                print(f"  RUNNING: {info.get('running', 0)}")
+                print(f"  HELD:    {info.get('held', 0)}")
+                print(f"  UNKNOWN: {info.get('unknown', 0)}")
+                print(f"  TOTAL:   {info.get('total', 0)}")
+            else:
+                # finished
+                print(f"\n=== Cluster {cid} Status ===")
+                print("FINISHED JOBS:")
+                print(f"  COMPLETED: {info.get('completed', 0)}")
+                print(f"  FAILED:    {info.get('failed', 0)}")
+                if info.get('held', 0) > 0:
+                    print(f"  HELD:      {info.get('held', 0)}")
+                print(f"  TOTAL:     {info.get('total', 0)}")
+            return info
+
+        # Still nothing -> retry or timeout
+        if time.time() - start >= STATUS_RETRY_TIMEOUT:
+            raise TimeoutError(
+                f"Cluster {cid}: no condor_q, log, or history info "
+                f"after {STATUS_RETRY_TIMEOUT} seconds"
+            )
+
+        time.sleep(STATUS_RETRY_INTERVAL)
 
 
 def watch_cluster(cluster_id: Union[int, str],
@@ -432,167 +434,3 @@ def _cli():
 
 if __name__ == "__main__":
     _cli()
-
-
-
-"""
-===========================================================
- Condor Status Monitor — Usage Cheat Sheet
-===========================================================
-
-This file provides two main functions:
-
-  1) check_cluster_status(cluster_id, log_folder=None)
-  2) watch_cluster(cluster_id, interval=5, log_folder=None, ...)
-
------------------------------------------------------------
- Python REPL Examples
------------------------------------------------------------
-
-Start Python:
-
-    python3
-
-Import the functions:
-
-    from condor_status import check_cluster_status, watch_cluster
-
------------------------------------------------------------
- 1) Single Status Check
------------------------------------------------------------
-
-Check cluster once:
-
-    info = check_cluster_status(14418670)
-
-The returned dict always contains:
-
-    info["state"]        # "active" | "finished" | "not_found"
-    info["total"]
-    info["idle"]
-    info["running"]
-    info["completed"]
-    info["failed"]
-    info["held"]
-    info["exitcodes"]
-
-Example:
-
-    if info["state"] == "finished":
-        print("Jobs done!")
-
------------------------------------------------------------
- 2) Check Using a Custom Log Folder First
------------------------------------------------------------
-
-    info = check_cluster_status(
-        14418670,
-        log_folder="/eos/user/a/amalhotr/condor_logs"
-    )
-
------------------------------------------------------------
- 3) Watch Until Cluster Finishes (Blocking)
------------------------------------------------------------
-
-Watch cluster every 2 seconds:
-
-    result = watch_cluster(14418670, interval=2)
-
-Final summary is stored in:
-
-    final = result["final"]
-
-Example:
-
-    if final["failed"] == 0:
-        print("All jobs succeeded!")
-
------------------------------------------------------------
- 4) Watch With Explicit Log Directory
------------------------------------------------------------
-
-    result = watch_cluster(
-        14418670,
-        interval=3,
-        log_folder="./logs"
-    )
-
------------------------------------------------------------
- 5) Automatically Submit Next Batch After Completion
------------------------------------------------------------
-
-Example pipeline chaining:
-
-    import subprocess
-
-    def submit_next(summary):
-        if summary["failed"] == 0:
-            print("Submitting next batch...")
-            subprocess.run(["condor_submit", "next_batch.jdl"])
-        else:
-            print("Some jobs failed — stopping.")
-
-    watch_cluster(
-        14418670,
-        interval=5,
-        log_folder="./logs",
-        on_complete=submit_next
-    )
-
------------------------------------------------------------
- Terminal / CLI Examples
------------------------------------------------------------
-
-Single status check:
-
-    python condor_status.py 14418670
-
-Single check with custom log folder:
-
-    python condor_status.py 14418670 --logdir ./logs
-
-Watch cluster every 1 second:
-
-    python condor_status.py 14418670 --watch --interval 1
-
-Watch cluster and check EOS logs first:
-
-    python condor_status.py 14418670 --watch --interval 2 \
-        --logdir /eos/user/a/amalhotr/condor_logs
-
-Limit watcher to 20 polls:
-
-    python condor_status.py 14418670 --watch --interval 2 --max-polls 20
-
------------------------------------------------------------
- JSON Output Examples
------------------------------------------------------------
-
-Write final status check to JSON:
-
-    python condor_status.py 14418670 --json-out status.json
-
-Write full watcher timeline to JSON:
-
-    python condor_status.py 14418670 --watch --interval 2 \
-        --json-out watcher_result.json
-
-The watcher JSON contains:
-
-    {
-      "polls": [...],
-      "final": {...}
-    }
-
------------------------------------------------------------
- Notes
------------------------------------------------------------
-
-- condor_q is used first (fast, active jobs)
-- log files are checked second (fast)
-- condor_history is only used as a last fallback (slow)
-
-This makes monitoring efficient even on lxplus.
-
-===========================================================
-"""

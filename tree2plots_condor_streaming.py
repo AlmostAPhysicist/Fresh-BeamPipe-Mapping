@@ -16,6 +16,7 @@ import subprocess
 import uuid
 import time
 import argparse
+import re
 from pathlib import Path
 from collections import deque
 
@@ -48,6 +49,8 @@ TMP_DIR = LOCAL_BASE / "condor_tmp"
 JOB_FLAVOUR = "longlunch"
 POLL_INTERVAL = 60
 
+LOG_DIR_STR = str(LOG_DIR.resolve())
+
 # ============================================================
 # SETUP
 # ============================================================
@@ -77,7 +80,20 @@ def submit(jdl: Path, dry_run: bool) -> str:
         print("STDERR:\n", res.stderr)
         raise RuntimeError("condor_submit failed")
 
-    return res.stdout.strip().split()[-1].strip(".")
+    stdout = (res.stdout or "").strip()
+    m = re.search(r"submitted to cluster\s+(\d+)", stdout, re.IGNORECASE)
+    if not m:
+        m = re.search(r"ClusterId\s*=\s*(\d+)", stdout, re.IGNORECASE)
+    if m:
+        cluster = m.group(1)
+    else:
+        nums = re.findall(r"\b(\d{3,})\b", stdout)
+        if nums:
+            cluster = nums[-1]
+        else:
+            token = stdout.split()[-1] if stdout.split() else f"dry_{uuid.uuid4().hex[:8]}"
+            return token
+    return f"{cluster}.0"
 
 def safe_unlink(p: Path):
     try:
@@ -128,9 +144,9 @@ def make_primary_job(inputs):
     jdl.write_text(f"""universe = vanilla
 executable = {sh}
 should_transfer_files = NO
-log    = {LOG_DIR}/primary_{uid}.log
-output = {LOG_DIR}/primary_{uid}.out
-error  = {LOG_DIR}/primary_{uid}.err
+log    = {LOG_DIR_STR}/primary_{uid}.log
+output = {LOG_DIR_STR}/primary_{uid}.out
+error  = {LOG_DIR_STR}/primary_{uid}.err
 +JobFlavour = "{JOB_FLAVOUR}"
 queue 1
 """)
@@ -155,9 +171,9 @@ def make_hadd_job(inputs):
     jdl.write_text(f"""universe = vanilla
 executable = {sh}
 should_transfer_files = NO
-log    = {LOG_DIR}/hadd_{uid}.log
-output = {LOG_DIR}/hadd_{uid}.out
-error  = {LOG_DIR}/hadd_{uid}.err
+log    = {LOG_DIR_STR}/hadd_{uid}.log
+output = {LOG_DIR_STR}/hadd_{uid}.out
+error  = {LOG_DIR_STR}/hadd_{uid}.err
 +JobFlavour = "{JOB_FLAVOUR}"
 queue 1
 """)
@@ -198,7 +214,7 @@ def main(dry_run: bool):
         # ---------------- poll completions ----------------
         finished = []
         for cid, meta in active.items():
-            if dry_run or check_cluster_status(cid, LOG_DIR)["state"] == "finished":
+            if dry_run or check_cluster_status(cid, LOG_DIR_STR)["state"] == "finished":
                 finished.append(cid)
 
         for cid in finished:
