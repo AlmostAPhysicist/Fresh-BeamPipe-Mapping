@@ -24,8 +24,8 @@ from collections import deque
 from condor_test.condor_status import check_cluster_status
 
 # ================= CONFIG =================
-INPUT_LIST = Path("path-text-files/OfflineData-v1.txt").resolve()
-OUTPUT_NAME = "FINAL_HADD_v1.root"
+INPUT_LIST = Path("path-text-files/ScoutingMC-v1-hitcuts.txt").resolve()
+OUTPUT_NAME = "ScoutingMC-v1-hitcuts.root"
 
 HADD_FILES_PER_JOB = 16
 MAX_HADD_JOBS_IN_FLIGHT = 64

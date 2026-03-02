@@ -92,16 +92,17 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 #    wantSummary = cms.untracked.bool(True)
 #)
 
-process.MessageLogger.cerr.FwkSummary.reportEvery = 2500
-process.MessageLogger.cerr.FwkReport.reportEvery = 2500
+process.MessageLogger.cerr.FwkSummary.reportEvery = 10
+process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 process.source = cms.Source("PoolSource",
     # Test file generated on CMSSW 13.3.0
-    # fileNames = cms.untracked.vstring( 
+    fileNames = cms.untracked.vstring( 
     #     'file:///eos/user/a/amalhotr/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/DYto2Mu4Jets_UnpackerOutput/250320_232332/0000/HLTUnpackerOutput_1.root'
-    # )
+        "file:test-outputs/HLTUnpackerScouting_test.root"
+    )
 )
 
 
@@ -113,7 +114,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #Choosing the GlobalTag  
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '133X_mcRun3_2024_realistic_v9', '')  
+process.GlobalTag = GlobalTag(process.GlobalTag, '140X_mcRun3_2024_realistic_v26', '')  
 
 process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi")
 process.load("TrackingTools.TransientTrack.TransientTrackBuilder_cfi")
@@ -154,7 +155,7 @@ process.Vertexer = cms.EDProducer('Vertexer',
 # Save only the scouting collections on the output file
 process.out = cms.OutputModule("PoolOutputModule",
     # fileName = cms.untracked.string('/eos/user/a/amalhotr/BeamGeo/CrabUnpackVertexerOutput.root'),
-    fileName = cms.untracked.string('DY2M_VertexerOutput.root'),
+    fileName = cms.untracked.string('test-outputs/VertexerScouting_test.root'),
 )
 
 # Usually it is better to put producers on a task instead of a path

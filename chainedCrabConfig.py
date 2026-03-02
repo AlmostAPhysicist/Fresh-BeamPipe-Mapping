@@ -3,7 +3,8 @@ config = config()
 
 # theTag = "ScoutingData_2024H_TreeMakerRedone"  # updated tag
 # theTag = "ScoutingData_Updated_10mod15_v1"  # updated tag
-theTag = "OfflineData_DYto2Mu_MINIAODSIM_v2-hardcuts"  # updated tag, for offline data 
+# theTag = "OfflineData_DYto2Mu_MINIAODSIM_v2-hardcuts"  # updated tag, for offline data 
+theTag = "ScoutingData_DYto2Mu_MINIAODSIM_v1-hitcuts"  # updated tag, for scouting data
 
 config.General.requestName = theTag
 config.General.transferOutputs = True
@@ -15,9 +16,9 @@ config.JobType.maxMemoryMB = 2500 # value in MB (max: 3000)
 # config.JobType.maxJobRuntimeMin = 2750  # value in minutes (max: 2750)
 
 config.JobType.pluginName = 'Analysis'
-# config.JobType.psetName = 'UnifiedScoutingVertexingPlotsMaker.py'  # RENAMED
+config.JobType.psetName = 'UnifiedScoutingVertexingPlotsMaker.py'  # RENAMED
 # config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'  # RENAMED
-config.JobType.psetName = 'UnifiedOfflineVertexingPlotMaker.py'  # RENAMED, for offline data
+# config.JobType.psetName = 'UnifiedOfflineVertexingPlotMaker.py'  # RENAMED, for offline data
 # config.JobType.numCores = 4
 
 
@@ -72,7 +73,7 @@ config.Data.unitsPerJob = 5  # Number of files per job
 # For TTrees (when ready):
 # config.JobType.psetName = 'UnifiedScoutingVertexingTreeMaker.py'
 # config.JobType.outputFiles = ["ScoutingTree_Output.root"]
-config.JobType.outputFiles = ["OfflineData_VertexingPlots_DYto2Mu_MINIAODSIM.root"]
+config.JobType.outputFiles = ["Scouting_MC_DYto2Mu_withHitCuts.root"]
 
 
 config.Data.outputDatasetTag = theTag

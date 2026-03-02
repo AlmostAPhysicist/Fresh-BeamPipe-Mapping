@@ -93,6 +93,7 @@ Notes / Caveats:
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/TrackReco/interface/HitPattern.h"
+#include "DataFormats/Scouting/interface/Run3ScoutingTrack.h"
 
 #include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
 #include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
@@ -137,6 +138,8 @@ private:
     const edm::EDGetTokenT<reco::BeamSpot> beamspot_token;
     const edm::EDGetTokenT<std::vector<reco::Track>> tracksToken;
     const edm::EDGetTokenT<std::vector<reco::Vertex>> primaryVerticesToken;
+    // new: mapping from reco::Track -> scouting track ref
+    const edm::EDGetTokenT<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> trackToScoutingRefToken_;
 
     // Define branch histogram structure as a named type
     struct BranchHistos {
@@ -207,6 +210,12 @@ private:
             TH1F* eta;
             TH1F* phi;
             TH1F* momentum;
+
+            TH1F* nPixelHits;
+            TH1F* nStripHits;
+            TH1F* nTrackerLayers;
+            TH2F* nHits_vs_dxy;              // nhits vs dxy
+            TH2F* nHits_vs_dxyError;
             
             struct {
                 TH1F* IP_ref;
@@ -231,6 +240,12 @@ private:
             TH1F* eta;
             TH1F* phi;
             TH1F* momentum;
+
+            TH1F* nPixelHits;
+            TH1F* nStripHits;
+            TH1F* nTrackerLayers;
+            TH2F* nHits_vs_dxy;              // nhits vs dxy
+            TH2F* nHits_vs_dxyError;
             
             struct {
                 TH1F* IP_ref;
@@ -255,6 +270,12 @@ private:
             TH1F* eta;
             TH1F* phi;
             TH1F* momentum;
+
+            TH1F* nPixelHits;
+            TH1F* nStripHits;
+            TH1F* nTrackerLayers;
+            TH2F* nHits_vs_dxy;              // nhits vs dxy
+            TH2F* nHits_vs_dxyError;
             
             struct {
                 TH1F* IP_ref;
@@ -276,6 +297,10 @@ private:
         } vertex;
     } tracks_;
 
+    // Duplicate histogram containers for the "hit-cuts" root
+    VertexHistos vertices_cut_;
+    TrackHistos  tracks_cut_;
+
     // Fix: ESGetTokenT -> ESGetToken
     edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> ttBuilderToken_;
 
@@ -291,6 +316,12 @@ private:
     const int    seed_minStripHits_;
     const int    seed_minTrackerLayers_;
 
+    // Global hit-cut thresholds (configurable)
+    const int hit_minPixelHits_;
+    const int hit_minStripHits_;
+    const int hit_minTrackerLayers_;
+    const bool applyHitCuts_;
+
     // --- NEW: debug histograms for IP significance populations ---
     // A) All tracks
     TH1F* h_allTracks_ipSig_ref;
@@ -305,6 +336,14 @@ private:
     TH1F* h_seedTracks_pt;
     TH1F* h_seedTracks_eta;          // NEW
     TH1F* h_seedTracks_phi;          // NEW
+
+    // Fill mode abstraction for Nominal vs WithHitCuts
+    enum class FillMode { Nominal, WithHitCuts };
+    
+    // Helper to determine if we should fill for this mode
+    inline bool allowFill(FillMode mode, bool passesHitCuts) const {
+        return (mode == FillMode::Nominal) || passesHitCuts;
+    }
 
     // Helper methods
     typedef std::set<reco::TrackRef> track_set;
@@ -347,6 +386,8 @@ ScoutingPlotMakerRun3::ScoutingPlotMakerRun3(const edm::ParameterSet& iConfig):
     beamspot_token(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot_src"))),
     tracksToken(consumes<std::vector<reco::Track>>(iConfig.getParameter<edm::InputTag>("tracks"))),
     primaryVerticesToken(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("primaryVertices"))),
+    trackToScoutingRefToken_(consumes<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>>(
+        edm::InputTag("hltScoutingUnpackProducer", "Track-RefToOriginal"))),
     // Fix member init order: ttBuilderToken_ is declared before seed_* in the class
     ttBuilderToken_(esConsumes(edm::ESInputTag("", "TransientTrackBuilder"))),
     // --- Harmonize seed/IP thresholds with Vertexer naming; fall back to legacy analyzer names ---
@@ -367,7 +408,12 @@ ScoutingPlotMakerRun3::ScoutingPlotMakerRun3(const edm::ParameterSet& iConfig):
     seed_maxIPSig_(        iConfig.getUntrackedParameter<double>("seed_maxIPSig", 1e9) ),
     seed_minPixelHits_(    iConfig.getUntrackedParameter<int>("seed_minPixelHits", 0) ),
     seed_minStripHits_(    iConfig.getUntrackedParameter<int>("seed_minStripHits", 0) ),
-    seed_minTrackerLayers_(iConfig.getUntrackedParameter<int>("seed_minTrackerLayers", 0) )
+    seed_minTrackerLayers_(iConfig.getUntrackedParameter<int>("seed_minTrackerLayers", 0) ),
+    // Global hit-cut thresholds (configurable)
+    hit_minPixelHits_( iConfig.getUntrackedParameter<int>("hit_minPixelHits", 3) ),
+    hit_minStripHits_( iConfig.getUntrackedParameter<int>("hit_minStripHits", 2) ),
+    hit_minTrackerLayers_( iConfig.getUntrackedParameter<int>("hit_minTrackerLayers", 6) ),
+    applyHitCuts_( iConfig.getParameter<bool>("applyHitCuts") )
 {
     usesResource("TFileService");
 }
@@ -379,19 +425,41 @@ ScoutingPlotMakerRun3::~ScoutingPlotMakerRun3() {
 void ScoutingPlotMakerRun3::beginJob() {
     edm::Service<TFileService> fs;
     
+    // two top-level folders: Nominal (always). WithHitCuts only when applyHitCuts_ is true
+    TFileDirectory rootNom = fs->mkdir("Nominal");
+    TFileDirectory rootCut;
+    if (applyHitCuts_) {
+        rootCut = fs->mkdir("WithHitCuts");
+    }
+    
     // ==================== EVENT LEVEL ====================
-    TFileDirectory eventDir = fs->mkdir("Event");
-    event_.nPrimaryVertices = eventDir.make<TH1F>("nPrimaryVertices","Number of Primary Vertices; nPV; Events",100,0,100);
-    event_.nSelectedVertices = eventDir.make<TH1F>("nSelectedVertices","Number of Selected Vertices; N_{vtx}; Events",200,0,1000);
-    event_.primaryVertices_xy = eventDir.make<TH2F>("primaryVertices_xy","Primary Vertices XY; X [cm]; Y [cm]",200,-1,1,200,-1,1);
-    event_.beamspot_xy = eventDir.make<TH2F>("beamspot_xy","Beamspot Position; x_{BS} [cm]; y_{BS} [cm]",200,-1,1,200,-1,1);
-    event_.avgPV_vs_beamspot = eventDir.make<TH2F>("avgPV_vs_beamspot","AvgPV - Beamspot; #Delta x [cm]; #Delta y [cm]",200,-1,1,200,-1,1);
+    TFileDirectory eventDirNom = rootNom.mkdir("Event");
+    
+    event_.nPrimaryVertices = eventDirNom.make<TH1F>("nPrimaryVertices","Number of Primary Vertices; nPV; Events",100,0,100);
+    event_.nSelectedVertices = eventDirNom.make<TH1F>("nSelectedVertices","Number of Selected Vertices; N_{vtx}; Events",100,0,100);
+    event_.primaryVertices_xy = eventDirNom.make<TH2F>("primaryVertices_xy","Primary Vertices XY; X [cm]; Y [cm]",200,-1,1,200,-1,1);
+    event_.beamspot_xy = eventDirNom.make<TH2F>("beamspot_xy","Beamspot Position; x_{BS} [cm]; y_{BS} [cm]",200,-1,1,200,-1,1);
+    event_.avgPV_vs_beamspot = eventDirNom.make<TH2F>("avgPV_vs_beamspot","AvgPV - Beamspot; #Delta x [cm]; #Delta y [cm]",200,-1,1,200,-1,1);
+    
+    // Duplicate event histograms in cut folder only when requested
+    if (applyHitCuts_) {
+        TFileDirectory eventDirCut = rootCut.mkdir("Event");
+        eventDirCut.make<TH1F>("nPrimaryVertices","Number of Primary Vertices; nPV; Events",100,0,100);
+        eventDirCut.make<TH1F>("nSelectedVertices","Number of Selected Vertices; N_{vtx}; Events",100,0,100);
+        eventDirCut.make<TH2F>("primaryVertices_xy","Primary Vertices XY; X [cm]; Y [cm]",200,-1,1,200,-1,1);
+        eventDirCut.make<TH2F>("beamspot_xy","Beamspot Position; x_{BS} [cm]; y_{BS} [cm]",200,-1,1,200,-1,1);
+        eventDirCut.make<TH2F>("avgPV_vs_beamspot","AvgPV - Beamspot; #Delta x [cm]; #Delta y [cm]",200,-1,1,200,-1,1);
+    }
 
     // ==================== VERTICES ====================
-    TFileDirectory verticesDir = fs->mkdir("Vertices");
+    TFileDirectory verticesDirNom = rootNom.mkdir("Vertices");
     
-    // Create branches for each ntk × angle combination
-    TFileDirectory vtxSelDir = verticesDir.mkdir("Selected");
+    // Create branches for each ntk × angle combination (both Nominal and WithHitCuts)
+    TFileDirectory vtxSelDirNom = verticesDirNom.mkdir("Selected");
+    TFileDirectory vtxSelDirCut;
+    if (applyHitCuts_) {
+        vtxSelDirCut = rootCut.mkdir("Vertices").mkdir("Selected");
+    }
     
     for (size_t i_ntk = 0; i_ntk < cut_ntk_.size(); ++i_ntk) {
         const auto& ntk_set = cut_ntk_[i_ntk];
@@ -410,7 +478,11 @@ void ScoutingPlotMakerRun3::beginJob() {
             }
         }
         
-        TFileDirectory ntkDir = vtxSelDir.mkdir(ntkBranchName);
+        TFileDirectory ntkDirNom = vtxSelDirNom.mkdir(ntkBranchName);
+        TFileDirectory ntkDirCut;
+        if (applyHitCuts_) {
+            ntkDirCut = vtxSelDirCut.mkdir(ntkBranchName);
+        }
         
         for (size_t i_angle = 0; i_angle < cut_opening_angle_min_.size(); ++i_angle) {
             double angle_cut = cut_opening_angle_min_[i_angle];
@@ -427,91 +499,175 @@ void ScoutingPlotMakerRun3::beginJob() {
             }
             
             std::string branchKey = ntkBranchName + "/" + angleBranchName;
-            TFileDirectory branchDir = ntkDir.mkdir(angleBranchName);
+            TFileDirectory branchDirNom = ntkDirNom.mkdir(angleBranchName);
+            TFileDirectory branchDirCut;
+            if (applyHitCuts_) {
+                branchDirCut = ntkDirCut.mkdir(angleBranchName);
+            }
             
             auto& branch = vertices_.branches[branchKey];
             
-            // Create all histograms for this branch (REDUCED BINNING)
-            TFileDirectory kinDir = branchDir.mkdir("Kinematics");
-            branch.chi2norm = kinDir.make<TH1F>("chi2norm","Vertex #chi^{2}/ndof; #chi^{2}/ndof; Vertices",200,0,20);
-            branch.pt = kinDir.make<TH1F>("pt","Vertex p_{T}; p_{T} [GeV]; Vertices",100,0,100); // reduced from 200
-            branch.eta = kinDir.make<TH1F>("eta","Vertex #eta; #eta; Vertices",100,-5,5); // reduced from 200
-            branch.phi = kinDir.make<TH1F>("phi","Vertex #phi; #phi; Vertices",100,-3.14,3.14); // reduced from 200
-            branch.mass = kinDir.make<TH1F>("mass","Vertex Mass; Mass [GeV]; Vertices",100,0,10); // reduced from 200
-            branch.nTracks = kinDir.make<TH1F>("nTracks","Number of Tracks; N_{tracks}; Vertices",50,0,50); // reduced from 200
+            // Create all histograms for this branch (Nominal)
+            TFileDirectory kinDirNom = branchDirNom.mkdir("Kinematics");
+            branch.chi2norm = kinDirNom.make<TH1F>("chi2norm","Vertex #chi^{2}/ndof; #chi^{2}/ndof; Vertices",200,0,20);
+            branch.pt = kinDirNom.make<TH1F>("pt","Vertex p_{T}; p_{T} [GeV]; Vertices",100,0,100);
+            branch.eta = kinDirNom.make<TH1F>("eta","Vertex #eta; #eta; Vertices",100,-5,5);
+            branch.phi = kinDirNom.make<TH1F>("phi","Vertex #phi; #phi; Vertices",100,-3.14,3.14);
+            branch.mass = kinDirNom.make<TH1F>("mass","Vertex Mass; Mass [GeV]; Vertices",100,0,10);
+            branch.nTracks = kinDirNom.make<TH1F>("nTracks","Number of Tracks; N_{tracks}; Vertices",50,0,50);
             
-            TFileDirectory spatialDir = branchDir.mkdir("Spatial");
-            branch.xy_global = spatialDir.make<TH2F>("xy_global","Vertex XY (Global); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
-            branch.xy_ref = spatialDir.make<TH2F>("xy_ref","Vertex XY (ref); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            TFileDirectory spatialDirNom = branchDirNom.mkdir("Spatial");
+            branch.xy_global = spatialDirNom.make<TH2F>("xy_global","Vertex XY (Global); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            branch.xy_ref = spatialDirNom.make<TH2F>("xy_ref","Vertex XY (ref); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
             
-            TFileDirectory distDir = branchDir.mkdir("Distance");
-            branch.distance.dBV_origin = distDir.make<TH1F>("dBV_origin","d_{BV} wrt (0,0); d_{BV} [cm]; Vertices",200,0,10);
-            branch.distance.dBV_ref = distDir.make<TH1F>("dBV_ref","d_{BV} wrt ref; d_{BV} [cm]; Vertices",200,0,10);
-            branch.distance.dBV_beamspot = distDir.make<TH1F>("dBV_beamspot","d_{BV} wrt BS; d_{BV} [cm]; Vertices",200,0,10);
-            branch.distance.dBV_avgPV = distDir.make<TH1F>("dBV_avgPV","d_{BV} wrt avgPV; d_{BV} [cm]; Vertices",200,0,10);
-            branch.distance.dBV_error = distDir.make<TH1F>("dBV_error","d_{BV} Uncertainty; #sigma_{dBV} [cm]; Vertices",1000,0,0.1);
+            TFileDirectory distDirNom = branchDirNom.mkdir("Distance");
+            branch.distance.dBV_origin = distDirNom.make<TH1F>("dBV_origin","d_{BV} wrt (0,0); d_{BV} [cm]; Vertices",200,0,10);
+            branch.distance.dBV_ref = distDirNom.make<TH1F>("dBV_ref","d_{BV} wrt ref; d_{BV} [cm]; Vertices",200,0,10);
+            branch.distance.dBV_beamspot = distDirNom.make<TH1F>("dBV_beamspot","d_{BV} wrt BS; d_{BV} [cm]; Vertices",200,0,10);
+            branch.distance.dBV_avgPV = distDirNom.make<TH1F>("dBV_avgPV","d_{BV} wrt avgPV; d_{BV} [cm]; Vertices",200,0,10);
+            branch.distance.dBV_error = distDirNom.make<TH1F>("dBV_error","d_{BV} Uncertainty; #sigma_{dBV} [cm]; Vertices",1000,0,0.1);
             
-            TFileDirectory angleDir = branchDir.mkdir("OpeningAngles");
-            branch.openingAngle.pairwise = angleDir.make<TH1F>("pairwise","Opening Angle (pairwise); Angle [rad]; Pairs",180,0,3.14159);
-            branch.openingAngle.mean = angleDir.make<TH1F>("mean","Mean Opening Angle; <Angle> [rad]; Vertices",180,0,3.14159);
-            branch.openingAngle.min = angleDir.make<TH1F>("min","Min Opening Angle; Min Angle [rad]; Vertices",180,0,3.14159);
-            branch.openingAngle.max = angleDir.make<TH1F>("max","Max Opening Angle; Max Angle [rad]; Vertices",180,0,3.14159);
+            TFileDirectory angleDirNom = branchDirNom.mkdir("OpeningAngles");
+            branch.openingAngle.pairwise = angleDirNom.make<TH1F>("pairwise","Opening Angle (pairwise); Angle [rad]; Pairs",180,0,3.14159);
+            branch.openingAngle.mean = angleDirNom.make<TH1F>("mean","Mean Opening Angle; <Angle> [rad]; Vertices",180,0,3.14159);
+            branch.openingAngle.min = angleDirNom.make<TH1F>("min","Min Opening Angle; Min Angle [rad]; Vertices",180,0,3.14159);
+            branch.openingAngle.max = angleDirNom.make<TH1F>("max","Max Opening Angle; Max Angle [rad]; Vertices",180,0,3.14159);
             
             // Topology (REDUCED BINNING)
-            TFileDirectory topoDir = branchDir.mkdir("Topology");
-            TFileDirectory barrelDir = topoDir.mkdir("Barrel");
-            branch.barrel.eta = barrelDir.make<TH1F>("eta","#eta (Barrel); #eta; Vertices",100,-3,3); // reduced from 200
-            branch.barrel.mass = barrelDir.make<TH1F>("mass","Mass (Barrel); Mass [GeV]; Vertices",100,0,10); // reduced from 200
-            branch.barrel.dBV = barrelDir.make<TH1F>("dBV","d_{BV} (Barrel); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
-            branch.barrel.xy_global = barrelDir.make<TH2F>("xy_global","XY (Barrel); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
-            branch.barrel.xy_ref = barrelDir.make<TH2F>("xy_ref","XY (Barrel, ref); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            TFileDirectory topoDirNom = branchDirNom.mkdir("Topology");
+            TFileDirectory barrelDirNom = topoDirNom.mkdir("Barrel");
+            branch.barrel.eta = barrelDirNom.make<TH1F>("eta","#eta (Barrel); #eta; Vertices",100,-3,3); // reduced from 200
+            branch.barrel.mass = barrelDirNom.make<TH1F>("mass","Mass (Barrel); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+            branch.barrel.dBV = barrelDirNom.make<TH1F>("dBV","d_{BV} (Barrel); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+            branch.barrel.xy_global = barrelDirNom.make<TH2F>("xy_global","XY (Barrel); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            branch.barrel.xy_ref = barrelDirNom.make<TH2F>("xy_ref","XY (Barrel, ref); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
             
-            TFileDirectory endcapDir = topoDir.mkdir("Endcap");
-            branch.endcap.eta = endcapDir.make<TH1F>("eta","#eta (Endcap); #eta; Vertices",100,-3,3); // reduced from 200
-            branch.endcap.mass = endcapDir.make<TH1F>("mass","Mass (Endcap); Mass [GeV]; Vertices",100,0,10); // reduced from 200
-            branch.endcap.dBV = endcapDir.make<TH1F>("dBV","d_{BV} (Endcap); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
-            branch.endcap.xy_global = endcapDir.make<TH2F>("xy_global","XY (Endcap); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
-            branch.endcap.xy_ref = endcapDir.make<TH2F>("xy_ref","XY (Endcap, ref); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            TFileDirectory endcapDirNom = topoDirNom.mkdir("Endcap");
+            branch.endcap.eta = endcapDirNom.make<TH1F>("eta","#eta (Endcap); #eta; Vertices",100,-3,3); // reduced from 200
+            branch.endcap.mass = endcapDirNom.make<TH1F>("mass","Mass (Endcap); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+            branch.endcap.dBV = endcapDirNom.make<TH1F>("dBV","d_{BV} (Endcap); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+            branch.endcap.xy_global = endcapDirNom.make<TH2F>("xy_global","XY (Endcap); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            branch.endcap.xy_ref = endcapDirNom.make<TH2F>("xy_ref","XY (Endcap, ref); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
 
-            TFileDirectory leftEndcapDir = topoDir.mkdir("LeftEndcap");
-            branch.leftEndcap.eta = leftEndcapDir.make<TH1F>("eta","#eta (Left Endcap); #eta; Vertices",100,-3,3); // reduced from 200
-            branch.leftEndcap.mass = leftEndcapDir.make<TH1F>("mass","Mass (Left Endcap); Mass [GeV]; Vertices",100,0,10); // reduced from 200
-            branch.leftEndcap.dBV = leftEndcapDir.make<TH1F>("dBV","d_{BV} (Left Endcap); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
-            branch.leftEndcap.xy_global = leftEndcapDir.make<TH2F>("xy_global","XY (Left Endcap); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            TFileDirectory leftEndcapDirNom = topoDirNom.mkdir("LeftEndcap");
+            branch.leftEndcap.eta = leftEndcapDirNom.make<TH1F>("eta","#eta (Left Endcap); #eta; Vertices",100,-3,3); // reduced from 200
+            branch.leftEndcap.mass = leftEndcapDirNom.make<TH1F>("mass","Mass (Left Endcap); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+            branch.leftEndcap.dBV = leftEndcapDirNom.make<TH1F>("dBV","d_{BV} (Left Endcap); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+            branch.leftEndcap.xy_global = leftEndcapDirNom.make<TH2F>("xy_global","XY (Left Endcap); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
             
-            TFileDirectory rightEndcapDir = topoDir.mkdir("RightEndcap");
-            branch.rightEndcap.eta = rightEndcapDir.make<TH1F>("eta","#eta (Right Endcap); #eta; Vertices",100,-3,3); // reduced from 200
-            branch.rightEndcap.mass = rightEndcapDir.make<TH1F>("mass","Mass (Right Endcap); Mass [GeV]; Vertices",100,0,10); // reduced from 200
-            branch.rightEndcap.dBV = rightEndcapDir.make<TH1F>("dBV","d_{BV} (Right Endcap); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
-            branch.rightEndcap.xy_global = rightEndcapDir.make<TH2F>("xy_global","XY (Right Endcap); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            TFileDirectory rightEndcapDirNom = topoDirNom.mkdir("RightEndcap");
+            branch.rightEndcap.eta = rightEndcapDirNom.make<TH1F>("eta","#eta (Right Endcap); #eta; Vertices",100,-3,3); // reduced from 200
+            branch.rightEndcap.mass = rightEndcapDirNom.make<TH1F>("mass","Mass (Right Endcap); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+            branch.rightEndcap.dBV = rightEndcapDirNom.make<TH1F>("dBV","d_{BV} (Right Endcap); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+            branch.rightEndcap.xy_global = rightEndcapDirNom.make<TH2F>("xy_global","XY (Right Endcap); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            
+            if (applyHitCuts_) {
+                auto& branchCut = vertices_cut_.branches[branchKey];
+
+                // Duplicate for WithHitCuts
+                TFileDirectory kinDirCut = branchDirCut.mkdir("Kinematics");
+                branchCut.chi2norm = kinDirCut.make<TH1F>("chi2norm","Vertex #chi^{2}/ndof; #chi^{2}/ndof; Vertices",200,0,20);
+                branchCut.pt = kinDirCut.make<TH1F>("pt","Vertex p_{T}; p_{T} [GeV]; Vertices",100,0,100);
+                branchCut.eta = kinDirCut.make<TH1F>("eta","Vertex #eta; #eta; Vertices",100,-5,5);
+                branchCut.phi = kinDirCut.make<TH1F>("phi","Vertex #phi; #phi; Vertices",100,-3.14,3.14);
+                branchCut.mass = kinDirCut.make<TH1F>("mass","Vertex Mass; Mass [GeV]; Vertices",100,0,10);
+                branchCut.nTracks = kinDirCut.make<TH1F>("nTracks","Number of Tracks; N_{tracks}; Vertices",50,0,50);
+                
+                TFileDirectory spatialDirCut = branchDirCut.mkdir("Spatial");
+                branchCut.xy_global = spatialDirCut.make<TH2F>("xy_global","Vertex XY (Global); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                branchCut.xy_ref = spatialDirCut.make<TH2F>("xy_ref","Vertex XY (ref); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                
+                TFileDirectory distDirCut = branchDirCut.mkdir("Distance");
+                branchCut.distance.dBV_origin = distDirCut.make<TH1F>("dBV_origin","d_{BV} wrt (0,0); d_{BV} [cm]; Vertices",200,0,10);
+                branchCut.distance.dBV_ref = distDirCut.make<TH1F>("dBV_ref","d_{BV} wrt ref; d_{BV} [cm]; Vertices",200,0,10);
+                branchCut.distance.dBV_beamspot = distDirCut.make<TH1F>("dBV_beamspot","d_{BV} wrt BS; d_{BV} [cm]; Vertices",200,0,10);
+                branchCut.distance.dBV_avgPV = distDirCut.make<TH1F>("dBV_avgPV","d_{BV} wrt avgPV; d_{BV} [cm]; Vertices",200,0,10);
+                branchCut.distance.dBV_error = distDirCut.make<TH1F>("dBV_error","d_{BV} Uncertainty; #sigma_{dBV} [cm]; Vertices",1000,0,0.1);
+                
+                TFileDirectory angleDirCut = branchDirCut.mkdir("OpeningAngles");
+                branchCut.openingAngle.pairwise = angleDirCut.make<TH1F>("pairwise","Opening Angle (pairwise); Angle [rad]; Pairs",180,0,3.14159);
+                branchCut.openingAngle.mean = angleDirCut.make<TH1F>("mean","Mean Opening Angle; <Angle> [rad]; Vertices",180,0,3.14159);
+                branchCut.openingAngle.min = angleDirCut.make<TH1F>("min","Min Opening Angle; Min Angle [rad]; Vertices",180,0,3.14159);
+                branchCut.openingAngle.max = angleDirCut.make<TH1F>("max","Max Opening Angle; Max Angle [rad]; Vertices",180,0,3.14159);
+                
+                TFileDirectory topoDirCut = branchDirCut.mkdir("Topology");
+                TFileDirectory barrelDirCut = topoDirCut.mkdir("Barrel");
+                branchCut.barrel.eta = barrelDirCut.make<TH1F>("eta","#eta (Barrel); #eta; Vertices",100,-3,3); // reduced from 200
+                branchCut.barrel.mass = barrelDirCut.make<TH1F>("mass","Mass (Barrel); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+                branchCut.barrel.dBV = barrelDirCut.make<TH1F>("dBV","d_{BV} (Barrel); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+                branchCut.barrel.xy_global = barrelDirCut.make<TH2F>("xy_global","XY (Barrel); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                branchCut.barrel.xy_ref = barrelDirCut.make<TH2F>("xy_ref","XY (Barrel, ref); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                
+                TFileDirectory endcapDirCut = topoDirCut.mkdir("Endcap");
+                branchCut.endcap.eta = endcapDirCut.make<TH1F>("eta","#eta (Endcap); #eta; Vertices",100,-3,3); // reduced from 200
+                branchCut.endcap.mass = endcapDirCut.make<TH1F>("mass","Mass (Endcap); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+                branchCut.endcap.dBV = endcapDirCut.make<TH1F>("dBV","d_{BV} (Endcap); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+                branchCut.endcap.xy_global = endcapDirCut.make<TH2F>("xy_global","XY (Endcap); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                branchCut.endcap.xy_ref = endcapDirCut.make<TH2F>("xy_ref","XY (Endcap, ref); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+
+                TFileDirectory leftEndcapDirCut = topoDirCut.mkdir("LeftEndcap");
+                branchCut.leftEndcap.eta = leftEndcapDirCut.make<TH1F>("eta","#eta (Left Endcap); #eta; Vertices",100,-3,3); // reduced from 200
+                branchCut.leftEndcap.mass = leftEndcapDirCut.make<TH1F>("mass","Mass (Left Endcap); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+                branchCut.leftEndcap.dBV = leftEndcapDirCut.make<TH1F>("dBV","d_{BV} (Left Endcap); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+                branchCut.leftEndcap.xy_global = leftEndcapDirCut.make<TH2F>("xy_global","XY (Left Endcap); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                
+                TFileDirectory rightEndcapDirCut = topoDirCut.mkdir("RightEndcap");
+                branchCut.rightEndcap.eta = rightEndcapDirCut.make<TH1F>("eta","#eta (Right Endcap); #eta; Vertices",100,-3,3); // reduced from 200
+                branchCut.rightEndcap.mass = rightEndcapDirCut.make<TH1F>("mass","Mass (Right Endcap); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+                branchCut.rightEndcap.dBV = rightEndcapDirCut.make<TH1F>("dBV","d_{BV} (Right Endcap); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+                branchCut.rightEndcap.xy_global = rightEndcapDirCut.make<TH2F>("xy_global","XY (Right Endcap); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+            }
 
             // PV regions (REDUCED BINNING)
             if (PVBoundary1 != -1) {
-                TFileDirectory regionDir = branchDir.mkdir("PVRegions");
+                TFileDirectory regionDirNom = branchDirNom.mkdir("PVRegions");
                 
-                TFileDirectory regADir = regionDir.mkdir("RegionA");
-                branch.regionA.mass = regADir.make<TH1F>("mass","Mass (Region A); Mass [GeV]; Vertices",100,0,10); // reduced from 200
-                branch.regionA.dBV = regADir.make<TH1F>("dBV","d_{BV} (Region A); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
-                branch.regionA.xy_global = regADir.make<TH2F>("xy_global","XY Global (Region A); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
-                branch.regionA.xy_ref = regADir.make<TH2F>("xy_ref","XY ref (Region A); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                TFileDirectory regADirNom = regionDirNom.mkdir("RegionA");
+                branch.regionA.mass = regADirNom.make<TH1F>("mass","Mass (Region A); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+                branch.regionA.dBV = regADirNom.make<TH1F>("dBV","d_{BV} (Region A); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+                branch.regionA.xy_global = regADirNom.make<TH2F>("xy_global","XY Global (Region A); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                branch.regionA.xy_ref = regADirNom.make<TH2F>("xy_ref","XY ref (Region A); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
 
-                TFileDirectory regBDir = regionDir.mkdir("RegionB");
-                branch.regionB.mass = regBDir.make<TH1F>("mass","Mass (Region B); Mass [GeV]; Vertices",100,0,10); // reduced from 200
-                branch.regionB.dBV = regBDir.make<TH1F>("dBV","d_{BV} (Region B); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
-                branch.regionB.xy_global = regBDir.make<TH2F>("xy_global","XY Global (Region B); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
-                branch.regionB.xy_ref = regBDir.make<TH2F>("xy_ref","XY ref (Region B); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                TFileDirectory regBDirNom = regionDirNom.mkdir("RegionB");
+                branch.regionB.mass = regBDirNom.make<TH1F>("mass","Mass (Region B); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+                branch.regionB.dBV = regBDirNom.make<TH1F>("dBV","d_{BV} (Region B); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+                branch.regionB.xy_global = regBDirNom.make<TH2F>("xy_global","XY Global (Region B); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                branch.regionB.xy_ref = regBDirNom.make<TH2F>("xy_ref","XY ref (Region B); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
                 
-                TFileDirectory regCDir = regionDir.mkdir("RegionC");
-                branch.regionC.mass = regCDir.make<TH1F>("mass","Mass (Region C); Mass [GeV]; Vertices",100,0,10); // reduced from 200
-                branch.regionC.dBV = regCDir.make<TH1F>("dBV","d_{BV} (Region C); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
-                branch.regionC.xy_global = regCDir.make<TH2F>("xy_global","XY Global (Region C); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
-                branch.regionC.xy_ref = regCDir.make<TH2F>("xy_ref","XY ref (Region C); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                TFileDirectory regCDirNom = regionDirNom.mkdir("RegionC");
+                branch.regionC.mass = regCDirNom.make<TH1F>("mass","Mass (Region C); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+                branch.regionC.dBV = regCDirNom.make<TH1F>("dBV","d_{BV} (Region C); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+                branch.regionC.xy_global = regCDirNom.make<TH2F>("xy_global","XY Global (Region C); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                branch.regionC.xy_ref = regCDirNom.make<TH2F>("xy_ref","XY ref (Region C); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                
+            }
+            if (applyHitCuts_ && PVBoundary1 != -1) {
+                auto& branchCut = vertices_cut_.branches[branchKey];
+                TFileDirectory regionDirCut = branchDirCut.mkdir("PVRegions");
+                
+                TFileDirectory regADirCut = regionDirCut.mkdir("RegionA");
+                branchCut.regionA.mass = regADirCut.make<TH1F>("mass","Mass (Region A); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+                branchCut.regionA.dBV = regADirCut.make<TH1F>("dBV","d_{BV} (Region A); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+                branchCut.regionA.xy_global = regADirCut.make<TH2F>("xy_global","XY Global (Region A); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                branchCut.regionA.xy_ref = regADirCut.make<TH2F>("xy_ref","XY ref (Region A); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+
+                TFileDirectory regBDirCut = regionDirCut.mkdir("RegionB");
+                branchCut.regionB.mass = regBDirCut.make<TH1F>("mass","Mass (Region B); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+                branchCut.regionB.dBV = regBDirCut.make<TH1F>("dBV","d_{BV} (Region B); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+                branchCut.regionB.xy_global = regBDirCut.make<TH2F>("xy_global","XY Global (Region B); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                branchCut.regionB.xy_ref = regBDirCut.make<TH2F>("xy_ref","XY ref (Region B); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                
+                TFileDirectory regCDirCut = regionDirCut.mkdir("RegionC");
+                branchCut.regionC.mass = regCDirCut.make<TH1F>("mass","Mass (Region C); Mass [GeV]; Vertices",100,0,10); // reduced from 200
+                branchCut.regionC.dBV = regCDirCut.make<TH1F>("dBV","d_{BV} (Region C); d_{BV} [cm]; Vertices",100,0,10); // reduced from 200
+                branchCut.regionC.xy_global = regCDirCut.make<TH2F>("xy_global","XY Global (Region C); X [cm]; Y [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
+                branchCut.regionC.xy_ref = regCDirCut.make<TH2F>("xy_ref","XY ref (Region C); X-X_{ref} [cm]; Y-Y_{ref} [cm]",800,-10,10,800,-10,10); // reduced from 2000x2000
             }
         }
     }
 
     // ==================== TRACKS ====================
-    TFileDirectory tracksDir = fs->mkdir("Tracks");
+    TFileDirectory tracksDir = rootNom.mkdir("Tracks");
     
     // All tracks
     TFileDirectory trkAllDir = tracksDir.mkdir("All");
@@ -520,6 +676,12 @@ void ScoutingPlotMakerRun3::beginJob() {
     tracks_.all.eta = trkAllKinDir.make<TH1F>("eta","Track #eta (all); #eta; Tracks",100,-3,3);
     tracks_.all.phi = trkAllKinDir.make<TH1F>("phi","Track #phi (all); #phi; Tracks",100,-3.14,3.14);
     tracks_.all.momentum = trkAllKinDir.make<TH1F>("momentum","Track Momentum (all); Total Momentum p [GeV]; Tracks",100,0,100);
+    
+    tracks_.all.nPixelHits = trkAllDir.make<TH1F>("nPixelHits","Pixel hits per track (all);N pixel hits;Tracks",10,0,10);
+    tracks_.all.nStripHits = trkAllDir.make<TH1F>("nStripHits","Strip hits per track (all);N strip hits;Tracks",30,0,30);
+    tracks_.all.nTrackerLayers = trkAllDir.make<TH1F>("nTrackerLayers","Tracker layers with measurement (all);N layers;Tracks",30,0,30);
+    tracks_.all.nHits_vs_dxy = trkAllDir.make<TH2F>("nHits_vs_dxy","Hits vs dxy (all);d_{xy} [cm];N hits",200,-2.0,2.0,40,0,40);
+    tracks_.all.nHits_vs_dxyError = trkAllDir.make<TH2F>("nHits_vs_dxyError","Hits vs dxy error (all);#sigma_{dxy} [cm];N hits",200,0.0,0.05,40,0,40);
     
     TFileDirectory trkAllIPDir = trkAllDir.mkdir("ImpactParameter");
     tracks_.all.ip.IP_ref = trkAllIPDir.make<TH1F>("IP_ref","Impact Parameter wrt ref (all); IP [cm]; Tracks",500,0,5);
@@ -544,6 +706,12 @@ void ScoutingPlotMakerRun3::beginJob() {
     tracks_.seed.phi = trkSeedKinDir.make<TH1F>("phi","Track #phi (seed-like); #phi; Tracks",100,-3.14,3.14);
     tracks_.seed.momentum = trkSeedKinDir.make<TH1F>("momentum","Track Momentum (seed-like); Total Momentum p [GeV]; Tracks",100,0,100);
     
+    tracks_.seed.nPixelHits = trkSeedDir.make<TH1F>("nPixelHits","Pixel hits per track (seed-like);N pixel hits;Tracks",10,0,10);
+    tracks_.seed.nStripHits = trkSeedDir.make<TH1F>("nStripHits","Strip hits per track (seed-like);N strip hits;Tracks",30,0,30);
+    tracks_.seed.nTrackerLayers = trkSeedDir.make<TH1F>("nTrackerLayers","Tracker layers with measurement (seed-like);N layers;Tracks",30,0,30);
+    tracks_.seed.nHits_vs_dxy = trkSeedDir.make<TH2F>("nHits_vs_dxy","Hits vs dxy (seed-like);d_{xy} [cm];N hits",200,-2.0,2.0,40,0,40);
+    tracks_.seed.nHits_vs_dxyError = trkSeedDir.make<TH2F>("nHits_vs_dxyError","Hits vs dxy error (seed-like);#sigma_{dxy} [cm];N hits",200,0.0,0.05,40,0,40);
+    
     TFileDirectory trkSeedIPDir = trkSeedDir.mkdir("ImpactParameter");
     tracks_.seed.ip.IP_ref = trkSeedIPDir.make<TH1F>("IP_ref","Impact Parameter wrt ref (seed-like); IP [cm]; Tracks",500,0,5);
     tracks_.seed.ip.IPSig_ref = trkSeedIPDir.make<TH1F>("IPSig_ref","|IP|/#sigma wrt ref (seed-like); |IP|/#sigma; Tracks",100,0,50);
@@ -567,6 +735,12 @@ void ScoutingPlotMakerRun3::beginJob() {
     tracks_.vertex.phi = trkVtxKinDir.make<TH1F>("phi","Track #phi (vertex); #phi; Tracks",100,-3.14,3.14);
     tracks_.vertex.momentum = trkVtxKinDir.make<TH1F>("momentum","Track Momentum (vertex); Total Momentum p [GeV]; Tracks",100,0,100);
     
+    tracks_.vertex.nPixelHits = trkVtxDir.make<TH1F>("nPixelHits","Pixel hits per track (vertex);N pixel hits;Tracks",10,0,10);
+    tracks_.vertex.nStripHits = trkVtxDir.make<TH1F>("nStripHits","Strip hits per track (vertex);N strip hits;Tracks",30,0,30);
+    tracks_.vertex.nTrackerLayers = trkVtxDir.make<TH1F>("nTrackerLayers","Tracker layers with measurement (vertex);N layers;Tracks",30,0,30);
+    tracks_.vertex.nHits_vs_dxy = trkVtxDir.make<TH2F>("nHits_vs_dxy","Hits vs dxy (vertex);d_{xy} [cm];N hits",200,-2.0,2.0,40,0,40);
+    tracks_.vertex.nHits_vs_dxyError = trkVtxDir.make<TH2F>("nHits_vs_dxyError","Hits vs dxy error (vertex);#sigma_{dxy} [cm];N hits",200,0.0,0.05,40,0,40);
+    
     TFileDirectory trkVtxIPDir = trkVtxDir.mkdir("ImpactParameter");
     tracks_.vertex.ip.IP_ref = trkVtxIPDir.make<TH1F>("IP_ref","Impact Parameter wrt ref (vertex); IP [cm]; Tracks",500,0,5);
     tracks_.vertex.ip.IPSig_ref = trkVtxIPDir.make<TH1F>("IPSig_ref","|IP|/#sigma wrt ref (vertex); |IP|/#sigma; Tracks",100,0,50);
@@ -583,6 +757,35 @@ void ScoutingPlotMakerRun3::beginJob() {
     tracks_.vertex.ip.dxyError = trkVtxIPDir.make<TH1F>("dxyError","dxy Error (vertex); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
     tracks_.vertex.ip.dxyError_barrel = trkVtxIPDir.make<TH1F>("dxyError_barrel","dxy Error Barrel (vertex); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
     tracks_.vertex.ip.dxyError_endcap = trkVtxIPDir.make<TH1F>("dxyError_endcap","dxy Error Endcap (vertex); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
+    
+    // ==================== TRACKS (WithHitCuts) ====================
+    if (applyHitCuts_) {
+        TFileDirectory tracksCutDir = rootCut.mkdir("Tracks");
+        
+        // All tracks (WithHitCuts)
+        TFileDirectory trkAllCutDir = tracksCutDir.mkdir("All");
+        tracks_cut_.all.nPixelHits = trkAllCutDir.make<TH1F>("nPixelHits","Pixel hits per track (all, hit cuts);N pixel hits;Tracks",10,0,10);
+        tracks_cut_.all.nStripHits = trkAllCutDir.make<TH1F>("nStripHits","Strip hits per track (all, hit cuts);N strip hits;Tracks",30,0,30);
+        tracks_cut_.all.nTrackerLayers = trkAllCutDir.make<TH1F>("nTrackerLayers","Tracker layers with measurement (all, hit cuts);N layers;Tracks",30,0,30);
+        tracks_cut_.all.nHits_vs_dxy = trkAllCutDir.make<TH2F>("nHits_vs_dxy","Hits vs dxy (all, hit cuts);d_{xy} [cm];N hits",200,-2.0,2.0,40,0,40);
+        tracks_cut_.all.nHits_vs_dxyError = trkAllCutDir.make<TH2F>("nHits_vs_dxyError","Hits vs dxy error (all, hit cuts);#sigma_{dxy} [cm];N hits",200,0.0,0.05,40,0,40);
+        
+        // Seed-like tracks (WithHitCuts)
+        TFileDirectory trkSeedCutDir = tracksCutDir.mkdir("SeedLike");
+        tracks_cut_.seed.nPixelHits = trkSeedCutDir.make<TH1F>("nPixelHits","Pixel hits per track (seed-like, hit cuts);N pixel hits;Tracks",10,0,10);
+        tracks_cut_.seed.nStripHits = trkSeedCutDir.make<TH1F>("nStripHits","Strip hits per track (seed-like, hit cuts);N strip hits;Tracks",30,0,30);
+        tracks_cut_.seed.nTrackerLayers = trkSeedCutDir.make<TH1F>("nTrackerLayers","Tracker layers with measurement (seed-like, hit cuts);N layers;Tracks",30,0,30);
+        tracks_cut_.seed.nHits_vs_dxy = trkSeedCutDir.make<TH2F>("nHits_vs_dxy","Hits vs dxy (seed-like, hit cuts);d_{xy} [cm];N hits",200,-2.0,2.0,40,0,40);
+        tracks_cut_.seed.nHits_vs_dxyError = trkSeedCutDir.make<TH2F>("nHits_vs_dxyError","Hits vs dxy error (seed-like, hit cuts);#sigma_{dxy} [cm];N hits",200,0.0,0.05,40,0,40);
+        
+        // Vertex-associated tracks (WithHitCuts)
+        TFileDirectory trkVtxCutDir = tracksCutDir.mkdir("VertexAssociated");
+        tracks_cut_.vertex.nPixelHits = trkVtxCutDir.make<TH1F>("nPixelHits","Pixel hits per track (vertex, hit cuts);N pixel hits;Tracks",10,0,10);
+        tracks_cut_.vertex.nStripHits = trkVtxCutDir.make<TH1F>("nStripHits","Strip hits per track (vertex, hit cuts);N strip hits;Tracks",30,0,30);
+        tracks_cut_.vertex.nTrackerLayers = trkVtxCutDir.make<TH1F>("nTrackerLayers","Tracker layers with measurement (vertex, hit cuts);N layers;Tracks",30,0,30);
+        tracks_cut_.vertex.nHits_vs_dxy = trkVtxCutDir.make<TH2F>("nHits_vs_dxy","Hits vs dxy (vertex, hit cuts);d_{xy} [cm];N hits",200,-2.0,2.0,40,0,40);
+        tracks_cut_.vertex.nHits_vs_dxyError = trkVtxCutDir.make<TH2F>("nHits_vs_dxyError","Hits vs dxy error (vertex, hit cuts);#sigma_{dxy} [cm];N hits",200,0.0,0.05,40,0,40);
+    }
 }
 
 void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -636,6 +839,23 @@ void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         event_.avgPV_vs_beamspot->Fill(avgPVVtx.x() - bsVtx.x(), avgPVVtx.y() - bsVtx.y());
     }
 
+    // Read the mapping: reco::Track -> edm::Ref<Run3ScoutingTrack>
+    edm::Handle<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> trackToScoutingRefH;
+    iEvent.getByToken(trackToScoutingRefToken_, trackToScoutingRefH);
+    const bool haveTrackToScoutingMap = trackToScoutingRefH.isValid();
+    if (!haveTrackToScoutingMap) {
+        edm::LogWarning("ScoutingPlotMakerRun3") << "Track->ScoutingTrack ValueMap not found; hit plots will be empty.";
+    }
+
+    // Helper lambda to check hit cuts
+    auto passHitCuts = [&](int nPix, int nStrip, int nLayers) {
+        if (!applyHitCuts_) return true;
+        if (nPix    < hit_minPixelHits_) return false;
+        if (nStrip  < hit_minStripHits_) return false;
+        if (nLayers < hit_minTrackerLayers_) return false;
+        return true;
+    };
+
     // --- ALL TRACKS (from unpacker) ---
     {
         const math::XYZPoint origin(0.,0.,0.);
@@ -675,6 +895,35 @@ void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
             tracks_.all.ip.dxy_origin->Fill(dxy0);
             if (dxyErr > 0) {
                 tracks_.all.ip.dxySig_origin->Fill(std::fabs(dxy0 / dxyErr));
+            }
+            
+            // Hit information
+            int nPixelHits = 0, nStripHits = 0, nTrackerLayers = 0;
+            if (haveTrackToScoutingMap) {
+                auto scoutingRef = (*trackToScoutingRefH)[trRef];
+                if (scoutingRef.isNonnull()) {
+                    nPixelHits     = scoutingRef->tk_nValidPixelHits();
+                    nStripHits     = scoutingRef->tk_nValidStripHits();
+                    nTrackerLayers = scoutingRef->tk_nTrackerLayersWithMeasurement();
+                }
+            }
+            
+            const bool trackPassesHitCuts = passHitCuts(nPixelHits, nStripHits, nTrackerLayers);
+            int nHits = nPixelHits + nStripHits;
+            
+            std::vector<FillMode> modes = {FillMode::Nominal};
+            if (applyHitCuts_) modes.push_back(FillMode::WithHitCuts);
+            for (FillMode mode : modes) {
+                bool passes = (mode == FillMode::Nominal) ? true : trackPassesHitCuts;
+                if (!allowFill(mode, passes)) continue;
+                auto& T = (mode == FillMode::Nominal) ? tracks_.all : tracks_cut_.all;
+                T.nPixelHits->Fill(nPixelHits);
+                T.nStripHits->Fill(nStripHits);
+                T.nTrackerLayers->Fill(nTrackerLayers);
+                T.nHits_vs_dxy->Fill(dxy0, nHits);
+                if (dxyErr > 0 && std::isfinite(dxyErr)) {
+                    T.nHits_vs_dxyError->Fill(dxyErr, nHits);
+                }
             }
             
             // dxy errors
@@ -734,6 +983,23 @@ void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
             tracks_.seed.ip.dxy_origin->Fill(dxy0);
             if (dxyErr > 0) {
                 tracks_.seed.ip.dxySig_origin->Fill(std::fabs(dxy0 / dxyErr));
+            }
+            
+            // Hit information (reuse nPixelHits, nStripHits, nTrackerLayers already computed above)
+            nHits = nPixelHits + nStripHits;
+            std::vector<FillMode> seedModes = {FillMode::Nominal};
+            if (applyHitCuts_) seedModes.push_back(FillMode::WithHitCuts);
+            for (FillMode mode : seedModes) {
+                bool passes = (mode == FillMode::Nominal) ? true : passHitCuts(nPixelHits, nStripHits, nTrackerLayers);
+                if (!allowFill(mode, passes)) continue;
+                auto& T = (mode == FillMode::Nominal) ? tracks_.seed : tracks_cut_.seed;
+                T.nPixelHits->Fill(nPixelHits);
+                T.nStripHits->Fill(nStripHits);
+                T.nTrackerLayers->Fill(nTrackerLayers);
+                T.nHits_vs_dxy->Fill(dxy0, nHits);
+                if (dxyErr > 0 && std::isfinite(dxyErr)) {
+                    T.nHits_vs_dxyError->Fill(dxyErr, nHits);
+                }
             }
             
             tracks_.seed.ip.dxyError->Fill(dxyErr);
@@ -854,6 +1120,32 @@ void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
             tracks_.vertex.ip.dxy_origin->Fill(dxy0);
             if (dxyErr > 0) {
                 tracks_.vertex.ip.dxySig_origin->Fill(std::fabs(dxy0 / dxyErr));
+            }
+            
+            // Hit information
+            int nPixelHits = 0, nStripHits = 0, nTrackerLayers = 0;
+            if (haveTrackToScoutingMap) {
+                auto scoutingRef = (*trackToScoutingRefH)[tr];
+                if (scoutingRef.isNonnull()) {
+                    nPixelHits     = scoutingRef->tk_nValidPixelHits();
+                    nStripHits     = scoutingRef->tk_nValidStripHits();
+                    nTrackerLayers = scoutingRef->tk_nTrackerLayersWithMeasurement();
+                }
+            }
+            int nHits = nPixelHits + nStripHits;
+            std::vector<FillMode> vertexModes = {FillMode::Nominal};
+            if (applyHitCuts_) vertexModes.push_back(FillMode::WithHitCuts);
+            for (FillMode mode : vertexModes) {
+                bool passes = (mode == FillMode::Nominal) ? true : passHitCuts(nPixelHits, nStripHits, nTrackerLayers);
+                if (!allowFill(mode, passes)) continue;
+                auto& T = (mode == FillMode::Nominal) ? tracks_.vertex : tracks_cut_.vertex;
+                T.nPixelHits->Fill(nPixelHits);
+                T.nStripHits->Fill(nStripHits);
+                T.nTrackerLayers->Fill(nTrackerLayers);
+                T.nHits_vs_dxy->Fill(dxy0, nHits);
+                if (dxyErr > 0 && std::isfinite(dxyErr)) {
+                    T.nHits_vs_dxyError->Fill(dxyErr, nHits);
+                }
             }
             
             // dxy errors
@@ -977,6 +1269,30 @@ void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         // REMOVE the duplicate calculation block that was here!
         // The old code had a second calculation using use_2d_vertex_dist_ toggle
         // which was overwriting these correct 2D values with 3D values.
+
+        // Vertex-level hit-cut gate: Check if all constituent tracks pass hit cuts
+        bool vertexPassesHitCuts = true;
+        if (applyHitCuts_) {
+            for (auto track : tks) {
+                if (!track.isNonnull()) continue;
+                
+                int nPixelHits = 0, nStripHits = 0, nTrackerLayers = 0;
+                if (haveTrackToScoutingMap) {
+                    auto scoutingRef = (*trackToScoutingRefH)[track];
+                    if (scoutingRef.isNonnull()) {
+                        nPixelHits     = scoutingRef->tk_nValidPixelHits();
+                        nStripHits     = scoutingRef->tk_nValidStripHits();
+                        nTrackerLayers = scoutingRef->tk_nTrackerLayersWithMeasurement();
+                    }
+                }
+                
+                // Check if this track passes hit cuts
+                if (!passHitCuts(nPixelHits, nStripHits, nTrackerLayers)) {
+                    vertexPassesHitCuts = false;
+                    break;
+                }
+            }
+        }
 
         // Loop over all ntk × angle branches
         for (size_t i_ntk = 0; i_ntk < cut_ntk_.size(); ++i_ntk) {
@@ -1116,6 +1432,83 @@ void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
                     }
                 }
                 
+                // Fill WithHitCuts folder only if enabled and vertex passes hit cuts
+                if (applyHitCuts_ && vertexPassesHitCuts) {
+                    auto& branch_cut = vertices_cut_.branches[branchKey];
+                    
+                    branch_cut.chi2norm->Fill(v.normalizedChi2());
+                    branch_cut.nTracks->Fill(ntk);
+                    branch_cut.xy_global->Fill(v.x(), v.y());
+                    branch_cut.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                    branch_cut.distance.dBV_ref->Fill(dBVref);
+                    branch_cut.distance.dBV_origin->Fill(dBV00);
+                    branch_cut.distance.dBV_error->Fill(dBV_err);
+                    branch_cut.openingAngle.mean->Fill(meanAngle);
+                    branch_cut.openingAngle.min->Fill(minAngle);
+                    branch_cut.openingAngle.max->Fill(maxAngle);
+                    
+                    // Additional reference distances (always 2D)
+                    if (havePV) {
+                        Measurement1D dBVavgPV = vertexDist2D.distance(v, avgPVVtx);
+                        branch_cut.distance.dBV_avgPV->Fill(dBVavgPV.value());
+                    }
+                    if (haveBS) {
+                        Measurement1D dBVbs = vertexDist2D.distance(v, bsVtx);
+                        branch_cut.distance.dBV_beamspot->Fill(dBVbs.value());
+                    }
+                    
+                    branch_cut.pt->Fill(sumVec.Pt());
+                    branch_cut.eta->Fill(sumVec.Eta());
+                    branch_cut.phi->Fill(sumVec.Phi());
+                    branch_cut.mass->Fill(invMass);
+                    
+                    // Topology
+                    if (std::fabs(sumVec.Eta()) < 1.0) {
+                        branch_cut.barrel.eta->Fill(sumVec.Eta());
+                        branch_cut.barrel.dBV->Fill(dBVref);
+                        branch_cut.barrel.mass->Fill(invMass);
+                        branch_cut.barrel.xy_global->Fill(v.x(), v.y());
+                        branch_cut.barrel.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                    } else {
+                        branch_cut.endcap.eta->Fill(sumVec.Eta());
+                        branch_cut.endcap.dBV->Fill(dBVref);
+                        branch_cut.endcap.mass->Fill(invMass);
+                        branch_cut.endcap.xy_global->Fill(v.x(), v.y());
+                        branch_cut.endcap.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                        
+                        if (sumVec.Eta() < -1.0) {
+                            branch_cut.leftEndcap.eta->Fill(sumVec.Eta());
+                            branch_cut.leftEndcap.dBV->Fill(dBVref);
+                            branch_cut.leftEndcap.mass->Fill(invMass);
+                            branch_cut.leftEndcap.xy_global->Fill(v.x(), v.y());
+                        } else if (sumVec.Eta() > 1.0) {
+                            branch_cut.rightEndcap.eta->Fill(sumVec.Eta());
+                            branch_cut.rightEndcap.dBV->Fill(dBVref);
+                            branch_cut.rightEndcap.mass->Fill(invMass);
+                            branch_cut.rightEndcap.xy_global->Fill(v.x(), v.y());
+                        }
+                    }
+                    
+                    // PV regions
+                    if (PVBoundary1 != -1) {
+                        if (pvRegion == 0) {
+                            branch_cut.regionA.xy_global->Fill(v.x(), v.y());
+                            branch_cut.regionA.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                            branch_cut.regionA.dBV->Fill(dBVref);
+                            branch_cut.regionA.mass->Fill(invMass);
+                        } else if (pvRegion == 1) {
+                            branch_cut.regionB.xy_global->Fill(v.x(), v.y());
+                            branch_cut.regionB.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                            branch_cut.regionB.dBV->Fill(dBVref);
+                            branch_cut.regionB.mass->Fill(invMass);
+                        } else {
+                            branch_cut.regionC.xy_global->Fill(v.x(), v.y());
+                            branch_cut.regionC.xy_ref->Fill(v.x() - refVtx.x(), v.y() - refVtx.y());
+                            branch_cut.regionC.dBV->Fill(dBVref);
+                            branch_cut.regionC.mass->Fill(invMass);
+                        }
+                    }
+                }
 
             }
         }
@@ -1238,6 +1631,18 @@ void ScoutingPlotMakerRun3::fillDescriptions(edm::ConfigurationDescriptions& des
     desc.addUntracked<int>("seed_minPixelHits", 0);
     desc.addUntracked<int>("seed_minStripHits", 0);
     desc.addUntracked<int>("seed_minTrackerLayers", 0);
+    // --- Analyzer-only track quality cuts (NOT used by Vertexer) ---
+    desc.addUntracked<double>("track_pt_min_cut", 0.9);
+    desc.addUntracked<double>("track_dxySig_min_cut", 4.0);
+    desc.addUntracked<double>("track_dxySig_max_cut", 100.0);
+    desc.addUntracked<int>("track_npixelHits_min_cut", 1);
+    desc.addUntracked<int>("track_nstripHits_min_cut", 0);
+    desc.addUntracked<int>("track_ntrackerLayers_min_cut", 5);
+    // Global hit-cut thresholds for Nominal vs WithHitCuts folders
+    desc.addUntracked<int>("hit_minPixelHits", 3);
+    desc.addUntracked<int>("hit_minStripHits", 2);
+    desc.addUntracked<int>("hit_minTrackerLayers", 6);
+    desc.add<bool>("applyHitCuts", false);
     descriptions.add("scoutingPlotMakerRun3", desc);
 }
 

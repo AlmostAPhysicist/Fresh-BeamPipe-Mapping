@@ -3,8 +3,8 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("CHAIN")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-# process.MessageLogger.cerr.FwkSummary.reportEvery = 5
-# process.MessageLogger.cerr.FwkReport.reportEvery = 5
+# process.MessageLogger.cerr.FwkSummary.reportEvery = 50
+# process.MessageLogger.cerr.FwkReport.reportEvery = 50
 # process.MessageLogger.cerr.FwkSummary.reportEvery = 100
 # process.MessageLogger.cerr.FwkReport.reportEvery = 100
 process.MessageLogger.cerr.FwkSummary.reportEvery = 1000
@@ -24,7 +24,7 @@ process.options = cms.untracked.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100000)  # Limited events for testing
+    input = cms.untracked.int32(10000)  # Limited events for testing
     # input = cms.untracked.int32(150000)  # Local
     # input = cms.untracked.int32(500000)  # Process all events
     # input = cms.untracked.int32(-1)  # Process all events
@@ -37,15 +37,17 @@ process.source = cms.Source("PoolSource",
         # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/130000/b7867cb3-0c5b-407f-a8c3-3edf960415e3.root"
     # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/000e726a-ca68-420b-b531-23f6733ba1e4.root"
     # "file:/tmp/test.root"
-    "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/02fa9546-0c14-45e9-906a-ddd16bdd30ba.root",
+    # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/02fa9546-0c14-45e9-906a-ddd16bdd30ba.root",
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/dc76810a-c42b-4f76-b965-7475a9b4fb96.root",
-    # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/003ca643-43f8-40dd-92b3-4c6a4ccdc894.root", #EDM Number of events: 527035
+    "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/003ca643-43f8-40dd-92b3-4c6a4ccdc894.root", #EDM Number of events: 527035
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root",
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root", # Empty file
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/013b488b-7af4-450f-b175-b39623c72ae2.root",
     # MC Files
     # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/0639b06f-0a53-4150-ac4f-ffab0df5ef91.root",
     # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/06a339e5-cb52-4e75-b0e4-91285db66993.root"
+    # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/017d2bf5-4f3c-40ab-b6f9-c42381b6ae9b.root"
+
     )
 )
 
@@ -65,8 +67,8 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # -------------------------- OUTPUT PATH --------------------------------
 #-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/ScoutingPlotsTest_Size100k.root")
-    # fileName = cms.string("ScoutingPlots_Output.root")  # Histogram/plot output
+    fileName = cms.string("test-outputs/Scouting_vs_Offline_data.root")
+    # fileName = cms.string("Scouting_MC_DYto2Mu_withHitCuts.root")  # Histogram/plot output
 )
 #-----------------------------------------------------------------------
 
@@ -94,7 +96,7 @@ referencePreference = 'BS'  # Default to BeamSpot
 process.Vertexer = cms.EDProducer('Vertexer',
     seed_tracks_src = cms.InputTag('hltScoutingUnpackProducer', 'Track'),
     # Change to match the name in fillDescriptions (primaryVertices instead of primaryVertices_src)
-    primaryVertices = cms.InputTag("hltScoutingUnpackProducer", "PrimaryVertex"),  # vector of PVs; Vertexer will average them
+    primaryVertices = cms.InputTag("hltScoutingUnpackProducer", "PrimaryVertex"),
     beamspot_src = cms.InputTag('offlineBeamSpot'),
     refPreference = cms.untracked.string(referencePreference),
 
@@ -102,13 +104,19 @@ process.Vertexer = cms.EDProducer('Vertexer',
     minSeedIPSig = cms.untracked.double(4.0),
     minSeedPt    = cms.untracked.double(0.9),
 
-    # Other parameters (kept for downstream, but not used in seed preselection) Again, NOTE: These are NOT used for seed selection within the Vertexer! These are only for ScoutingTreeMaker downstream (I should probably change this later for clarity)
-    pt_min_cut = cms.double(0.9),
-    dxySig_min_cut = cms.double(4.0),
-    dxySig_max_cut = cms.double(100.0),
-    npixelHits_min_cut = cms.int32(1),
-    nstripHits_min_cut = cms.int32(0),
-    ntrackerLayers_min_cut = cms.int32(5),
+    # --------------------------------------------------------------------
+    # The following parameters WERE present previously but are *not used*
+    # inside Vertexer (seed preselection uses only minSeedIPSig & minSeedPt).
+    # They are analyzer / treemaker quality cuts and therefore moved to the
+    # ScoutingPlotMaker (scoutingPlots) below. Keep them commented here to
+    # avoid confusion / accidental coupling.
+    # --------------------------------------------------------------------
+    # pt_min_cut = cms.double(0.9),
+    # dxySig_min_cut = cms.double(4.0),
+    # dxySig_max_cut = cms.double(100.0),
+    # npixelHits_min_cut = cms.int32(1),
+    # nstripHits_min_cut = cms.int32(0),
+    # ntrackerLayers_min_cut = cms.int32(5),
 
     n_tracks_per_seed_vertex = cms.int32(2),
     max_seed_vertex_chi2 = cms.double(5),
@@ -157,16 +165,37 @@ process.scoutingPlots = cms.EDAnalyzer('ScoutingPlotMakerRun3',
     required_dxy_error = cms.double(-1),
     refPreference = cms.untracked.string(referencePreference),
 
-    # Seed-like plots: mirror Vertexer’s thresholds and 2D/3D toggle (plots only; no selection)
+    # ------------------------------
+    # Analyzer-only / treemaker cuts
+    # (moved out of Vertexer to avoid coupling)
+    # ------------------------------
+    # Track-level quality cuts used by the analyzer (NOT used by Vertexer).
+    # Keep these in the treemaker so the Vertexer remains focused on finding seeds.
+    track_pt_min_cut            = cms.untracked.double(0.9),
+    track_dxySig_min_cut        = cms.untracked.double(4.0),
+    track_dxySig_max_cut        = cms.untracked.double(100.0),
+    # track_npixelHits_min_cut    = cms.untracked.int32(1),
+    # track_nstripHits_min_cut    = cms.untracked.int32(0),
+    # track_ntrackerLayers_min_cut= cms.untracked.int32(5),
+
+    # Global toggle and thresholds for WithHitCuts folder
+    applyHitCuts = cms.bool(True),
+    hit_minPixelHits = cms.untracked.int32(3),
+    hit_minStripHits = cms.untracked.int32(2),
+    hit_minTrackerLayers = cms.untracked.int32(6),
+
+    # Seed-like plots: mirror Vertexer's *seed* thresholds (for plotting only; no selection)
+    # NOTE: minSeedIPSig / minSeedPt are still the canonical vertexer knobs.
     seed_minIPSig        = cms.untracked.double(process.Vertexer.minSeedIPSig.value()),
     seed_minPt           = cms.untracked.double(process.Vertexer.minSeedPt.value()),
-    seed_maxIPSig        = cms.untracked.double(process.Vertexer.dxySig_max_cut.value()),
-    seed_minPixelHits    = cms.untracked.int32(process.Vertexer.npixelHits_min_cut.value()),
-    seed_minStripHits    = cms.untracked.int32(process.Vertexer.nstripHits_min_cut.value()),
-    seed_minTrackerLayers= cms.untracked.int32(process.Vertexer.ntrackerLayers_min_cut.value()),
+    # For the following seed-* plot knobs we use the analyzer-local values above
+    seed_maxIPSig        = cms.untracked.double(100.0), # was dxySig_max_cut; keep as analyzer plotting value
+    seed_minPixelHits    = cms.untracked.int32(3),
+    seed_minStripHits    = cms.untracked.int32(2),
+    seed_minTrackerLayers= cms.untracked.int32(6),
     seed_use2DTrackDist  = cms.untracked.bool(process.Vertexer.use_2d_track_dist.value()),
 
-    # Shared toggles for consistent definitions
+    # Shared toggles for consistent definitions (read from Vertexer for truth)
     use_2d_track_dist   = cms.bool(process.Vertexer.use_2d_track_dist.value()),
     use_2d_vertex_dist  = cms.bool(process.Vertexer.use_2d_vertex_dist.value()),
 
