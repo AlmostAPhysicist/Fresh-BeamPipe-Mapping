@@ -314,11 +314,7 @@ void ScoutingTreeMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
         edm::Handle<reco::BeamSpot> beamspot;
         iEvent.getByToken(beamspot_token, beamspot);
         if (beamspot.isValid()) {
-            reco::Vertex::Error bsErr;
-            for (int i=0;i<3;++i) for (int j=i;j<3;++j) bsErr(i,j)=0.0;
-            bsErr(0,0)=beamspot->covariance()(0,0);
-            bsErr(1,1)=beamspot->covariance()(1,1);
-            bsVtx = reco::Vertex(beamspot->position(), bsErr);
+            bsVtx = reco::Vertex(beamspot->position(), beamspot->covariance3D());
             haveBS = true;
             beamspot_x_ = bsVtx.x();
             beamspot_y_ = bsVtx.y();

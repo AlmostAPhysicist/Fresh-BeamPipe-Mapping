@@ -16,4 +16,6 @@
 <use name="SimGeneral/HepPDTRecord"/>
 <use name="SimTracker/TrackAssociation"/>
 <use name="TrackingTools/Records"/>
+<use name="root"/>
+<use name="rootgpad"/>
 <flags EDM_PLUGIN="1"/>

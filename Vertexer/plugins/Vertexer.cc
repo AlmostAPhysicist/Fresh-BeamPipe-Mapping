@@ -404,12 +404,9 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     iEvent.getByToken(beamspotToken_, bs);
     if (bs.isValid()) {
       ref_x = bs->position().x(); ref_y = bs->position().y(); ref_z = bs->position().z();
-      // RESTORE original: diagonal-only covariance (off-diagonals zero)
-      ref_error(0,0)=bs->covariance()(0,0);
-      ref_error(1,1)=bs->covariance()(1,1);
-      ref_error(2,2)=bs->covariance()(2,2);
+      ref_error = bs->covariance3D();
       haveRef = true;
-      if (verbose) edm::LogInfo("Vertexer") << "Using beam spot as reference.";
+      if (verbose) edm::LogInfo("Vertexer") << "Using beam spot as reference (full covariance).";
     }
   }
 
@@ -454,6 +451,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   for (size_t i_tk=0; i_tk<seed_track_handle->size(); ++i_tk) {
     edm::Ref<reco::TrackCollection> tk_ref(seed_track_handle, i_tk);
     reco::TransientTrack ttk = tt_builder.build(tk_ref);
+    if (!ttk.isValid()) continue;
     // RESTORE original: use track_dist (2D/3D according to use_2d_track_dist)
     auto ttk_dist = track_dist(ttk, fake_ref_vtx);
     if (!ttk_dist.first) continue;
