@@ -51,6 +51,8 @@
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "TrackingTools/IPTools/interface/IPTools.h"
+#include "CondFormats/DataRecord/interface/BeamSpotOnlineHLTObjectsRcd.h"
+#include "CondFormats/BeamSpotObjects/interface/BeamSpotOnlineObjects.h"
 
 class ScoutingPlotMakerRun3 : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 public:
@@ -80,6 +82,7 @@ private:
 
     enum class RefPreference { PreferPV, PreferBeamSpot };
     const RefPreference refPreference_;
+    const bool useOnlineBeamSpot_;
 
     // Input tokens
     const edm::EDGetTokenT<std::vector<reco::Vertex>> verticesToken;
@@ -87,6 +90,7 @@ private:
     const edm::EDGetTokenT<std::vector<reco::Track>> tracksToken;
     const edm::EDGetTokenT<std::vector<reco::Vertex>> primaryVerticesToken;
     const edm::EDGetTokenT<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> trackToScoutingRefToken_;
+    const edm::ESGetToken<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd> bsOnlineToken_;
 
     // Histogram containers (same struct definitions as before)
     struct BranchHistos {
@@ -132,6 +136,7 @@ private:
         TH2F* primaryVertices_xy = nullptr;
         TH2F* beamspot_xy = nullptr;
         TH2F* avgPV_vs_beamspot = nullptr;
+        TH2F* offlineVSonlineBeamSpot = nullptr;
     };
 
     struct VertexHistos {
@@ -225,6 +230,7 @@ private:
 
     std::pair<bool, std::string> determineReferenceVertex(
         const edm::Event& iEvent,
+        const edm::EventSetup& iSetup,
         reco::Vertex& refVtx,
         bool& havePV,
         reco::Vertex& avgPVVtx,
@@ -256,12 +262,14 @@ ScoutingPlotMakerRun3::ScoutingPlotMakerRun3(const edm::ParameterSet& iConfig):
     PVBoundary2(iConfig.getParameter<int>("PVBoundary2")),
     refPreference_(iConfig.getUntrackedParameter<std::string>("refPreference", "BeamSpot") == "PV" ?
                    RefPreference::PreferPV : RefPreference::PreferBeamSpot),
+    useOnlineBeamSpot_(iConfig.getUntrackedParameter<bool>("useOnlineBeamSpot", false)),
     verticesToken(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("displacedVertices"))),
     beamspot_token(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot_src"))),
     tracksToken(consumes<std::vector<reco::Track>>(iConfig.getParameter<edm::InputTag>("tracks"))),
     primaryVerticesToken(consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("primaryVertices"))),
     trackToScoutingRefToken_(consumes<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>>(
         edm::InputTag("hltScoutingUnpackProducer", "Track-RefToOriginal"))),
+    bsOnlineToken_(esConsumes<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd>()),
     ttBuilderToken_(esConsumes(edm::ESInputTag("", "TransientTrackBuilder"))),
     seed_minIPSig_( iConfig.existsAs<double>("minSeedIPSig", true) ?
                     iConfig.getUntrackedParameter<double>("minSeedIPSig") :
@@ -313,6 +321,10 @@ void ScoutingPlotMakerRun3::beginJob() {
         eh.primaryVertices_xy = eventDir.make<TH2F>("primaryVertices_xy","Primary Vertices XY; X [cm]; Y [cm]",200,-1,1,200,-1,1);
         eh.beamspot_xy = eventDir.make<TH2F>("beamspot_xy","Beamspot Position; x_{BS} [cm]; y_{BS} [cm]",200,-1,1,200,-1,1);
         eh.avgPV_vs_beamspot = eventDir.make<TH2F>("avgPV_vs_beamspot","AvgPV - Beamspot; #Delta x [cm]; #Delta y [cm]",200,-1,1,200,-1,1);
+        eh.offlineVSonlineBeamSpot = eventDir.make<TH2F>(
+            "offlineVSonlineBeamSpot",
+            "Offline - Online Beamspot; #Delta x [cm]; #Delta y [cm]",
+            100,-0.2,0.2,100,-0.2,0.2);
         event_map_.emplace(mode, std::move(eh));
 
         // VERTICES: create Selected / ntk branches / angle sub-branches
@@ -570,10 +582,37 @@ void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
     // reference vertices
     reco::Vertex refVtx, avgPVVtx, bsVtx;
     bool havePV = false, haveBS = false;
-    auto [haveRef, refType] = determineReferenceVertex(iEvent, refVtx, havePV, avgPVVtx, haveBS, bsVtx);
+    auto [haveRef, refType] = determineReferenceVertex(iEvent, iSetup, refVtx, havePV, avgPVVtx, haveBS, bsVtx);
     if (!haveRef) {
         LogWarning("ScoutingPlotMakerRun3") << "No valid reference (avgPV or BeamSpot). Skipping event.";
         return;
+    }
+
+    // Fill event-level beamspot comparison plots (offline vs online) when both are available.
+    edm::Handle<reco::BeamSpot> bsOfflineH;
+    iEvent.getByToken(beamspot_token, bsOfflineH);
+    auto bsOnlineH = iSetup.getHandle(bsOnlineToken_);
+
+    if (bsOfflineH.isValid() && bsOnlineH.isValid()) {
+        const double dx = bsOfflineH->x0() - bsOnlineH->x();
+        const double dy = bsOfflineH->y0() - bsOnlineH->y();
+        for (const auto &mode : fillModes_) {
+            event_map_.at(mode).offlineVSonlineBeamSpot->Fill(dx, dy);
+        }
+    }
+
+    if (havePV) {
+        for (const auto &mode : fillModes_) {
+            event_map_.at(mode).primaryVertices_xy->Fill(avgPVVtx.x(), avgPVVtx.y());
+        }
+    }
+    if (haveBS) {
+        for (const auto &mode : fillModes_) {
+            event_map_.at(mode).beamspot_xy->Fill(bsVtx.x(), bsVtx.y());
+            if (havePV) {
+                event_map_.at(mode).avgPV_vs_beamspot->Fill(avgPVVtx.x() - bsVtx.x(), avgPVVtx.y() - bsVtx.y());
+            }
+        }
     }
 
     VertexDistanceXY vertexDist2D;
@@ -1007,6 +1046,7 @@ void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
 // determineReferenceVertex (unchanged logic)
 std::pair<bool, std::string> ScoutingPlotMakerRun3::determineReferenceVertex(
     const edm::Event& iEvent,
+    const edm::EventSetup& iSetup,
     reco::Vertex& refVtx,
     bool& havePV,
     reco::Vertex& avgPVVtx,
@@ -1038,16 +1078,44 @@ std::pair<bool, std::string> ScoutingPlotMakerRun3::determineReferenceVertex(
         }
     }
 
+    bool haveOfflineBS = false;
+    reco::Vertex bsOfflineVtx;
     edm::Handle<reco::BeamSpot> beamspot;
     iEvent.getByToken(beamspot_token, beamspot);
     if (beamspot.isValid()) {
-        reco::Vertex::Error bsErr;
-        for (int i=0;i<3;++i) for (int j=i;j<3;++j) bsErr(i,j)=0.0;
-        bsErr(0,0)=beamspot->covariance()(0,0);
-        bsErr(1,1)=beamspot->covariance()(1,1);
-        bsErr(2,2)=beamspot->covariance()(2,2);
-        bsVtx = reco::Vertex(beamspot->position(), bsErr);
+        bsOfflineVtx = reco::Vertex(beamspot->position(), beamspot->covariance3D());
+        haveOfflineBS = true;
+    }
+
+    bool haveOnlineBS = false;
+    reco::Vertex bsOnlineVtx;
+    if (useOnlineBeamSpot_) {
+        auto bsOnlineHandle = iSetup.getHandle(bsOnlineToken_);
+        if (bsOnlineHandle.isValid()) {
+            reco::Vertex::Error bsErr;
+            for (int i=0;i<3;++i) for (int j=i;j<3;++j) bsErr(i,j)=bsOnlineHandle->covariance(i,j);
+            const reco::Vertex::Point onlinePos(bsOnlineHandle->x(), bsOnlineHandle->y(), bsOnlineHandle->z());
+            bsOnlineVtx = reco::Vertex(onlinePos, bsErr);
+            haveOnlineBS = true;
+        } else {
+            edm::LogError("ScoutingPlotMakerRun3")
+                << "useOnlineBeamSpot=True but BeamSpotOnlineHLTObjectsRcd is unavailable. "
+                << "Falling back to offline beamspot if present.";
+        }
+    }
+
+    if (useOnlineBeamSpot_ && haveOnlineBS) {
+        bsVtx = bsOnlineVtx;
         haveBS = true;
+    } else if (haveOfflineBS) {
+        bsVtx = bsOfflineVtx;
+        haveBS = true;
+    } else {
+        haveBS = false;
+        if (useOnlineBeamSpot_) {
+            edm::LogError("ScoutingPlotMakerRun3")
+                << "No usable beamspot found (online missing and offline beamspot product invalid). Continuing without beamspot reference.";
+        }
     }
 
     if (refPreference_ == RefPreference::PreferPV && havePV) {
@@ -1102,6 +1170,7 @@ void ScoutingPlotMakerRun3::fillDescriptions(edm::ConfigurationDescriptions& des
     desc.add<edm::InputTag>("beamspot_src", edm::InputTag("offlineBeamSpot"));
     desc.add<edm::InputTag>("tracks", edm::InputTag("hltScoutingUnpackProducer", "Track"));
     desc.add<edm::InputTag>("primaryVertices", edm::InputTag("hltScoutingPrimaryVertexPacker", "primaryVtx"));
+    desc.addUntracked<bool>("useOnlineBeamSpot", false);
     desc.addUntracked<std::string>("refPreference", "BeamSpot");
     desc.addUntracked<double>("seed_minIPSig", 4.0);
     desc.addUntracked<double>("seed_minPt", 0.9);

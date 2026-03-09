@@ -24,7 +24,7 @@ process.options = cms.untracked.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    # input = cms.untracked.int32(10000)  # Limited events for testing
+    input = cms.untracked.int32(10000)  # Limited events for testing
     # input = cms.untracked.int32(150000)  # Local
     # input = cms.untracked.int32(500000)  # Process all events
     # input = cms.untracked.int32(-1)  # Process all events
@@ -44,7 +44,7 @@ process.source = cms.Source("PoolSource",
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/933/00000/51f2ac21-4b92-4144-8b4f-39f726f4351a.root", # Empty file
     # "root://cmsxrootd.fnal.gov//store/data/Run2024H/ScoutingPFRun3/HLTSCOUT/v1/000/385/836/00000/013b488b-7af4-450f-b175-b39623c72ae2.root",
     # MC Files
-    # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/0639b06f-0a53-4150-ac4f-ffab0df5ef91.root",
+    "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/0639b06f-0a53-4150-ac4f-ffab0df5ef91.root",
     # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/06a339e5-cb52-4e75-b0e4-91285db66993.root"
     # "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/017d2bf5-4f3c-40ab-b6f9-c42381b6ae9b.root"
 
@@ -56,8 +56,8 @@ process.source = cms.Source("PoolSource",
 # Global tag
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '140X_dataRun3_Prompt_v4', '')
-# process.GlobalTag = GlobalTag(process.GlobalTag, '140X_mcRun3_2024_realistic_v26', '')
+# process.GlobalTag = GlobalTag(process.GlobalTag, '140X_dataRun3_Prompt_v4', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '140X_mcRun3_2024_realistic_v26', '')
 
 # Geometry and Magnetic Field
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
@@ -67,8 +67,8 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # -------------------------- OUTPUT PATH --------------------------------
 #-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    # fileName = cms.string("test-outputs/Scouting_vs_Offline_data.root")
-    fileName = cms.string("Scouting_MC_2024H_withHitCuts.root")  # Histogram/plot output
+    fileName = cms.string("test-outputs/onlineBeamSpot_v1.root")
+    # fileName = cms.string("Scouting_MC_2024H_withHitCuts.root")  # Histogram/plot output
 )
 #-----------------------------------------------------------------------
 
@@ -92,12 +92,19 @@ process.load("TrackingTools.TransientTrack.TransientTrackBuilder_cfi")
 # 'PrimaryVertex', 'AvgPV', or 'PV': Use average primary vertex as primary reference
 referencePreference = 'BS'  # Default to BeamSpot
 
+# Beamspot configuration knobs shared across modules.
+# `useOnlineBeamSpot = True` means: try EventSetup online beamspot first,
+# then fall back to `offlineBeamSpotTag` if online payload is unavailable.
+useOnlineBeamSpot = True
+offlineBeamSpotTag = cms.InputTag('offlineBeamSpot')
+
 # Update Vertexer configuration with synchronized parameters
 process.Vertexer = cms.EDProducer('Vertexer',
     seed_tracks_src = cms.InputTag('hltScoutingUnpackProducer', 'Track'),
     # Change to match the name in fillDescriptions (primaryVertices instead of primaryVertices_src)
     primaryVertices = cms.InputTag("hltScoutingUnpackProducer", "PrimaryVertex"),
-    beamspot_src = cms.InputTag('offlineBeamSpot'),
+    beamspot_src = offlineBeamSpotTag,
+    useOnlineBeamSpot = cms.untracked.bool(useOnlineBeamSpot),
     refPreference = cms.untracked.string(referencePreference),
 
     # RESTORE original seed thresholds (used internally by Vertexer)
@@ -202,7 +209,8 @@ process.scoutingPlots = cms.EDAnalyzer('ScoutingPlotMakerRun3',
     PVBoundary1 = cms.int32(20),
     PVBoundary2 = cms.int32(40),
     displacedVertices = cms.InputTag("Vertexer"),
-    beamspot_src = cms.InputTag('offlineBeamSpot'),  # Same beamspot source as Vertexer
+    beamspot_src = offlineBeamSpotTag,  # Same offline fallback beamspot tag as Vertexer
+    useOnlineBeamSpot = cms.untracked.bool(useOnlineBeamSpot),
     tracks = cms.InputTag("hltScoutingUnpackProducer", "Track"), # Same tracks as Vertexer's seed_tracks_src
     primaryVertices = cms.InputTag("hltScoutingUnpackProducer", "PrimaryVertex") # Same PVs as Vertexer's primaryVertices
 )

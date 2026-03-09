@@ -41,6 +41,8 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
+#include "CondFormats/DataRecord/interface/BeamSpotOnlineHLTObjectsRcd.h"
+#include "CondFormats/BeamSpotObjects/interface/BeamSpotOnlineObjects.h"
 
 //Scouting data formats
 #include "DataFormats/Scouting/interface/Run3ScoutingElectron.h"
@@ -126,8 +128,10 @@ private:
   enum class RefMode { UsePVCollection, UseBeamSpot };
   enum class RefPreference { PreferPV, PreferBeamSpot };
   const RefPreference refPreference_;
+  const bool useOnlineBeamSpot_;
   const edm::EDGetTokenT<std::vector<reco::Vertex>> primaryVerticesToken_;  // vector of PVs
   const edm::EDGetTokenT<reco::BeamSpot>            beamspotToken_;         // fallback
+  const edm::ESGetToken<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd> beamspotOnlineToken_;
   const edm::EDGetTokenT<std::vector<reco::Track>>  seed_tracks_token_;
   const edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> token_builder;
 
@@ -335,6 +339,7 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
   minSeedPt   (params.getUntrackedParameter<double>("minSeedPt",    0.9)),
   refPreference_(params.getUntrackedParameter<std::string>("refPreference", "BeamSpot") == "PV" ? 
                   RefPreference::PreferPV : RefPreference::PreferBeamSpot),
+  useOnlineBeamSpot_(params.getUntrackedParameter<bool>("useOnlineBeamSpot", false)),
   primaryVerticesToken_((params.existsAs<edm::InputTag>("primaryVertices_src") || 
                         params.existsAs<edm::InputTag>("primaryVertices")) ?
                         consumes<std::vector<reco::Vertex>>( getPVTag(params) ) :
@@ -342,6 +347,7 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
   beamspotToken_(params.existsAs<edm::InputTag>("beamspot_src") ?
                 consumes<reco::BeamSpot>( params.getParameter<edm::InputTag>("beamspot_src") ) :
                 consumes<reco::BeamSpot>( edm::InputTag("offlineBeamSpot") )),
+  beamspotOnlineToken_(esConsumes<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd>()),
   seed_tracks_token_(consumes(params.getParameter<edm::InputTag>("seed_tracks_src"))),
   token_builder(esConsumes(edm::ESInputTag("", "TransientTrackBuilder"))),
 
@@ -400,13 +406,43 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // Try BeamSpot if needed
   if (!haveRef && (refPreference_ == RefPreference::PreferBeamSpot || !havePV)) {
-    edm::Handle<reco::BeamSpot> bs;
-    iEvent.getByToken(beamspotToken_, bs);
-    if (bs.isValid()) {
-      ref_x = bs->position().x(); ref_y = bs->position().y(); ref_z = bs->position().z();
-      ref_error = bs->covariance3D();
+    bool haveBeamspotReference = false;
+
+    if (useOnlineBeamSpot_) {
+      auto bsOnlineH = iSetup.getHandle(beamspotOnlineToken_);
+      if (bsOnlineH.isValid()) {
+        ref_x = bsOnlineH->x();
+        ref_y = bsOnlineH->y();
+        ref_z = bsOnlineH->z();
+        for (int i=0;i<3;++i)
+          for (int j=i;j<3;++j)
+            ref_error(i,j)=bsOnlineH->covariance(i,j);
+        haveBeamspotReference = true;
+        if (verbose) edm::LogInfo("Vertexer") << "Using online beam spot as reference.";
+      } else {
+        edm::LogError("Vertexer")
+          << "useOnlineBeamSpot=True but BeamSpotOnlineHLTObjectsRcd is unavailable. "
+          << "Falling back to offline beamspot if present.";
+      }
+    }
+
+    if (!haveBeamspotReference) {
+      edm::Handle<reco::BeamSpot> bs;
+      iEvent.getByToken(beamspotToken_, bs);
+      if (bs.isValid()) {
+        ref_x = bs->position().x(); ref_y = bs->position().y(); ref_z = bs->position().z();
+        ref_error = bs->covariance3D();
+        haveBeamspotReference = true;
+        if (verbose) edm::LogInfo("Vertexer") << "Using offline beam spot as reference.";
+      }
+    }
+
+    if (haveBeamspotReference) {
       haveRef = true;
-      if (verbose) edm::LogInfo("Vertexer") << "Using beam spot as reference (full covariance).";
+    } else if (useOnlineBeamSpot_) {
+      edm::LogError("Vertexer")
+        << "No usable beamspot found (online missing and offline beamspot product invalid). "
+        << "Will continue to other fallbacks if available.";
     }
   }
 

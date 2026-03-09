@@ -3,6 +3,7 @@
 <use name="FWCore/Utilities"/> 
 <use name="FWCore/Common"/> 
 <use name="DataFormats/Common"/>
+<use name="DataFormats/BeamSpot"/>
 <use name="DataFormats/HLTReco"/>
 <use name="DataFormats/Scouting"/>
 <use name="DataFormats/PatCandidates"/>
@@ -16,6 +17,8 @@
 <use name="SimGeneral/HepPDTRecord"/>
 <use name="SimTracker/TrackAssociation"/>
 <use name="TrackingTools/Records"/>
+<use name="CondFormats/BeamSpotObjects"/>
+<use name="CondFormats/DataRecord"/>
 <use name="root"/>
 <use name="rootgpad"/>
 <flags EDM_PLUGIN="1"/>
