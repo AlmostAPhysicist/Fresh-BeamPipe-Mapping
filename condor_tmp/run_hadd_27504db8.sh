@@ -1,4 +1,0 @@
-#!/bin/bash
-set -euo pipefail
-
-hadd -f /eos/user/a/amalhotr/tree2plots_streaming/hadd/hadd_27504db8.root /eos/user/a/amalhotr/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/OfflineData_DYto2Mu_MINIAODSIM_v2-hardcuts/260209_035205/0000/OfflineData_VertexingPlots_DYto2Mu_MINIAODSIM_1.root /eos/user/a/amalhotr/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/OfflineData_DYto2Mu_MINIAODSIM_v2-hardcuts/260209_035205/0000/OfflineData_VertexingPlots_DYto2Mu_MINIAODSIM_10.root /eos/user/a/amalhotr/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/OfflineData_DYto2Mu_MINIAODSIM_v2-hardcuts/260209_035205/0000/OfflineData_VertexingPlots_DYto2Mu_MINIAODSIM_100.root

@@ -1,8 +1,0 @@
-universe = vanilla
-executable = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_tmp/run_hadd_3_20260211T024545_4c00ec2d.sh
-should_transfer_files = NO
-log    = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/hadd_3_20260211T024545_4c00ec2d.log
-output = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/hadd_3_20260211T024545_4c00ec2d.out
-error  = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/hadd_3_20260211T024545_4c00ec2d.err
-+JobFlavour = "espresso"
-queue 1

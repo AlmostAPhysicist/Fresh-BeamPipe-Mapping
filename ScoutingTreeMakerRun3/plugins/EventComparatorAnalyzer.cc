@@ -1,13 +1,7 @@
-// EventComparator2Analyzer.cc
-// Compare offline (packedCandidateToTrack -> VertexerOffline) vs scouting (hltScoutingUnpackProducer -> Vertexer)
-//
-// Writes histograms under two folders: "Offline" and "Scouting" and creates overlay canvases at endJob().
-
+// EventComparatorAnalyzer.cc
 #include <memory>
-#include <string>
 #include <vector>
-#include <sstream>
-#include <iomanip>
+#include <string>
 #include <cmath>
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -21,325 +15,350 @@
 
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
-#include "DataFormats/BeamSpot/interface/BeamSpot.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/BeamSpot/interface/BeamSpot.h"
+#include "DataFormats/TrackReco/interface/TrackBase.h" // for TrackBaseRef
 
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TCanvas.h"
-#include "TLegend.h"
-#include "TLorentzVector.h"
+#include "RecoVertex/VertexTools/interface/VertexDistanceXY.h"
 
-class EventComparator2Analyzer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
+#include "TH1D.h"
+#include "TH2D.h"
+
+class EventComparatorAnalyzer :
+  public edm::one::EDAnalyzer<edm::one::SharedResources>
+{
 public:
-  explicit EventComparator2Analyzer(const edm::ParameterSet &);
-  ~EventComparator2Analyzer() override = default;
-
-  static void fillDescriptions(edm::ConfigurationDescriptions &descriptions);
+  explicit EventComparatorAnalyzer(const edm::ParameterSet&);
+  ~EventComparatorAnalyzer() override = default;
 
 private:
   void beginJob() override;
-  void analyze(const edm::Event &, const edm::EventSetup &) override;
-  void endJob() override;
+  void analyze(const edm::Event&, const edm::EventSetup&) override;
 
-  // Config parameters (InputTags)
-  const edm::InputTag displacedVerticesOfflineTag_;
-  const edm::InputTag displacedVerticesScoutingTag_;
-  const edm::InputTag tracksOfflineTag_;
-  const edm::InputTag tracksScoutingTag_;
-  const edm::InputTag beamspotTag_;
-
-  // consumes tokens
+  // tokens
   edm::EDGetTokenT<std::vector<reco::Vertex>> vtxOfflineToken_;
   edm::EDGetTokenT<std::vector<reco::Vertex>> vtxScoutingToken_;
-  edm::EDGetTokenT<std::vector<reco::Track>>  trkOfflineToken_;
-  edm::EDGetTokenT<std::vector<reco::Track>>  trkScoutingToken_;
-  edm::EDGetTokenT<reco::BeamSpot>            beamspotToken_;
 
-  // Selection parameters
-  const int vertex_min_ntracks_;
-  const double vertex_max_chi2_;
-  const int nEventsToSave_; // optional per-event saving not used heavily, but kept
+  edm::EDGetTokenT<std::vector<reco::Track>> trkOfflineToken_;
+  edm::EDGetTokenT<std::vector<reco::Track>> trkScoutingToken_;
 
-  // bookkeeping
-  int savedEvents_;
+  edm::EDGetTokenT<reco::BeamSpot> beamspotToken_;
 
-  // TFileService-owned histograms (two groups)
-  struct VtxHistos {
-    TH1F *pt= nullptr, *eta = nullptr, *phi=nullptr, *mass=nullptr;
-    TH1F *ntracks=nullptr, *chi2=nullptr, *dBV=nullptr, *dBVerr=nullptr;
-  };
-  struct TrkHistos {
-    TH1F *pt=nullptr, *eta=nullptr, *phi=nullptr, *p=nullptr;
-    TH1F *npix=nullptr, *nstrip=nullptr, *nlayers=nullptr;
-    TH1F *dxy=nullptr, *dxySig=nullptr, *dxyErr=nullptr;
-  };
+  // cuts / config
+  int vertex_min_ntracks_;
+  double vertex_max_chi2_;
 
-  VtxHistos v_off_, v_scout_;
-  TrkHistos t_off_, t_scout_;
+  double track_pt_min_cut_;
+  double track_dxySig_min_cut_;
+  bool apply_hit_cuts_;
+  int hit_minPixelHits_;
+  int hit_minStripHits_;
+  int hit_minTrackerLayers_;
 
-  // helper to create overlay canvases at endJob
-  void makeOverlayCanvas(TH1F* h_off, TH1F* h_scout, const std::string &cname, const std::string &title);
+  int stopAfterSelectedVertices_;
+  bool hardStopOnLimit_;
+  int selectedEventsSeen_;
+
+  TFileDirectory eventCompareDir_;
+
+  // Offline histograms
+  TH1D* h_vtx_pt_off_ = nullptr;
+  TH1D* h_vtx_mass_off_ = nullptr;
+  TH1D* h_vtx_chi2_off_ = nullptr;
+  TH1D* h_vtx_ntrk_off_ = nullptr;
+  TH1D* h_vtx_dbverr_off_ = nullptr;
+  TH2D* h_vtx_xy_off_ = nullptr;
+  TH2D* h_beamspot_xy_off_ = nullptr;
+
+  TH1D* h_trk_pt_off_ = nullptr;
+  TH1D* h_trk_eta_off_ = nullptr;
+  TH1D* h_trk_phi_off_ = nullptr;
+  TH1D* h_trk_dxy_off_ = nullptr;
+  TH1D* h_trk_dxyerr_off_ = nullptr;
+  TH1D* h_trk_ipsig_off_ = nullptr;
+
+  // Scouting histograms
+  TH1D* h_vtx_pt_scout_ = nullptr;
+  TH1D* h_vtx_mass_scout_ = nullptr;
+  TH1D* h_vtx_chi2_scout_ = nullptr;
+  TH1D* h_vtx_ntrk_scout_ = nullptr;
+  TH1D* h_vtx_dbverr_scout_ = nullptr;
+  TH2D* h_vtx_xy_scout_ = nullptr;
+  TH2D* h_beamspot_xy_scout_ = nullptr;
+
+  TH1D* h_trk_pt_scout_ = nullptr;
+  TH1D* h_trk_eta_scout_ = nullptr;
+  TH1D* h_trk_phi_scout_ = nullptr;
+  TH1D* h_trk_dxy_scout_ = nullptr;
+  TH1D* h_trk_dxyerr_scout_ = nullptr;
+  TH1D* h_trk_ipsig_scout_ = nullptr;
 };
 
-//
-// Implementation
-//
-
-EventComparator2Analyzer::EventComparator2Analyzer(const edm::ParameterSet &iConfig) :
-  displacedVerticesOfflineTag_( iConfig.getParameter<edm::InputTag>("displacedVerticesOffline") ),
-  displacedVerticesScoutingTag_( iConfig.getParameter<edm::InputTag>("displacedVerticesScouting") ),
-  tracksOfflineTag_( iConfig.getParameter<edm::InputTag>("tracksOffline") ),
-  tracksScoutingTag_( iConfig.getParameter<edm::InputTag>("tracksScouting") ),
-  beamspotTag_( iConfig.getParameter<edm::InputTag>("beamspot_src") ),
-  vertex_min_ntracks_( iConfig.getParameter<int>("vertex_min_ntracks") ),
-  vertex_max_chi2_( iConfig.getParameter<double>("vertex_max_chi2") ),
-  nEventsToSave_( iConfig.getParameter<int>("nEventsToSave") ),
-  savedEvents_(0)
+EventComparatorAnalyzer::EventComparatorAnalyzer(const edm::ParameterSet& cfg)
 {
   usesResource("TFileService");
 
-  // register consumes tokens
-  vtxOfflineToken_  = consumes<std::vector<reco::Vertex>>(displacedVerticesOfflineTag_);
-  vtxScoutingToken_ = consumes<std::vector<reco::Vertex>>(displacedVerticesScoutingTag_);
-  trkOfflineToken_  = consumes<std::vector<reco::Track>>(tracksOfflineTag_);
-  trkScoutingToken_ = consumes<std::vector<reco::Track>>(tracksScoutingTag_);
-  beamspotToken_    = consumes<reco::BeamSpot>(beamspotTag_);
+  vtxOfflineToken_ =
+    consumes<std::vector<reco::Vertex>>(cfg.getParameter<edm::InputTag>("displacedVerticesOffline"));
+
+  vtxScoutingToken_ =
+    consumes<std::vector<reco::Vertex>>(cfg.getParameter<edm::InputTag>("displacedVerticesScouting"));
+
+  trkOfflineToken_ =
+    consumes<std::vector<reco::Track>>(cfg.getParameter<edm::InputTag>("tracksOffline"));
+
+  trkScoutingToken_ =
+    consumes<std::vector<reco::Track>>(cfg.getParameter<edm::InputTag>("tracksScouting"));
+
+  beamspotToken_ =
+    consumes<reco::BeamSpot>(cfg.getParameter<edm::InputTag>("beamspot_src"));
+
+  vertex_min_ntracks_ =
+    cfg.getParameter<int>("vertex_min_ntracks");
+
+  vertex_max_chi2_ =
+    cfg.getParameter<double>("vertex_max_chi2");
+
+  track_pt_min_cut_ = cfg.getUntrackedParameter<double>("track_pt_min_cut", 0.9);
+  track_dxySig_min_cut_ = cfg.getUntrackedParameter<double>("track_dxySig_min_cut", 4.0);
+  apply_hit_cuts_ = cfg.getUntrackedParameter<bool>("applyHitCuts", false);
+  hit_minPixelHits_ = cfg.getUntrackedParameter<int>("hit_minPixelHits", 3);
+  hit_minStripHits_ = cfg.getUntrackedParameter<int>("hit_minStripHits", 2);
+  hit_minTrackerLayers_ = cfg.getUntrackedParameter<int>("hit_minTrackerLayers", 6);
+
+  stopAfterSelectedVertices_ =
+    cfg.getUntrackedParameter<int>("stopAfterSelectedVertices", -1);
+
+  hardStopOnLimit_ =
+    cfg.getUntrackedParameter<bool>("hardStopOnLimit", false);
+
+  selectedEventsSeen_ = 0;
 }
 
-void EventComparator2Analyzer::beginJob() {
+namespace {
+  const double PION_MASS = 0.13957039; // GeV
+}
+
+void EventComparatorAnalyzer::beginJob() {
   edm::Service<TFileService> fs;
+  eventCompareDir_ = fs->mkdir("EventCompare");
 
-  // Make directories and histos for Offline
-  TFileDirectory offDir = fs->mkdir("Offline");
-  v_off_.pt   = offDir.make<TH1F>("vtx_pt_off","vertex p_{T} (offline); p_{T} [GeV]; Vertices",100,0,100);
-  v_off_.eta  = offDir.make<TH1F>("vtx_eta_off","vertex #eta (offline); #eta; Vertices",100,-5,5);
-  v_off_.phi  = offDir.make<TH1F>("vtx_phi_off","vertex #phi (offline); #phi; Vertices",100,-3.15,3.15);
-  v_off_.mass = offDir.make<TH1F>("vtx_mass_off","vertex mass (offline); mass [GeV]; Vertices",100,0,10);
-  v_off_.ntracks = offDir.make<TH1F>("vtx_ntracks_off","vertex ntracks (offline); ntracks; Vertices",50,0,50);
-  v_off_.chi2 = offDir.make<TH1F>("vtx_chi2_off","#chi^{2}/ndof (offline); #chi^{2}/ndof; Vertices",200,0,20);
-  v_off_.dBV = offDir.make<TH1F>("vtx_dBV_off","d_{BV} (offline); d_{BV} [cm]; Vertices",200,0,10);
-  v_off_.dBVerr = offDir.make<TH1F>("vtx_dBVerr_off","d_{BV} error (offline); #sigma_{dBV} [cm]; Vertices",200,0,0.1);
+  TFileDirectory offlineDir = eventCompareDir_.mkdir("Offline");
+  TFileDirectory scoutingDir = eventCompareDir_.mkdir("Scouting");
 
-  TFileDirectory troff = offDir.mkdir("Tracks");
-  t_off_.pt = troff.make<TH1F>("trk_pt_off","track p_{T} (offline); p_{T} [GeV]; Tracks",100,0,100);
-  t_off_.eta = troff.make<TH1F>("trk_eta_off","track #eta (offline); #eta; Tracks",100,-5,5);
-  t_off_.phi = troff.make<TH1F>("trk_phi_off","track #phi (offline); #phi; Tracks",100,-3.15,3.15);
-  t_off_.p = troff.make<TH1F>("trk_p_off","track p (offline); p [GeV]; Tracks",100,0,200);
-  t_off_.npix = troff.make<TH1F>("trk_npix_off","track nPixelHits (offline); npix; Tracks",10,0,10);
-  t_off_.nstrip = troff.make<TH1F>("trk_nstrip_off","track nStripHits (offline); nstrip; Tracks",30,0,30);
-  t_off_.nlayers = troff.make<TH1F>("trk_nlayers_off","track nTrackerLayers (offline); nlayers; Tracks",30,0,30);
-  t_off_.dxy = troff.make<TH1F>("trk_dxy_off","track dxy (offline); dxy [cm]; Tracks",200,-2.0,2.0);
-  t_off_.dxySig = troff.make<TH1F>("trk_dxySig_off","track dxySig (offline); |dxy|/#sigma; Tracks",100,0,50);
-  t_off_.dxyErr = troff.make<TH1F>("trk_dxyErr_off","track dxyErr (offline); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
+  TFileDirectory offVtxDir = offlineDir.mkdir("Vertices");
+  TFileDirectory offTrkDir = offlineDir.mkdir("Tracks");
+  TFileDirectory scoutVtxDir = scoutingDir.mkdir("Vertices");
+  TFileDirectory scoutTrkDir = scoutingDir.mkdir("Tracks");
 
-  // Make directories and histos for Scouting
-  TFileDirectory scDir = fs->mkdir("Scouting");
-  v_scout_.pt   = scDir.make<TH1F>("vtx_pt_scout","vertex p_{T} (scouting); p_{T} [GeV]; Vertices",100,0,100);
-  v_scout_.eta  = scDir.make<TH1F>("vtx_eta_scout","vertex #eta (scouting); #eta; Vertices",100,-5,5);
-  v_scout_.phi  = scDir.make<TH1F>("vtx_phi_scout","vertex #phi (scouting); #phi; Vertices",100,-3.15,3.15);
-  v_scout_.mass = scDir.make<TH1F>("vtx_mass_scout","vertex mass (scouting); mass [GeV]; Vertices",100,0,10);
-  v_scout_.ntracks = scDir.make<TH1F>("vtx_ntracks_scout","vertex ntracks (scouting); ntracks; Vertices",50,0,50);
-  v_scout_.chi2 = scDir.make<TH1F>("vtx_chi2_scout","#chi^{2}/ndof (scouting); #chi^{2}/ndof; Vertices",200,0,20);
-  v_scout_.dBV = scDir.make<TH1F>("vtx_dBV_scout","d_{BV} (scouting); d_{BV} [cm]; Vertices",200,0,10);
-  v_scout_.dBVerr = scDir.make<TH1F>("vtx_dBVerr_scout","d_{BV} error (scouting); #sigma_{dBV} [cm]; Vertices",200,0,0.1);
+  h_vtx_pt_off_ = offVtxDir.make<TH1D>("pt", "Offline Vertex p_{T}; p_{T} [GeV]; entries", 100, 0, 50);
+  h_vtx_mass_off_ = offVtxDir.make<TH1D>("mass", "Offline Vertex mass; m [GeV]; entries", 100, 0, 10);
+  h_vtx_chi2_off_ = offVtxDir.make<TH1D>("chi2", "Offline Vertex norm chi2; chi2_{norm}; entries", 100, 0, 50);
+  h_vtx_ntrk_off_ = offVtxDir.make<TH1D>("nTracks", "Offline Vertex nTracks; n_{tracks}; entries", 20, 0, 20);
+  h_vtx_dbverr_off_ = offVtxDir.make<TH1D>("dBV_error", "Offline Vertex d_{BV} error; #sigma_{dBV} [cm]; entries", 200, 0, 0.2);
+  h_vtx_xy_off_ = offVtxDir.make<TH2D>("xy", "Offline Vertex XY; x [cm]; y [cm]", 400, -10, 10, 400, -10, 10);
+  h_beamspot_xy_off_ = offVtxDir.make<TH2D>("beamspot_xy", "Offline Beamspot XY; x_{BS} [cm]; y_{BS} [cm]", 400, -1, 1, 400, -1, 1);
 
-  TFileDirectory trsc = scDir.mkdir("Tracks");
-  t_scout_.pt = trsc.make<TH1F>("trk_pt_scout","track p_{T} (scouting); p_{T} [GeV]; Tracks",100,0,100);
-  t_scout_.eta = trsc.make<TH1F>("trk_eta_scout","track #eta (scouting); #eta; Tracks",100,-5,5);
-  t_scout_.phi = trsc.make<TH1F>("trk_phi_scout","track #phi (scouting); #phi; Tracks",100,-3.15,3.15);
-  t_scout_.p = trsc.make<TH1F>("trk_p_scout","track p (scouting); p [GeV]; Tracks",100,0,200);
-  t_scout_.npix = trsc.make<TH1F>("trk_npix_scout","track nPixelHits (scouting); npix; Tracks",10,0,10);
-  t_scout_.nstrip = trsc.make<TH1F>("trk_nstrip_scout","track nStripHits (scouting); nstrip; Tracks",30,0,30);
-  t_scout_.nlayers = trsc.make<TH1F>("trk_nlayers_scout","track nTrackerLayers (scouting); nlayers; Tracks",30,0,30);
-  t_scout_.dxy = trsc.make<TH1F>("trk_dxy_scout","track dxy (scouting); dxy [cm]; Tracks",200,-2.0,2.0);
-  t_scout_.dxySig = trsc.make<TH1F>("trk_dxySig_scout","track dxySig (scouting); |dxy|/#sigma; Tracks",100,0,50);
-  t_scout_.dxyErr = trsc.make<TH1F>("trk_dxyErr_scout","track dxyErr (scouting); #sigma_{dxy} [cm]; Tracks",200,0,0.05);
+  h_trk_pt_off_ = offTrkDir.make<TH1D>("pt", "Offline Track p_{T}; p_{T} [GeV]; entries", 100, 0, 50);
+  h_trk_eta_off_ = offTrkDir.make<TH1D>("eta", "Offline Track #eta; #eta; entries", 100, -3, 3);
+  h_trk_phi_off_ = offTrkDir.make<TH1D>("phi", "Offline Track #phi; #phi; entries", 100, -M_PI, M_PI);
+  h_trk_dxy_off_ = offTrkDir.make<TH1D>("dxy", "Offline Track dxy; dxy [cm]; entries", 100, -1.0, 1.0);
+  h_trk_dxyerr_off_ = offTrkDir.make<TH1D>("dxy_error", "Offline Track dxy error; #sigma_{dxy} [cm]; entries", 200, 0, 0.05);
+  h_trk_ipsig_off_ = offTrkDir.make<TH1D>("ipsig", "Offline Track IPsig; |dxy|/err; entries", 100, 0, 50);
+
+  h_vtx_pt_scout_ = scoutVtxDir.make<TH1D>("pt", "Scouting Vertex p_{T}; p_{T} [GeV]; entries", 100, 0, 50);
+  h_vtx_mass_scout_ = scoutVtxDir.make<TH1D>("mass", "Scouting Vertex mass; m [GeV]; entries", 100, 0, 10);
+  h_vtx_chi2_scout_ = scoutVtxDir.make<TH1D>("chi2", "Scouting Vertex norm chi2; chi2_{norm}; entries", 100, 0, 50);
+  h_vtx_ntrk_scout_ = scoutVtxDir.make<TH1D>("nTracks", "Scouting Vertex nTracks; n_{tracks}; entries", 20, 0, 20);
+  h_vtx_dbverr_scout_ = scoutVtxDir.make<TH1D>("dBV_error", "Scouting Vertex d_{BV} error; #sigma_{dBV} [cm]; entries", 200, 0, 0.2);
+  h_vtx_xy_scout_ = scoutVtxDir.make<TH2D>("xy", "Scouting Vertex XY; x [cm]; y [cm]", 400, -10, 10, 400, -10, 10);
+  h_beamspot_xy_scout_ = scoutVtxDir.make<TH2D>("beamspot_xy", "Scouting Beamspot XY; x_{BS} [cm]; y_{BS} [cm]", 400, -1, 1, 400, -1, 1);
+
+  h_trk_pt_scout_ = scoutTrkDir.make<TH1D>("pt", "Scouting Track p_{T}; p_{T} [GeV]; entries", 100, 0, 50);
+  h_trk_eta_scout_ = scoutTrkDir.make<TH1D>("eta", "Scouting Track #eta; #eta; entries", 100, -3, 3);
+  h_trk_phi_scout_ = scoutTrkDir.make<TH1D>("phi", "Scouting Track #phi; #phi; entries", 100, -M_PI, M_PI);
+  h_trk_dxy_scout_ = scoutTrkDir.make<TH1D>("dxy", "Scouting Track dxy; dxy [cm]; entries", 100, -1.0, 1.0);
+  h_trk_dxyerr_scout_ = scoutTrkDir.make<TH1D>("dxy_error", "Scouting Track dxy error; #sigma_{dxy} [cm]; entries", 200, 0, 0.05);
+  h_trk_ipsig_scout_ = scoutTrkDir.make<TH1D>("ipsig", "Scouting Track IPsig; |dxy|/err; entries", 100, 0, 50);
 }
 
-void EventComparator2Analyzer::analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup) {
-  using namespace edm;
-  using namespace reco;
+void EventComparatorAnalyzer::analyze(
+  const edm::Event& event,
+  const edm::EventSetup&)
+{
+  // fetch beamspot (for dxy computation if available)
+  edm::Handle<reco::BeamSpot> beamspotH;
+  event.getByToken(beamspotToken_, beamspotH);
+  const reco::BeamSpot *bs = beamspotH.isValid() ? &*beamspotH : nullptr;
+  VertexDistanceXY vertexDist2D;
 
-  // Read offline vertices and tracks
-  Handle<std::vector<Vertex>> vtxOffH;
-  iEvent.getByToken(vtxOfflineToken_, vtxOffH);
-  bool haveOffV = vtxOffH.isValid() && !vtxOffH->empty();
-
-  Handle<std::vector<Track>> trkOffH;
-  iEvent.getByToken(trkOfflineToken_, trkOffH);
-  bool haveOffTrk = trkOffH.isValid();
-
-  // Read scouting vertices and tracks
-  Handle<std::vector<Vertex>> vtxScoutH;
-  iEvent.getByToken(vtxScoutingToken_, vtxScoutH);
-  bool haveScoutV = vtxScoutH.isValid() && !vtxScoutH->empty();
-
-  Handle<std::vector<Track>> trkScoutH;
-  iEvent.getByToken(trkScoutingToken_, trkScoutH);
-  bool haveScoutTrk = trkScoutH.isValid();
-
-  math::XYZPoint refPoint(0., 0., 0.);
-  Handle<reco::BeamSpot> beamspotH;
-  iEvent.getByToken(beamspotToken_, beamspotH);
-  if (beamspotH.isValid()) {
-    refPoint = beamspotH->position();
+  reco::Vertex::Error refErr;
+  for (int i = 0; i < 3; ++i) {
+    for (int j = i; j < 3; ++j) {
+      refErr(i, j) = 0.0;
+    }
+  }
+  reco::Vertex refVtx;
+  if (bs) {
+    refErr(0, 0) = bs->covariance()(0, 0);
+    refErr(1, 1) = bs->covariance()(1, 1);
+    refErr(2, 2) = bs->covariance()(2, 2);
+    refVtx = reco::Vertex(bs->position(), refErr);
+    h_beamspot_xy_off_->Fill(bs->position().x(), bs->position().y());
+    h_beamspot_xy_scout_->Fill(bs->position().x(), bs->position().y());
+  } else {
+    refErr(0, 0) = 1e-6;
+    refErr(1, 1) = 1e-6;
+    refErr(2, 2) = 1e-6;
+    reco::Vertex::Point origin(0.0, 0.0, 0.0);
+    refVtx = reco::Vertex(origin, refErr);
   }
 
-  // quick vertex predicate
-  auto vertexPasses = [&](const Vertex &v)->bool {
-    const size_t ntracks = std::distance(v.tracks_begin(), v.tracks_end());
-    if ((int)ntracks < vertex_min_ntracks_) return false;
-    if (vertex_max_chi2_ >= 0.0 && v.normalizedChi2() > vertex_max_chi2_) return false;
+  edm::Handle<std::vector<reco::Vertex>> vtxOff;
+  event.getByToken(vtxOfflineToken_,vtxOff);
+
+  edm::Handle<std::vector<reco::Vertex>> vtxScout;
+  event.getByToken(vtxScoutingToken_,vtxScout);
+
+  edm::Handle<std::vector<reco::Track>> trkOff;
+  event.getByToken(trkOfflineToken_,trkOff);
+
+  edm::Handle<std::vector<reco::Track>> trkScout;
+  event.getByToken(trkScoutingToken_,trkScout);
+
+  // quick early exit if nothing relevant
+  if(!vtxOff.isValid() && !vtxScout.isValid()) return;
+  if(!trkOff.isValid() && !trkScout.isValid()) return;
+
+  if(stopAfterSelectedVertices_ > 0 && selectedEventsSeen_ >= stopAfterSelectedVertices_){
+    return;
+  }
+  selectedEventsSeen_++;
+
+  // decide whether vertex passes basic vertex selection
+  auto passVertex = [&](const reco::Vertex &v) -> bool {
+    int nt = std::distance(v.tracks_begin(), v.tracks_end());
+    if(nt < vertex_min_ntracks_) return false;
+    if(vertex_max_chi2_ > 0 && v.normalizedChi2() > vertex_max_chi2_) return false;
     return true;
   };
 
-  // Fill offline histograms from the first selected offline vertex (if present)
-  if (haveOffV) {
-    for (const auto &v : *vtxOffH) {
-      if (!vertexPasses(v)) continue;
+  // ---------- Fill vertex histograms for offline ----------
+  auto processVertexCollection = [&](const std::vector<reco::Vertex> *vtxs, bool isOffline) {
+    if(!vtxs) return;
+    for(const auto &v : *vtxs){
+      if(!passVertex(v)) continue;
 
-      // vertex-level fills
-      TLorentzVector sumVec(0,0,0,0);
-      for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
-        TrackRef tr = it->castTo<TrackRef>();
-        if (!tr.isNonnull()) continue;
-        constexpr double kPionMass = 0.13957;
-        TLorentzVector tv; tv.SetPtEtaPhiM(tr->pt(), tr->eta(), tr->phi(), kPionMass);
-        sumVec += tv;
-      }
-      v_off_.pt->Fill(sumVec.Pt());
-      v_off_.eta->Fill(sumVec.Eta());
-      v_off_.phi->Fill(sumVec.Phi());
-      v_off_.mass->Fill(sumVec.M());
-      v_off_.ntracks->Fill(std::distance(v.tracks_begin(), v.tracks_end()));
-      v_off_.chi2->Fill(v.normalizedChi2());
-      double dBV = std::hypot(v.x(), v.y());
-      v_off_.dBV->Fill(dBV);
-      v_off_.dBVerr->Fill(0.0); // no direct vertex dBV error available here
+      // number of tracks
+      int ntrack = std::distance(v.tracks_begin(), v.tracks_end());
 
-      // track-level fills (from tracks referenced by vertex)
-      for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
-        TrackRef tr = it->castTo<TrackRef>();
-        if (!tr.isNonnull()) continue;
-        t_off_.pt->Fill(tr->pt());
-        t_off_.eta->Fill(tr->eta());
-        t_off_.phi->Fill(tr->phi());
-        t_off_.p->Fill(tr->p());
-        // robust accessors; some releases use hitPattern(), some have found()
-        int npix = 0, nstrip = 0, nlayers = 0;
-        try {
-          npix = tr->hitPattern().numberOfValidPixelHits();
-          nstrip = tr->hitPattern().numberOfValidStripHits();
-        } catch (...) { npix = 0; nstrip = 0; }
-        try { nlayers = tr->found() ? tr->found() : 0; } catch(...) { nlayers = 0; }
-        t_off_.npix->Fill(npix);
-        t_off_.nstrip->Fill(nstrip);
-        t_off_.nlayers->Fill(nlayers);
-        const double dxyRef = tr->dxy(refPoint);
-        t_off_.dxy->Fill(dxyRef);
-        if (tr->dxyError() > 0) t_off_.dxySig->Fill(std::fabs(dxyRef/tr->dxyError()));
-        t_off_.dxyErr->Fill(tr->dxyError());
+      // Attempt to compute sum pT and invariant mass from track refs (if present)
+      double sum_px=0, sum_py=0, sum_pz=0, sum_e=0;
+      for(auto it = v.tracks_begin(); it != v.tracks_end(); ++it){
+        reco::TrackBaseRef baseRef = *it;
+        reco::TrackRef tr = baseRef.castTo<reco::TrackRef>();
+        if(tr.isNonnull()){
+          const reco::Track &t = *tr;
+          // apply analyzer-level track quality cuts before using in vertex-level sums
+          if(t.pt() < track_pt_min_cut_) continue;
+          double dxy = t.d0();
+          double dxyerr = (t.d0Error()>0) ? t.d0Error() : 1e-6;
+          double dxySig = std::abs(dxy)/dxyerr;
+          if(dxySig < track_dxySig_min_cut_) continue;
+
+          // optional hit cuts (best-effort: Track has numberOfValidHits(), but not pixel/strip split in reco::Track)
+          if(apply_hit_cuts_){
+            if(t.hitPattern().numberOfValidPixelHits() < hit_minPixelHits_) continue;
+            if(t.hitPattern().numberOfValidStripHits() < hit_minStripHits_) continue;
+            if(t.hitPattern().trackerLayersWithMeasurement() < hit_minTrackerLayers_) continue;
+          }
+
+          double pt = t.pt();
+          double phi = t.phi();
+          double eta = t.eta();
+          double px = pt * std::cos(phi);
+          double py = pt * std::sin(phi);
+          double pz = pt * std::sinh(eta);
+          double p2 = px*px + py*py + pz*pz;
+          double e = std::sqrt(p2 + PION_MASS*PION_MASS);
+
+          sum_px += px;
+          sum_py += py;
+          sum_pz += pz;
+          sum_e  += e;
+        }
+      } // end tracks of vertex
+
+      double vtx_pt = std::sqrt(sum_px*sum_px + sum_py*sum_py);
+      double mass2 = sum_e*sum_e - (sum_px*sum_px + sum_py*sum_py + sum_pz*sum_pz);
+      double vtx_mass = (mass2 > 0) ? std::sqrt(mass2) : 0.0;
+
+      if(isOffline){
+        Measurement1D dBV = vertexDist2D.distance(v, refVtx);
+        h_vtx_pt_off_->Fill(vtx_pt);
+        h_vtx_mass_off_->Fill(vtx_mass);
+        h_vtx_chi2_off_->Fill(v.normalizedChi2());
+        h_vtx_ntrk_off_->Fill(ntrack);
+        h_vtx_dbverr_off_->Fill(dBV.error());
+        h_vtx_xy_off_->Fill(v.x(), v.y());
+      } else {
+        Measurement1D dBV = vertexDist2D.distance(v, refVtx);
+        h_vtx_pt_scout_->Fill(vtx_pt);
+        h_vtx_mass_scout_->Fill(vtx_mass);
+        h_vtx_chi2_scout_->Fill(v.normalizedChi2());
+        h_vtx_ntrk_scout_->Fill(ntrack);
+        h_vtx_dbverr_scout_->Fill(dBV.error());
+        h_vtx_xy_scout_->Fill(v.x(), v.y());
       }
-      break; // only use the first selected offline vertex for event-level compare
     }
-  }
+  };
 
-  // Fill scouting histograms from the first selected scouting vertex (if present)
-  if (haveScoutV) {
-    for (const auto &v : *vtxScoutH) {
-      if (!vertexPasses(v)) continue;
+  processVertexCollection(vtxOff.isValid() ? &*vtxOff : nullptr, true);
+  processVertexCollection(vtxScout.isValid() ? &*vtxScout : nullptr, false);
 
-      TLorentzVector sumVec(0,0,0,0);
-      for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
-        TrackRef tr = it->castTo<TrackRef>();
-        if (!tr.isNonnull()) continue;
-        constexpr double kPionMass = 0.13957;
-        TLorentzVector tv; tv.SetPtEtaPhiM(tr->pt(), tr->eta(), tr->phi(), kPionMass);
-        sumVec += tv;
+  // ---------- Fill track histograms ----------
+  auto processTrackCollection = [&](const std::vector<reco::Track> *trks, bool isOffline) {
+    if(!trks) return;
+    for(const auto &t : *trks){
+      // analyzer-level track quality
+      if(t.pt() < track_pt_min_cut_) continue;
+      double dxy = t.d0();
+      double dxyerr = (t.d0Error()>0) ? t.d0Error() : 1e-6;
+      double dxySig = std::abs(dxy)/dxyerr;
+      if(dxySig < track_dxySig_min_cut_) continue;
+
+      if(apply_hit_cuts_){
+        if(t.hitPattern().numberOfValidPixelHits() < hit_minPixelHits_) continue;
+        if(t.hitPattern().numberOfValidStripHits() < hit_minStripHits_) continue;
+        if(t.hitPattern().trackerLayersWithMeasurement() < hit_minTrackerLayers_) continue;
       }
-      v_scout_.pt->Fill(sumVec.Pt());
-      v_scout_.eta->Fill(sumVec.Eta());
-      v_scout_.phi->Fill(sumVec.Phi());
-      v_scout_.mass->Fill(sumVec.M());
-      v_scout_.ntracks->Fill(std::distance(v.tracks_begin(), v.tracks_end()));
-      v_scout_.chi2->Fill(v.normalizedChi2());
-      double dBV = std::hypot(v.x(), v.y());
-      v_scout_.dBV->Fill(dBV);
-      v_scout_.dBVerr->Fill(0.0);
 
-      // track-level fills
-      for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it) {
-        TrackRef tr = it->castTo<TrackRef>();
-        if (!tr.isNonnull()) continue;
-        t_scout_.pt->Fill(tr->pt());
-        t_scout_.eta->Fill(tr->eta());
-        t_scout_.phi->Fill(tr->phi());
-        t_scout_.p->Fill(tr->p());
-        int npix = 0, nstrip = 0, nlayers = 0;
-        try {
-          npix = tr->hitPattern().numberOfValidPixelHits();
-          nstrip = tr->hitPattern().numberOfValidStripHits();
-        } catch (...) { npix = 0; nstrip = 0; }
-        try { nlayers = tr->found() ? tr->found() : 0; } catch(...) { nlayers = 0; }
-        t_scout_.npix->Fill(npix);
-        t_scout_.nstrip->Fill(nstrip);
-        t_scout_.nlayers->Fill(nlayers);
-        const double dxyRef = tr->dxy(refPoint);
-        t_scout_.dxy->Fill(dxyRef);
-        if (tr->dxyError() > 0) t_scout_.dxySig->Fill(std::fabs(dxyRef/tr->dxyError()));
-        t_scout_.dxyErr->Fill(tr->dxyError());
+      if(isOffline){
+        h_trk_pt_off_->Fill(t.pt());
+        h_trk_eta_off_->Fill(t.eta());
+        h_trk_phi_off_->Fill(t.phi());
+        if(bs) h_trk_dxy_off_->Fill(t.d0()); else h_trk_dxy_off_->Fill(t.d0());
+        h_trk_dxyerr_off_->Fill(dxyerr);
+        h_trk_ipsig_off_->Fill(std::abs(dxySig));
+      } else {
+        h_trk_pt_scout_->Fill(t.pt());
+        h_trk_eta_scout_->Fill(t.eta());
+        h_trk_phi_scout_->Fill(t.phi());
+        if(bs) h_trk_dxy_scout_->Fill(t.d0()); else h_trk_dxy_scout_->Fill(t.d0());
+        h_trk_dxyerr_scout_->Fill(dxyerr);
+        h_trk_ipsig_scout_->Fill(std::abs(dxySig));
       }
-      break; // only first selected scouting vertex
     }
+  };
+
+  processTrackCollection(trkOff.isValid() ? &*trkOff : nullptr, true);
+  processTrackCollection(trkScout.isValid() ? &*trkScout : nullptr, false);
+
+  // optionally throw to stop job early (user wanted this behavior)
+  if(hardStopOnLimit_ && stopAfterSelectedVertices_ > 0 && selectedEventsSeen_ >= stopAfterSelectedVertices_){
+    throw cms::Exception("StopJob") << "Reached requested number of selected events";
   }
-
-  // optional per-event saving count
-  if ( (haveOffV || haveScoutV) && savedEvents_ < nEventsToSave_ ) {
-    ++savedEvents_;
-  }
 }
 
-void EventComparator2Analyzer::endJob() {
-  // create overlay canvases (offline vs scouting) and write them into the output ROOT file
-  makeOverlayCanvas(v_off_.pt, v_scout_.pt, "overlay_vtx_pt", "Vertex p_{T} overlay");
-  makeOverlayCanvas(v_off_.mass, v_scout_.mass, "overlay_vtx_mass", "Vertex mass overlay");
-  makeOverlayCanvas(v_off_.chi2, v_scout_.chi2, "overlay_vtx_chi2", "Vertex #chi^{2}/ndof overlay");
-  makeOverlayCanvas(v_off_.ntracks, v_scout_.ntracks, "overlay_vtx_ntracks", "Vertex N_{tracks} overlay");
-  makeOverlayCanvas(t_off_.pt, t_scout_.pt, "overlay_trk_pt", "Track p_{T} overlay");
-  makeOverlayCanvas(t_off_.eta, t_scout_.eta, "overlay_trk_eta", "Track #eta overlay");
-  makeOverlayCanvas(t_off_.dxy, t_scout_.dxy, "overlay_trk_dxy", "Track dxy overlay");
-}
-
-void EventComparator2Analyzer::makeOverlayCanvas(TH1F* h_off, TH1F* h_scout, const std::string &cname, const std::string &title) {
-  if (!h_off || !h_scout) return;
-  TCanvas *c = new TCanvas(cname.c_str(), title.c_str(), 800, 600);
-  h_off->SetLineColor(kBlue);
-  h_off->SetLineWidth(2);
-  h_scout->SetLineColor(kRed);
-  h_scout->SetLineWidth(2);
-  h_off->Draw();
-  h_scout->Draw("SAME");
-  TLegend leg(0.70, 0.75, 0.90, 0.90);
-  leg.AddEntry(h_off, "Offline", "l");
-  leg.AddEntry(h_scout, "Scouting", "l");
-  leg.Draw();
-  c->Write();
-  delete c;
-}
-
-void EventComparator2Analyzer::fillDescriptions(edm::ConfigurationDescriptions &descriptions) {
-  edm::ParameterSetDescription desc;
-  desc.add<edm::InputTag>("displacedVerticesOffline", edm::InputTag("VertexerOffline", ""));
-  desc.add<edm::InputTag>("displacedVerticesScouting", edm::InputTag("Vertexer", ""));
-  desc.add<edm::InputTag>("tracksOffline", edm::InputTag("packedCandidateToTrack","Track"));
-  desc.add<edm::InputTag>("tracksScouting", edm::InputTag("hltScoutingUnpackProducer","Track"));
-  desc.add<edm::InputTag>("beamspot_src", edm::InputTag("offlineBeamSpot"));
-  desc.add<int>("nEventsToSave", 5);
-  desc.add<int>("vertex_min_ntracks", 2);
-  desc.add<double>("vertex_max_chi2", -1.0);
-  descriptions.add("eventComparator2", desc);
-}
-
-DEFINE_FWK_MODULE(EventComparator2Analyzer);
+DEFINE_FWK_MODULE(EventComparatorAnalyzer);

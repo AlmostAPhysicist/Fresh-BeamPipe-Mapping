@@ -1,21 +1,38 @@
 # run_compare_cfg.py
 import FWCore.ParameterSet.Config as cms
+
 process = cms.Process("COMPARE")
 
+# ---------------- Message Logger / options ----------------
 process.load("FWCore.MessageService.MessageLogger_cfi")
+process.MessageLogger.cerr.FwkSummary.reportEvery = 1
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
+import argparse
 
+parser = argparse.ArgumentParser(description="takes in event index")
+
+parser.add_argument("--n", type=int, default=0, help="Your age (default: 0)")
+args = parser.parse_args()
+
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
+
+# ---------------- Input files (put your files here) ----------------
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        # <-- set your input files here
-        "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/017d2bf5-4f3c-40ab-b6f9-c42381b6ae9b.root"
+        # put input files here, e.g.
+    "root://cmsxrootd.fnal.gov//store/mc/RunIII2024Summer24MiniAOD/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v3/110000/017d2bf5-4f3c-40ab-b6f9-c42381b6ae9b.root"
+
     )
 )
 
-# Global tag and geometry
+process.source.skipEvents = cms.untracked.uint32(args.n)  # jump to event index you want
+
+
+
+
+# ---------------- Conditions / geometry ----------------
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '140X_mcRun3_2024_realistic_v26', '')
@@ -23,21 +40,21 @@ process.GlobalTag = GlobalTag(process.GlobalTag, '140X_mcRun3_2024_realistic_v26
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
-# TFileService
+# ---------------- TFileService ----------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("EventCompare_Output.root")
+    fileName = cms.string(f"EventCompare_Output_{args.n+1}.root")
 )
 
 # BeamSpot & transient track builder
 process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi")
 process.load("TrackingTools.TransientTrack.TransientTrackBuilder_cfi")
 
-# PackedCandidate -> Track (for offline MINIAOD)
+# ---------------- PackedCandidate -> Track (offline) ----------------
 process.packedCandidateToTrack = cms.EDProducer("PackedCandidateToTrackProducer",
     src = cms.InputTag("packedPFCandidates")
 )
 
-# HLT Scouting Unpack Producer (scouting)
+# ---------------- HLT Scouting Unpack Producer (scouting) ----------------
 process.hltScoutingUnpackProducer = cms.EDProducer('HLTScoutingUnpackProducer',
     scoutingTrack = cms.InputTag('hltScoutingTrackPacker'),
     scoutingPrimaryVertex = cms.InputTag('hltScoutingPrimaryVertexPacker', 'primaryVtx'),
@@ -48,9 +65,9 @@ process.hltScoutingUnpackProducer = cms.EDProducer('HLTScoutingUnpackProducer',
     mightGet = cms.optional.untracked.vstring
 )
 
-# Vertexer for offline (run on packedCandidateToTrack output)
+# ---------------- Vertexer (offline) ----------------
 process.VertexerOffline = cms.EDProducer('Vertexer',
-    seed_tracks_src = cms.InputTag('packedCandidateToTrack','Track'),
+    seed_tracks_src = cms.InputTag('packedCandidateToTrack', 'Track'),
     primaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
     beamspot_src = cms.InputTag('offlineBeamSpot'),
     refPreference = cms.untracked.string('BS'),
@@ -77,10 +94,10 @@ process.VertexerOffline = cms.EDProducer('Vertexer',
     verbose = cms.bool(False)
 )
 
-# Vertexer for scouting (unchanged)
-process.Vertexer = cms.EDProducer('Vertexer',
+# ---------------- Vertexer (scouting) ----------------
+process.VertexerScouting = cms.EDProducer('Vertexer',
     seed_tracks_src = cms.InputTag('hltScoutingUnpackProducer', 'Track'),
-    primaryVertices = cms.InputTag("hltScoutingPrimaryVertexPacker","primaryVtx"),
+    primaryVertices = cms.InputTag('hltScoutingUnpackProducer', 'PrimaryVertex'),
     beamspot_src = cms.InputTag('offlineBeamSpot'),
     refPreference = cms.untracked.string('BS'),
     minSeedIPSig = cms.untracked.double(4.0),
@@ -106,23 +123,37 @@ process.Vertexer = cms.EDProducer('Vertexer',
     verbose = cms.bool(False)
 )
 
-# Analyzer
-process.eventComparator2 = cms.EDAnalyzer('EventComparator2Analyzer',
+# ---------------- Analyzer: EventComparatorAnalyzer ----------------
+process.EventComparatorAnalyzer = cms.EDAnalyzer('EventComparatorAnalyzer',
     displacedVerticesOffline = cms.InputTag("VertexerOffline"),
-    displacedVerticesScouting = cms.InputTag("Vertexer"),
-    tracksOffline = cms.InputTag("packedCandidateToTrack","Track"),
-    tracksScouting = cms.InputTag("hltScoutingUnpackProducer","Track"),
-    nEventsToSave = cms.int32(10),
+    displacedVerticesScouting = cms.InputTag("VertexerScouting"),
+    tracksOffline = cms.InputTag("packedCandidateToTrack", "Track"),
+    tracksScouting = cms.InputTag("hltScoutingUnpackProducer", "Track"),
+    beamspot_src = cms.InputTag('offlineBeamSpot'),
+
+    # selection / plotting knobs
+    stopAfterSelectedVertices = cms.untracked.int32(10),  # set to 1 for single event
+    hardStopOnLimit = cms.untracked.bool(False),
     vertex_min_ntracks = cms.int32(2),
-    vertex_max_chi2 = cms.double(-1.0)
+    vertex_max_chi2 = cms.double(-1.0),
+
+    # analyzer-level track cuts (used for track plots and vertex-sum)
+    track_pt_min_cut = cms.untracked.double(0.9),
+    track_dxySig_min_cut = cms.untracked.double(4.0),
+
+    # optional hit cuts (best-effort checks)
+    applyHitCuts = cms.untracked.bool(False),
+    hit_minPixelHits = cms.untracked.int32(3),
+    hit_minStripHits = cms.untracked.int32(2),
+    hit_minTrackerLayers = cms.untracked.int32(6)
 )
 
-# Path: produce offline tracks -> vertexer offline, produce scouting tracks -> vertexer, then analyzer
+# ---------------- Path ----------------
 process.p = cms.Path(
     process.packedCandidateToTrack +
+    process.hltScoutingUnpackProducer +
     process.offlineBeamSpot +
     process.VertexerOffline +
-    process.hltScoutingUnpackProducer +
-    process.Vertexer +
-    process.eventComparator2
+    process.VertexerScouting +
+    process.EventComparatorAnalyzer
 )

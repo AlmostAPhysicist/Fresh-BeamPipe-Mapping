@@ -1,8 +1,0 @@
-universe = vanilla
-executable = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_tmp/run_hadd_3_20260210T211804_626d9712.sh
-should_transfer_files = NO
-log    = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/hadd_3_20260210T211804_626d9712.log
-output = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/hadd_3_20260210T211804_626d9712.out
-error  = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/hadd_3_20260210T211804_626d9712.err
-+JobFlavour = "longlunch"
-queue 1
