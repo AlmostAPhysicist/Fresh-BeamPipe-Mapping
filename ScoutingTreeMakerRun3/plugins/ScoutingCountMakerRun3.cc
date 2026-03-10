@@ -9,6 +9,7 @@
 #include <cmath>
 #include <sstream>
 #include <iostream>
+#include <set>
 
 #include "TLorentzVector.h"
 #include "TVector3.h"
@@ -24,6 +25,7 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "TH1F.h"
 #include "TH2F.h"
 
 #include "DataFormats/VertexReco/interface/Vertex.h"
@@ -278,9 +280,21 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
     VertexDistanceXY vdist2d;
 
     // --- Scouting collection handling ---
+    struct VertexSummary {
+        float x = 0.0f;
+        float y = 0.0f;
+        float pt = 0.0f;
+        float mass = 0.0f;
+        float chi2 = 0.0f;
+        float dBVerr = 0.0f;
+        int nTracks = 0;
+        std::vector<reco::TrackRef> tracks;
+    };
+
     struct SelectionResult {
         int nSel = 0;
         std::vector<std::pair<float, float>> selectedXY;
+        std::vector<VertexSummary> vertices;
     };
 
     auto processVertices = [&](const edm::Handle<std::vector<reco::Vertex>> &vH,
@@ -401,6 +415,19 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
             // vertex passes
             ++result.nSel;
             result.selectedXY.emplace_back(static_cast<float>(v.x()), static_cast<float>(v.y()));
+
+            VertexSummary vtxSummary;
+            vtxSummary.x = static_cast<float>(v.x());
+            vtxSummary.y = static_cast<float>(v.y());
+            vtxSummary.pt = static_cast<float>(sumVec.Pt());
+            vtxSummary.mass = static_cast<float>(invMass);
+            vtxSummary.chi2 = static_cast<float>(v.normalizedChi2());
+            vtxSummary.dBVerr = static_cast<float>(dBV_err);
+            vtxSummary.nTracks = nGoodTracks;
+            for (const auto &trRef : tks) {
+                if (trRef.isNonnull()) vtxSummary.tracks.push_back(trRef);
+            }
+            result.vertices.push_back(std::move(vtxSummary));
         } // vertex loop
 
         return result;
@@ -409,6 +436,11 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
     // get scouting vertices
     Handle<std::vector<reco::Vertex>> scoutingVtxH;
     iEvent.getByToken(scoutingVerticesToken_, scoutingVtxH);
+    if (!scoutingVtxH.isValid()) {
+        edm::LogWarning("ScoutingCountMakerRun3")
+            << "Scouting vertex collection is invalid for event "
+            << iEvent.id().run() << ":" << iEvent.id().luminosityBlock() << ":" << iEvent.id().event();
+    }
     SelectionResult scoutingResult;
     if (haveScoutingRef) scoutingResult = processVertices(scoutingVtxH, scoutingRefVtx, true);
     const int scoutingSelected = scoutingResult.nSel;
@@ -416,6 +448,11 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
     // get offline vertices
     Handle<std::vector<reco::Vertex>> offlineVtxH;
     iEvent.getByToken(offlineVerticesToken_, offlineVtxH);
+    if (!offlineVtxH.isValid()) {
+        edm::LogWarning("ScoutingCountMakerRun3")
+            << "Offline vertex collection is invalid for event "
+            << iEvent.id().run() << ":" << iEvent.id().luminosityBlock() << ":" << iEvent.id().event();
+    }
     SelectionResult offlineResult;
     if (haveOfflineRef) offlineResult = processVertices(offlineVtxH, offlineRefVtx, false);
     const int offlineSelected = offlineResult.nSel;
@@ -435,28 +472,98 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
             dirName << "Event" << iEvent.id().event();
             TFileDirectory eventDir = fs->mkdir(dirName.str().c_str());
 
-            if (scoutingSelected > 0) {
-                TH2F *hScoutingXY = eventDir.make<TH2F>(
-                    "scouting_vertex_xy",
-                    "Scouting Selected Vertex XY;X [cm];Y [cm]",
-                    800, -10.0, 10.0,
-                    800, -10.0, 10.0
-                );
-                for (const auto &xy : scoutingResult.selectedXY) {
-                    hScoutingXY->Fill(xy.first, xy.second);
-                }
-            }
+            auto fillCollectionFolder = [&](const char *collectionName,
+                                            const SelectionResult &result) {
+                TFileDirectory collectionDir = eventDir.mkdir(collectionName);
 
-            if (offlineSelected > 0) {
-                TH2F *hOfflineXY = eventDir.make<TH2F>(
-                    "offline_vertex_xy",
-                    "Offline Selected Vertex XY;X [cm];Y [cm]",
-                    800, -10.0, 10.0,
-                    800, -10.0, 10.0
-                );
-                for (const auto &xy : offlineResult.selectedXY) {
-                    hOfflineXY->Fill(xy.first, xy.second);
+                TFileDirectory verticesDir = collectionDir.mkdir("Vertices");
+                TH1F *h_vtx_pt = verticesDir.make<TH1F>("pt", "Vertex p_{T};p_{T} [GeV];entries", 100, 0, 50);
+                TH1F *h_vtx_mass = verticesDir.make<TH1F>("mass", "Vertex mass;m [GeV];entries", 100, 0, 10);
+                TH1F *h_vtx_chi2 = verticesDir.make<TH1F>("chi2", "Vertex norm chi2;chi2_{norm};entries", 100, 0, 50);
+                TH1F *h_vtx_ntrk = verticesDir.make<TH1F>("nTracks", "Vertex nTracks;n_{tracks};entries", 20, 0, 20);
+                TH1F *h_vtx_dbverr = verticesDir.make<TH1F>("dBV_error", "Vertex d_{BV} error;#sigma_{dBV} [cm];entries", 200, 0, 0.2);
+                TH2F *h_vtx_xy = verticesDir.make<TH2F>("xy", "Vertex XY;x [cm];y [cm]", 400, -10, 10, 400, -10, 10);
+                TH2F *h_beamspot_xy = verticesDir.make<TH2F>("beamspot_xy", "Beamspot XY;x_{BS} [cm];y_{BS} [cm]", 400, -1, 1, 400, -1, 1);
+
+                if (haveOfflineBS) {
+                    h_beamspot_xy->Fill(offlineBsVtx.x(), offlineBsVtx.y());
                 }
+
+                std::vector<reco::TrackRef> allVertexTracks;
+                for (const auto &v : result.vertices) {
+                    h_vtx_pt->Fill(v.pt);
+                    h_vtx_mass->Fill(v.mass);
+                    h_vtx_chi2->Fill(v.chi2);
+                    h_vtx_ntrk->Fill(v.nTracks);
+                    h_vtx_dbverr->Fill(v.dBVerr);
+                    h_vtx_xy->Fill(v.x, v.y);
+                    allVertexTracks.insert(allVertexTracks.end(), v.tracks.begin(), v.tracks.end());
+                }
+
+                TFileDirectory tracksDir = collectionDir.mkdir("Tracks");
+                TH1F *h_trk_pt = tracksDir.make<TH1F>("pt", "Track p_{T};p_{T} [GeV];entries", 100, 0, 50);
+                TH1F *h_trk_eta = tracksDir.make<TH1F>("eta", "Track #eta;#eta;entries", 100, -3, 3);
+                TH1F *h_trk_phi = tracksDir.make<TH1F>("phi", "Track #phi;#phi;entries", 100, -3.2, 3.2);
+                TH1F *h_trk_dxy = tracksDir.make<TH1F>("dxy", "Track dxy;dxy [cm];entries", 100, -1.0, 1.0);
+                TH1F *h_trk_dxyerr = tracksDir.make<TH1F>("dxy_error", "Track dxy error;#sigma_{dxy} [cm];entries", 200, 0, 0.05);
+                TH1F *h_trk_ipsig = tracksDir.make<TH1F>("ipsig", "Track IPsig;|dxy|/err;entries", 100, 0, 50);
+
+                TFileDirectory vertexAssocDir = tracksDir.mkdir("VertexAssociatedTracks");
+                for (size_t ivtx = 0; ivtx < result.vertices.size(); ++ivtx) {
+                    const auto &v = result.vertices[ivtx];
+                    std::ostringstream vertexDirName;
+                    vertexDirName << "Vertex" << (ivtx + 1);
+                    TFileDirectory oneVertexDir = vertexAssocDir.mkdir(vertexDirName.str().c_str());
+
+                    std::set<unsigned int> seenTrackKeys;
+                    int trackCounter = 0;
+                    for (const auto &trRef : v.tracks) {
+                        if (!trRef.isNonnull()) continue;
+                        const unsigned int key = trRef.key();
+                        if (seenTrackKeys.find(key) != seenTrackKeys.end()) continue;
+                        seenTrackKeys.insert(key);
+
+                        const float pt = static_cast<float>(trRef->pt());
+                        const float eta = static_cast<float>(trRef->eta());
+                        const float phi = static_cast<float>(trRef->phi());
+                        const float dxy = static_cast<float>(trRef->d0());
+                        const float dxyErr = static_cast<float>(trRef->d0Error());
+                        const float ipSig = (dxyErr > 0.0f) ? std::fabs(dxy / dxyErr) : 0.0f;
+
+                        h_trk_pt->Fill(pt);
+                        h_trk_eta->Fill(eta);
+                        h_trk_phi->Fill(phi);
+                        h_trk_dxy->Fill(dxy);
+                        h_trk_dxyerr->Fill(dxyErr);
+                        h_trk_ipsig->Fill(ipSig);
+
+                        ++trackCounter;
+                        std::ostringstream trackDirName;
+                        trackDirName << "Track" << trackCounter;
+                        TFileDirectory oneTrackDir = oneVertexDir.mkdir(trackDirName.str().c_str());
+
+                        TH1F *h_one_pt = oneTrackDir.make<TH1F>("pt", "Track p_{T};p_{T} [GeV];entries", 100, 0, 50);
+                        TH1F *h_one_eta = oneTrackDir.make<TH1F>("eta", "Track #eta;#eta;entries", 100, -3, 3);
+                        TH1F *h_one_phi = oneTrackDir.make<TH1F>("phi", "Track #phi;#phi;entries", 100, -3.2, 3.2);
+                        TH1F *h_one_dxy = oneTrackDir.make<TH1F>("dxy", "Track dxy;dxy [cm];entries", 100, -1.0, 1.0);
+                        TH1F *h_one_dxyerr = oneTrackDir.make<TH1F>("dxy_error", "Track dxy error;#sigma_{dxy} [cm];entries", 200, 0, 0.05);
+                        TH1F *h_one_ipsig = oneTrackDir.make<TH1F>("ipsig", "Track IPsig;|dxy|/err;entries", 100, 0, 50);
+
+                        h_one_pt->Fill(pt);
+                        h_one_eta->Fill(eta);
+                        h_one_phi->Fill(phi);
+                        h_one_dxy->Fill(dxy);
+                        h_one_dxyerr->Fill(dxyErr);
+                        h_one_ipsig->Fill(ipSig);
+                    }
+                }
+            };
+
+            if (scoutingSelected > 0) {
+                fillCollectionFolder("Scouting", scoutingResult);
+            }
+            if (offlineSelected > 0) {
+                fillCollectionFolder("Offline", offlineResult);
             }
         }
     }

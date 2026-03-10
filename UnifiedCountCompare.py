@@ -23,7 +23,7 @@ process.options = cms.untracked.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(100)
 )
 
 # -------------------------- INPUT PATH ------------------------------------
@@ -61,6 +61,11 @@ process.hltScoutingUnpackProducer = cms.EDProducer('HLTScoutingUnpackProducer',
 process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi")
 process.load("TrackingTools.TransientTrack.TransientTrackBuilder_cfi")
 
+# Build reco::Track collection from packed candidates for OFFLINE vertexing
+process.packedCandidateToTrack = cms.EDProducer("PackedCandidateToTrackProducer",
+    src = cms.InputTag("packedPFCandidates")
+)
+
 referencePreference = 'BS'
 useOnlineBeamSpot = True
 offlineBeamSpotTag = cms.InputTag('offlineBeamSpot')
@@ -68,6 +73,39 @@ offlineBeamSpotTag = cms.InputTag('offlineBeamSpot')
 process.Vertexer = cms.EDProducer('Vertexer',
     seed_tracks_src = cms.InputTag('hltScoutingUnpackProducer', 'Track'),
     primaryVertices = cms.InputTag("hltScoutingUnpackProducer", "PrimaryVertex"),
+    beamspot_src = offlineBeamSpotTag,
+    useOnlineBeamSpot = cms.untracked.bool(useOnlineBeamSpot),
+    refPreference = cms.untracked.string(referencePreference),
+
+    minSeedIPSig = cms.untracked.double(4.0),
+    minSeedPt    = cms.untracked.double(0.9),
+
+    n_tracks_per_seed_vertex = cms.int32(2),
+    max_seed_vertex_chi2 = cms.double(5),
+    resolve_split_vertices_loose = cms.bool(False),
+    resolve_split_vertices_tight = cms.bool(False),
+    investigate_merged_vertices = cms.bool(False),
+    use_2d_vertex_dist = cms.bool(False),
+    use_2d_track_dist = cms.bool(True),
+    merge_anyway_dist = cms.double(-1),
+    merge_anyway_sig = cms.double(4),
+    merge_shared_dist = cms.double(-1),
+    merge_shared_sig = cms.double(4),
+    max_track_vertex_dist = cms.double(-1),
+    max_track_vertex_sig = cms.double(-1),
+    min_track_vertex_sig_to_remove = cms.double(1.5),
+    remove_one_track_at_a_time = cms.bool(True),
+    max_nm1_refit_dist3 = cms.double(-1),
+    max_nm1_refit_distz = cms.double(-1),
+    max_nm1_refit_count = cms.int32(-1),
+    logBeamspotSource = cms.untracked.bool(True),
+    verbose = cms.bool(False),
+)
+
+# Offline vertexer (mirrors EventComparatorAnalyzer setup)
+process.VertexerOffline = cms.EDProducer('Vertexer',
+    seed_tracks_src = cms.InputTag('packedCandidateToTrack', 'Track'),
+    primaryVertices = cms.InputTag('offlineSlimmedPrimaryVertices'),
     beamspot_src = offlineBeamSpotTag,
     useOnlineBeamSpot = cms.untracked.bool(useOnlineBeamSpot),
     refPreference = cms.untracked.string(referencePreference),
@@ -114,7 +152,7 @@ process.scoutingTrackCount = cms.EDFilter('ScoutingTrackCountFilter',
 
 process.ScoutingCountMakerRun3 = cms.EDAnalyzer("ScoutingCountMakerRun3",
     scoutingVertices = cms.InputTag("Vertexer"),                # scouting/displaced vertices from Vertexer
-    offlineVertices  = cms.InputTag("displacedVertices"),       # offline displaced vertices (change if different)
+    offlineVertices  = cms.InputTag("VertexerOffline"),         # offline displaced vertices from offline Vertexer
     primaryVertices  = cms.InputTag("hltScoutingPrimaryVertexPacker", "primaryVtx"),
     beamspot_src     = cms.InputTag("offlineBeamSpot"),
     tracks           = cms.InputTag("hltScoutingUnpackProducer", "Track"),
@@ -123,8 +161,8 @@ process.ScoutingCountMakerRun3 = cms.EDAnalyzer("ScoutingCountMakerRun3",
     cut_opening_angle_min = cms.double(-1.0),
 
     # scalar cuts
-    required_invmass = cms.double(-1),
-    required_chi2 = cms.double(-1.0),
+    required_invmass = cms.double(2.0),
+    required_chi2 = cms.double(5.0),
     required_dBV_min = cms.double(-1.0),
     required_dBV_max = cms.double(-1.0),
     required_dxy_min = cms.double(-1.0),
@@ -133,15 +171,15 @@ process.ScoutingCountMakerRun3 = cms.EDAnalyzer("ScoutingCountMakerRun3",
     required_dxy_error = cms.double(-1.0),
 
     # track-level analyzer cuts (untracked)
-    track_pt_min_cut = cms.untracked.double(0.9),
+    track_pt_min_cut = cms.untracked.double(1.0),
     track_dxySig_min_cut = cms.untracked.double(4.0),
     track_dxySig_max_cut = cms.untracked.double(100.0),
 
     # hit-cuts toggle + thresholds
     applyHitCuts = cms.bool(True),
-    hit_minPixelHits = cms.untracked.int32(1),
-    hit_minStripHits = cms.untracked.int32(1),
-    hit_minTrackerLayers = cms.untracked.int32(1),
+    hit_minPixelHits = cms.untracked.int32(3),
+    hit_minStripHits = cms.untracked.int32(2),
+    hit_minTrackerLayers = cms.untracked.int32(6),
 
     # seed-like thresholds (for consistency with Vertexer)
     seed_minIPSig = cms.untracked.double(process.Vertexer.minSeedIPSig.value()),
@@ -161,9 +199,11 @@ process.ScoutingCountMakerRun3 = cms.EDAnalyzer("ScoutingCountMakerRun3",
 # -------------------------- Path ------------------------------------------
 process.p = cms.Path(
     process.scoutingTrackCount +
+    process.packedCandidateToTrack +
     process.hltScoutingUnpackProducer +
     process.offlineBeamSpot +       # ensures offline beamspot product is available
     process.Vertexer +
+    process.VertexerOffline +
     process.ScoutingCountMakerRun3
 )
 
