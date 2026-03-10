@@ -129,6 +129,7 @@ private:
   enum class RefPreference { PreferPV, PreferBeamSpot };
   const RefPreference refPreference_;
   const bool useOnlineBeamSpot_;
+  const bool logBeamspotSource_;
   const edm::EDGetTokenT<std::vector<reco::Vertex>> primaryVerticesToken_;  // vector of PVs
   const edm::EDGetTokenT<reco::BeamSpot>            beamspotToken_;         // fallback
   const edm::ESGetToken<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd> beamspotOnlineToken_;
@@ -340,6 +341,7 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
   refPreference_(params.getUntrackedParameter<std::string>("refPreference", "BeamSpot") == "PV" ? 
                   RefPreference::PreferPV : RefPreference::PreferBeamSpot),
   useOnlineBeamSpot_(params.getUntrackedParameter<bool>("useOnlineBeamSpot", false)),
+  logBeamspotSource_(params.getUntrackedParameter<bool>("logBeamspotSource", false)),
   primaryVerticesToken_((params.existsAs<edm::InputTag>("primaryVertices_src") || 
                         params.existsAs<edm::InputTag>("primaryVertices")) ?
                         consumes<std::vector<reco::Vertex>>( getPVTag(params) ) :
@@ -418,7 +420,11 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
           for (int j=i;j<3;++j)
             ref_error(i,j)=bsOnlineH->covariance(i,j);
         haveBeamspotReference = true;
-        if (verbose) edm::LogInfo("Vertexer") << "Using online beam spot as reference.";
+        if ( logBeamspotSource_) {
+          edm::LogInfo("Vertexer")
+            << "Using online beam spot as reference"
+            << " x=" << ref_x << " y=" << ref_y << " z=" << ref_z;
+        }
       } else {
         edm::LogError("Vertexer")
           << "useOnlineBeamSpot=True but BeamSpotOnlineHLTObjectsRcd is unavailable. "
@@ -433,7 +439,11 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         ref_x = bs->position().x(); ref_y = bs->position().y(); ref_z = bs->position().z();
         ref_error = bs->covariance3D();
         haveBeamspotReference = true;
-        if (verbose) edm::LogInfo("Vertexer") << "Using offline beam spot as reference.";
+        if ( logBeamspotSource_) {
+          edm::LogInfo("Vertexer")
+            << "Using offline beam spot as reference"
+            << " x=" << ref_x << " y=" << ref_y << " z=" << ref_z;
+        }
       }
     }
 
