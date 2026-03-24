@@ -4,8 +4,8 @@ process = cms.Process("CHAIN")
 
 # -------------------- MessageLogger / Options / Events --------------------
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkSummary.reportEvery = 5
-process.MessageLogger.cerr.FwkReport.reportEvery = 5
+process.MessageLogger.cerr.FwkSummary.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 # process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
 # process.MessageLogger.debugModules = cms.untracked.vstring()
 # process.MessageLogger.cerr.ScoutingCountMakerRun3 = cms.untracked.PSet(
@@ -23,7 +23,7 @@ process.options = cms.untracked.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(5000)
 )
 
 # -------------------------- INPUT PATH ------------------------------------
@@ -43,7 +43,7 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 
 # -------------------------- TFileService -----------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/vertex_counts.root")
+    fileName = cms.string("test-outputs/vertex_counts_v8.root")
 )
 
 # -------------------------- HLT Scouting Unpacker --------------------------
@@ -83,7 +83,7 @@ process.Vertexer = cms.EDProducer('Vertexer',
     n_tracks_per_seed_vertex = cms.int32(2),
     max_seed_vertex_chi2 = cms.double(5),
     resolve_split_vertices_loose = cms.bool(False),
-    resolve_split_vertices_tight = cms.bool(False),
+    resolve_split_vertices_tight = cms.bool(False), # Could be interesting to turn on for scouting vertices, but keep off for now to mirror offline vertexing and simplify comparisons
     investigate_merged_vertices = cms.bool(False),
     use_2d_vertex_dist = cms.bool(False),
     use_2d_track_dist = cms.bool(True),
@@ -156,13 +156,21 @@ process.ScoutingCountMakerRun3 = cms.EDAnalyzer("ScoutingCountMakerRun3",
     primaryVertices  = cms.InputTag("hltScoutingPrimaryVertexPacker", "primaryVtx"),
     beamspot_src     = cms.InputTag("offlineBeamSpot"),
     tracks           = cms.InputTag("hltScoutingUnpackProducer", "Track"),
+    offlineTracks    = cms.InputTag("packedCandidateToTrack", "Track"),
+
+    # ntk cut: list the exact track multiplicities to accept; empty = accept all
+    cut_ntk = cms.PSet(
+        # values = cms.vint32(3, 4),  # accept only 3-track or 4-track vertices
+        # values = cms.vint32(2),         # accept 2-track vertices only
+        values = cms.vint32(),         # accept all vertices regardless of track multiplicity
+    ),
 
     # single opening-angle cut (rad)
     cut_opening_angle_min = cms.double(-1.0),
 
     # scalar cuts
-    required_invmass = cms.double(2.0),
-    required_chi2 = cms.double(5.0),
+    required_invmass = cms.double(-1.0),  # no inv mass cut
+    required_chi2 = cms.double(-1.0),      # no chi2 cut
     required_dBV_min = cms.double(-1.0),
     required_dBV_max = cms.double(-1.0),
     required_dxy_min = cms.double(-1.0),
@@ -177,8 +185,8 @@ process.ScoutingCountMakerRun3 = cms.EDAnalyzer("ScoutingCountMakerRun3",
 
     # hit-cuts toggle + thresholds
     applyHitCuts = cms.bool(True),
-    hit_minPixelHits = cms.untracked.int32(3),
-    hit_minStripHits = cms.untracked.int32(2),
+    hit_minPixelHits = cms.untracked.int32(2),
+    hit_minStripHits = cms.untracked.int32(6),
     hit_minTrackerLayers = cms.untracked.int32(6),
 
     # seed-like thresholds (for consistency with Vertexer)

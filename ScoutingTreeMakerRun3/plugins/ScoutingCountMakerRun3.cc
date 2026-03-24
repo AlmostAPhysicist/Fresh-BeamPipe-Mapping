@@ -4,11 +4,14 @@
 // Configure parameters in your cfg as shown after this file.
 
 #include <memory>
+#include <algorithm>
 #include <vector>
 #include <string>
 #include <cmath>
+#include <limits>
 #include <sstream>
 #include <iostream>
+#include <iomanip>
 #include <set>
 
 #include "TLorentzVector.h"
@@ -62,6 +65,7 @@ private:
     const edm::InputTag primaryVerticesTag_;
     const edm::InputTag beamspotTag_;
 
+    std::vector<int> cut_ntk_;
     const double cut_opening_angle_min_;
     const double required_invmass_;
     const double required_chi2_;
@@ -102,6 +106,7 @@ private:
     const edm::EDGetTokenT<std::vector<reco::Vertex>> primaryVerticesToken_;
     const edm::EDGetTokenT<reco::BeamSpot> beamspotToken_;
     const edm::EDGetTokenT<std::vector<reco::Track>> tracksToken_;
+    const edm::EDGetTokenT<std::vector<reco::Track>> offlineTracksToken_;
     const edm::EDGetTokenT<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> trackToScoutingRefToken_;
     const edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> ttBuilderToken_;
     const edm::ESGetToken<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd> bsOnlineToken_;
@@ -111,8 +116,40 @@ private:
 
     // simple run summary counters
     unsigned long long nEvents_ = 0;
+    unsigned long long nSelectedEvents_ = 0;  // counter for events with ≥1 selected vertex (used for folder naming)
     unsigned long long totalScoutingSelected_ = 0;
     unsigned long long totalOfflineSelected_ = 0;
+
+    // event-level selection overlap counters
+    unsigned long long nEventsWithOfflineSelected_ = 0;
+    unsigned long long nEventsWithScoutingSelected_ = 0;
+    unsigned long long nEventsWithBothSelected_ = 0;
+    unsigned long long nEventsWithOfflineOnly_ = 0;
+    unsigned long long nEventsWithScoutingOnly_ = 0;
+
+    // offline-selected event breakdown
+    unsigned long long nOffSelAndScoSel_ = 0;
+    unsigned long long nOffSelAndNoScoSel_ = 0;
+    unsigned long long nOffSelNoScoNoMatch_ = 0;
+    unsigned long long nOffSelNoScoMatch_ = 0;
+    unsigned long long nOffSelNoScoMatchR_ = 0;
+    unsigned long long nOffSelScoNoMatch_ = 0;
+    unsigned long long nOffSelScoMatch_ = 0;
+    unsigned long long nOffSelScoMatchR_ = 0;
+
+    // scouting-selected event breakdown
+    unsigned long long nScoSelAndOffSel_ = 0;
+    unsigned long long nScoSelAndNoOffSel_ = 0;
+    unsigned long long nScoSelNoOffNoMatch_ = 0;
+    unsigned long long nScoSelNoOffMatch_ = 0;
+    unsigned long long nScoSelNoOffMatchR_ = 0;
+    unsigned long long nScoSelOffNoMatch_ = 0;
+    unsigned long long nScoSelOffMatch_ = 0;
+    unsigned long long nScoSelOffMatchR_ = 0;
+
+    // scouting track cut pool occupancy counters (all events)
+    unsigned long long nEventsPoolNonEmpty_ = 0;  // EW events
+    unsigned long long nEventsPoolEmpty_ = 0;     // E events
 };
 
 // -------------------- Implementation --------------------
@@ -157,12 +194,17 @@ ScoutingCountMakerRun3::ScoutingCountMakerRun3(const edm::ParameterSet &ps) :
     primaryVerticesToken_( consumes<std::vector<reco::Vertex>>(primaryVerticesTag_) ),
     beamspotToken_( consumes<reco::BeamSpot>(beamspotTag_) ),
     tracksToken_( consumes<std::vector<reco::Track>>( ps.getParameter<edm::InputTag>("tracks") ) ),
+    offlineTracksToken_( consumes<std::vector<reco::Track>>( ps.getParameter<edm::InputTag>("offlineTracks") ) ),
     trackToScoutingRefToken_( consumes<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>>( edm::InputTag("hltScoutingUnpackProducer","Track-RefToOriginal") ) ),
     ttBuilderToken_( esConsumes<TransientTrackBuilder, TransientTrackRecord>(edm::ESInputTag("", "TransientTrackBuilder")) ),
     bsOnlineToken_( esConsumes<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd>() )
 {
     usesResource("TFileService"); // no histos but safe if other modules use TFileService
     // Note: trackToScoutingRefToken_ may be invalid in some workflows - we check at runtime
+
+    // parse cut_ntk PSet
+    const auto &ntkPSet = ps.getParameter<edm::ParameterSet>("cut_ntk");
+    cut_ntk_ = ntkPSet.getParameter<std::vector<int>>("values");
 }
 
 void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup) {
@@ -297,6 +339,26 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
         std::vector<VertexSummary> vertices;
     };
 
+    struct TrackSummary {
+        float pt = 0.0f;
+        float eta = 0.0f;
+        float phi = 0.0f;
+        float dxy = 0.0f;
+        float dxyErr = 0.0f;
+        float ipSig = 0.0f;
+    };
+
+    auto summarizeTrack = [](const reco::Track &track) {
+        TrackSummary summary;
+        summary.pt = static_cast<float>(track.pt());
+        summary.eta = static_cast<float>(track.eta());
+        summary.phi = static_cast<float>(track.phi());
+        summary.dxy = static_cast<float>(track.d0());
+        summary.dxyErr = static_cast<float>(track.d0Error());
+        summary.ipSig = (summary.dxyErr > 0.0f) ? std::fabs(summary.dxy / summary.dxyErr) : 0.0f;
+        return summary;
+    };
+
     auto processVertices = [&](const edm::Handle<std::vector<reco::Vertex>> &vH,
                                const reco::Vertex &refVtx,
                                bool useHitCutsForCollection) -> SelectionResult {
@@ -317,6 +379,13 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
             std::vector<reco::TrackRef> tks = vertex_track_vec(v);
             const size_t ntk = tks.size();
             if (ntk < 2) continue;
+            if (!cut_ntk_.empty()) {
+                bool ntkAccepted = false;
+                for (int allowed : cut_ntk_) {
+                    if (static_cast<int>(ntk) == allowed) { ntkAccepted = true; break; }
+                }
+                if (!ntkAccepted) continue;
+            }
 
             // opening-angle
             double minAngle = 1e9;
@@ -457,6 +526,257 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
     if (haveOfflineRef) offlineResult = processVertices(offlineVtxH, offlineRefVtx, false);
     const int offlineSelected = offlineResult.nSel;
 
+    Handle<std::vector<reco::Track>> scoutingTracksH;
+    iEvent.getByToken(tracksToken_, scoutingTracksH);
+    if (!scoutingTracksH.isValid()) {
+        edm::LogWarning("ScoutingCountMakerRun3")
+            << "Scouting track collection is invalid for event "
+            << iEvent.id().run() << ":" << iEvent.id().luminosityBlock() << ":" << iEvent.id().event();
+    }
+
+    // Build the scouting track pool used for matching/reporting.
+    // This pool is filtered with the same scouting-quality track cuts (pt, IP significance, optional hits).
+    std::vector<size_t> scoutingTrackPoolIndices;
+    if (scoutingTracksH.isValid()) {
+        Handle<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> trackToScoutingRefPoolH;
+        if (applyHitCuts_) {
+            iEvent.getByToken(trackToScoutingRefToken_, trackToScoutingRefPoolH);
+        }
+        const auto *trackToScoutingPoolPtr = trackToScoutingRefPoolH.isValid() ? &(*trackToScoutingRefPoolH) : nullptr;
+
+        if (!haveScoutingRef) {
+            edm::LogWarning("ScoutingCountMakerRun3")
+                << "Scouting reference unavailable: scouting track pool cannot be IP-filtered for event "
+                << iEvent.id().run() << ":" << iEvent.id().luminosityBlock() << ":" << iEvent.id().event()
+                << ". The scouting matching/reporting pool will be empty for this event.";
+        } else {
+            scoutingTrackPoolIndices.reserve(scoutingTracksH->size());
+            for (size_t iscout = 0; iscout < scoutingTracksH->size(); ++iscout) {
+                reco::TrackRef trackRef(scoutingTracksH, iscout);
+                if (!trackRef.isNonnull()) continue;
+
+                if (trackRef->pt() < track_pt_min_cut_) continue;
+
+                reco::TransientTrack ttrack = ttBuilder.build(trackRef);
+                std::pair<bool, Measurement1D> ipres;
+                if (seed_use2DTrackDist_) {
+                    ipres = IPTools::absoluteTransverseImpactParameter(ttrack, scoutingRefVtx);
+                } else {
+                    ipres = IPTools::absoluteImpactParameter3D(ttrack, scoutingRefVtx);
+                }
+                if (!ipres.first) continue;
+
+                const double ipSig = ipres.second.significance();
+                if (ipSig < track_dxySig_min_cut_ || ipSig > track_dxySig_max_cut_) continue;
+
+                if (applyHitCuts_) {
+                    int nPixelHits = 999;
+                    int nStripHits = 999;
+                    int nTrackerLayers = 999;
+                    if (trackToScoutingPoolPtr) {
+                        auto scoutingRef = (*trackToScoutingPoolPtr)[trackRef];
+                        if (scoutingRef.isNonnull()) {
+                            nPixelHits     = scoutingRef->tk_nValidPixelHits();
+                            nStripHits     = scoutingRef->tk_nValidStripHits();
+                            nTrackerLayers = scoutingRef->tk_nTrackerLayersWithMeasurement();
+                        }
+                    }
+                    if (nPixelHits < hit_minPixelHits_ || nStripHits < hit_minStripHits_ || nTrackerLayers < hit_minTrackerLayers_) {
+                        continue;
+                    }
+                }
+
+                scoutingTrackPoolIndices.push_back(iscout);
+            }
+        }
+
+        if (verbose_) {
+            edm::LogInfo("ScoutingCountMakerRun3")
+                << "Scouting track pool size after filtering: " << scoutingTrackPoolIndices.size()
+                << " / " << scoutingTracksH->size();
+        }
+    }
+
+    if (scoutingTrackPoolIndices.empty()) {
+        ++nEventsPoolEmpty_;
+    } else {
+        ++nEventsPoolNonEmpty_;
+    }
+
+    Handle<std::vector<reco::Track>> offlineTracksH;
+    iEvent.getByToken(offlineTracksToken_, offlineTracksH);
+    if (!offlineTracksH.isValid()) {
+        edm::LogWarning("ScoutingCountMakerRun3")
+            << "Offline track collection is invalid for event "
+            << iEvent.id().run() << ":" << iEvent.id().luminosityBlock() << ":" << iEvent.id().event();
+    }
+
+    constexpr double kApproximateMatchCut = 1.3;
+    auto deltaPhiAbs = [](double phi1, double phi2) {
+        return std::fabs(std::atan2(std::sin(phi1 - phi2), std::cos(phi1 - phi2)));
+    };
+
+    std::vector<std::vector<TrackSummary>> approximateScoutingMatches;
+    if (offlineSelected > 0) {
+        approximateScoutingMatches.resize(offlineResult.vertices.size());
+        if (!scoutingTracksH.isValid()) {
+            edm::LogWarning("ScoutingCountMakerRun3")
+                << "Cannot build approximate scouting matches because the scouting track collection is unavailable.";
+        } else if (scoutingTrackPoolIndices.empty()) {
+            if (verbose_) {
+                edm::LogInfo("ScoutingCountMakerRun3")
+                    << "Scouting track pool is empty after filtering; approximate scouting matching is skipped for this event.";
+            }
+        } else {
+            for (size_t ivtx = 0; ivtx < offlineResult.vertices.size(); ++ivtx) {
+                const auto &vertex = offlineResult.vertices[ivtx];
+                std::set<unsigned int> seenOfflineTrackKeys;
+
+                for (const auto &offlineTrackRef : vertex.tracks) {
+                    if (!offlineTrackRef.isNonnull()) continue;
+                    if (!seenOfflineTrackKeys.insert(offlineTrackRef.key()).second) continue;
+
+                    std::vector<std::pair<double, size_t>> rankedMatches;
+                    rankedMatches.reserve(scoutingTrackPoolIndices.size());
+                    for (const size_t iscout : scoutingTrackPoolIndices) {
+                        const auto &scoutingTrack = scoutingTracksH->at(iscout);
+                        const double dEta = std::fabs(offlineTrackRef->eta() - scoutingTrack.eta());
+                        const double dPhi = deltaPhiAbs(offlineTrackRef->phi(), scoutingTrack.phi());
+                        const double dPt = std::fabs(offlineTrackRef->pt() - scoutingTrack.pt());
+                        const double cost = (1.0 + dEta) * (1.0 + dPhi) * (1.0 + dPt);
+                        if (cost >= kApproximateMatchCut) continue;
+                        rankedMatches.emplace_back(cost, iscout);
+                    }
+
+                    if (rankedMatches.empty()) {
+                        if (verbose_) {
+                            edm::LogInfo("ScoutingCountMakerRun3")
+                                << "No approximate scouting match found for offline-associated track in event "
+                                << iEvent.id().run() << ":" << iEvent.id().luminosityBlock() << ":" << iEvent.id().event();
+                        }
+                        continue;
+                    }
+
+                    std::sort(rankedMatches.begin(), rankedMatches.end(),
+                              [](const auto &lhs, const auto &rhs) { return lhs.first < rhs.first; });
+
+                    approximateScoutingMatches[ivtx].push_back(
+                        summarizeTrack(scoutingTracksH->at(rankedMatches.front().second))
+                    );
+                }
+            }
+        }
+    }
+
+    // Reverse matching: for each scouting vertex, find best-matching offline track.
+    std::vector<std::vector<TrackSummary>> approximateOfflineMatches;
+    if (scoutingSelected > 0) {
+        approximateOfflineMatches.resize(scoutingResult.vertices.size());
+        if (!offlineTracksH.isValid()) {
+            edm::LogWarning("ScoutingCountMakerRun3")
+                << "Cannot build approximate offline matches because the offline track collection is unavailable.";
+        } else {
+            for (size_t ivtx = 0; ivtx < scoutingResult.vertices.size(); ++ivtx) {
+                const auto &vertex = scoutingResult.vertices[ivtx];
+                std::set<unsigned int> seenScoutingTrackKeys;
+
+                for (const auto &scoutingTrackRef : vertex.tracks) {
+                    if (!scoutingTrackRef.isNonnull()) continue;
+                    if (!seenScoutingTrackKeys.insert(scoutingTrackRef.key()).second) continue;
+
+                    std::vector<std::pair<double, size_t>> rankedMatches;
+                    rankedMatches.reserve(offlineTracksH->size());
+                    for (size_t ioff = 0; ioff < offlineTracksH->size(); ++ioff) {
+                        const auto &offlineTrack = offlineTracksH->at(ioff);
+                        const double dEta = std::fabs(scoutingTrackRef->eta() - offlineTrack.eta());
+                        const double dPhi = deltaPhiAbs(scoutingTrackRef->phi(), offlineTrack.phi());
+                        const double dPt  = std::fabs(scoutingTrackRef->pt() - offlineTrack.pt());
+                        const double cost = (1.0 + dEta) * (1.0 + dPhi) * (1.0 + dPt);
+                        if (cost >= kApproximateMatchCut) continue;
+                        rankedMatches.emplace_back(cost, ioff);
+                    }
+
+                    if (rankedMatches.empty()) {
+                        if (verbose_) {
+                            edm::LogInfo("ScoutingCountMakerRun3")
+                                << "No approximate offline match found for scouting-associated track in event "
+                                << iEvent.id().run() << ":" << iEvent.id().luminosityBlock() << ":" << iEvent.id().event();
+                        }
+                        continue;
+                    }
+
+                    std::sort(rankedMatches.begin(), rankedMatches.end(),
+                              [](const auto &lhs, const auto &rhs) { return lhs.first < rhs.first; });
+
+                    approximateOfflineMatches[ivtx].push_back(
+                        summarizeTrack(offlineTracksH->at(rankedMatches.front().second))
+                    );
+                }
+            }
+        }
+    }
+
+    const auto classifyMatchBucket = [](int nMatchedTracks) {
+        if (nMatchedTracks >= 2) return 2;  // match(R)
+        if (nMatchedTracks == 1) return 1;  // match
+        return 0;                            // no match
+    };
+
+    int offlineMatchedTrackCount = 0;
+    for (const auto &matchedVec : approximateScoutingMatches) {
+        offlineMatchedTrackCount += static_cast<int>(matchedVec.size());
+    }
+
+    int scoutingMatchedTrackCount = 0;
+    for (const auto &matchedVec : approximateOfflineMatches) {
+        scoutingMatchedTrackCount += static_cast<int>(matchedVec.size());
+    }
+
+    const bool hasOfflineSelected = (offlineSelected > 0);
+    const bool hasScoutingSelected = (scoutingSelected > 0);
+
+    if (hasOfflineSelected) ++nEventsWithOfflineSelected_;
+    if (hasScoutingSelected) ++nEventsWithScoutingSelected_;
+    if (hasOfflineSelected && hasScoutingSelected) {
+        ++nEventsWithBothSelected_;
+    } else if (hasOfflineSelected) {
+        ++nEventsWithOfflineOnly_;
+    } else if (hasScoutingSelected) {
+        ++nEventsWithScoutingOnly_;
+    }
+
+    if (hasOfflineSelected) {
+        if (hasScoutingSelected) {
+            ++nOffSelAndScoSel_;
+            const int bucket = classifyMatchBucket(offlineMatchedTrackCount);
+            if (bucket == 2) ++nOffSelScoMatchR_;
+            else if (bucket == 1) ++nOffSelScoMatch_;
+            else ++nOffSelScoNoMatch_;
+        } else {
+            ++nOffSelAndNoScoSel_;
+            const int bucket = classifyMatchBucket(offlineMatchedTrackCount);
+            if (bucket == 2) ++nOffSelNoScoMatchR_;
+            else if (bucket == 1) ++nOffSelNoScoMatch_;
+            else ++nOffSelNoScoNoMatch_;
+        }
+    }
+
+    if (hasScoutingSelected) {
+        if (hasOfflineSelected) {
+            ++nScoSelAndOffSel_;
+            const int bucket = classifyMatchBucket(scoutingMatchedTrackCount);
+            if (bucket == 2) ++nScoSelOffMatchR_;
+            else if (bucket == 1) ++nScoSelOffMatch_;
+            else ++nScoSelOffNoMatch_;
+        } else {
+            ++nScoSelAndNoOffSel_;
+            const int bucket = classifyMatchBucket(scoutingMatchedTrackCount);
+            if (bucket == 2) ++nScoSelNoOffMatchR_;
+            else if (bucket == 1) ++nScoSelNoOffMatch_;
+            else ++nScoSelNoOffNoMatch_;
+        }
+    }
+
     // Write event folders only for events with at least one selected vertex in either collection.
     if (scoutingSelected > 0 || offlineSelected > 0) {
         std::cout << "Selected vertices found in event " << iEvent.id().event()
@@ -468,12 +788,85 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
 
         edm::Service<TFileService> fs;
         if (fs.isAvailable()) {
+            ++nSelectedEvents_;
             std::ostringstream dirName;
-            dirName << "Event" << iEvent.id().event();
+            const bool poolNonEmpty = !scoutingTrackPoolIndices.empty();
+            dirName << (poolNonEmpty ? "EW" : "E") << nSelectedEvents_;
+            // Offline: per-ntk match status (O part)
+            if (offlineSelected > 0) {
+                dirName << "_O";
+                std::set<int> uniqueNtksOff;
+                for (const auto &v : offlineResult.vertices) uniqueNtksOff.insert(v.nTracks);
+                for (int ntk : uniqueNtksOff) {
+                    int matchedTrackCount = 0;
+                    for (size_t ivtx = 0; ivtx < offlineResult.vertices.size(); ++ivtx) {
+                        if (offlineResult.vertices[ivtx].nTracks == ntk &&
+                            ivtx < approximateScoutingMatches.size() &&
+                            !approximateScoutingMatches[ivtx].empty()) {
+                            matchedTrackCount += static_cast<int>(approximateScoutingMatches[ivtx].size());
+                        }
+                    }
+                    dirName << "_ntk" << ntk;
+                    if (matchedTrackCount > 0) {
+                        dirName << "withMatch";
+                        if (matchedTrackCount >= 2) dirName << "(R)";
+                    }
+                }
+            }
+            // Scouting: per-ntk match status (S part)
+            if (scoutingSelected > 0) {
+                dirName << "_S";
+                std::set<int> uniqueNtksSco;
+                for (const auto &v : scoutingResult.vertices) uniqueNtksSco.insert(v.nTracks);
+                for (int ntk : uniqueNtksSco) {
+                    int matchedTrackCount = 0;
+                    for (size_t ivtx = 0; ivtx < scoutingResult.vertices.size(); ++ivtx) {
+                        if (scoutingResult.vertices[ivtx].nTracks == ntk &&
+                            ivtx < approximateOfflineMatches.size() &&
+                            !approximateOfflineMatches[ivtx].empty()) {
+                            matchedTrackCount += static_cast<int>(approximateOfflineMatches[ivtx].size());
+                        }
+                    }
+                    dirName << "_ntk" << ntk;
+                    if (matchedTrackCount > 0) {
+                        dirName << "withMatch";
+                        if (matchedTrackCount >= 2) dirName << "(R)";
+                    }
+                }
+            }
             TFileDirectory eventDir = fs->mkdir(dirName.str().c_str());
 
+            auto fillTrackHistograms = [](TH1F *h_trk_pt,
+                                         TH1F *h_trk_eta,
+                                         TH1F *h_trk_phi,
+                                         TH1F *h_trk_dxy,
+                                         TH1F *h_trk_dxyerr,
+                                         TH1F *h_trk_ipsig,
+                                         const TrackSummary &track) {
+                h_trk_pt->Fill(track.pt);
+                h_trk_eta->Fill(track.eta);
+                h_trk_phi->Fill(track.phi);
+                h_trk_dxy->Fill(track.dxy);
+                h_trk_dxyerr->Fill(track.dxyErr);
+                h_trk_ipsig->Fill(track.ipSig);
+            };
+
+            auto fillSingleTrackDirectory = [&](TFileDirectory &trackDir, const TrackSummary &track) {
+                TH1F *h_one_pt = trackDir.make<TH1F>("pt", "Track p_{T};p_{T} [GeV];entries", 100, 0, 50);
+                TH1F *h_one_eta = trackDir.make<TH1F>("eta", "Track #eta;#eta;entries", 100, -3, 3);
+                TH1F *h_one_phi = trackDir.make<TH1F>("phi", "Track #phi;#phi;entries", 100, -3.2, 3.2);
+                TH1F *h_one_dxy = trackDir.make<TH1F>("dxy", "Track dxy;dxy [cm];entries", 100, -1.0, 1.0);
+                TH1F *h_one_dxyerr = trackDir.make<TH1F>("dxy_error", "Track dxy error;#sigma_{dxy} [cm];entries", 200, 0, 0.05);
+                TH1F *h_one_ipsig = trackDir.make<TH1F>("ipsig", "Track IPsig;|dxy|/err;entries", 100, 0, 50);
+
+                fillTrackHistograms(h_one_pt, h_one_eta, h_one_phi, h_one_dxy, h_one_dxyerr, h_one_ipsig, track);
+            };
+
             auto fillCollectionFolder = [&](const char *collectionName,
-                                            const SelectionResult &result) {
+                                            const SelectionResult &result,
+                                            const edm::Handle<std::vector<reco::Track>> &allTracksH,
+                                            const std::vector<size_t> *cutTrackPoolIndices = nullptr,
+                                            const std::vector<std::vector<TrackSummary>> *approximateMatches = nullptr) {
                 TFileDirectory collectionDir = eventDir.mkdir(collectionName);
 
                 TFileDirectory verticesDir = collectionDir.mkdir("Vertices");
@@ -489,7 +882,6 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
                     h_beamspot_xy->Fill(offlineBsVtx.x(), offlineBsVtx.y());
                 }
 
-                std::vector<reco::TrackRef> allVertexTracks;
                 for (const auto &v : result.vertices) {
                     h_vtx_pt->Fill(v.pt);
                     h_vtx_mass->Fill(v.mass);
@@ -497,16 +889,55 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
                     h_vtx_ntrk->Fill(v.nTracks);
                     h_vtx_dbverr->Fill(v.dBVerr);
                     h_vtx_xy->Fill(v.x, v.y);
-                    allVertexTracks.insert(allVertexTracks.end(), v.tracks.begin(), v.tracks.end());
                 }
 
                 TFileDirectory tracksDir = collectionDir.mkdir("Tracks");
-                TH1F *h_trk_pt = tracksDir.make<TH1F>("pt", "Track p_{T};p_{T} [GeV];entries", 100, 0, 50);
-                TH1F *h_trk_eta = tracksDir.make<TH1F>("eta", "Track #eta;#eta;entries", 100, -3, 3);
-                TH1F *h_trk_phi = tracksDir.make<TH1F>("phi", "Track #phi;#phi;entries", 100, -3.2, 3.2);
-                TH1F *h_trk_dxy = tracksDir.make<TH1F>("dxy", "Track dxy;dxy [cm];entries", 100, -1.0, 1.0);
-                TH1F *h_trk_dxyerr = tracksDir.make<TH1F>("dxy_error", "Track dxy error;#sigma_{dxy} [cm];entries", 200, 0, 0.05);
-                TH1F *h_trk_ipsig = tracksDir.make<TH1F>("ipsig", "Track IPsig;|dxy|/err;entries", 100, 0, 50);
+                if (cutTrackPoolIndices) {
+                    TFileDirectory rawTracksDir = tracksDir.mkdir("Raw");
+                    TH1F *h_raw_trk_pt = rawTracksDir.make<TH1F>("pt", "Track p_{T};p_{T} [GeV];entries", 100, 0, 50);
+                    TH1F *h_raw_trk_eta = rawTracksDir.make<TH1F>("eta", "Track #eta;#eta;entries", 100, -3, 3);
+                    TH1F *h_raw_trk_phi = rawTracksDir.make<TH1F>("phi", "Track #phi;#phi;entries", 100, -3.2, 3.2);
+                    TH1F *h_raw_trk_dxy = rawTracksDir.make<TH1F>("dxy", "Track dxy;dxy [cm];entries", 100, -1.0, 1.0);
+                    TH1F *h_raw_trk_dxyerr = rawTracksDir.make<TH1F>("dxy_error", "Track dxy error;#sigma_{dxy} [cm];entries", 200, 0, 0.05);
+                    TH1F *h_raw_trk_ipsig = rawTracksDir.make<TH1F>("ipsig", "Track IPsig;|dxy|/err;entries", 100, 0, 50);
+
+                    TFileDirectory cutTracksDir = tracksDir.mkdir("Cut");
+                    TH1F *h_cut_trk_pt = cutTracksDir.make<TH1F>("pt", "Track p_{T};p_{T} [GeV];entries", 100, 0, 50);
+                    TH1F *h_cut_trk_eta = cutTracksDir.make<TH1F>("eta", "Track #eta;#eta;entries", 100, -3, 3);
+                    TH1F *h_cut_trk_phi = cutTracksDir.make<TH1F>("phi", "Track #phi;#phi;entries", 100, -3.2, 3.2);
+                    TH1F *h_cut_trk_dxy = cutTracksDir.make<TH1F>("dxy", "Track dxy;dxy [cm];entries", 100, -1.0, 1.0);
+                    TH1F *h_cut_trk_dxyerr = cutTracksDir.make<TH1F>("dxy_error", "Track dxy error;#sigma_{dxy} [cm];entries", 200, 0, 0.05);
+                    TH1F *h_cut_trk_ipsig = cutTracksDir.make<TH1F>("ipsig", "Track IPsig;|dxy|/err;entries", 100, 0, 50);
+
+                    if (allTracksH.isValid()) {
+                        for (const auto &track : *allTracksH) {
+                            fillTrackHistograms(h_raw_trk_pt, h_raw_trk_eta, h_raw_trk_phi,
+                                                h_raw_trk_dxy, h_raw_trk_dxyerr, h_raw_trk_ipsig,
+                                                summarizeTrack(track));
+                        }
+                        for (const size_t idx : *cutTrackPoolIndices) {
+                            if (idx >= allTracksH->size()) continue;
+                            const auto &track = allTracksH->at(idx);
+                            fillTrackHistograms(h_cut_trk_pt, h_cut_trk_eta, h_cut_trk_phi,
+                                                h_cut_trk_dxy, h_cut_trk_dxyerr, h_cut_trk_ipsig,
+                                                summarizeTrack(track));
+                        }
+                    }
+                } else {
+                    TH1F *h_trk_pt = tracksDir.make<TH1F>("pt", "Track p_{T};p_{T} [GeV];entries", 100, 0, 50);
+                    TH1F *h_trk_eta = tracksDir.make<TH1F>("eta", "Track #eta;#eta;entries", 100, -3, 3);
+                    TH1F *h_trk_phi = tracksDir.make<TH1F>("phi", "Track #phi;#phi;entries", 100, -3.2, 3.2);
+                    TH1F *h_trk_dxy = tracksDir.make<TH1F>("dxy", "Track dxy;dxy [cm];entries", 100, -1.0, 1.0);
+                    TH1F *h_trk_dxyerr = tracksDir.make<TH1F>("dxy_error", "Track dxy error;#sigma_{dxy} [cm];entries", 200, 0, 0.05);
+                    TH1F *h_trk_ipsig = tracksDir.make<TH1F>("ipsig", "Track IPsig;|dxy|/err;entries", 100, 0, 50);
+
+                    if (allTracksH.isValid()) {
+                        for (const auto &track : *allTracksH) {
+                            fillTrackHistograms(h_trk_pt, h_trk_eta, h_trk_phi, h_trk_dxy, h_trk_dxyerr, h_trk_ipsig,
+                                                summarizeTrack(track));
+                        }
+                    }
+                }
 
                 TFileDirectory vertexAssocDir = tracksDir.mkdir("VertexAssociatedTracks");
                 for (size_t ivtx = 0; ivtx < result.vertices.size(); ++ivtx) {
@@ -523,48 +954,38 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
                         if (seenTrackKeys.find(key) != seenTrackKeys.end()) continue;
                         seenTrackKeys.insert(key);
 
-                        const float pt = static_cast<float>(trRef->pt());
-                        const float eta = static_cast<float>(trRef->eta());
-                        const float phi = static_cast<float>(trRef->phi());
-                        const float dxy = static_cast<float>(trRef->d0());
-                        const float dxyErr = static_cast<float>(trRef->d0Error());
-                        const float ipSig = (dxyErr > 0.0f) ? std::fabs(dxy / dxyErr) : 0.0f;
-
-                        h_trk_pt->Fill(pt);
-                        h_trk_eta->Fill(eta);
-                        h_trk_phi->Fill(phi);
-                        h_trk_dxy->Fill(dxy);
-                        h_trk_dxyerr->Fill(dxyErr);
-                        h_trk_ipsig->Fill(ipSig);
-
                         ++trackCounter;
                         std::ostringstream trackDirName;
                         trackDirName << "Track" << trackCounter;
                         TFileDirectory oneTrackDir = oneVertexDir.mkdir(trackDirName.str().c_str());
 
-                        TH1F *h_one_pt = oneTrackDir.make<TH1F>("pt", "Track p_{T};p_{T} [GeV];entries", 100, 0, 50);
-                        TH1F *h_one_eta = oneTrackDir.make<TH1F>("eta", "Track #eta;#eta;entries", 100, -3, 3);
-                        TH1F *h_one_phi = oneTrackDir.make<TH1F>("phi", "Track #phi;#phi;entries", 100, -3.2, 3.2);
-                        TH1F *h_one_dxy = oneTrackDir.make<TH1F>("dxy", "Track dxy;dxy [cm];entries", 100, -1.0, 1.0);
-                        TH1F *h_one_dxyerr = oneTrackDir.make<TH1F>("dxy_error", "Track dxy error;#sigma_{dxy} [cm];entries", 200, 0, 0.05);
-                        TH1F *h_one_ipsig = oneTrackDir.make<TH1F>("ipsig", "Track IPsig;|dxy|/err;entries", 100, 0, 50);
+                        fillSingleTrackDirectory(oneTrackDir, summarizeTrack(*trRef));
+                    }
+                }
 
-                        h_one_pt->Fill(pt);
-                        h_one_eta->Fill(eta);
-                        h_one_phi->Fill(phi);
-                        h_one_dxy->Fill(dxy);
-                        h_one_dxyerr->Fill(dxyErr);
-                        h_one_ipsig->Fill(ipSig);
+                if (approximateMatches) {
+                    for (size_t ivtx = 0; ivtx < approximateMatches->size(); ++ivtx) {
+                        std::ostringstream approxDirName;
+                        approxDirName << "ApproximateVertex" << (ivtx + 1);
+                        TFileDirectory approxVertexDir = tracksDir.mkdir(approxDirName.str().c_str());
+
+                        const auto &matchedTracks = approximateMatches->at(ivtx);
+                        for (size_t itrk = 0; itrk < matchedTracks.size(); ++itrk) {
+                            std::ostringstream trackDirName;
+                            trackDirName << "Track" << (itrk + 1);
+                            TFileDirectory matchedTrackDir = approxVertexDir.mkdir(trackDirName.str().c_str());
+                            fillSingleTrackDirectory(matchedTrackDir, matchedTracks[itrk]);
+                        }
                     }
                 }
             };
 
-            if (scoutingSelected > 0) {
-                fillCollectionFolder("Scouting", scoutingResult);
-            }
-            if (offlineSelected > 0) {
-                fillCollectionFolder("Offline", offlineResult);
-            }
+            fillCollectionFolder("Scouting", scoutingResult, scoutingTracksH,
+                                 &scoutingTrackPoolIndices,
+                                 offlineSelected > 0 ? &approximateScoutingMatches : nullptr);
+            fillCollectionFolder("Offline", offlineResult, offlineTracksH,
+                                 nullptr,
+                                 scoutingSelected > 0 ? &approximateOfflineMatches : nullptr);
         }
     }
 
@@ -584,6 +1005,94 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
 
 void ScoutingCountMakerRun3::endJob() {
     if (printSummary_) {
+        const auto fracPct = [](unsigned long long num, unsigned long long den) {
+            if (den == 0) return 0.0;
+            return 100.0 * static_cast<double>(num) / static_cast<double>(den);
+        };
+
+        std::cout << std::fixed << std::setprecision(2);
+        std::cout << "================ ScoutingCountMakerRun3 Summary ================\n";
+        std::cout << "Total events processed: " << nEvents_ << "\n";
+        std::cout << "Events with offline selected vertices: "
+                  << nEventsWithOfflineSelected_ << "/" << nEvents_
+                  << " (" << fracPct(nEventsWithOfflineSelected_, nEvents_) << "%)\n";
+        std::cout << "Events with scouting selected vertices: "
+                  << nEventsWithScoutingSelected_ << "/" << nEvents_
+                  << " (" << fracPct(nEventsWithScoutingSelected_, nEvents_) << "%)\n";
+        std::cout << "Events with both selected: "
+                  << nEventsWithBothSelected_ << "/" << nEvents_
+                  << " (" << fracPct(nEventsWithBothSelected_, nEvents_) << "%)\n";
+        std::cout << "Events with offline only: "
+                  << nEventsWithOfflineOnly_ << "/" << nEvents_
+                  << " (" << fracPct(nEventsWithOfflineOnly_, nEvents_) << "%)\n";
+        std::cout << "Events with scouting only: "
+                  << nEventsWithScoutingOnly_ << "/" << nEvents_
+                  << " (" << fracPct(nEventsWithScoutingOnly_, nEvents_) << "%)\n";
+
+        std::cout << "Offline-selected event breakdown:\n";
+        std::cout << "Offline selected AND scouting selected: "
+                  << nOffSelAndScoSel_ << "/" << nEventsWithOfflineSelected_
+                  << " (" << fracPct(nOffSelAndScoSel_, nEventsWithOfflineSelected_) << "%)\n";
+        std::cout << "Offline selected AND no scouting selected: "
+                  << nOffSelAndNoScoSel_ << "/" << nEventsWithOfflineSelected_
+                  << " (" << fracPct(nOffSelAndNoScoSel_, nEventsWithOfflineSelected_) << "%)\n";
+
+        std::cout << "Offline selected, no scouting selected, no match: "
+                  << nOffSelNoScoNoMatch_ << "/" << nEventsWithOfflineSelected_
+                  << " (" << fracPct(nOffSelNoScoNoMatch_, nEventsWithOfflineSelected_) << "%)\n";
+        std::cout << "Offline selected, no scouting selected, match: "
+                  << nOffSelNoScoMatch_ << "/" << nEventsWithOfflineSelected_
+                  << " (" << fracPct(nOffSelNoScoMatch_, nEventsWithOfflineSelected_) << "%)\n";
+        std::cout << "Offline selected, no scouting selected, match(R): "
+                  << nOffSelNoScoMatchR_ << "/" << nEventsWithOfflineSelected_
+                  << " (" << fracPct(nOffSelNoScoMatchR_, nEventsWithOfflineSelected_) << "%)\n";
+
+        std::cout << "Offline selected, scouting selected too, no match: "
+                  << nOffSelScoNoMatch_ << "/" << nEventsWithOfflineSelected_
+                  << " (" << fracPct(nOffSelScoNoMatch_, nEventsWithOfflineSelected_) << "%)\n";
+        std::cout << "Offline selected, scouting selected too, match: "
+                  << nOffSelScoMatch_ << "/" << nEventsWithOfflineSelected_
+                  << " (" << fracPct(nOffSelScoMatch_, nEventsWithOfflineSelected_) << "%)\n";
+        std::cout << "Offline selected, scouting selected too, match(R): "
+                  << nOffSelScoMatchR_ << "/" << nEventsWithOfflineSelected_
+                  << " (" << fracPct(nOffSelScoMatchR_, nEventsWithOfflineSelected_) << "%)\n";
+
+        std::cout << "Scouting-selected event breakdown:\n";
+        std::cout << "Scouting selected AND offline selected: "
+                  << nScoSelAndOffSel_ << "/" << nEventsWithScoutingSelected_
+                  << " (" << fracPct(nScoSelAndOffSel_, nEventsWithScoutingSelected_) << "%)\n";
+        std::cout << "Scouting selected AND no offline selected: "
+                  << nScoSelAndNoOffSel_ << "/" << nEventsWithScoutingSelected_
+                  << " (" << fracPct(nScoSelAndNoOffSel_, nEventsWithScoutingSelected_) << "%)\n";
+
+        std::cout << "Scouting selected, no offline selected, no match: "
+                  << nScoSelNoOffNoMatch_ << "/" << nEventsWithScoutingSelected_
+                  << " (" << fracPct(nScoSelNoOffNoMatch_, nEventsWithScoutingSelected_) << "%)\n";
+        std::cout << "Scouting selected, no offline selected, match: "
+                  << nScoSelNoOffMatch_ << "/" << nEventsWithScoutingSelected_
+                  << " (" << fracPct(nScoSelNoOffMatch_, nEventsWithScoutingSelected_) << "%)\n";
+        std::cout << "Scouting selected, no offline selected, match(R): "
+                  << nScoSelNoOffMatchR_ << "/" << nEventsWithScoutingSelected_
+                  << " (" << fracPct(nScoSelNoOffMatchR_, nEventsWithScoutingSelected_) << "%)\n";
+
+        std::cout << "Scouting selected, offline selected too, no match: "
+                  << nScoSelOffNoMatch_ << "/" << nEventsWithScoutingSelected_
+                  << " (" << fracPct(nScoSelOffNoMatch_, nEventsWithScoutingSelected_) << "%)\n";
+        std::cout << "Scouting selected, offline selected too, match: "
+                  << nScoSelOffMatch_ << "/" << nEventsWithScoutingSelected_
+                  << " (" << fracPct(nScoSelOffMatch_, nEventsWithScoutingSelected_) << "%)\n";
+        std::cout << "Scouting selected, offline selected too, match(R): "
+                  << nScoSelOffMatchR_ << "/" << nEventsWithScoutingSelected_
+                  << " (" << fracPct(nScoSelOffMatchR_, nEventsWithScoutingSelected_) << "%)\n";
+        std::cout << "Scouting track cut pool occupancy (all events):\n";
+        std::cout << "Events with non-empty scouting cut pool (EW): "
+                  << nEventsPoolNonEmpty_ << "/" << nEvents_
+                  << " (" << fracPct(nEventsPoolNonEmpty_, nEvents_) << "%)\n";
+        std::cout << "Events with empty scouting cut pool (E): "
+                  << nEventsPoolEmpty_ << "/" << nEvents_
+                  << " (" << fracPct(nEventsPoolEmpty_, nEvents_) << "%)\n";
+        std::cout << "===============================================================\n";
+
         edm::LogInfo("ScoutingCountMakerRun3")
             << "Summary: events=" << nEvents_
             << " total_scouting_selected_vertices=" << totalScoutingSelected_
@@ -599,6 +1108,11 @@ void ScoutingCountMakerRun3::fillDescriptions(edm::ConfigurationDescriptions &de
     desc.add<edm::InputTag>("primaryVertices", edm::InputTag("hltScoutingPrimaryVertexPacker", "primaryVtx"));
     desc.add<edm::InputTag>("beamspot_src", edm::InputTag("offlineBeamSpot"));
     desc.add<edm::InputTag>("tracks", edm::InputTag("hltScoutingUnpackProducer", "Track"));
+    desc.add<edm::InputTag>("offlineTracks", edm::InputTag("packedCandidateToTrack", "Track"));
+
+    edm::ParameterSetDescription ntkDesc;
+    ntkDesc.add<std::vector<int>>("values", {});
+    desc.add("cut_ntk", ntkDesc);
 
     desc.add<double>("cut_opening_angle_min", 0.05);
     desc.add<double>("required_invmass", 2.0);
