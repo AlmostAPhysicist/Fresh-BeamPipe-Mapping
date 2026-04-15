@@ -18,6 +18,12 @@
 
 // system include files
 #include <memory>
+#include <algorithm>
+#include <fstream>
+#include <iomanip>
+#include <limits>
+#include <sstream>
+#include <unordered_set>
 
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -113,6 +119,7 @@ private:
   const int max_nm1_refit_count;
   const bool investigate_merged_vertices;
   const bool verbose;
+  const bool printVertexerLogs_;
 
   // REMOVE legacy-style seed knobs that changed physics
   // const double pt_min_cut_;
@@ -130,6 +137,7 @@ private:
   const RefPreference refPreference_;
   const bool useOnlineBeamSpot_;
   const bool logBeamspotSource_;
+  const edm::InputTag seedTracksTag_;
   const edm::EDGetTokenT<std::vector<reco::Vertex>> primaryVerticesToken_;  // vector of PVs
   const edm::EDGetTokenT<reco::BeamSpot>            beamspotToken_;         // fallback
   const edm::ESGetToken<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd> beamspotOnlineToken_;
@@ -323,6 +331,7 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
   max_nm1_refit_count(params.getParameter<int>("max_nm1_refit_count")),
   investigate_merged_vertices(params.getParameter<bool>("investigate_merged_vertices")),
   verbose(params.getParameter<bool>("verbose")),
+  printVertexerLogs_(params.getUntrackedParameter<bool>("printVertexerLogs", false)),
   
   // read new params (provide same defaults as current hard-coded values)
   // REMOVE these (do not read minSeed*)
@@ -342,6 +351,7 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
                   RefPreference::PreferPV : RefPreference::PreferBeamSpot),
   useOnlineBeamSpot_(params.getUntrackedParameter<bool>("useOnlineBeamSpot", false)),
   logBeamspotSource_(params.getUntrackedParameter<bool>("logBeamspotSource", false)),
+  seedTracksTag_(params.getParameter<edm::InputTag>("seed_tracks_src")),
   primaryVerticesToken_((params.existsAs<edm::InputTag>("primaryVertices_src") || 
                         params.existsAs<edm::InputTag>("primaryVertices")) ?
                         consumes<std::vector<reco::Vertex>>( getPVTag(params) ) :
@@ -350,7 +360,7 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
                 consumes<reco::BeamSpot>( params.getParameter<edm::InputTag>("beamspot_src") ) :
                 consumes<reco::BeamSpot>( edm::InputTag("offlineBeamSpot") )),
   beamspotOnlineToken_(esConsumes<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd>()),
-  seed_tracks_token_(consumes(params.getParameter<edm::InputTag>("seed_tracks_src"))),
+  seed_tracks_token_(consumes(seedTracksTag_)),
   token_builder(esConsumes(edm::ESInputTag("", "TransientTrackBuilder"))),
 
   putToken_{produces()} {}
@@ -364,13 +374,113 @@ Vertexer::~Vertexer() {}
 
 // ------------ method called to produce the data  ------------
 void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
+
+  // ------------------------------------------------------------------
+  // LOGGING SETUP: file name, event metadata, and run mode (scouting/offline)
+  // Big picture:
+  //   - This module builds seed vertices from displaced-track candidates.
+  //   - Then it resolves shared-track ambiguities and optionally merges nearby
+  //     vertices according to configured geometric/significance criteria.
+  //   - Logging here is intentionally verbose to let us reconstruct each
+  //     decision without changing the vertexing physics.
+  // ------------------------------------------------------------------
+  const std::string moduleLabel = moduleDescription().moduleLabel();
+
+  // See if input is Offline or Scouting
+  const bool isOfflineVertexer =
+      (moduleLabel.find("Offline") != std::string::npos) ||
+      (seedTracksTag_.label().find("packedCandidateToTrack") != std::string::npos);
+
+  std::ofstream logFile;
+  auto logLine = [&](const std::string& msg) {
+    if (printVertexerLogs_ && logFile.is_open()) {
+      logFile << msg << "\n";
+    }
+  };
+
+  // Event metadata
+  if (printVertexerLogs_) {
+    std::ostringstream fileName;
+    fileName << "vertexer_log_" << moduleLabel
+             << "_run" << iEvent.id().run()
+             << "_lumi" << iEvent.id().luminosityBlock()
+             << "_event" << iEvent.id().event()
+             << ".txt";
+    logFile.open(fileName.str(), std::ios::out);
+    if (logFile.is_open()) {
+      logFile << std::fixed << std::setprecision(6);
+      logFile << "============================================================\n";
+      logFile << "Vertexer log for module: " << moduleLabel << "\n";
+      logFile << "Event: run=" << iEvent.id().run()
+              << " lumi=" << iEvent.id().luminosityBlock()
+              << " event=" << iEvent.id().event() << "\n";
+      logFile << "Mode: " << (isOfflineVertexer ? "Offline" : "Scouting") << "\n";
+      logFile << "Reference preference config: "
+              << (refPreference_ == RefPreference::PreferPV ? "PV" : "BeamSpot") << "\n";
+      logFile << "Defaults note: refPreference defaults to BeamSpot unless configured otherwise.\n";
+      logFile << "\n";
+      logFile << "Notation legend:\n";
+      logFile << "  - TrackN means pT-ordered label within this event (N=0 is highest pT).\n";
+      logFile << "  - dxy and dxySig use transverse impact parameter of reco::Track relative to a point.\n";
+      logFile << "  - dist/sig in TRACK_ARBITRATION use track_dist():\n";
+      logFile << "      * if use_2d_track_dist=True -> absoluteTransverseImpactParameter (2D IP)\n";
+      logFile << "      * if use_2d_track_dist=False -> absoluteImpactParameter3D (3D IP)\n";
+      logFile << "  - dBV is vertex distance from chosen reference (PV-average or beamspot).\n";
+      logFile << "  - dBVErr is inferred as dBV/significance when significance is non-zero.\n";
+      logFile << "  - DROP_* entries are explicit removals and include the reason + content.\n";
+      logFile << "  - MERGE_STEP entries document merge attempts/success/fallback points.\n";
+      logFile << "  - TRACK_ARBITRATION entries show per-shared-track removal decisions.\n";
+      logFile << "============================================================\n";
+      logFile << "------------------------------------------------------------\n";
+    }
+  }
+
   // Retrieve seed tracks
   edm::Handle<std::vector<reco::Track>> seed_track_handle;
   iEvent.getByToken(seed_tracks_token_, seed_track_handle);
   if (!seed_track_handle.isValid()) {
+    logLine("Seed track handle invalid. Returning empty vertex collection.");
     if (verbose) edm::LogWarning("Vertexer") << "Seed track handle invalid (return empty collection; no fake vertices).";
     iEvent.emplace(putToken_, reco::VertexCollection());
     return;
+  }
+
+  // ------------------------------------------------------------------
+  // LOGGING PREP: prepare PV/BS references and a stable track label map (pT-ordered)
+  // Why label by pT?
+  //   We only change presentation: labels provide human-readable, deterministic
+  //   names while preserving original track keys for algorithmic bookkeeping.
+  // ------------------------------------------------------------------
+  edm::Handle<std::vector<reco::Vertex>> pvForTrackLogHandle;
+  if (!primaryVerticesToken_.isUninitialized()) {
+    iEvent.getByToken(primaryVerticesToken_, pvForTrackLogHandle);
+  }
+  const bool havePVForTrackLog = pvForTrackLogHandle.isValid() && !pvForTrackLogHandle->empty();
+  reco::Vertex::Point pvRefPoint(0.0, 0.0, 0.0);
+  if (havePVForTrackLog) {
+    pvRefPoint = pvForTrackLogHandle->front().position();
+  }
+
+  edm::Handle<reco::BeamSpot> bsForTrackLogHandle;
+  iEvent.getByToken(beamspotToken_, bsForTrackLogHandle);
+  const bool haveBSForTrackLog = bsForTrackLogHandle.isValid();
+  reco::TrackBase::Point beamspotPoint(0.0, 0.0, 0.0);
+  if (haveBSForTrackLog) {
+    beamspotPoint = reco::TrackBase::Point(bsForTrackLogHandle->position().x(),
+                                           bsForTrackLogHandle->position().y(),
+                                           bsForTrackLogHandle->position().z());
+  }
+
+  std::vector<size_t> trackIdxByPt(seed_track_handle->size());
+  for (size_t i = 0; i < seed_track_handle->size(); ++i) {
+    trackIdxByPt[i] = i;
+  }
+  std::sort(trackIdxByPt.begin(), trackIdxByPt.end(),
+            [&](size_t a, size_t b) { return seed_track_handle->at(a).pt() > seed_track_handle->at(b).pt(); });
+
+  std::unordered_map<unsigned int, int> trackLabelByKey;
+  for (size_t i = 0; i < trackIdxByPt.size(); ++i) {
+    trackLabelByKey[static_cast<unsigned int>(trackIdxByPt[i])] = static_cast<int>(i);
   }
 
   // Determine reference vertex (average PV or beamspot)
@@ -480,6 +590,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   }
 
   if (!haveRef) {
+    logLine("No valid reference vertex/beamspot found. Returning empty vertex collection.");
     if (verbose) edm::LogWarning("Vertexer") << "No valid reference (PV avg or BeamSpot). Returning empty (no fake substitute).";
     iEvent.emplace(putToken_, reco::VertexCollection());
     return;
@@ -487,11 +598,40 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   const reco::Vertex fake_ref_vtx(reco::Vertex::Point(ref_x, ref_y, ref_z), ref_error);
 
+  {
+    logLine(" ");
+    logLine("-------------------- REFERENCE SELECTION --------------------");
+    std::ostringstream header;
+    header << "Reference vertex: x=" << ref_x << " y=" << ref_y << " z=" << ref_z;
+    logLine(header.str());
+    logLine("This reference is used for impact-parameter significance and dBV-like distances.");
+    logLine(" ");
+    logLine("---------------------- INPUT TRACK LIST ----------------------");
+    {
+      std::ostringstream srcLine;
+      srcLine << "INPUT SOURCE: seed_tracks_src=" << seedTracksTag_.label();
+      if (!seedTracksTag_.instance().empty()) srcLine << ":" << seedTracksTag_.instance();
+      if (!seedTracksTag_.process().empty()) srcLine << " (process=" << seedTracksTag_.process() << ")";
+      logLine(srcLine.str());
+    }
+    logLine("Tracks ordered by descending pT:");
+  }
+
   // TransientTrack builder
   auto const& tt_builder = iSetup.getData(token_builder);
 
-  // Seed track selection (apply each cut once)
+  // ==================================================
+  // 1) Seed Track Selection
+  // ==================================================
+  // Seed Track Selection
+  // Apply the track seed cuts:
+  // - pT > 0.9 GeV
+  // - |IP significance(reference)| > 4.0
+  // Every surviving track is added to the seed track list.
   std::vector<reco::TransientTrack> seed_tracks;
+  std::vector<unsigned int> seed_track_keys;
+  std::unordered_set<unsigned int> seedTrackKeySet;
+  std::unordered_map<unsigned int, float> seedTrackIPSigByKey;
   std::unordered_map<unsigned int,size_t> seed_track_ref_map;
 
   for (size_t i_tk=0; i_tk<seed_track_handle->size(); ++i_tk) {
@@ -511,11 +651,81 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     // Keep the seed
     seed_track_ref_map[tk_ref.key()] = seed_tracks.size();
+    seed_track_keys.push_back(tk_ref.key());
+    seedTrackKeySet.insert(tk_ref.key());
+    seedTrackIPSigByKey[tk_ref.key()] = IP_sig;
     seed_tracks.emplace_back(std::move(ttk));
 
     if (verbose)
       printf("Seed preselect: key=%u pt=%.3f IPsig(ref)=%.3f KEPT\n",
              tk_ref.key(), tk_ref->pt(), IP_sig);
+  }
+
+  for (size_t orderIdx = 0; orderIdx < trackIdxByPt.size(); ++orderIdx) {
+    const size_t tkIdx = trackIdxByPt[orderIdx];
+    const reco::Track& tk = seed_track_handle->at(tkIdx);
+
+    const double dxyOrigin = tk.dxy(reco::TrackBase::Point(0.0, 0.0, 0.0));
+    const double dxyBeamspot = haveBSForTrackLog ? tk.dxy(beamspotPoint) : std::numeric_limits<double>::quiet_NaN();
+    const double dxySigOrigin = (tk.dxyError() > 0.0) ? (dxyOrigin / tk.dxyError()) : std::numeric_limits<double>::quiet_NaN();
+    const double dxySigBeamspot = (tk.dxyError() > 0.0) ? (dxyBeamspot / tk.dxyError()) : std::numeric_limits<double>::quiet_NaN();
+    const double dzOrigin = tk.dz(reco::TrackBase::Point(0.0, 0.0, 0.0));
+    const double dzPV = havePVForTrackLog ? tk.dz(pvRefPoint) : std::numeric_limits<double>::quiet_NaN();
+
+    std::ostringstream trkLine;
+        trkLine << "Track" << orderIdx
+            << " pt=" << tk.pt()
+            << " eta=" << tk.eta()
+            << " phi=" << tk.phi()
+            << " dxy(beamspot)=" << dxyBeamspot
+            << " dxySig(beamspot)=" << dxySigBeamspot
+            << " dxy(0,0)=" << dxyOrigin
+            << " dxySig(0,0)=" << dxySigOrigin
+            << " dz(PV)=" << dzPV
+            << " dz(0,0)=" << dzOrigin
+            << " dxyErr=" << tk.dxyError()
+          << " dzErr=" << tk.dzError();
+    logLine(trkLine.str());
+  }
+
+  {
+    logLine(" ");
+    logLine("[Seed Track Selection]");
+    std::ostringstream selSummary;
+    selSummary << "Seed-track summary: totalTracks=" << seed_track_handle->size()
+               << " selectedSeedTracks=" << seed_tracks.size();
+    logLine(selSummary.str());
+    logLine("Apply seed cuts: pT > 0.9 GeV and |IP significance(reference)| > 4.0.");
+    logLine(" ");
+    logLine("[Seed Track Selection] Seed track list");
+    logLine("Only seed tracks used for seed-vertex combinations:");
+    for (size_t orderIdx = 0; orderIdx < trackIdxByPt.size(); ++orderIdx) {
+      const size_t tkIdx = trackIdxByPt[orderIdx];
+      if (seedTrackKeySet.count(static_cast<unsigned int>(tkIdx)) == 0) continue;
+      const reco::Track& tk = seed_track_handle->at(tkIdx);
+      const double dxyOrigin = tk.dxy(reco::TrackBase::Point(0.0, 0.0, 0.0));
+      const double dxyBeamspot = haveBSForTrackLog ? tk.dxy(beamspotPoint) : std::numeric_limits<double>::quiet_NaN();
+      const double dxySigOrigin = (tk.dxyError() > 0.0) ? (dxyOrigin / tk.dxyError()) : std::numeric_limits<double>::quiet_NaN();
+      const double dxySigBeamspot = (tk.dxyError() > 0.0) ? (dxyBeamspot / tk.dxyError()) : std::numeric_limits<double>::quiet_NaN();
+      const double dzOrigin = tk.dz(reco::TrackBase::Point(0.0, 0.0, 0.0));
+      const double dzPV = havePVForTrackLog ? tk.dz(pvRefPoint) : std::numeric_limits<double>::quiet_NaN();
+      const float ipSig = seedTrackIPSigByKey.count(static_cast<unsigned int>(tkIdx)) ? seedTrackIPSigByKey[static_cast<unsigned int>(tkIdx)] : std::numeric_limits<float>::quiet_NaN();
+      std::ostringstream trkLine;
+      trkLine << "Track" << orderIdx
+              << " pt=" << tk.pt()
+              << " eta=" << tk.eta()
+              << " phi=" << tk.phi()
+              << " dxy(beamspot)=" << dxyBeamspot
+              << " dxySig(beamspot)=" << dxySigBeamspot
+              << " dxy(0,0)=" << dxyOrigin
+              << " dxySig(0,0)=" << dxySigOrigin
+              << " dz(PV)=" << dzPV
+              << " dz(0,0)=" << dzOrigin
+              << " dxyErr=" << tk.dxyError()
+              << " dzErr=" << tk.dzError()
+              << " IPsig(ref)=" << ipSig;
+      logLine(trkLine.str());
+    }
   }
 
   // build safe lambda (bounds + cache) REPLACES previous version
@@ -532,15 +742,24 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   };
 
   //////////////////////////////////////////////////////////////////////
-  // Form seed vertices from all pairs of tracks whose vertex fit
-  // passes cuts.
+  // 2) Candidate Vertices and Vertex Seed Selection Cuts
   //////////////////////////////////////////////////////////////////////
+  // Candidate Vertices and Vertex Seed Selection Cuts
+  // Every possible pair of seed tracks is fit into a vertex
+  // (Kalman Vertex Fitting) to get the vertex.
+  // Apply the following cuts:
+  // - vertex chi2 < maxSeedVertexChi2
+  // If passed:
+  // - store as candidate vertex
+  // If failed:
+  // - discard only this pair
 
   const size_t ntk = seed_tracks.size();
   
   std::unique_ptr<reco::VertexCollection> vertices(new reco::VertexCollection);
   
   if (ntk == 0) {
+    logLine("No seed tracks passed selection. No seed vertices can be formed for this event.");
     iEvent.emplace(putToken_, std::move(*vertices));
     return;
   }
@@ -555,6 +774,30 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if (!ttks[i].isValid()) return;  // safety
     }
     TransientVertex seed_vertex = kv_reco_.vertex(ttks);
+    if (seed_vertex.isValid()) {
+      const reco::Vertex candidate(seed_vertex);
+      const auto dBV = vertex_dist(candidate, fake_ref_vtx);
+      const double dBVErr = (std::abs(dBV.significance()) > 0.0) ? (dBV.value() / dBV.significance()) : std::numeric_limits<double>::quiet_NaN();
+
+      std::ostringstream seedLine;
+      seedLine << "[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={";
+      for (size_t i = 0; i < itks.size(); ++i) {
+        const unsigned int key = seed_track_keys[itks[i]];
+        const int label = trackLabelByKey.count(key) ? trackLabelByKey[key] : -1;
+        if (i) seedLine << ",";
+        seedLine << "Track" << label;
+      }
+      seedLine << "}"
+               << " x=" << candidate.x()
+               << " y=" << candidate.y()
+               << " z=" << candidate.z()
+               << " chi2=" << candidate.normalizedChi2()
+               << " dBV=" << dBV.value()
+               << " dBVErr=" << dBVErr
+               << " passChi2Cut=" << (candidate.normalizedChi2() < max_seed_vertex_chi2 ? "YES" : "NO");
+      logLine(seedLine.str());
+    }
+
     if (seed_vertex.isValid() && seed_vertex.normalisedChiSquared() < max_seed_vertex_chi2) {
       vertices->push_back(reco::Vertex(seed_vertex));
       if (verbose) {
@@ -564,6 +807,70 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         printf(": vertex #%zu: chi2/dof: %7.3f dof: %7.3f pos(ref): <%7.3f,%7.3f,%7.3f>\n",
                vertices->size() - 1, v.normalizedChi2(), v.ndof(), vx, vy, vz);
       }
+    }
+  };
+
+  auto formatTrackSetLabels = [&](const track_set& tset) {
+    std::vector<int> labels;
+    labels.reserve(tset.size());
+    for (auto tk : tset) {
+      const unsigned int key = tk.key();
+      auto it = trackLabelByKey.find(key);
+      labels.push_back(it != trackLabelByKey.end() ? it->second : -1);
+    }
+    std::sort(labels.begin(), labels.end());
+    std::ostringstream out;
+    out << "{";
+    for (size_t i = 0; i < labels.size(); ++i) {
+      if (i) out << ",";
+      out << "Track" << labels[i];
+    }
+    out << "}";
+    return out.str();
+  };
+
+  auto formatTrackLabel = [&](const reco::TrackRef& tk) {
+    const unsigned int key = tk.key();
+    auto it = trackLabelByKey.find(key);
+    std::ostringstream out;
+    out << "Track" << (it != trackLabelByKey.end() ? it->second : -1);
+    return out.str();
+  };
+
+  auto vertexSummary = [&](const reco::Vertex& vv) {
+    const auto dBV = vertex_dist(vv, fake_ref_vtx);
+    const double dBVErr = (std::abs(dBV.significance()) > 0.0) ? (dBV.value() / dBV.significance()) : std::numeric_limits<double>::quiet_NaN();
+    const auto tset = vertex_track_set(vv, 0.0);
+    std::ostringstream out;
+    out << "x=" << vv.x()
+        << " y=" << vv.y()
+        << " z=" << vv.z()
+        << " chi2=" << vv.normalizedChi2()
+        << " dBV=" << dBV.value()
+        << " dBVErr=" << dBVErr
+        << " tracks=" << formatTrackSetLabels(tset);
+    return out.str();
+  };
+
+  auto dumpVertices = [&](const std::string& header) {
+    // Snapshot helper: emits the full currently-active vertex list so we can
+    // audit state transitions after each merge/refit/reset step.
+    logLine(header);
+    for (size_t iv = 0; iv < vertices->size(); ++iv) {
+      const auto& vv = vertices->at(iv);
+      const auto dBV = vertex_dist(vv, fake_ref_vtx);
+      const double dBVErr = (std::abs(dBV.significance()) > 0.0) ? (dBV.value() / dBV.significance()) : std::numeric_limits<double>::quiet_NaN();
+      const auto tset = vertex_track_set(vv, 0.0);
+      std::ostringstream line;
+      line << "Vertex" << (iv + 1)
+           << " x=" << vv.x()
+           << " y=" << vv.y()
+           << " z=" << vv.z()
+           << " chi2=" << vv.normalizedChi2()
+           << " dBV=" << dBV.value()
+           << " dBVErr=" << dBVErr
+           << " tracks=" << formatTrackSetLabels(tset);
+      logLine(line.str());
     }
   };
 
@@ -588,12 +895,67 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     }
   }
 
+  dumpVertices("[Candidate Vertices and Vertex Seed Selection Cuts] State after initial seed-vertex formation:");
+  logLine("------------------------------------------------------------");
+
   //////////////////////////////////////////////////////////////////////
-  // Take care of track sharing. If a track is in two vertices, and
-  // the vertices are "close", refit the tracks from the two together
-  // as one vertex. If the vertices are not close, keep the track in
-  // the vertex to which it is "closer".
+  // 3) Vertex Merging and Cleanup Loop: Compare Vertex Pairs
   //////////////////////////////////////////////////////////////////////
+  // Vertex Merging and Cleanup Loop:
+  // Compare Vertex Pairs
+  // - this loop continues until one full scan causes no changes
+  // - any merge, drop, or refit causes Restart Loop
+
+  logLine(" ");
+  logLine("[Vertex Merging and Cleanup Loop: Compare Vertex Pairs]");
+  logLine("This loop continues until one full scan causes no changes.");
+  logLine("Any merge, drop, or refit causes [Restart Loop].");
+  {
+    std::ostringstream modeLine;
+    modeLine << "Track-to-vertex compatibility distance mode: "
+             << (use_2d_track_dist ? "2D transverse IP" : "3D absolute IP")
+             << " (use_2d_track_dist=" << (use_2d_track_dist ? "True" : "False") << ")";
+    logLine(modeLine.str());
+  }
+  {
+    std::ostringstream thrLine;
+    thrLine << "Configured thresholds used in this stage: "
+            << "max_track_vertex_dist=" << max_track_vertex_dist
+            << ", max_track_vertex_sig=" << max_track_vertex_sig
+            << ", min_track_vertex_sig_to_remove=" << min_track_vertex_sig_to_remove
+            << ", remove_one_track_at_a_time=" << (remove_one_track_at_a_time ? "True" : "False")
+            << ", merge_shared_dist=" << merge_shared_dist
+            << ", merge_shared_sig=" << merge_shared_sig;
+    logLine(thrLine.str());
+  }
+  logLine("[Rule 1]");
+  logLine("If Vertex B tracks are entirely contained in Vertex A tracks, Vertex B is removed as redundant.");
+  logLine("Drop smaller redundant vertex, then [Restart Loop].");
+  logLine("[Do 2 Vertices Have a Shared Track?]");
+  logLine("If no: continue scanning remaining vertex pairs.");
+  logLine("Only return reconstructed vertices after a full scan completes with no changes.");
+  logLine("[Are the 2 Vertices Close?]");
+  logLine("Compare vertex distances: distance(vertexA, vertexB) and significance(vertexA, vertexB).");
+  logLine("Thresholds: max_vertex_dist (= merge_shared_dist) and max_vertex_sig (= merge_shared_sig).");
+  logLine("This stage answers closeness and, in the same answer, marks merge (YES) or refit-only (NO).");
+  logLine("This is vertex-to-vertex closeness. This is NOT track-to-vertex distance.");
+  logLine("[Union Merge (Kalman fit a vertex for the union of set of tracks)]");
+  logLine("Build a temporary merged vertex candidate from the union of all unique tracks.");
+  logLine("If merged fit returns exactly one valid full-union vertex: replace source vertices, drop source vertices, [Restart Loop].");
+  logLine("If merged fit does not pass valid full-union checks: ignore merged candidate and continue with original two vertices.");
+  logLine("[Force Drop a Track (OR 2!)]");
+  logLine("For each shared track and each vertex side, report exact threshold checks.");
+  logLine("hardFail = track_dist invalid OR NOT( dist < max_track_vertex_dist OR sig < max_track_vertex_sig )");
+  logLine("remove_from_0 = hardFail0; remove_from_1 = hardFail1");
+  logLine("Further checks:");
+  logLine("If both sig < min_track_vertex_sig_to_remove: keep bigger vertex; if equal size, drop from first vertex in hand.");
+  logLine("Else: keep lower-significance side and drop from higher-significance side.");
+  logLine("So either 1 OR 2 tracks can be marked for removal (at least 1). ");
+  logLine("[Refit for the vertices whose tracks were dropped]");
+  logLine("This stage performs actual removal by rebuilding with surviving tracks only.");
+  logLine("Rebuild only affected vertices; unchanged vertices stay untouched.");
+  logLine("If a refit side no longer has enough tracks for a valid vertex, drop that vertex; then [Restart Loop].");
+  logLine("------------------------------------------------------------");
   
   //printf("entering the track sharing part\n");
   
@@ -603,6 +965,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::vector<reco::Vertex>::iterator v[2];
 
   size_t ivtx[2];
+  int sharedPhaseIteration = 0;
   
   for (v[0] = vertices->begin(); v[0] != vertices->end(); ++v[0]) {
     track_set tracks[2];
@@ -610,8 +973,17 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     tracks[0] = vertex_track_set(*v[0]);
     
     if (tracks[0].size() < 2) {
+      {
+        std::ostringstream msg;
+        msg << "DROP_VERTEX reason=track-sharing vertex has <2 tracks"
+            << " vertexIndex=" << (ivtx[0] + 1)
+            << " content={" << vertexSummary(*v[0]) << "}";
+        logLine(msg.str());
+      }
       if (verbose)
         printf("track-sharing: vertex-0 #%zu is down to one track, junking it\n", ivtx[0]);
+      // This is where the vertex is ACTUALLY removed from the system.
+      // Reason: dropping a vertex that is already reduced below 2 tracks.
       v[0] = vertices->erase(v[0]) - 1;
       ++n_onetracks;
       continue;
@@ -623,12 +995,35 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     track_set tracks_to_remove_in_refit[2];
     
     for (v[1] = v[0] + 1; v[1] != vertices->end(); ++v[1]) {
+      ++sharedPhaseIteration;
       ivtx[1] = v[1] - vertices->begin();
       tracks[1] = vertex_track_set(*v[1]);
 
+      {
+        std::ostringstream msg;
+        msg << "================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration " << sharedPhaseIteration << " ================";
+        logLine(msg.str());
+      }
+      {
+        std::ostringstream msg;
+        msg << "Compare Vertex" << (ivtx[0] + 1) << " {" << vertexSummary(*v[0]) << "}"
+            << "  vs  Vertex" << (ivtx[1] + 1) << " {" << vertexSummary(*v[1]) << "}";
+        logLine(msg.str());
+      }
+
       if (tracks[1].size() < 2) {
+        {
+          std::ostringstream msg;
+          msg << "DROP_VERTEX reason=track-sharing vertex has <2 tracks"
+              << " vertexIndex=" << (ivtx[1] + 1)
+                << " content={" << vertexSummary(*v[1]) << "}"
+                << " rule=R5";
+          logLine(msg.str());
+        }
         if (verbose)
           printf("track-sharing: vertex-1 #%zu is down to one track, junking it\n", ivtx[1]);	
+  // This is where the vertex is ACTUALLY removed from the system.
+  // Reason: dropping a vertex that is already reduced below 2 tracks.
 	v[1] = vertices->erase(v[1]) - 1;
         ++n_onetracks;
         continue;
@@ -646,17 +1041,39 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       }
 
       
+      // 4) Rule 1
       if (is_track_subset(tracks[0], tracks[1])) {
+        {
+          std::ostringstream msg;
+          msg << "[Rule 1] Vertex" << (ivtx[1] + 1) << " tracks are contained in Vertex" << (ivtx[0] + 1)
+              << " and Vertex" << (ivtx[1] + 1)
+              << " tracksA=" << formatTrackSetLabels(tracks[0])
+              << " tracksB=" << formatTrackSetLabels(tracks[1])
+              << " rule=R1";
+          logLine(msg.str());
+
+          std::ostringstream dropMsg;
+          dropMsg << "[Rule 1] drop smaller redundant vertex"
+                  << " droppedVertexIndex=" << (ivtx[1] + 1)
+              << " content={" << vertexSummary(*v[1]) << "}"
+              << " rule=R1";
+          logLine(dropMsg.str());
+          logLine("[Restart Loop]");
+        }
         if (verbose)
           printf("   subset/duplicate vertices %zu and %zu, erasing second and starting over\n", ivtx[0], ivtx[1]);
         duplicate = true;
+        // Stop searching more vertex partners for this v[0].
+        // This pair already triggered cleanup logic.
+        // Restart the full compare loop after this update.
         break;
       }
 
       std::vector<reco::TrackRef> shared_tracks;
-      for (auto tk : tracks[0])
+      for (auto tk : tracks[0]){
         if (tracks[1].count(tk) > 0)
           shared_tracks.push_back(tk);
+      }
 
       if (verbose) {
         if (shared_tracks.size()) {
@@ -669,29 +1086,109 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       }
 
       
+
+      // 5) Do 2 Vertices Have a Shared Track?
+      if (shared_tracks.size() == 0) {
+        logLine("[Do 2 Vertices Have a Shared Track?] NO -> continue scanning remaining vertex pairs.");
+      }
+
       if (shared_tracks.size() > 0){
+    	// 6) Are the 2 Vertices Close?
 	Measurement1D v_dist = vertex_dist(*v[0], *v[1]);
+	{
+	  std::ostringstream msg;
+	  msg << "[Do 2 Vertices Have a Shared Track?] YES sharedTracks="
+	      << formatTrackSetLabels(track_set(shared_tracks.begin(), shared_tracks.end()));
+	  logLine(msg.str());
+	}
+  const bool distancePass = (v_dist.value() < merge_shared_dist);
+  const bool significancePass = (v_dist.significance() < merge_shared_sig);
+  {
+    std::ostringstream msg;
+    msg << "[Are the 2 Vertices Close?] " << ((distancePass || significancePass) ? "YES" : "NO");
+    logLine(msg.str());
+  }
+  if (distancePass || significancePass) {
+    std::ostringstream reason;
+    if (distancePass && significancePass) {
+      reason << "Reason: distance threshold passed and significance threshold passed "
+             << "(vertexDistance=" << v_dist.value() << " < max_vertex_dist=" << merge_shared_dist
+             << ", vertexSignificance=" << v_dist.significance() << " < max_vertex_sig=" << merge_shared_sig << ")";
+    } else if (distancePass) {
+      reason << "Reason: distance threshold passed "
+             << "(vertexDistance=" << v_dist.value() << " < max_vertex_dist=" << merge_shared_dist << ")";
+    } else {
+      reason << "Reason: significance threshold passed "
+             << "(vertexSignificance=" << v_dist.significance() << " < max_vertex_sig=" << merge_shared_sig << ")";
+    }
+    logLine(reason.str());
+    logLine("Action: marked for merge");
+  } else {
+    std::ostringstream reason;
+    reason << "Reason: dist and significance both failed merge thresholds"
+           << " (vertexDistance=" << v_dist.value() << " vs max_vertex_dist=" << merge_shared_dist
+           << ", vertexSignificance=" << v_dist.significance() << " vs max_vertex_sig=" << merge_shared_sig << ")";
+    logLine(reason.str());
+    logLine("Action: marked for refit only");
+  }
 	
         if (verbose)
           printf("   vertex dist (2d? %i) %7.3f  sig %7.3f\n", use_2d_vertex_dist, v_dist.value(), v_dist.significance());
 	
-	if (v_dist.value() < merge_shared_dist || v_dist.significance() < merge_shared_sig) {
+  if (distancePass || significancePass) {
+    // 7) Union Merge (Kalman fit a vertex for the union of set of tracks)
+          {
+            std::ostringstream msg;
+            msg << "Pair: Vertex" << (ivtx[0] + 1) << " vs Vertex" << (ivtx[1] + 1);
+            logLine(msg.str());
+          }
           if (verbose) printf("          dist < %7.3f || sig < %7.3f, will try using merge result first before arbitration\n", merge_shared_dist, merge_shared_sig);
+	  {
+	    track_set union_tracks = tracks[0];
+	    union_tracks.insert(tracks[1].begin(), tracks[1].end());
+	    std::ostringstream msg;
+	    msg << "Temporary union tracks=" << formatTrackSetLabels(union_tracks);
+	    logLine(msg.str());
+	  }
 	  merge = true;
       }
-	else
+	else {
+    logLine("This stage ONLY marks possible removals.");
+    logLine("Nothing is removed from the actual vertex yet.");
 	  refit = true;
+	}
 	
         
-	for (auto tk : shared_tracks) {
+  // 8) Mark to Drop a Track (From 1 OR 2 vertices!)
+  // This stage reports exact threshold checks and ONLY marks tracks.
+  // Actual removal happens later in [Refit for the vertices whose tracks were dropped].
+  for (auto tk : shared_tracks) {
 	  reco::TransientTrack ttk = getTransientTrack(tk);            // was 'const & ttk' (dangling)
 	  if (!ttk.isValid()) continue;                                // new guard
-	  auto t_dist_0 = track_dist(ttk, *v[0]);
-	  auto t_dist_1 = track_dist(ttk, *v[1]);
+    const reco::TrackBase::Point v0Point(v[0]->x(), v[0]->y(), v[0]->z());
+    const reco::TrackBase::Point v1Point(v[1]->x(), v[1]->y(), v[1]->z());
+    const double dxyToV0 = tk->dxy(v0Point);
+    const double dxyToV1 = tk->dxy(v1Point);
+    const double dzToV0 = tk->dz(v0Point);
+    const double dzToV1 = tk->dz(v1Point);
+    const double dxySigToV0 = (tk->dxyError() > 0.0) ? (dxyToV0 / tk->dxyError()) : std::numeric_limits<double>::quiet_NaN();
+    const double dxySigToV1 = (tk->dxyError() > 0.0) ? (dxyToV1 / tk->dxyError()) : std::numeric_limits<double>::quiet_NaN();
+    const double dzSigToV0 = (tk->dzError() > 0.0) ? (dzToV0 / tk->dzError()) : std::numeric_limits<double>::quiet_NaN();
+    const double dzSigToV1 = (tk->dzError() > 0.0) ? (dzToV1 / tk->dzError()) : std::numeric_limits<double>::quiet_NaN();
+    auto t_dist_0 = track_dist(ttk, *v[0]);
+    auto t_dist_1 = track_dist(ttk, *v[1]);
+    const bool trackDistValid0 = t_dist_0.first;
+    const bool trackDistValid1 = t_dist_1.first;
+    const bool v0DistPass = (t_dist_0.second.value() < max_track_vertex_dist);
+    const bool v0SigPass = (t_dist_0.second.significance() < max_track_vertex_sig);
+    const bool v1DistPass = (t_dist_1.second.value() < max_track_vertex_dist);
+    const bool v1SigPass = (t_dist_1.second.significance() < max_track_vertex_sig);
 	  
 	  
 	  t_dist_0.first = t_dist_0.first && (t_dist_0.second.value() < max_track_vertex_dist || t_dist_0.second.significance() < max_track_vertex_sig);
 	  t_dist_1.first = t_dist_1.first && (t_dist_1.second.value() < max_track_vertex_dist || t_dist_1.second.significance() < max_track_vertex_sig);
+    const bool v0CompatibilityFailed = !t_dist_0.first;
+    const bool v1CompatibilityFailed = !t_dist_1.first;
 	  bool remove_from_0 = !t_dist_0.first;
 	  bool remove_from_1 = !t_dist_1.first;
 	  if (t_dist_0.second.significance() < min_track_vertex_sig_to_remove && t_dist_1.second.significance() < min_track_vertex_sig_to_remove) {
@@ -705,18 +1202,99 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	  else
 	    remove_from_0 = true;
 	  
-	  if (remove_from_0) tracks_to_remove_in_refit[0].insert(tk);
-	  if (remove_from_1) tracks_to_remove_in_refit[1].insert(tk);
+    if (remove_from_0) {
+      // Track is only MARKED for later removal here.
+      // It is still part of the current vertex until the refit stage below.
+      tracks_to_remove_in_refit[0].insert(tk);
+    }
+    if (remove_from_1) {
+      // Track is only MARKED for later removal here.
+      // It is still part of the current vertex until the refit stage below.
+      tracks_to_remove_in_refit[1].insert(tk);
+    }
+
+    std::ostringstream block;
+    block << "[Mark to Drop a Track (From 1 OR 2 vertices!)] " << formatTrackLabel(tk) << "\n"
+          << "track_dist_valid_v0=" << (trackDistValid0 ? 1 : 0)
+          << " track_dist_valid_v1=" << (trackDistValid1 ? 1 : 0) << "\n"
+          << "distToV0=" << t_dist_0.second.value() << " vs max_track_vertex_dist=" << max_track_vertex_dist
+          << " -> " << (v0DistPass ? "PASS" : "FAIL") << "\n"
+          << "sigToV0=" << t_dist_0.second.significance() << " vs max_track_vertex_sig=" << max_track_vertex_sig
+          << " -> " << (v0SigPass ? "PASS" : "FAIL") << "\n"
+          << "distToV1=" << t_dist_1.second.value() << " vs max_track_vertex_dist=" << max_track_vertex_dist
+          << " -> " << (v1DistPass ? "PASS" : "FAIL") << "\n"
+          << "sigToV1=" << t_dist_1.second.significance() << " vs max_track_vertex_sig=" << max_track_vertex_sig
+          << " -> " << (v1SigPass ? "PASS" : "FAIL") << "\n"
+          << "dxyToV0=" << dxyToV0 << " dxySigToV0=" << dxySigToV0
+          << " dxyToV1=" << dxyToV1 << " dxySigToV1=" << dxySigToV1
+          << " dzToV0=" << dzToV0 << " dzSigToV0=" << dzSigToV0
+          << " dzToV1=" << dzToV1 << " dzSigToV1=" << dzSigToV1 << "\n";
+
+    if (remove_from_0 && remove_from_1) {
+      block << "Decision: removed from both (Vertex" << (ivtx[0] + 1) << " and Vertex" << (ivtx[1] + 1)
+            << ") because compatibility failed with max_track_vertex_dist=" << max_track_vertex_dist
+            << " and max_track_vertex_sig=" << max_track_vertex_sig << ".";
+    } else if (remove_from_0) {
+      if (v0CompatibilityFailed) {
+        block << "Decision: removed from Vertex" << (ivtx[0] + 1)
+              << " because compatibility failed (distToV0=" << t_dist_0.second.value()
+              << ", sigToV0=" << t_dist_0.second.significance()
+              << ", max_track_vertex_dist=" << max_track_vertex_dist
+              << ", max_track_vertex_sig=" << max_track_vertex_sig << ").";
+      } else if (t_dist_0.second.significance() < min_track_vertex_sig_to_remove &&
+                 t_dist_1.second.significance() < min_track_vertex_sig_to_remove) {
+        block << "Decision: kept in bigger vertex; removed from Vertex" << (ivtx[0] + 1)
+              << " because both significances are below min_track_vertex_sig_to_remove="
+              << min_track_vertex_sig_to_remove << " and size tie-break chose this side.";
+      } else {
+        block << "Decision: lower significance side won; removed from Vertex" << (ivtx[0] + 1)
+              << " because sigToV0=" << t_dist_0.second.significance()
+              << " is not lower than sigToV1=" << t_dist_1.second.significance() << ".";
+      }
+    } else if (remove_from_1) {
+      if (v1CompatibilityFailed) {
+        block << "Decision: removed from Vertex" << (ivtx[1] + 1)
+              << " because compatibility failed (distToV1=" << t_dist_1.second.value()
+              << ", sigToV1=" << t_dist_1.second.significance()
+              << ", max_track_vertex_dist=" << max_track_vertex_dist
+              << ", max_track_vertex_sig=" << max_track_vertex_sig << ").";
+      } else if (t_dist_0.second.significance() < min_track_vertex_sig_to_remove &&
+                 t_dist_1.second.significance() < min_track_vertex_sig_to_remove) {
+        block << "Decision: kept in bigger vertex; removed from Vertex" << (ivtx[1] + 1)
+              << " because both significances are below min_track_vertex_sig_to_remove="
+              << min_track_vertex_sig_to_remove << " and size tie-break chose this side.";
+      } else {
+        block << "Decision: lower significance side won; removed from Vertex" << (ivtx[1] + 1)
+              << " because sigToV1=" << t_dist_1.second.significance()
+              << " is not lower than sigToV0=" << t_dist_0.second.significance() << ".";
+      }
+    } else {
+      block << "Decision: lower significance side won; no removal was marked in this step.";
+    }
+    logLine(block.str());
 	  
-	  if (remove_one_track_at_a_time) break;
+    if (remove_one_track_at_a_time) {
+      logLine("[Mark to Drop a Track (From 1 OR 2 vertices!)] remove_one_track_at_a_time=True -> stop after first shared-track decision.");
+      // Important subtlety:
+      // one shared-track conflict is resolved before restart,
+      // but this one conflict may still remove the track from 1 OR 2 vertices.
+      // Stop searching more shared tracks inside this vertex pair.
+      // Only one shared-track conflict is resolved before restart.
+      break;
+    }
 	}
 	
+    	// Stop searching more vertex partners for this v[0].
+    	// This pair already triggered cleanup logic.
+    	// Restart the full compare loop after this update.
 	break;
 	
       }
     }
         
     if (duplicate) {
+      // This is where the vertex is ACTUALLY removed from the system.
+      // Reason: dropping a redundant duplicate vertex.
       vertices->erase(v[1]);
     }
 
@@ -737,24 +1315,89 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       for (const TransientVertex& tv : kv_reco_dropin(ttks))
         new_vertices.emplace_back(tv);
 
-      // If we got two new vertices, maybe it took A B and A C D and made a better one from B C D, and left a broken one A B! C! D!.
-      // If we get one that is truly the merger of the track lists, great. If it is just something like A B , A C . A B C!, or we get nothing, then default to arbitration.
+      {
+        std::ostringstream msg;
+        msg << "[Temporary Merge Candidate]";
+        logLine(msg.str());
+      }
+      {
+        std::ostringstream msg;
+        msg << "count=" << new_vertices.size();
+        logLine(msg.str());
+      }
+      if (new_vertices.size() > 0) {
+        std::ostringstream msg;
+        msg << "candidate0={" << vertexSummary(new_vertices[0]) << "}";
+        logLine(msg.str());
+      }
+      if (new_vertices.size() > 1) {
+        std::ostringstream msg;
+        msg << "candidate1={" << vertexSummary(new_vertices[1]) << "}";
+        logLine(msg.str());
+      }
+
       if (new_vertices.size() > 1) {
         assert(new_vertices.size() == 2);
+        logLine("[Merge Outcome] SPLIT_RESULT");
+        logLine("Reason: temporary fit returned 2 vertices");
+        logLine("Action: overwrite both original slots with split fit outputs");
+        {
+          std::ostringstream msg;
+          msg << "[SPLIT RESULT UPDATE]\n"
+              << "Overwrite Vertex" << (ivtx[0] + 1) << " and Vertex" << (ivtx[1] + 1)
+              << " with split fit outputs";
+          logLine(msg.str());
+        }
+        // Replace the old vertex in-place with the new refitted / merged vertex.
+        // This is NOT adding a new vertex; it overwrites the existing slot.
         *v[1] = reco::Vertex(new_vertices[1]);
+        // Replace the old vertex in-place with the new refitted / merged vertex.
+        // This is NOT adding a new vertex; it overwrites the existing slot.
         *v[0] = reco::Vertex(new_vertices[0]);
 	
       }
       else if (new_vertices.size() == 1 && vertex_track_set(new_vertices[0], 0) == tracks_to_fit) {
+        logLine("[Merge Outcome] SUCCESS");
+        logLine("Reason: exactly one valid full-union vertex returned");
+        logLine("Overrule: previously marked track drops are ignored");
+        const reco::Vertex droppedVertex = *v[1];
+        // Merge success overrules earlier marked drops for this pair.
+        // We apply the full-union merged result directly.
+        // This is where the vertex is ACTUALLY removed from the system.
+        // Reason: dropping the source vertex after successful union merge.
         vertices->erase(v[1]);
-	
+
+        // Replace the old vertex in-place with the new refitted / merged vertex.
+        // This is NOT adding a new vertex; it overwrites the existing slot.
         *v[0] = reco::Vertex(new_vertices[0]); // ok to use v[0] after the erase(v[1]) because v[0] is by construction before v[1]
+	{
+	  std::ostringstream msg;
+	  msg << "[Vertex Update]\n"
+	      << "SUCCESSFUL MERGE:\n"
+	      << "Overwrite Vertex" << (ivtx[0] + 1) << " with merged vertex\n"
+	      << "Erase Vertex" << (ivtx[1] + 1) << " from vertex collection\n"
+	      << "MergedVertex={" << vertexSummary(*v[0]) << "}\n"
+	      << "DroppedSourceVertex={" << vertexSummary(droppedVertex) << "}";
+	  logLine(msg.str());
+	}
 	
       }
-      else refit = true;
+      else {
+        logLine("[Merge Outcome] FAILURE");
+        if (new_vertices.size() == 0) {
+          logLine("Reason: zero vertices returned OR chi2 wrapper rejected fit");
+        } else {
+          logLine("Reason: one vertex missing union tracks");
+        }
+        logLine("Action: ignore temporary merge candidate, proceed to [Refit for the vertices whose tracks were dropped]");
+        refit = true;
+      }
       
     }
+      // 9) Refit for the vertices whose tracks were dropped
       if (refit) {
+  logLine("[Refit for the vertices whose tracks were dropped]");
+  logLine("Marked tracks become actual removals here, by rebuilding from surviving tracks only.");
 	bool erase[2] = { false };
 	reco::Vertex vsave[2] = { *v[0], *v[1] };
 	
@@ -763,6 +1406,9 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	    continue;
 
         std::vector<reco::TransientTrack> ttks;
+        // Actual removal happens here:
+        // rebuild the vertex using only surviving tracks
+        // (excluding tracks previously marked for removal).
         for (auto tk : tracks[i]) {
           if (tracks_to_remove_in_refit[i].count(tk) == 0) {
             auto tt = getTransientTrack(tk);
@@ -772,21 +1418,104 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         reco::VertexCollection new_vertices;
         for (const TransientVertex& tv : kv_reco_dropin(ttks))
           new_vertices.emplace_back(tv);
-        if (new_vertices.size() == 1)
+        {
+          track_set removedTracks = tracks_to_remove_in_refit[i];
+          track_set survivingTracks;
+          for (auto tk : tracks[i]) {
+            if (tracks_to_remove_in_refit[i].count(tk) == 0) survivingTracks.insert(tk);
+          }
+          std::ostringstream msg;
+          msg << "[Refit Result]"
+              << " VertexSide=" << i
+              << " removedTracks=" << formatTrackSetLabels(removedTracks)
+              << " survivingTracks=" << formatTrackSetLabels(survivingTracks);
+          logLine(msg.str());
+        }
+        {
+          std::ostringstream msg;
+          if (new_vertices.size() > 0) {
+            msg << "temporaryRefitCandidate={" << vertexSummary(new_vertices[0]) << "}";
+          } else {
+            msg << "temporaryRefitCandidate={NONE}";
+          }
+          logLine(msg.str());
+        }
+        if (new_vertices.size() == 1) {
+          logLine("Outcome=SUCCESS_REPLACE");
+          {
+            std::ostringstream msg;
+            msg << "[REFIT UPDATE]\n"
+                << "Overwrite Vertex" << (ivtx[i] + 1)
+                << " with surviving-track refit result";
+            logLine(msg.str());
+          }
+          // Replace the old vertex in-place with the new refitted / merged vertex.
+          // This is NOT adding a new vertex; it overwrites the existing slot.
           * v[i] = new_vertices[0];
-        else
+        }
+        else {
+          if (ttks.size() < 2) {
+            logLine("Outcome=FAILURE_DROP reason=<2 tracks survived");
+          } else if (new_vertices.size() == 0) {
+            logLine("Outcome=FAILURE_DROP reason=fit invalid OR chi2 wrapper rejected OR not exactly one valid replacement");
+          } else {
+            logLine("Outcome=FAILURE_DROP reason=not exactly one valid replacement");
+          }
           erase[i] = true;
 	}
+	}
 
-      if (erase[1]) vertices->erase(v[1]);
-      if (erase[0]) vertices->erase(v[0]);
+      if (erase[1]) {
+        {
+          std::ostringstream msg;
+          msg << "[REFIT UPDATE]\n"
+              << "Drop Vertex" << (ivtx[1] + 1)
+              << " because no valid replacement was produced";
+          logLine(msg.str());
+        }
+        // This is where the vertex is ACTUALLY removed from the system.
+        // Reason: dropping an invalid vertex after refit failure.
+        vertices->erase(v[1]);
+      }
+      if (erase[0]) {
+        {
+          std::ostringstream msg;
+          msg << "[REFIT UPDATE]\n"
+              << "Drop Vertex" << (ivtx[0] + 1)
+              << " because no valid replacement was produced";
+          logLine(msg.str());
+        }
+        // This is where the vertex is ACTUALLY removed from the system.
+        // Reason: dropping an invalid vertex after refit failure.
+        vertices->erase(v[0]);
+      }
+
+      if (erase[0] || erase[1]) {
+        std::ostringstream msg;
+        msg << "DROP_VERTEX reason=refit/arbitration could not produce a valid replacement"
+            << " eraseV0=" << (erase[0] ? 1 : 0)
+            << " eraseV1=" << (erase[1] ? 1 : 0)
+            << " originalV0={" << vertexSummary(vsave[0]) << "}"
+            << " originalV1={" << vertexSummary(vsave[1]) << "}";
+        logLine(msg.str());
+        logLine("Refit for this side did not return exactly one valid vertex, so that side is dropped.");
+      }
 
       }
 
+    // 10) Restart Loop
     // If we changed the vertices at all, start loop over completely.
     if (duplicate || merge || refit) {
+      dumpVertices("State after a merge/drop/refit step:");
+      logLine("[Restart Loop]");
+      logLine("Reason: vertex list topology changed after merge/refit/drop");
+      logLine("Restart full pairwise scan from beginning");
+      logLine("============================================================");
       //printf("duplicate = %d, merge = %d, refit = %d\n", duplicate, merge, refit);
       
+      // Restart Loop:
+      // the vertex list changed, so restart the full pairwise scan from the beginning.
+      // Previous pair ordering assumptions may no longer be valid.
       v[0] = vertices->begin() - 1;  // -1 because about to ++sv
       ++n_resets;
       
@@ -803,6 +1532,10 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 
   if (resolve_split_vertices_loose) {
+
+    logLine(" ");
+    logLine("------------------- LOOSE MERGE PHASE -----------------------");
+    logLine("Goal: merge nearby vertices that satisfy loose distance/significance criteria.");
 
     
     if (merge_anyway_sig > 0 || merge_anyway_dist > 0) {
@@ -854,11 +1587,25 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
             }
 
 	    if (merged_vertices.size() == 1) {
+              const reco::Vertex droppedVertex = *v[1];
+              {
+                std::ostringstream msg;
+                msg << "MERGE_STEP loose-merge succeeded between two nearby vertices"
+                    << " droppedVertex={" << vertexSummary(droppedVertex) << "}"
+                    << " mergedVertex={" << vertexSummary(merged_vertices[0]) << "}"
+                    << " mergedTracks=" << formatTrackSetLabels(vertex_track_set(merged_vertices[0], 0.0));
+                logLine(msg.str());
+                logLine("Interpretation: loose geometric consistency favored replacing two vertices with one.");
+              }
               
               //std::cout << "check no mem out of ranges (before) : " << v[1] - vertices->begin() << std::endl;
+              // Replace the old vertex in-place with the new refitted / merged vertex.
+              // This is NOT adding a new vertex; it overwrites the existing slot.
               *v[0] = merged_vertices[0];
               //std::cout << "check no mem out of ranges (after) : " << v[1] - vertices->begin() << std::endl;
 
+              // This is where the vertex is ACTUALLY removed from the system.
+              // Reason: dropping the source vertex after successful union merge.
               v[1] = vertices->erase(v[1]) - 1;
             }
           }
@@ -872,6 +1619,9 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //////////////////////////////////////////////////////////////////////
   
   if (max_nm1_refit_dist3 > 0 || max_nm1_refit_distz > 0) {
+    logLine(" ");
+    logLine("----------------- N-1 TRACK DROP PHASE ----------------------");
+    logLine("Goal: test whether removing one track yields a vertex movement beyond configured limits.");
     std::vector<int> refit_count(vertices->size(), 0);
 
     int iv = 0;
@@ -900,9 +1650,25 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
             (max_nm1_refit_dist3 > 0 && dist3_2 > pow(max_nm1_refit_dist3, 2)) ||
             (max_nm1_refit_distz > 0 && distz > max_nm1_refit_distz)) {
 
+          {
+            std::ostringstream msg;
+            msg << "DROP_TRACK_FROM_VERTEX reason=nm1-refit move-too-large-or-invalid"
+                << " removedTrack=" << formatTrackLabel(tks[i])
+                << " oldVertex={" << vertexSummary(*v[0]) << "}"
+                << " newVertexAfterDrop={" << vertexSummary(vnm1) << "}"
+                << " dist3=" << std::sqrt(dist3_2)
+                << " distz=" << distz;
+            logLine(msg.str());
+            logLine("Interpretation: this track is incompatible with stable-vertex hypothesis under N-1 test.");
+          }
+
+          // Replace the old vertex in-place with the new refitted / merged vertex.
+          // This is NOT adding a new vertex; it overwrites the existing slot.
           *v[0] = vnm1;
           ++refit_count[iv];
           --v[0], --iv;
+          // Stop searching more track-removal candidates for this vertex in this pass.
+          // One update was applied; control returns to continue the outer scan.
           break;
         }
       }
@@ -910,6 +1676,15 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     iv = 0; //some vertices after dz refiting have normalized chi2 > 5
     for (v[0] = vertices->begin(); v[0] != vertices->end(); ++v[0], ++iv) {
        if ((*v[0]).normalizedChi2() > 5) {
+         {
+           std::ostringstream msg;
+           msg << "DROP_VERTEX reason=post-nm1 normalizedChi2>5"
+               << " content={" << vertexSummary(*v[0]) << "}";
+           logLine(msg.str());
+           logLine("Interpretation: vertex quality no longer acceptable after iterative N-1 updates.");
+         }
+         // This is where the vertex is ACTUALLY removed from the system.
+         // Reason: dropping an invalid vertex after refit failure.
          v[0] = vertices->erase(v[0]) - 1;
          continue;
        }
@@ -927,6 +1702,9 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   
   if (resolve_split_vertices_tight) {
+    logLine(" ");
+    logLine("------------------- TIGHT MERGE PHASE -----------------------");
+    logLine("Goal: resolve split vertices with strict dPhi/svdist2d/dBV criteria.");
     reco::VertexCollection potential_merged_vertices;
 
     for (v[0] = vertices->begin(); v[0] != vertices->end(); ++v[0]) {
@@ -978,9 +1756,25 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
             if (merged_vertices.size() == 1 && vertex_track_set(merged_vertices[0], 0) == tracks_to_fit) {
 
+              const reco::Vertex droppedVertex = *v[1];
+
+              {
+                std::ostringstream msg;
+                msg << "MERGE_STEP tight-merge succeeded"
+                    << " droppedVertex={" << vertexSummary(droppedVertex) << "}"
+                    << " mergedVertex={" << vertexSummary(merged_vertices[0]) << "}"
+                    << " tracks=" << formatTrackSetLabels(tracks_to_fit);
+                logLine(msg.str());
+                logLine("Interpretation: tight split-vertex criteria confirmed a physically consistent merge.");
+              }
+
               merge = true;
 
+              // This is where the vertex is ACTUALLY removed from the system.
+              // Reason: dropping the source vertex after successful union merge.
               v[1] = vertices->erase(v[1]) - 1; // (1) erase and point the iterator at the previous entry
+              // Replace the old vertex in-place with the new refitted / merged vertex.
+              // This is NOT adding a new vertex; it overwrites the existing slot.
               *v[0] = reco::Vertex(merged_vertices[0]); // (2) updated v[0] (ok to use v[0] after the erase(v[1]) because v[0] is by construction before v[1])
             }
           }
@@ -996,8 +1790,16 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 
   //////////////////////////////////////////////////////////////////////
-  // Put the output.
+  // 11) Return the reconstructed vertices
   //////////////////////////////////////////////////////////////////////
+
+  logLine(" ");
+  logLine("[Return the reconstructed vertices]");
+  logLine("No pairs of vertices share a common track after a full scan:");
+  logLine("Return the reconstructed vertices");
+  dumpVertices("Final vertex state:");
+  logLine("Return complete: only reconstructed output vertices are persisted to the event.");
+  logLine("============================================================");
   
   //Save the vertices
   iEvent.emplace(putToken_, std::move(*vertices));

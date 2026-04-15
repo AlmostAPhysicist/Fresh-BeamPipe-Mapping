@@ -4,8 +4,8 @@ process = cms.Process("CHAIN")
 
 # -------------------- MessageLogger / Options / Events --------------------
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkSummary.reportEvery = 100
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkSummary.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True),
@@ -13,8 +13,10 @@ process.options = cms.untracked.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(5000)
+    input = cms.untracked.int32(1)
 )
+
+
 
 # -------------------------- INPUT PATH ------------------------------------
 process.source = cms.Source("PoolSource",
@@ -23,6 +25,8 @@ process.source = cms.Source("PoolSource",
     )
 )
 
+# offset the event processing to skip events with no scouting tracks (if desired)
+process.source.skipEvents = cms.untracked.uint32(60)
 # -------------------------- GLOBAL TAG / GEOM ------------------------------
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
@@ -33,7 +37,7 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 
 # -------------------------- TFileService -----------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/vertex_counts_tree_v1.root")
+    fileName = cms.string("test-outputs/vertex_counts_print1.root")
 )
 
 # -------------------------- HLT Scouting Unpacker --------------------------
@@ -58,6 +62,7 @@ process.packedCandidateToTrack = cms.EDProducer("PackedCandidateToTrackProducer"
 
 referencePreference = 'BS'
 useOnlineBeamSpot = True
+printVertexerLogs = True
 offlineBeamSpotTag = cms.InputTag('offlineBeamSpot')
 
 process.Vertexer = cms.EDProducer('Vertexer',
@@ -89,6 +94,7 @@ process.Vertexer = cms.EDProducer('Vertexer',
     max_nm1_refit_distz = cms.double(-1),
     max_nm1_refit_count = cms.int32(-1),
     logBeamspotSource = cms.untracked.bool(True),
+    printVertexerLogs = cms.untracked.bool(printVertexerLogs),
     verbose = cms.bool(False),
 )
 
@@ -122,6 +128,7 @@ process.VertexerOffline = cms.EDProducer('Vertexer',
     max_nm1_refit_distz = cms.double(-1),
     max_nm1_refit_count = cms.int32(-1),
     logBeamspotSource = cms.untracked.bool(True),
+    printVertexerLogs = cms.untracked.bool(printVertexerLogs),
     verbose = cms.bool(False),
 )
 
