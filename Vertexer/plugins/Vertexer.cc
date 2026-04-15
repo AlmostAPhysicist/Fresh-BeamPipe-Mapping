@@ -80,6 +80,15 @@ namespace {
   }
 }
 
+// For Ordering Vertices by pT
+// Comparator to sort vertices by descending pT.
+// Used only for changing traversal order, not for physics changes.
+struct order_seed_vtx_pt {
+  bool operator()(const reco::Vertex& a, const reco::Vertex& b) const {
+    return a.p4().pt() > b.p4().pt();
+  }
+};
+
 
 using namespace edm;
 
@@ -120,6 +129,7 @@ private:
   const bool investigate_merged_vertices;
   const bool verbose;
   const bool printVertexerLogs_;
+  const bool order_seed_vertex;
 
   // REMOVE legacy-style seed knobs that changed physics
   // const double pt_min_cut_;
@@ -332,6 +342,7 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
   investigate_merged_vertices(params.getParameter<bool>("investigate_merged_vertices")),
   verbose(params.getParameter<bool>("verbose")),
   printVertexerLogs_(params.getUntrackedParameter<bool>("printVertexerLogs", false)),
+  order_seed_vertex(params.getUntrackedParameter<bool>("order_seed_vertex", false)),
   
   // read new params (provide same defaults as current hard-coded values)
   // REMOVE these (do not read minSeed*)
@@ -956,6 +967,19 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   logLine("Rebuild only affected vertices; unchanged vertices stay untouched.");
   logLine("If a refit side no longer has enough tracks for a valid vertex, drop that vertex; then [Restart Loop].");
   logLine("------------------------------------------------------------");
+  
+  // ============================================================
+  // For Ordering Vertices by pT
+  // Sort seed vertices by descending pT before pairwise cleanup.
+  // This only changes traversal order, not the physics logic.
+  // Useful for testing whether vertex scan order affects outcomes.
+  // ============================================================
+  if (order_seed_vertex) {
+    std::sort(vertices->begin(), vertices->end(), order_seed_vtx_pt());
+    if (printVertexerLogs_) {
+      logLine("[Vertex Ordering] Sort initial seed vertices by descending pT before compare loop");
+    }
+  }
   
   //printf("entering the track sharing part\n");
   

@@ -1,0 +1,286 @@
+============================================================
+Vertexer log for module: VertexerOffline
+Event: run=1 lumi=360562 event=1819391274
+Mode: Offline
+Reference preference config: BeamSpot
+Defaults note: refPreference defaults to BeamSpot unless configured otherwise.
+
+Notation legend:
+  - TrackN means pT-ordered label within this event (N=0 is highest pT).
+  - dxy and dxySig use transverse impact parameter of reco::Track relative to a point.
+  - dist/sig in TRACK_ARBITRATION use track_dist():
+      * if use_2d_track_dist=True -> absoluteTransverseImpactParameter (2D IP)
+      * if use_2d_track_dist=False -> absoluteImpactParameter3D (3D IP)
+  - dBV is vertex distance from chosen reference (PV-average or beamspot).
+  - dBVErr is inferred as dBV/significance when significance is non-zero.
+  - DROP_* entries are explicit removals and include the reason + content.
+  - MERGE_STEP entries document merge attempts/success/fallback points.
+  - TRACK_ARBITRATION entries show per-shared-track removal decisions.
+============================================================
+------------------------------------------------------------
+ 
+-------------------- REFERENCE SELECTION --------------------
+Reference vertex: x=0.0286051 y=-0.0165892 z=0.423598
+This reference is used for impact-parameter significance and dBV-like distances.
+ 
+---------------------- INPUT TRACK LIST ----------------------
+INPUT SOURCE: seed_tracks_src=packedCandidateToTrack:Track
+Tracks ordered by descending pT:
+Track0 pt=5.05859 eta=-0.125248 phi=2.16462 dxy(beamspot)=0.00016001 dxySig(beamspot)=0.0601 dxy(0,0)=-0.0142659 dxySig(0,0)=-5.35828 dz(PV)=-6.31819 dz(0,0)=-3.0998 dxyErr=0.0026624 dzErr=0.00411551
+Track1 pt=3.45508 eta=-1.14554 phi=-2.04859 dxy(beamspot)=-0.00610921 dxySig(beamspot)=-2.03309 dxy(0,0)=0.0269205 dxySig(0,0)=8.95891 dz(PV)=0.00627441 dz(0,0)=3.2284 dxyErr=0.00300489 dzErr=0.00582874
+Track2 pt=3.2168 eta=-0.528092 phi=-1.49633 dxy(beamspot)=0.0792513 dxySig(beamspot)=31.9377 dxy(0,0)=0.106543 dxySig(0,0)=42.936 dz(PV)=-6.37767 dz(0,0)=-3.14634 dxyErr=0.00248144 dzErr=0.00329728
+Track3 pt=2.68164 eta=-0.570025 phi=-1.19261 dxy(beamspot)=-0.0333391 dxySig(beamspot)=-14.279 dxy(0,0)=-0.0128807 dxySig(0,0)=-5.51674 dz(PV)=-6.34068 dz(0,0)=-3.10408 dxyErr=0.00233483 dzErr=0.00380354
+Track4 pt=2.47461 eta=1.53978 phi=-1.96793 dxy(beamspot)=0.000155741 dxySig(beamspot)=0.0377014 dxy(0,0)=0.0329509 dxySig(0,0)=7.9767 dz(PV)=0.0146484 dz(0,0)=3.23055 dxyErr=0.00413089 dzErr=0.0107632
+Track5 pt=2.34375 eta=-0.518754 phi=-2.203 dxy(beamspot)=0.00257978 dxySig(beamspot)=0.970285 dxy(0,0)=0.0354592 dxySig(0,0)=13.3366 dz(PV)=3.79245 dz(0,0)=7.01178 dxyErr=0.00265878 dzErr=0.00404418
+Track6 pt=2.32227 eta=-0.723655 phi=-1.16098 dxy(beamspot)=-0.00293719 dxySig(beamspot)=-0.803769 dxy(0,0)=0.0166893 dxySig(0,0)=4.56708 dz(PV)=-6.31845 dz(0,0)=-3.07678 dxyErr=0.00365427 dzErr=0.00575106
+Track7 pt=2.27148 eta=2.39051 phi=2.05768 dxy(beamspot)=-0.0234397 dxySig(beamspot)=-3.96207 dxy(0,0)=-0.0409589 dxySig(0,0)=-6.9234 dz(PV)=-4.09511 dz(0,0)=-0.729709 dxyErr=0.00591602 dzErr=0.0287494
+Track8 pt=2.16016 eta=2.20045 phi=-1.66002 dxy(beamspot)=-0.00114601 dxySig(beamspot)=-0.187356 dxy(0,0)=0.0288234 dxySig(0,0)=4.7122 dz(PV)=-7.48095 dz(0,0)=-4.31385 dxyErr=0.00611677 dzErr=0.0259652
+Track9 pt=2.12695 eta=0.54677 phi=-2.35603 dxy(beamspot)=0.0177983 dxySig(beamspot)=3.40133 dxy(0,0)=0.0497569 dxySig(0,0)=9.50874 dz(PV)=-0.202693 dz(0,0)=3.02477 dxyErr=0.00523275 dzErr=0.00590831
+Track10 pt=2.03516 eta=0.913724 phi=-2.57957 dxy(beamspot)=-0.00129878 dxySig(beamspot)=-0.336289 dxy(0,0)=0.0279823 dxySig(0,0)=7.24536 dz(PV)=3.48368 dz(0,0)=6.72255 dxyErr=0.0038621 dzErr=0.00612972
+Track11 pt=2.02734 eta=-0.695639 phi=-1.40219 dxy(beamspot)=0.0191754 dxySig(beamspot)=6.0594 dxy(0,0)=0.044591 dxySig(0,0)=14.0907 dz(PV)=-6.30007 dz(0,0)=-3.06346 dxyErr=0.00316458 dzErr=0.00484825
+Track12 pt=1.98633 eta=-0.204169 phi=-1.04252 dxy(beamspot)=0.00273682 dxySig(beamspot)=0.647499 dxy(0,0)=0.0190806 dxySig(0,0)=4.51424 dz(PV)=0.000682373 dz(0,0)=3.22822 dxyErr=0.00422676 dzErr=0.00430338
+Track13 pt=1.87207 eta=-1.89795 phi=-2.45622 dxy(beamspot)=-0.00259556 dxySig(beamspot)=-0.532304 dxy(0,0)=0.0283534 dxySig(0,0)=5.8148 dz(PV)=-0.167738 dz(0,0)=3.01301 dxyErr=0.00487608 dzErr=0.0165818
+Track14 pt=1.80859 eta=-0.755516 phi=-1.27523 dxy(beamspot)=0.0016598 dxySig(beamspot)=0.280219 dxy(0,0)=0.0241923 dxySig(0,0)=4.08431 dz(PV)=0.0108301 dz(0,0)=3.25148 dxyErr=0.00592324 dzErr=0.00691348
+Track15 pt=1.78906 eta=2.11621 phi=-2.42479 dxy(beamspot)=1.62731e-05 dxySig(beamspot)=0.00293253 dxy(0,0)=0.031316 dxySig(0,0)=5.64336 dz(PV)=-4.51796 dz(0,0)=-1.24818 dxyErr=0.00554918 dzErr=0.0232321
+Track16 pt=1.73535 eta=1.26475 phi=0.949242 dxy(beamspot)=0.000463634 dxySig(beamspot)=0.0909097 dxy(0,0)=-0.0324515 dxySig(0,0)=-6.36311 dz(PV)=0.00860352 dz(0,0)=3.22324 dxyErr=0.00509994 dzErr=0.00849857
+Track17 pt=1.62402 eta=1.00949 phi=-2.30417 dxy(beamspot)=0.122694 dxySig(beamspot)=13.9217 dxy(0,0)=0.15505 dxySig(0,0)=17.5931 dz(PV)=0.313184 dz(0,0)=3.54466 dxyErr=0.00881312 dzErr=0.0131813
+Track18 pt=1.61914 eta=0.771447 phi=1.10912 dxy(beamspot)=-0.080214 dxySig(beamspot)=-14.7213 dxy(0,0)=-0.113214 dxySig(0,0)=-20.7776 dz(PV)=-4.66852 dz(0,0)=-1.44603 dxyErr=0.00544885 dzErr=0.00723477
+Track19 pt=1.60254 eta=-1.36711 phi=-2.75477 dxy(beamspot)=-0.00068648 dxySig(beamspot)=-0.136224 dxy(0,0)=0.0254683 dxySig(0,0)=5.05387 dz(PV)=-1.68019 dz(0,0)=1.50365 dxyErr=0.00503936 dzErr=0.0110751
+Track20 pt=1.59668 eta=-0.147404 phi=0.427839 dxy(beamspot)=-0.00220927 dxySig(beamspot)=-0.488814 dxy(0,0)=-0.0291716 dxySig(0,0)=-6.45438 dz(PV)=-4.18409 dz(0,0)=-0.959221 dxyErr=0.00451966 dzErr=0.00404671
+Track21 pt=1.56836 eta=-0.351756 phi=-0.0354565 dxy(beamspot)=-0.00380901 dxySig(beamspot)=-1.18315 dxy(0,0)=-0.0193738 dxySig(0,0)=-6.01786 dz(PV)=-0.175382 dz(0,0)=3.05698 dxyErr=0.00321938 dzErr=0.00541912
+Track22 pt=1.55371 eta=0.333445 phi=1.78393 dxy(beamspot)=-0.0042954 dxySig(beamspot)=-1.18534 dxy(0,0)=-0.0287441 dxySig(0,0)=-7.93213 dz(PV)=-0.177309 dz(0,0)=3.05163 dxyErr=0.00362376 dzErr=0.00547096
+Track23 pt=1.50781 eta=0.751122 phi=-2.63602 dxy(beamspot)=0.0267087 dxySig(beamspot)=4.91511 dxy(0,0)=0.0550761 dxySig(0,0)=10.1355 dz(PV)=0.0142773 dz(0,0)=3.25082 dxyErr=0.00543399 dzErr=0.00760398
+Track24 pt=1.49512 eta=0.841212 phi=1.8151 dxy(beamspot)=0.00111451 dxySig(beamspot)=0.274295 dxy(0,0)=-0.0226286 dxySig(0,0)=-5.56917 dz(PV)=-0.00361084 dz(0,0)=3.23848 dxyErr=0.00406319 dzErr=0.00681466
+Track25 pt=1.45898 eta=-0.386914 phi=0.796808 dxy(beamspot)=0.00286674 dxySig(beamspot)=0.469574 dxy(0,0)=-0.0291853 dxySig(0,0)=-4.78057 dz(PV)=-0.175967 dz(0,0)=3.04965 dxyErr=0.00610498 dzErr=0.00551356
+Track26 pt=1.43164 eta=-0.325938 phi=-1.62358 dxy(beamspot)=0.0721108 dxySig(beamspot)=13.1233 dxy(0,0)=0.101551 dxySig(0,0)=18.4811 dz(PV)=-6.41875 dz(0,0)=-3.19237 dxyErr=0.00549486 dzErr=0.00601061
+Track27 pt=1.36426 eta=-0.787561 phi=-2.97939 dxy(beamspot)=0.0048857 dxySig(beamspot)=1.01299 dxy(0,0)=0.0258765 dxySig(0,0)=5.36518 dz(PV)=3.78882 dz(0,0)=6.98835 dxyErr=0.00482305 dzErr=0.00726174
+Track28 pt=1.3623 eta=-0.806238 phi=0.511141 dxy(beamspot)=0.00020525 dxySig(beamspot)=0.034899 dxy(0,0)=-0.0282565 dxySig(0,0)=-4.80448 dz(PV)=-2.65919 dz(0,0)=0.578506 dxyErr=0.00588127 dzErr=0.00860185
+Track29 pt=1.34277 eta=-0.654256 phi=-1.5897 dxy(beamspot)=-0.00132015 dxySig(beamspot)=-0.271122 dxy(0,0)=0.0275935 dxySig(0,0)=5.66695 dz(PV)=-1.68866 dz(0,0)=1.54336 dxyErr=0.0048692 dzErr=0.00653216
+Track30 pt=1.34082 eta=0.419141 phi=-2.0696 dxy(beamspot)=-0.00847841 dxySig(beamspot)=-1.51596 dxy(0,0)=0.0245772 dxySig(0,0)=4.39447 dz(PV)=0.0192871 dz(0,0)=3.24147 dxyErr=0.00559276 dzErr=0.00634674
+Track31 pt=1.29004 eta=-1.97504 phi=0.274235 dxy(beamspot)=-0.0178601 dxySig(beamspot)=-2.04173 dxy(0,0)=-0.0415759 dxySig(0,0)=-4.75288 dz(PV)=-4.07954 dz(0,0)=-0.774905 dxyErr=0.00874752 dzErr=0.0294489
+Track32 pt=1.28027 eta=1.81133 phi=-2.36227 dxy(beamspot)=-0.00511721 dxySig(beamspot)=-0.771662 dxy(0,0)=0.0267878 dxySig(0,0)=4.03953 dz(PV)=-0.141922 dz(0,0)=3.10921 dxyErr=0.00663141 dzErr=0.02102
+Track33 pt=1.27246 eta=2.29804 phi=-1.56635 dxy(beamspot)=0.0150035 dxySig(beamspot)=1.65824 dxy(0,0)=0.0435345 dxySig(0,0)=4.8116 dz(PV)=-2.7128 dz(0,0)=0.435127 dxyErr=0.00904782 dzErr=0.0437662
+Track34 pt=1.26074 eta=-1.00143 phi=1.33276 dxy(beamspot)=-0.00351424 dxySig(beamspot)=-0.606794 dxy(0,0)=-0.0352244 dxySig(0,0)=-6.0821 dz(PV)=-0.181489 dz(0,0)=3.03132 dxyErr=0.00579148 dzErr=0.0095826
+Track35 pt=1.25879 eta=0.160588 phi=-2.68269 dxy(beamspot)=-0.00279374 dxySig(beamspot)=-0.515377 dxy(0,0)=0.0247502 dxySig(0,0)=4.56581 dz(PV)=-0.173538 dz(0,0)=3.05146 dxyErr=0.00542076 dzErr=0.00667505
+Track36 pt=1.25 eta=-1.31455 phi=0.595436 dxy(beamspot)=-0.0023292 dxySig(beamspot)=-0.40892 dxy(0,0)=-0.0321072 dxySig(0,0)=-5.6368 dz(PV)=0.00645508 dz(0,0)=3.25472 dxyErr=0.00569599 dzErr=0.0111237
+Track37 pt=1.24414 eta=-0.748375 phi=-2.56989 dxy(beamspot)=0.00466626 dxySig(beamspot)=0.665681 dxy(0,0)=0.0340946 dxySig(0,0)=4.86388 dz(PV)=-1.69297 dz(0,0)=1.51593 dxyErr=0.00700975 dzErr=0.00852376
+Track38 pt=1.23535 eta=1.54418 phi=1.11957 dxy(beamspot)=-0.000249074 dxySig(beamspot)=-0.0328244 dxy(0,0)=-0.0332252 dxySig(0,0)=-4.37861 dz(PV)=-0.66472 dz(0,0)=2.55941 dxyErr=0.00758808 dzErr=0.0186984
+Track39 pt=1.2207 eta=0.0688498 phi=1.085 dxy(beamspot)=-0.000492076 dxySig(beamspot)=-0.0821432 dxy(0,0)=-0.0335334 dxySig(0,0)=-5.59778 dz(PV)=0.117873 dz(0,0)=3.33981 dxyErr=0.00599047 dzErr=0.00718692
+Track40 pt=1.21973 eta=0.706992 phi=1.63492 dxy(beamspot)=-0.00212781 dxySig(beamspot)=-0.407768 dxy(0,0)=-0.0296111 dxySig(0,0)=-5.67459 dz(PV)=-7.92993 dz(0,0)=-4.69518 dxyErr=0.00521818 dzErr=0.00858056
+Track41 pt=1.21777 eta=-1.11551 phi=-2.58718 dxy(beamspot)=-0.00448464 dxySig(beamspot)=-0.786618 dxy(0,0)=0.0246786 dxySig(0,0)=4.3287 dz(PV)=-0.181861 dz(0,0)=3.01777 dxyErr=0.00570116 dzErr=0.0101746
+Track42 pt=1.20312 eta=-0.00933866 phi=1.78258 dxy(beamspot)=0.0020618 dxySig(beamspot)=0.457182 dxy(0,0)=-0.022417 dxySig(0,0)=-4.97073 dz(PV)=3.78477 dz(0,0)=7.00653 dxyErr=0.0045098 dzErr=0.00706934
+Track43 pt=1.20312 eta=-0.697653 phi=1.56031 dxy(beamspot)=-0.00101935 dxySig(beamspot)=-0.150342 dxy(0,0)=-0.0297968 dxySig(0,0)=-4.3947 dz(PV)=-0.195166 dz(0,0)=3.01575 dxyErr=0.00678017 dzErr=0.00925645
+Track44 pt=1.16992 eta=0.432691 phi=-1.33765 dxy(beamspot)=9.385e-05 dxySig(beamspot)=0.020632 dxy(0,0)=0.0240922 dxySig(0,0)=5.29643 dz(PV)=-2.65477 dz(0,0)=0.557764 dxyErr=0.00454876 dzErr=0.00619138
+Track45 pt=1.16309 eta=0.745811 phi=-1.54127 dxy(beamspot)=0.0207768 dxySig(beamspot)=2.88517 dxy(0,0)=0.0488796 dxySig(0,0)=6.78767 dz(PV)=-4.50178 dz(0,0)=-1.29269 dxyErr=0.00720123 dzErr=0.008799
+Track46 pt=1.14746 eta=1.10489 phi=1.01809 dxy(beamspot)=-0.00180977 dxySig(beamspot)=-0.320474 dxy(0,0)=-0.034865 dxySig(0,0)=-6.17387 dz(PV)=-7.46901 dz(0,0)=-4.25014 dxyErr=0.00564718 dzErr=0.0104289
+Track47 pt=1.1377 eta=-1.99683 phi=-1.46763 dxy(beamspot)=0.0125049 dxySig(beamspot)=1.40423 dxy(0,0)=0.0392495 dxySig(0,0)=4.40752 dz(PV)=1.19147 dz(0,0)=4.47759 dxyErr=0.00890513 dzErr=0.0308847
+Track48 pt=1.11719 eta=-0.700583 phi=0.926484 dxy(beamspot)=0.00375686 dxySig(beamspot)=0.787164 dxy(0,0)=-0.0290776 dxySig(0,0)=-6.09254 dz(PV)=-4.51701 dz(0,0)=-1.29112 dxyErr=0.00477265 dzErr=0.00701948
+Track49 pt=1.08984 eta=1.40519 phi=0.699835 dxy(beamspot)=-0.00205212 dxySig(beamspot)=-0.305612 dxy(0,0)=-0.0331663 dxySig(0,0)=-4.93929 dz(PV)=-0.678029 dz(0,0)=2.52054 dxyErr=0.00671479 dzErr=0.0145553
+Track50 pt=1.07715 eta=-0.525163 phi=-1.39984 dxy(beamspot)=0.0210933 dxySig(beamspot)=4.23185 dxy(0,0)=0.0464592 dxySig(0,0)=9.32086 dz(PV)=-6.35491 dz(0,0)=-3.12223 dxyErr=0.00498443 dzErr=0.00590711
+Track51 pt=1.04883 eta=1.61138 phi=-2.47643 dxy(beamspot)=0.0069766 dxySig(beamspot)=0.939844 dxy(0,0)=0.0376839 dxySig(0,0)=5.07654 dz(PV)=-6.33212 dz(0,0)=-3.07837 dxyErr=0.00742315 dzErr=0.0194541
+Track52 pt=1.04688 eta=-0.747642 phi=-2.37711 dxy(beamspot)=0.00272167 dxySig(beamspot)=0.490334 dxy(0,0)=0.0344941 dxySig(0,0)=6.21442 dz(PV)=-0.00640137 dz(0,0)=3.20714 dxyErr=0.00555066 dzErr=0.0078941
+ 
+[Seed Track Selection]
+Seed-track summary: totalTracks=53 selectedSeedTracks=8
+Apply seed cuts: pT > 0.9 GeV and |IP significance(reference)| > 4.0.
+ 
+[Seed Track Selection] Seed track list
+Only seed tracks used for seed-vertex combinations:
+Track2 pt=3.2168 eta=-0.528092 phi=-1.49633 dxy(beamspot)=0.0792513 dxySig(beamspot)=31.9377 dxy(0,0)=0.106543 dxySig(0,0)=42.936 dz(PV)=-6.37767 dz(0,0)=-3.14634 dxyErr=0.00248144 dzErr=0.00329728 IPsig(ref)=31.9486
+Track3 pt=2.68164 eta=-0.570025 phi=-1.19261 dxy(beamspot)=-0.0333391 dxySig(beamspot)=-14.279 dxy(0,0)=-0.0128807 dxySig(0,0)=-5.51674 dz(PV)=-6.34068 dz(0,0)=-3.10408 dxyErr=0.00233483 dzErr=0.00380354 IPsig(ref)=14.2847
+Track11 pt=2.02734 eta=-0.695639 phi=-1.40219 dxy(beamspot)=0.0191754 dxySig(beamspot)=6.0594 dxy(0,0)=0.044591 dxySig(0,0)=14.0907 dz(PV)=-6.30007 dz(0,0)=-3.06346 dxyErr=0.00316458 dzErr=0.00484825 IPsig(ref)=6.06217
+Track17 pt=1.62402 eta=1.00949 phi=-2.30417 dxy(beamspot)=0.122694 dxySig(beamspot)=13.9217 dxy(0,0)=0.15505 dxySig(0,0)=17.5931 dz(PV)=0.313184 dz(0,0)=3.54466 dxyErr=0.00881312 dzErr=0.0131813 IPsig(ref)=13.9246
+Track18 pt=1.61914 eta=0.771447 phi=1.10912 dxy(beamspot)=-0.080214 dxySig(beamspot)=-14.7213 dxy(0,0)=-0.113214 dxySig(0,0)=-20.7776 dz(PV)=-4.66852 dz(0,0)=-1.44603 dxyErr=0.00544885 dzErr=0.00723477 IPsig(ref)=14.7235
+Track23 pt=1.50781 eta=0.751122 phi=-2.63602 dxy(beamspot)=0.0267087 dxySig(beamspot)=4.91511 dxy(0,0)=0.0550761 dxySig(0,0)=10.1355 dz(PV)=0.0142773 dz(0,0)=3.25082 dxyErr=0.00543399 dzErr=0.00760398 IPsig(ref)=4.91621
+Track26 pt=1.43164 eta=-0.325938 phi=-1.62358 dxy(beamspot)=0.0721108 dxySig(beamspot)=13.1233 dxy(0,0)=0.101551 dxySig(0,0)=18.4811 dz(PV)=-6.41875 dz(0,0)=-3.19237 dxyErr=0.00549486 dzErr=0.00601061 IPsig(ref)=13.1305
+Track50 pt=1.07715 eta=-0.525163 phi=-1.39984 dxy(beamspot)=0.0210933 dxySig(beamspot)=4.23185 dxy(0,0)=0.0464592 dxySig(0,0)=9.32086 dz(PV)=-6.35491 dz(0,0)=-3.12223 dxyErr=0.00498443 dzErr=0.00590711 IPsig(ref)=4.2341
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track23,Track18} x=1.22393 y=2.18023 z=0.751449 chi2=30129.9 dBV=2.52236 dBVErr=0.00862002 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track23,Track26} x=1.64127 y=2.11837 z=-1.12193 chi2=93871.2 dBV=3.08988 dBVErr=0.0123118 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track23,Track50} x=0.938532 y=1.68904 z=-0.811818 chi2=147587 dBV=2.29421 dBVErr=0.00995298 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track23,Track2} x=0.440777 y=1.94276 z=-1.42112 chi2=229833 dBV=2.72248 dBVErr=0.00900668 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track23,Track11} x=0.438493 y=1.7963 z=-0.503236 chi2=182477 dBV=2.07692 dBVErr=0.00762175 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track23,Track17} x=0.47614 y=0.232156 z=2.85521 chi2=116.612 dBV=2.48494 dBVErr=0.023768 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track18,Track26} x=-0.0739706 y=-1.59237 z=-3.62979 chi2=16653.8 dBV=4.35013 dBVErr=0.0157671 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track18,Track50} x=-0.0401904 y=-0.57793 z=-3.02608 chi2=27402.6 dBV=3.49573 dBVErr=0.0151662 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track18,Track2} x=0.0687844 y=-0.591449 z=-3.2812 chi2=36588.5 dBV=3.74935 dBVErr=0.0148079 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track18,Track3} x=-0.020994 y=-0.163138 z=-2.87939 chi2=37649.7 dBV=3.30661 dBVErr=0.0131418 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track18,Track11} x=-0.0216938 y=-0.0940685 z=-2.66085 chi2=33937.4 dBV=3.08583 dBVErr=0.0147218 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track18,Track17} x=1.1634 y=2.10976 z=0.61263 chi2=3311.42 dBV=2.41761 dBVErr=0.00944142 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track26,Track50} x=0.090349 y=-0.261699 z=-3.2749 chi2=0.740068 dBV=3.70713 dBVErr=0.0171364 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track26,Track2} x=0.112163 y=-0.114356 z=-3.21722 chi2=15.9389 dBV=3.64308 dBVErr=0.0179309 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track26,Track3} x=0.0906769 y=-0.264455 z=-3.2739 chi2=1.23146 dBV=3.70632 dBVErr=0.0137408 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track26,Track11} x=0.0909022 y=-0.273344 z=-3.27926 chi2=0.805796 dBV=3.71227 dBVErr=0.015303 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track26,Track17} x=1.36703 y=3.31654 z=-1.61427 chi2=24234.8 dBV=4.12965 dBVErr=0.0152295 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track50,Track2} x=0.151453 y=-0.610567 z=-3.48329 chi2=14.9623 dBV=3.9537 dBVErr=0.0363394 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track50,Track3} x=0.0938619 y=-0.271606 z=-3.27715 chi2=0.0474476 dBV=3.71009 dBVErr=0.0196 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track50,Track11} x=0.0932444 y=-0.277411 z=-3.2812 chi2=0.131126 dBV=3.71453 dBVErr=0.0285825 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track50,Track17} x=0.607592 y=2.64761 z=-1.15558 chi2=46819.6 dBV=3.15071 dBVErr=0.0115861 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track2,Track3} x=0.135357 y=-0.377041 z=-3.35331 chi2=10.3564 dBV=3.79558 dBVErr=0.0136819 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track2,Track11} x=0.134642 y=-0.4645 z=-3.41351 chi2=31.8597 dBV=3.86462 dBVErr=0.0199062 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track2,Track17} x=0.163572 y=3.02134 z=-1.28634 chi2=56117.4 dBV=3.48871 dBVErr=0.00963513 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track3,Track11} x=0.0903586 y=-0.262974 z=-3.27074 chi2=0.0353057 dBV=3.70306 dBVErr=0.0167249 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track3,Track17} x=-0.412376 y=2.03118 z=-1.3977 chi2=114738 dBV=2.77578 dBVErr=0.0093772 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track11,Track17} x=0.126957 y=2.65141 z=-0.654816 chi2=52550.9 dBV=2.87939 dBVErr=0.00919667 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] State after initial seed-vertex formation:
+Vertex1 x=0.090349 y=-0.261699 z=-3.2749 chi2=0.740068 dBV=3.70713 dBVErr=0.0171364 tracks={Track26,Track50}
+Vertex2 x=0.0906769 y=-0.264455 z=-3.2739 chi2=1.23146 dBV=3.70632 dBVErr=0.0137408 tracks={Track3,Track26}
+Vertex3 x=0.0909022 y=-0.273344 z=-3.27926 chi2=0.805796 dBV=3.71227 dBVErr=0.015303 tracks={Track11,Track26}
+Vertex4 x=0.0938619 y=-0.271606 z=-3.27715 chi2=0.0474476 dBV=3.71009 dBVErr=0.0196 tracks={Track3,Track50}
+Vertex5 x=0.0932444 y=-0.277411 z=-3.2812 chi2=0.131126 dBV=3.71453 dBVErr=0.0285825 tracks={Track11,Track50}
+Vertex6 x=0.0903586 y=-0.262974 z=-3.27074 chi2=0.0353057 dBV=3.70306 dBVErr=0.0167249 tracks={Track3,Track11}
+------------------------------------------------------------
+ 
+[Vertex Merging and Cleanup Loop: Compare Vertex Pairs]
+This loop continues until one full scan causes no changes.
+Any merge, drop, or refit causes [Restart Loop].
+Track-to-vertex compatibility distance mode: 2D transverse IP (use_2d_track_dist=True)
+Configured thresholds used in this stage: max_track_vertex_dist=-1, max_track_vertex_sig=-1, min_track_vertex_sig_to_remove=1.5, remove_one_track_at_a_time=True, merge_shared_dist=-1, merge_shared_sig=4
+[Rule 1]
+If Vertex B tracks are entirely contained in Vertex A tracks, Vertex B is removed as redundant.
+Drop smaller redundant vertex, then [Restart Loop].
+[Do 2 Vertices Have a Shared Track?]
+If no: continue scanning remaining vertex pairs.
+Only return reconstructed vertices after a full scan completes with no changes.
+[Are the 2 Vertices Close?]
+Compare vertex distances: distance(vertexA, vertexB) and significance(vertexA, vertexB).
+Thresholds: max_vertex_dist (= merge_shared_dist) and max_vertex_sig (= merge_shared_sig).
+This stage answers closeness and, in the same answer, marks merge (YES) or refit-only (NO).
+This is vertex-to-vertex closeness. This is NOT track-to-vertex distance.
+[Union Merge (Kalman fit a vertex for the union of set of tracks)]
+Build a temporary merged vertex candidate from the union of all unique tracks.
+If merged fit returns exactly one valid full-union vertex: replace source vertices, drop source vertices, [Restart Loop].
+If merged fit does not pass valid full-union checks: ignore merged candidate and continue with original two vertices.
+[Force Drop a Track (OR 2!)]
+For each shared track and each vertex side, report exact threshold checks.
+hardFail = track_dist invalid OR NOT( dist < max_track_vertex_dist OR sig < max_track_vertex_sig )
+remove_from_0 = hardFail0; remove_from_1 = hardFail1
+Further checks:
+If both sig < min_track_vertex_sig_to_remove: keep bigger vertex; if equal size, drop from first vertex in hand.
+Else: keep lower-significance side and drop from higher-significance side.
+So either 1 OR 2 tracks can be marked for removal (at least 1). 
+[Refit for the vertices whose tracks were dropped]
+This stage performs actual removal by rebuilding with surviving tracks only.
+Rebuild only affected vertices; unchanged vertices stay untouched.
+If a refit side no longer has enough tracks for a valid vertex, drop that vertex; then [Restart Loop].
+------------------------------------------------------------
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 1 ================
+Compare Vertex1 {x=0.090349 y=-0.261699 z=-3.2749 chi2=0.740068 dBV=3.70713 dBVErr=0.0171364 tracks={Track26,Track50}}  vs  Vertex2 {x=0.0906769 y=-0.264455 z=-3.2739 chi2=1.23146 dBV=3.70632 dBVErr=0.0137408 tracks={Track3,Track26}}
+[Do 2 Vertices Have a Shared Track?] YES sharedTracks={Track26}
+[Are the 2 Vertices Close?] YES
+Reason: significance threshold passed (vertexSignificance=0.142822 < max_vertex_sig=4)
+Action: marked for merge
+Pair: Vertex1 vs Vertex2
+Temporary union tracks={Track3,Track26,Track50}
+[Mark to Drop a Track (From 1 OR 2 vertices!)] Track26
+track_dist_valid_v0=1 track_dist_valid_v1=1
+distToV0=0.00224216 vs max_track_vertex_dist=-1 -> FAIL
+sigToV0=0.334084 vs max_track_vertex_sig=-1 -> FAIL
+distToV1=0.00270966 vs max_track_vertex_dist=-1 -> FAIL
+sigToV1=0.400459 vs max_track_vertex_sig=-1 -> FAIL
+dxyToV0=-0.00247844 dxySigToV0=-0.451047 dxyToV1=-0.00295129 dxySigToV1=-0.5371 dzToV0=-0.0025859 dzSigToV0=-0.430222 dzToV1=-0.00449021 dzSigToV1=-0.747047
+Decision: removed from both (Vertex1 and Vertex2) because compatibility failed with max_track_vertex_dist=-1 and max_track_vertex_sig=-1.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] remove_one_track_at_a_time=True -> stop after first shared-track decision.
+[Temporary Merge Candidate]
+count=1
+candidate0={x=0.0912815 y=-0.2655 z=-3.27452 chi2=0.449182 dBV=3.70701 dBVErr=0.013536 tracks={Track3,Track26,Track50}}
+[Merge Outcome] SUCCESS
+Reason: exactly one valid full-union vertex returned
+Overrule: previously marked track drops are ignored
+[Vertex Update]
+SUCCESSFUL MERGE:
+Overwrite Vertex1 with merged vertex
+Erase Vertex2 from vertex collection
+MergedVertex={x=0.0912815 y=-0.2655 z=-3.27452 chi2=0.449182 dBV=3.70701 dBVErr=0.013536 tracks={Track3,Track26,Track50}}
+DroppedSourceVertex={x=0.0906769 y=-0.264455 z=-3.2739 chi2=1.23146 dBV=3.70632 dBVErr=0.0137408 tracks={Track3,Track26}}
+State after a merge/drop/refit step:
+Vertex1 x=0.0912815 y=-0.2655 z=-3.27452 chi2=0.449182 dBV=3.70701 dBVErr=0.013536 tracks={Track3,Track26,Track50}
+Vertex2 x=0.0909022 y=-0.273344 z=-3.27926 chi2=0.805796 dBV=3.71227 dBVErr=0.015303 tracks={Track11,Track26}
+Vertex3 x=0.0938619 y=-0.271606 z=-3.27715 chi2=0.0474476 dBV=3.71009 dBVErr=0.0196 tracks={Track3,Track50}
+Vertex4 x=0.0932444 y=-0.277411 z=-3.2812 chi2=0.131126 dBV=3.71453 dBVErr=0.0285825 tracks={Track11,Track50}
+Vertex5 x=0.0903586 y=-0.262974 z=-3.27074 chi2=0.0353057 dBV=3.70306 dBVErr=0.0167249 tracks={Track3,Track11}
+[Restart Loop]
+Reason: vertex list topology changed after merge/refit/drop
+Restart full pairwise scan from beginning
+============================================================
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 2 ================
+Compare Vertex1 {x=0.0912815 y=-0.2655 z=-3.27452 chi2=0.449182 dBV=3.70701 dBVErr=0.013536 tracks={Track3,Track26,Track50}}  vs  Vertex2 {x=0.0909022 y=-0.273344 z=-3.27926 chi2=0.805796 dBV=3.71227 dBVErr=0.015303 tracks={Track11,Track26}}
+[Do 2 Vertices Have a Shared Track?] YES sharedTracks={Track26}
+[Are the 2 Vertices Close?] YES
+Reason: significance threshold passed (vertexSignificance=0.453565 < max_vertex_sig=4)
+Action: marked for merge
+Pair: Vertex1 vs Vertex2
+Temporary union tracks={Track3,Track11,Track26,Track50}
+[Mark to Drop a Track (From 1 OR 2 vertices!)] Track26
+track_dist_valid_v0=1 track_dist_valid_v1=1
+distToV0=0.00336648 vs max_track_vertex_dist=-1 -> FAIL
+sigToV0=0.520914 vs max_track_vertex_sig=-1 -> FAIL
+distToV1=0.00338582 vs max_track_vertex_dist=-1 -> FAIL
+sigToV1=0.555016 vs max_track_vertex_sig=-1 -> FAIL
+dxyToV0=-0.0036101 dxySigToV0=-0.656996 dxyToV1=-0.00364517 dxySigToV1=-0.663378 dzToV0=-0.00421102 dzSigToV0=-0.700597 dzToV1=-0.00207563 dzSigToV1=-0.345327
+Decision: removed from both (Vertex1 and Vertex2) because compatibility failed with max_track_vertex_dist=-1 and max_track_vertex_sig=-1.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] remove_one_track_at_a_time=True -> stop after first shared-track decision.
+[Temporary Merge Candidate]
+count=1
+candidate0={x=0.0913805 y=-0.266646 z=-3.27458 chi2=0.313061 dBV=3.70715 dBVErr=0.0133113 tracks={Track3,Track11,Track26,Track50}}
+[Merge Outcome] SUCCESS
+Reason: exactly one valid full-union vertex returned
+Overrule: previously marked track drops are ignored
+[Vertex Update]
+SUCCESSFUL MERGE:
+Overwrite Vertex1 with merged vertex
+Erase Vertex2 from vertex collection
+MergedVertex={x=0.0913805 y=-0.266646 z=-3.27458 chi2=0.313061 dBV=3.70715 dBVErr=0.0133113 tracks={Track3,Track11,Track26,Track50}}
+DroppedSourceVertex={x=0.0909022 y=-0.273344 z=-3.27926 chi2=0.805796 dBV=3.71227 dBVErr=0.015303 tracks={Track11,Track26}}
+State after a merge/drop/refit step:
+Vertex1 x=0.0913805 y=-0.266646 z=-3.27458 chi2=0.313061 dBV=3.70715 dBVErr=0.0133113 tracks={Track3,Track11,Track26,Track50}
+Vertex2 x=0.0938619 y=-0.271606 z=-3.27715 chi2=0.0474476 dBV=3.71009 dBVErr=0.0196 tracks={Track3,Track50}
+Vertex3 x=0.0932444 y=-0.277411 z=-3.2812 chi2=0.131126 dBV=3.71453 dBVErr=0.0285825 tracks={Track11,Track50}
+Vertex4 x=0.0903586 y=-0.262974 z=-3.27074 chi2=0.0353057 dBV=3.70306 dBVErr=0.0167249 tracks={Track3,Track11}
+[Restart Loop]
+Reason: vertex list topology changed after merge/refit/drop
+Restart full pairwise scan from beginning
+============================================================
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 3 ================
+Compare Vertex1 {x=0.0913805 y=-0.266646 z=-3.27458 chi2=0.313061 dBV=3.70715 dBVErr=0.0133113 tracks={Track3,Track11,Track26,Track50}}  vs  Vertex2 {x=0.0938619 y=-0.271606 z=-3.27715 chi2=0.0474476 dBV=3.71009 dBVErr=0.0196 tracks={Track3,Track50}}
+[Rule 1] Vertex2 tracks are contained in Vertex1 and Vertex2 tracksA={Track3,Track11,Track26,Track50} tracksB={Track3,Track50} rule=R1
+[Rule 1] drop smaller redundant vertex droppedVertexIndex=2 content={x=0.0938619 y=-0.271606 z=-3.27715 chi2=0.0474476 dBV=3.71009 dBVErr=0.0196 tracks={Track3,Track50}} rule=R1
+[Restart Loop]
+State after a merge/drop/refit step:
+Vertex1 x=0.0913805 y=-0.266646 z=-3.27458 chi2=0.313061 dBV=3.70715 dBVErr=0.0133113 tracks={Track3,Track11,Track26,Track50}
+Vertex2 x=0.0932444 y=-0.277411 z=-3.2812 chi2=0.131126 dBV=3.71453 dBVErr=0.0285825 tracks={Track11,Track50}
+Vertex3 x=0.0903586 y=-0.262974 z=-3.27074 chi2=0.0353057 dBV=3.70306 dBVErr=0.0167249 tracks={Track3,Track11}
+[Restart Loop]
+Reason: vertex list topology changed after merge/refit/drop
+Restart full pairwise scan from beginning
+============================================================
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 4 ================
+Compare Vertex1 {x=0.0913805 y=-0.266646 z=-3.27458 chi2=0.313061 dBV=3.70715 dBVErr=0.0133113 tracks={Track3,Track11,Track26,Track50}}  vs  Vertex2 {x=0.0932444 y=-0.277411 z=-3.2812 chi2=0.131126 dBV=3.71453 dBVErr=0.0285825 tracks={Track11,Track50}}
+[Rule 1] Vertex2 tracks are contained in Vertex1 and Vertex2 tracksA={Track3,Track11,Track26,Track50} tracksB={Track11,Track50} rule=R1
+[Rule 1] drop smaller redundant vertex droppedVertexIndex=2 content={x=0.0932444 y=-0.277411 z=-3.2812 chi2=0.131126 dBV=3.71453 dBVErr=0.0285825 tracks={Track11,Track50}} rule=R1
+[Restart Loop]
+State after a merge/drop/refit step:
+Vertex1 x=0.0913805 y=-0.266646 z=-3.27458 chi2=0.313061 dBV=3.70715 dBVErr=0.0133113 tracks={Track3,Track11,Track26,Track50}
+Vertex2 x=0.0903586 y=-0.262974 z=-3.27074 chi2=0.0353057 dBV=3.70306 dBVErr=0.0167249 tracks={Track3,Track11}
+[Restart Loop]
+Reason: vertex list topology changed after merge/refit/drop
+Restart full pairwise scan from beginning
+============================================================
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 5 ================
+Compare Vertex1 {x=0.0913805 y=-0.266646 z=-3.27458 chi2=0.313061 dBV=3.70715 dBVErr=0.0133113 tracks={Track3,Track11,Track26,Track50}}  vs  Vertex2 {x=0.0903586 y=-0.262974 z=-3.27074 chi2=0.0353057 dBV=3.70306 dBVErr=0.0167249 tracks={Track3,Track11}}
+[Rule 1] Vertex2 tracks are contained in Vertex1 and Vertex2 tracksA={Track3,Track11,Track26,Track50} tracksB={Track3,Track11} rule=R1
+[Rule 1] drop smaller redundant vertex droppedVertexIndex=2 content={x=0.0903586 y=-0.262974 z=-3.27074 chi2=0.0353057 dBV=3.70306 dBVErr=0.0167249 tracks={Track3,Track11}} rule=R1
+[Restart Loop]
+State after a merge/drop/refit step:
+Vertex1 x=0.0913805 y=-0.266646 z=-3.27458 chi2=0.313061 dBV=3.70715 dBVErr=0.0133113 tracks={Track3,Track11,Track26,Track50}
+[Restart Loop]
+Reason: vertex list topology changed after merge/refit/drop
+Restart full pairwise scan from beginning
+============================================================
+ 
+[Return the reconstructed vertices]
+No pairs of vertices share a common track after a full scan:
+Return the reconstructed vertices
+Final vertex state:
+Vertex1 x=0.0913805 y=-0.266646 z=-3.27458 chi2=0.313061 dBV=3.70715 dBVErr=0.0133113 tracks={Track3,Track11,Track26,Track50}
+Return complete: only reconstructed output vertices are persisted to the event.
+============================================================

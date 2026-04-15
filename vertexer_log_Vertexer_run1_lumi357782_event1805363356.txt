@@ -187,6 +187,7 @@ This stage performs actual removal by rebuilding with surviving tracks only.
 Rebuild only affected vertices; unchanged vertices stay untouched.
 If a refit side no longer has enough tracks for a valid vertex, drop that vertex; then [Restart Loop].
 ------------------------------------------------------------
+[Vertex Ordering] Sort initial seed vertices by descending pT before compare loop
 ================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 1 ================
 Compare Vertex1 {x=-0.252302 y=-0.481298 z=-0.545803 chi2=2.32555 dBV=1.11113 dBVErr=0.013297 tracks={Track2,Track9}}  vs  Vertex2 {x=-0.251401 y=-0.48079 z=-0.549817 chi2=3.27063 dBV=1.11419 dBVErr=0.0127175 tracks={Track2,Track15}}
 [Do 2 Vertices Have a Shared Track?] YES sharedTracks={Track2}

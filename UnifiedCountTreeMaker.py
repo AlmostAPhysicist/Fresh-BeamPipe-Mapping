@@ -26,7 +26,13 @@ process.source = cms.Source("PoolSource",
 )
 
 # offset the event processing to skip events with no scouting tracks (if desired)
-process.source.skipEvents = cms.untracked.uint32(60)
+process.source.skipEvents = cms.untracked.uint32(60) #4,5
+# process.source.skipEvents = cms.untracked.uint32(2456) #3,3
+# process.source.skipEvents = cms.untracked.uint32(2217) #4,4
+# process.source.skipEvents = cms.untracked.uint32(85) #2,2
+# process.source.skipEvents = cms.untracked.uint32(964) #3,2
+# process.source.skipEvents = cms.untracked.uint32(4103) #5,7
+
 # -------------------------- GLOBAL TAG / GEOM ------------------------------
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
@@ -95,6 +101,7 @@ process.Vertexer = cms.EDProducer('Vertexer',
     max_nm1_refit_count = cms.int32(-1),
     logBeamspotSource = cms.untracked.bool(True),
     printVertexerLogs = cms.untracked.bool(printVertexerLogs),
+    order_seed_vertex = cms.untracked.bool(True),
     verbose = cms.bool(False),
 )
 
@@ -129,6 +136,7 @@ process.VertexerOffline = cms.EDProducer('Vertexer',
     max_nm1_refit_count = cms.int32(-1),
     logBeamspotSource = cms.untracked.bool(True),
     printVertexerLogs = cms.untracked.bool(printVertexerLogs),
+    order_seed_vertex = cms.untracked.bool(True),
     verbose = cms.bool(False),
 )
 
