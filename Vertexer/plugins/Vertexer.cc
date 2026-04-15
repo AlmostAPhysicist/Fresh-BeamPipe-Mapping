@@ -639,11 +639,10 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // - pT > 0.9 GeV
   // - |IP significance(reference)| > 4.0
   // Every surviving track is added to the seed track list.
-  std::vector<reco::TransientTrack> seed_tracks;
-  std::vector<unsigned int> seed_track_keys;
+  std::vector<reco::TrackRef> seed_tracks_raw;
+  std::vector<reco::TrackRef> seed_tracks_pt_ordered;
   std::unordered_set<unsigned int> seedTrackKeySet;
   std::unordered_map<unsigned int, float> seedTrackIPSigByKey;
-  std::unordered_map<unsigned int,size_t> seed_track_ref_map;
 
   for (size_t i_tk=0; i_tk<seed_track_handle->size(); ++i_tk) {
     edm::Ref<reco::TrackCollection> tk_ref(seed_track_handle, i_tk);
@@ -661,15 +660,22 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if (!(tk_ref->pt() > minSeedPt)) continue;
 
     // Keep the seed
-    seed_track_ref_map[tk_ref.key()] = seed_tracks.size();
-    seed_track_keys.push_back(tk_ref.key());
+    seed_tracks_raw.push_back(tk_ref);
     seedTrackKeySet.insert(tk_ref.key());
     seedTrackIPSigByKey[tk_ref.key()] = IP_sig;
-    seed_tracks.emplace_back(std::move(ttk));
 
     if (verbose)
       printf("Seed preselect: key=%u pt=%.3f IPsig(ref)=%.3f KEPT\n",
              tk_ref.key(), tk_ref->pt(), IP_sig);
+  }
+
+  seed_tracks_pt_ordered.reserve(seed_tracks_raw.size());
+  for (size_t orderIdx = 0; orderIdx < trackIdxByPt.size(); ++orderIdx) {
+    const size_t tkIdx = trackIdxByPt[orderIdx];
+    const unsigned int key = static_cast<unsigned int>(tkIdx);
+    if (seedTrackKeySet.count(key) == 0) continue;
+    edm::Ref<reco::TrackCollection> tk_ref(seed_track_handle, tkIdx);
+    seed_tracks_pt_ordered.push_back(tk_ref);
   }
 
   for (size_t orderIdx = 0; orderIdx < trackIdxByPt.size(); ++orderIdx) {
@@ -704,7 +710,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     logLine("[Seed Track Selection]");
     std::ostringstream selSummary;
     selSummary << "Seed-track summary: totalTracks=" << seed_track_handle->size()
-               << " selectedSeedTracks=" << seed_tracks.size();
+               << " selectedSeedTracks=" << seed_tracks_pt_ordered.size();
     logLine(selSummary.str());
     logLine("Apply seed cuts: pT > 0.9 GeV and |IP significance(reference)| > 4.0.");
     logLine(" ");
@@ -742,8 +748,6 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // build safe lambda (bounds + cache) REPLACES previous version
   auto getTransientTrack = [&](auto const& tk) -> reco::TransientTrack {
     const unsigned int k = tk.key();
-    auto it = seed_track_ref_map.find(k);
-    if (it != seed_track_ref_map.end()) return seed_tracks[it->second];
     if (k < seed_track_handle->size()) {
       edm::Ref<reco::TrackCollection> tr(seed_track_handle, k);
       return tt_builder.build(tr);
@@ -765,7 +769,19 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // If failed:
   // - discard only this pair
 
-  const size_t ntk = seed_tracks.size();
+  if (!order_seed_vertex) {
+    // ------------------------------------------------------------
+    // Controlled order-dependence test:
+    // Build seed vertices using ORIGINAL event track order,
+    // while preserving pT-ordered track labels for logging only.
+    // This isolates vertex insertion-order effects from label order.
+    // ------------------------------------------------------------
+  }
+
+  const auto& seed_tracks_for_vertexing =
+      order_seed_vertex ? seed_tracks_pt_ordered : seed_tracks_raw;
+
+  const size_t ntk = seed_tracks_for_vertexing.size();
   
   std::unique_ptr<reco::VertexCollection> vertices(new reco::VertexCollection);
   
@@ -781,7 +797,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   auto try_seed_vertex = [&]() {
     std::vector<reco::TransientTrack> ttks(n_tracks_per_seed_vertex);
     for (int i = 0; i < n_tracks_per_seed_vertex; ++i) {
-      ttks[i] = seed_tracks[itks[i]];
+      ttks[i] = getTransientTrack(seed_tracks_for_vertexing[itks[i]]);
       if (!ttks[i].isValid()) return;  // safety
     }
     TransientVertex seed_vertex = kv_reco_.vertex(ttks);
@@ -793,7 +809,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       std::ostringstream seedLine;
       seedLine << "[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={";
       for (size_t i = 0; i < itks.size(); ++i) {
-        const unsigned int key = seed_track_keys[itks[i]];
+        const unsigned int key = seed_tracks_for_vertexing[itks[i]].key();
         const int label = trackLabelByKey.count(key) ? trackLabelByKey[key] : -1;
         if (i) seedLine << ",";
         seedLine << "Track" << label;

@@ -101,7 +101,7 @@ process.Vertexer = cms.EDProducer('Vertexer',
     max_nm1_refit_count = cms.int32(-1),
     logBeamspotSource = cms.untracked.bool(True),
     printVertexerLogs = cms.untracked.bool(printVertexerLogs),
-    order_seed_vertex = cms.untracked.bool(True),
+    order_seed_vertex = cms.untracked.bool(False),
     verbose = cms.bool(False),
 )
 
@@ -136,7 +136,7 @@ process.VertexerOffline = cms.EDProducer('Vertexer',
     max_nm1_refit_count = cms.int32(-1),
     logBeamspotSource = cms.untracked.bool(True),
     printVertexerLogs = cms.untracked.bool(printVertexerLogs),
-    order_seed_vertex = cms.untracked.bool(True),
+    order_seed_vertex = cms.untracked.bool(False),
     verbose = cms.bool(False),
 )
 
