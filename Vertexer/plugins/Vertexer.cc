@@ -95,7 +95,6 @@ using namespace edm;
 //
 // class declaration
 //
-
 class Vertexer : public edm::stream::EDProducer<> {
 public:
   ~Vertexer() override;
@@ -130,6 +129,7 @@ private:
   const bool verbose;
   const bool printVertexerLogs_;
   const bool order_seed_vertex;
+  const bool use_seed_tracks_raw;
 
   // REMOVE legacy-style seed knobs that changed physics
   // const double pt_min_cut_;
@@ -343,6 +343,7 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
   verbose(params.getParameter<bool>("verbose")),
   printVertexerLogs_(params.getUntrackedParameter<bool>("printVertexerLogs", false)),
   order_seed_vertex(params.getUntrackedParameter<bool>("order_seed_vertex", false)),
+  use_seed_tracks_raw(params.getUntrackedParameter<bool>("use_seed_tracks_raw", false)),
   
   // read new params (provide same defaults as current hard-coded values)
   // REMOVE these (do not read minSeed*)
@@ -678,33 +679,6 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     seed_tracks_pt_ordered.push_back(tk_ref);
   }
 
-  for (size_t orderIdx = 0; orderIdx < trackIdxByPt.size(); ++orderIdx) {
-    const size_t tkIdx = trackIdxByPt[orderIdx];
-    const reco::Track& tk = seed_track_handle->at(tkIdx);
-
-    const double dxyOrigin = tk.dxy(reco::TrackBase::Point(0.0, 0.0, 0.0));
-    const double dxyBeamspot = haveBSForTrackLog ? tk.dxy(beamspotPoint) : std::numeric_limits<double>::quiet_NaN();
-    const double dxySigOrigin = (tk.dxyError() > 0.0) ? (dxyOrigin / tk.dxyError()) : std::numeric_limits<double>::quiet_NaN();
-    const double dxySigBeamspot = (tk.dxyError() > 0.0) ? (dxyBeamspot / tk.dxyError()) : std::numeric_limits<double>::quiet_NaN();
-    const double dzOrigin = tk.dz(reco::TrackBase::Point(0.0, 0.0, 0.0));
-    const double dzPV = havePVForTrackLog ? tk.dz(pvRefPoint) : std::numeric_limits<double>::quiet_NaN();
-
-    std::ostringstream trkLine;
-        trkLine << "Track" << orderIdx
-            << " pt=" << tk.pt()
-            << " eta=" << tk.eta()
-            << " phi=" << tk.phi()
-            << " dxy(beamspot)=" << dxyBeamspot
-            << " dxySig(beamspot)=" << dxySigBeamspot
-            << " dxy(0,0)=" << dxyOrigin
-            << " dxySig(0,0)=" << dxySigOrigin
-            << " dz(PV)=" << dzPV
-            << " dz(0,0)=" << dzOrigin
-            << " dxyErr=" << tk.dxyError()
-          << " dzErr=" << tk.dzError();
-    logLine(trkLine.str());
-  }
-
   {
     logLine(" ");
     logLine("[Seed Track Selection]");
@@ -714,21 +688,23 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     logLine(selSummary.str());
     logLine("Apply seed cuts: pT > 0.9 GeV and |IP significance(reference)| > 4.0.");
     logLine(" ");
-    logLine("[Seed Track Selection] Seed track list");
-    logLine("Only seed tracks used for seed-vertex combinations:");
-    for (size_t orderIdx = 0; orderIdx < trackIdxByPt.size(); ++orderIdx) {
-      const size_t tkIdx = trackIdxByPt[orderIdx];
-      if (seedTrackKeySet.count(static_cast<unsigned int>(tkIdx)) == 0) continue;
-      const reco::Track& tk = seed_track_handle->at(tkIdx);
+    // Debug label consistency:
+    // keep original full-event pT labels even after seed cuts.
+    // This ensures pT-ordered and raw-order dumps use the same label space.
+    logLine("[List of pT Ordered Tracks]");
+    for (size_t orderIdx = 0; orderIdx < seed_tracks_pt_ordered.size(); ++orderIdx) {
+      const reco::TrackRef& tk_ref = seed_tracks_pt_ordered[orderIdx];
+      const int label = trackLabelByKey.count(tk_ref.key()) ? trackLabelByKey[tk_ref.key()] : -1;
+      const reco::Track& tk = *tk_ref;
       const double dxyOrigin = tk.dxy(reco::TrackBase::Point(0.0, 0.0, 0.0));
       const double dxyBeamspot = haveBSForTrackLog ? tk.dxy(beamspotPoint) : std::numeric_limits<double>::quiet_NaN();
       const double dxySigOrigin = (tk.dxyError() > 0.0) ? (dxyOrigin / tk.dxyError()) : std::numeric_limits<double>::quiet_NaN();
       const double dxySigBeamspot = (tk.dxyError() > 0.0) ? (dxyBeamspot / tk.dxyError()) : std::numeric_limits<double>::quiet_NaN();
       const double dzOrigin = tk.dz(reco::TrackBase::Point(0.0, 0.0, 0.0));
       const double dzPV = havePVForTrackLog ? tk.dz(pvRefPoint) : std::numeric_limits<double>::quiet_NaN();
-      const float ipSig = seedTrackIPSigByKey.count(static_cast<unsigned int>(tkIdx)) ? seedTrackIPSigByKey[static_cast<unsigned int>(tkIdx)] : std::numeric_limits<float>::quiet_NaN();
+      const float ipSig = seedTrackIPSigByKey.count(tk_ref.key()) ? seedTrackIPSigByKey[tk_ref.key()] : std::numeric_limits<float>::quiet_NaN();
       std::ostringstream trkLine;
-      trkLine << "Track" << orderIdx
+      trkLine << "Track" << label
               << " pt=" << tk.pt()
               << " eta=" << tk.eta()
               << " phi=" << tk.phi()
@@ -742,6 +718,14 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
               << " dzErr=" << tk.dzError()
               << " IPsig(ref)=" << ipSig;
       logLine(trkLine.str());
+    }
+    logLine("[Raw Selected Track Order (same labels)]");
+    for (size_t slot = 0; slot < seed_tracks_raw.size(); ++slot) {
+      const unsigned int key = seed_tracks_raw[slot].key();
+      const int label = trackLabelByKey.count(key) ? trackLabelByKey[key] : -1;
+      std::ostringstream rawLine;
+      rawLine << "slot" << slot << " -> Track" << label;
+      logLine(rawLine.str());
     }
   }
 
@@ -769,17 +753,18 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // If failed:
   // - discard only this pair
 
-  if (!order_seed_vertex) {
-    // ------------------------------------------------------------
-    // Controlled order-dependence test:
-    // Build seed vertices using ORIGINAL event track order,
-    // while preserving pT-ordered track labels for logging only.
-    // This isolates vertex insertion-order effects from label order.
-    // ------------------------------------------------------------
-  }
+  // ------------------------------------------------------------
+  // Seed track source selection:
+  // use_seed_tracks_raw = true  -> original selected-track order
+  // use_seed_tracks_raw = false -> pT-ordered selected-track order
+  //
+  // Important:
+  // the first ACCEPTED seed vertex is the first pair that PASSES
+  // the chi2 cut in loop order, not necessarily the first pair visited.
+  // ------------------------------------------------------------
 
   const auto& seed_tracks_for_vertexing =
-      order_seed_vertex ? seed_tracks_pt_ordered : seed_tracks_raw;
+      use_seed_tracks_raw ? seed_tracks_raw : seed_tracks_pt_ordered;
 
   const size_t ntk = seed_tracks_for_vertexing.size();
   
@@ -815,6 +800,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         seedLine << "Track" << label;
       }
       seedLine << "}"
+               << " vertexPt=" << candidate.p4().pt()
                << " x=" << candidate.x()
                << " y=" << candidate.y()
                << " z=" << candidate.z()
@@ -872,6 +858,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     out << "x=" << vv.x()
         << " y=" << vv.y()
         << " z=" << vv.z()
+        << " vertexPt=" << vv.p4().pt()
         << " chi2=" << vv.normalizedChi2()
         << " dBV=" << dBV.value()
         << " dBVErr=" << dBVErr
@@ -884,19 +871,26 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     // audit state transitions after each merge/refit/reset step.
     logLine(header);
     for (size_t iv = 0; iv < vertices->size(); ++iv) {
-      const auto& vv = vertices->at(iv);
-      const auto dBV = vertex_dist(vv, fake_ref_vtx);
-      const double dBVErr = (std::abs(dBV.significance()) > 0.0) ? (dBV.value() / dBV.significance()) : std::numeric_limits<double>::quiet_NaN();
-      const auto tset = vertex_track_set(vv, 0.0);
       std::ostringstream line;
-      line << "Vertex" << (iv + 1)
-           << " x=" << vv.x()
-           << " y=" << vv.y()
-           << " z=" << vv.z()
-           << " chi2=" << vv.normalizedChi2()
-           << " dBV=" << dBV.value()
-           << " dBVErr=" << dBVErr
-           << " tracks=" << formatTrackSetLabels(tset);
+      line << "Vertex" << (iv + 1) << " " << vertexSummary(vertices->at(iv));
+      logLine(line.str());
+    }
+  };
+
+  auto dumpVerticesByPtOrder = [&](const std::string& header) {
+    logLine(header);
+    std::vector<size_t> vertexOrder(vertices->size());
+    for (size_t i = 0; i < vertexOrder.size(); ++i) {
+      vertexOrder[i] = i;
+    }
+    std::sort(vertexOrder.begin(), vertexOrder.end(), [&](size_t a, size_t b) {
+      return vertices->at(a).p4().pt() > vertices->at(b).p4().pt();
+    });
+    for (size_t rank = 0; rank < vertexOrder.size(); ++rank) {
+      const size_t vertexIndex = vertexOrder[rank];
+      std::ostringstream line;
+      line << "rank" << rank << " -> Vertex" << (vertexIndex + 1)
+           << " " << vertexSummary(vertices->at(vertexIndex));
       logLine(line.str());
     }
   };
@@ -922,7 +916,8 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     }
   }
 
-  dumpVertices("[Candidate Vertices and Vertex Seed Selection Cuts] State after initial seed-vertex formation:");
+  dumpVertices("[Vertex Raw Insertion Order]");
+  dumpVerticesByPtOrder("[List of pT Ordered Vertices]");
   logLine("------------------------------------------------------------");
 
   //////////////////////////////////////////////////////////////////////

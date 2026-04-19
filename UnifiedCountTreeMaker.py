@@ -4,8 +4,8 @@ process = cms.Process("CHAIN")
 
 # -------------------- MessageLogger / Options / Events --------------------
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkSummary.reportEvery = 1
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkSummary.reportEvery = 500
+process.MessageLogger.cerr.FwkReport.reportEvery = 500
 
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True),
@@ -13,7 +13,8 @@ process.options = cms.untracked.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1)
+    # input = cms.untracked.int32(1)
+    input = cms.untracked.int32(10000)
 )
 
 
@@ -26,7 +27,7 @@ process.source = cms.Source("PoolSource",
 )
 
 # offset the event processing to skip events with no scouting tracks (if desired)
-process.source.skipEvents = cms.untracked.uint32(60) #4,5
+# process.source.skipEvents = cms.untracked.uint32(60) #4,5
 # process.source.skipEvents = cms.untracked.uint32(2456) #3,3
 # process.source.skipEvents = cms.untracked.uint32(2217) #4,4
 # process.source.skipEvents = cms.untracked.uint32(85) #2,2
@@ -68,7 +69,7 @@ process.packedCandidateToTrack = cms.EDProducer("PackedCandidateToTrackProducer"
 
 referencePreference = 'BS'
 useOnlineBeamSpot = True
-printVertexerLogs = True
+printVertexerLogs = False
 offlineBeamSpotTag = cms.InputTag('offlineBeamSpot')
 
 process.Vertexer = cms.EDProducer('Vertexer',
@@ -93,7 +94,7 @@ process.Vertexer = cms.EDProducer('Vertexer',
     merge_shared_dist = cms.double(-1),
     merge_shared_sig = cms.double(4),
     max_track_vertex_dist = cms.double(-1),
-    max_track_vertex_sig = cms.double(-1),
+    max_track_vertex_sig = cms.double(5), # was mistakenly -1
     min_track_vertex_sig_to_remove = cms.double(1.5),
     remove_one_track_at_a_time = cms.bool(True),
     max_nm1_refit_dist3 = cms.double(-1),
@@ -102,6 +103,7 @@ process.Vertexer = cms.EDProducer('Vertexer',
     logBeamspotSource = cms.untracked.bool(True),
     printVertexerLogs = cms.untracked.bool(printVertexerLogs),
     order_seed_vertex = cms.untracked.bool(False),
+    use_seed_tracks_raw = cms.untracked.bool(False),
     verbose = cms.bool(False),
 )
 
@@ -128,7 +130,7 @@ process.VertexerOffline = cms.EDProducer('Vertexer',
     merge_shared_dist = cms.double(-1),
     merge_shared_sig = cms.double(4),
     max_track_vertex_dist = cms.double(-1),
-    max_track_vertex_sig = cms.double(-1),
+    max_track_vertex_sig = cms.double(5), # was mistakenly -1
     min_track_vertex_sig_to_remove = cms.double(1.5),
     remove_one_track_at_a_time = cms.bool(True),
     max_nm1_refit_dist3 = cms.double(-1),
@@ -137,6 +139,7 @@ process.VertexerOffline = cms.EDProducer('Vertexer',
     logBeamspotSource = cms.untracked.bool(True),
     printVertexerLogs = cms.untracked.bool(printVertexerLogs),
     order_seed_vertex = cms.untracked.bool(False),
+    use_seed_tracks_raw = cms.untracked.bool(False),
     verbose = cms.bool(False),
 )
 
@@ -176,8 +179,8 @@ process.ScoutingCountTreeMakerRun3 = cms.EDAnalyzer("ScoutingCountTreeMakerRun3"
     track_dxySig_max_cut = cms.untracked.double(100.0),
 
     applyHitCuts = cms.bool(True),
-    hit_minPixelHits = cms.untracked.int32(2),
-    hit_minStripHits = cms.untracked.int32(6),
+    hit_minPixelHits = cms.untracked.int32(3),
+    hit_minStripHits = cms.untracked.int32(2),
     hit_minTrackerLayers = cms.untracked.int32(6),
 
     seed_minIPSig = cms.untracked.double(process.Vertexer.minSeedIPSig.value()),
