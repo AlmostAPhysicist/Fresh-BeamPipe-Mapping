@@ -1442,12 +1442,14 @@ void ScoutingCountTreeMakerRun3::analyze(const edm::Event &iEvent, const edm::Ev
 
     // -------------------- event log --------------------
     if (evt_scoutingSelected_ > 0 || evt_offlineSelected_ > 0) {
-        std::cout << "Selected vertices found in event " << iEvent.id().event()
-                  << " (run:lumi:event=" << iEvent.id().run() << ":"
-                  << iEvent.id().luminosityBlock() << ":" << iEvent.id().event() << ")"
-                  << " scouting=" << evt_scoutingSelected_
-                  << " offline=" << evt_offlineSelected_
-                  << std::endl;
+        if (verbose_) {
+            std::cout << "Selected vertices found in event " << iEvent.id().event()
+                      << " (run:lumi:event=" << iEvent.id().run() << ":"
+                      << iEvent.id().luminosityBlock() << ":" << iEvent.id().event() << ")"
+                      << " scouting=" << evt_scoutingSelected_
+                      << " offline=" << evt_offlineSelected_
+                      << std::endl;
+        }
     }
 
     ++nEvents_;

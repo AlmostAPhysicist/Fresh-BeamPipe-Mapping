@@ -1,0 +1,423 @@
+============================================================
+Vertexer log for module: Vertexer
+Event: run=1 lumi=373062 event=1882469697
+Mode: Scouting
+Reference preference config: BeamSpot
+Defaults note: refPreference defaults to BeamSpot unless configured otherwise.
+
+Notation legend:
+  - TrackN means pT-ordered label within this event (N=0 is highest pT).
+  - dxy and dxySig use transverse impact parameter of reco::Track relative to a point.
+  - dist/sig in TRACK_ARBITRATION use track_dist():
+      * if use_2d_track_dist=True -> absoluteTransverseImpactParameter (2D IP)
+      * if use_2d_track_dist=False -> absoluteImpactParameter3D (3D IP)
+  - dBV is vertex distance from chosen reference (PV-average or beamspot).
+  - dBVErr is inferred as dBV/significance when significance is non-zero.
+  - DROP_* entries are explicit removals and include the reason + content.
+  - MERGE_STEP entries document merge attempts/success/fallback points.
+  - TRACK_ARBITRATION entries show per-shared-track removal decisions.
+============================================================
+------------------------------------------------------------
+ 
+-------------------- REFERENCE SELECTION --------------------
+Reference vertex: x=0.0286051 y=-0.0165892 z=0.423598
+This reference is used for impact-parameter significance and dBV-like distances.
+ 
+---------------------- INPUT TRACK LIST ----------------------
+INPUT SOURCE: seed_tracks_src=hltScoutingUnpackProducer:Track
+Tracks ordered by descending pT:
+ 
+[Seed Track Selection]
+Seed-track summary: totalTracks=59 selectedSeedTracks=8
+Apply seed cuts: pT > 0.9 GeV and |IP significance(reference)| > 4.0.
+ 
+[List of pT Ordered Tracks]
+Track1 pt=15.2188 eta=-2.06055 phi=-1.82422 dxy(beamspot)=-0.0294581 dxySig(beamspot)=-10.9226 dxy(0,0)=0.00239257 dxySig(0,0)=0.887125 dz(PV)=0.0449583 dz(0,0)=2.08512 dxyErr=0.00269699 dzErr=0.0114045 IPsig(ref)=10.9225
+Track2 pt=5.28906 eta=-1.97168 phi=-1.9873 dxy(beamspot)=-0.0450981 dxySig(beamspot)=-12.7463 dxy(0,0)=-0.012227 dxySig(0,0)=-3.45578 dz(PV)=0.0937393 dz(0,0)=2.11225 dxyErr=0.00353813 dzErr=0.00997138 IPsig(ref)=12.7463
+Track3 pt=5.19922 eta=-1.99219 phi=-2.04492 dxy(beamspot)=0.0134405 dxySig(beamspot)=4.52581 dxy(0,0)=0.0464642 dxySig(0,0)=15.6459 dz(PV)=0.00982376 dz(0,0)=2.02178 dxyErr=0.00296974 dzErr=0.0101417 IPsig(ref)=4.52577
+Track9 pt=3.34961 eta=-2.12695 phi=-1.97656 dxy(beamspot)=-0.0180977 dxySig(beamspot)=-4.33658 dxy(0,0)=0.0147328 dxySig(0,0)=3.53026 dz(PV)=0.234461 dz(0,0)=2.25664 dxyErr=0.00417328 dzErr=0.0162773 IPsig(ref)=4.33654
+Track27 pt=1.72363 eta=-1.07812 phi=-0.184448 dxy(beamspot)=0.0189465 dxySig(beamspot)=4.19841 dxy(0,0)=0.007885 dxySig(0,0)=1.74726 dz(PV)=0.146471 dz(0,0)=2.19283 dxyErr=0.00451279 dzErr=0.00750594 IPsig(ref)=4.1984
+Track31 pt=1.60059 eta=-2.03906 phi=1.26172 dxy(beamspot)=-0.0775425 dxySig(beamspot)=-9.29886 dxy(0,0)=-0.109838 dxySig(0,0)=-13.1717 dz(PV)=-0.25484 dz(0,0)=1.72421 dxyErr=0.00833893 dzErr=0.0278093 IPsig(ref)=9.29881
+Track34 pt=1.51562 eta=-2.03516 phi=-2.08398 dxy(beamspot)=0.0428356 dxySig(beamspot)=5.31178 dxy(0,0)=0.0759005 dxySig(0,0)=9.41195 dz(PV)=0.12115 dz(0,0)=2.12853 dxyErr=0.00806427 dzErr=0.0307333 IPsig(ref)=5.31176
+Track50 pt=1.23145 eta=-2.59766 phi=-2.67969 dxy(beamspot)=0.0742373 dxySig(beamspot)=4.52578 dxy(0,0)=0.101836 dxySig(0,0)=6.2083 dz(PV)=0.101018 dz(0,0)=1.98519 dxyErr=0.0164032 dzErr=0.107891 IPsig(ref)=4.52587
+[Raw Selected Track Order (same labels)]
+slot0 -> Track2
+slot1 -> Track1
+slot2 -> Track3
+slot3 -> Track9
+slot4 -> Track27
+slot5 -> Track31
+slot6 -> Track34
+slot7 -> Track50
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track1,Track2} vertexPt=20.4557 x=0.0233482 y=0.0816949 z=2.41046 chi2=0.120571 dBV=1.98929 dBVErr=0.0904274 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track1,Track3} vertexPt=20.3238 x=-0.0472084 y=-0.192781 z=1.32361 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track1,Track9} vertexPt=18.5365 x=-0.0463333 y=-0.16931 z=1.45022 chi2=55.0987 dBV=1.04062 dBVErr=0.108147 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track1,Track27} vertexPt=15.1976 x=0.00879695 y=0.0177532 z=2.17818 chi2=9.99076 dBV=1.75503 dBVErr=0.013956 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track1,Track31} vertexPt=13.6209 x=-0.00115952 y=-0.0519552 z=1.89176 chi2=139.764 dBV=1.46889 dBVErr=0.0191571 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track1,Track34} vertexPt=16.6881 x=-0.0647581 y=-0.259605 z=1.06539 chi2=12.7795 dBV=0.692579 dBVErr=0.0971853 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track1,Track50} vertexPt=16.0533 x=-0.0296933 y=-0.126211 z=1.58296 chi2=2.1173 dBV=1.16599 dBVErr=0.0810869 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track2,Track3} vertexPt=10.4839 x=-0.246059 y=-0.561968 z=-0.114774 chi2=137.983 dBV=0.814078 dBVErr=0.181729 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track2,Track9} vertexPt=8.63855 x=-0.0953236 y=-0.216416 z=1.27688 chi2=32.8147 dBV=0.885082 dBVErr=0.0972462 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track2,Track27} vertexPt=5.17222 x=-0.000637461 y=0.0203107 z=2.19023 chi2=11.2237 dBV=1.76726 dBVErr=0.0139413 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track2,Track31} vertexPt=3.70168 x=-0.0148112 y=-0.0498692 z=1.922 chi2=195.22 dBV=1.4994 dBVErr=0.0185628 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track2,Track34} vertexPt=6.79918 x=-0.274997 y=-0.605965 z=-0.246161 chi2=36.4144 dBV=0.942399 dBVErr=0.204242 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track2,Track50} vertexPt=6.28629 x=-0.0642318 y=-0.121742 z=1.62452 chi2=16.1857 dBV=1.20908 dBVErr=0.0813779 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track3,Track9} vertexPt=8.54407 x=-0.154272 y=-0.400469 z=0.485768 chi2=0.234309 dBV=0.429736 dBVErr=0.0132322 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track3,Track27} vertexPt=4.9883 x=0.0542002 y=0.00189994 z=2.12149 chi2=1.21121 dBV=1.69818 dBVErr=0.0137169 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track3,Track31} vertexPt=3.62992 x=0.0325622 y=-0.0551126 z=1.89436 chi2=61.3559 dBV=1.47127 dBVErr=0.0187214 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track3,Track34} vertexPt=6.71395 x=-0.30343 y=-0.692538 z=-0.694171 chi2=0.250636 dBV=1.3478 dBVErr=0.444392 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track3,Track50} vertexPt=6.23371 x=-0.00606442 y=-0.113968 z=1.64666 chi2=0.151096 dBV=1.22742 dBVErr=0.0891498 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track9,Track27} vertexPt=3.4141 x=0.00591905 y=-0.00845419 z=2.19214 chi2=21.5838 dBV=1.76871 dBVErr=0.0143284 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track9,Track31} vertexPt=1.76328 x=0.00570087 y=-0.072989 z=1.98142 chi2=116.118 dBV=1.55901 dBVErr=0.0202694 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track9,Track34} vertexPt=4.85922 x=-0.160103 y=-0.417475 z=0.42125 chi2=6.56965 dBV=0.443087 dBVErr=0.0563552 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track9,Track50} vertexPt=4.36227 x=-0.0323027 y=-0.118973 z=1.74466 chi2=9.40495 dBV=1.32642 dBVErr=0.101175 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track27,Track31} vertexPt=2.49373 x=0.124306 y=-0.0409267 z=2.00438 chi2=144.927 dBV=1.58387 dBVErr=0.0168659 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track27,Track34} vertexPt=1.89241 x=0.0620815 y=-0.0119464 z=2.11565 chi2=16.1787 dBV=1.69239 dBVErr=0.0160847 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track27,Track50} vertexPt=1.04812 x=0.0674939 y=-0.00990705 z=2.10527 chi2=20.8472 dBV=1.68213 dBVErr=0.0221922 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track31,Track34} vertexPt=0.328532 x=0.0636887 y=-0.084213 z=1.9598 chi2=14.7561 dBV=1.53809 dBVErr=0.0238914 passChi2Cut=NO
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track31,Track50} vertexPt=1.15384 x=0.0739128 y=-0.105002 z=2.02319 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 passChi2Cut=YES
+[Candidate Vertices and Vertex Seed Selection Cuts] SEED_VERTEX_CANDIDATE tracks={Track34,Track50} vertexPt=2.62744 x=0.0306064 y=-0.0994653 z=1.8601 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 passChi2Cut=YES
+[Vertex Raw Insertion Order]
+Vertex1 x=0.0233482 y=0.0816949 z=2.41046 vertexPt=20.4557 chi2=0.120571 dBV=1.98929 dBVErr=0.0904274 tracks={Track1,Track2}
+Vertex2 x=-0.0472084 y=-0.192781 z=1.32361 vertexPt=20.3238 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 tracks={Track1,Track3}
+Vertex3 x=-0.0296933 y=-0.126211 z=1.58296 vertexPt=16.0533 chi2=2.1173 dBV=1.16599 dBVErr=0.0810869 tracks={Track1,Track50}
+Vertex4 x=-0.154272 y=-0.400469 z=0.485768 vertexPt=8.54407 chi2=0.234309 dBV=0.429736 dBVErr=0.0132322 tracks={Track3,Track9}
+Vertex5 x=0.0542002 y=0.00189994 z=2.12149 vertexPt=4.9883 chi2=1.21121 dBV=1.69818 dBVErr=0.0137169 tracks={Track3,Track27}
+Vertex6 x=-0.30343 y=-0.692538 z=-0.694171 vertexPt=6.71395 chi2=0.250636 dBV=1.3478 dBVErr=0.444392 tracks={Track3,Track34}
+Vertex7 x=-0.00606442 y=-0.113968 z=1.64666 vertexPt=6.23371 chi2=0.151096 dBV=1.22742 dBVErr=0.0891498 tracks={Track3,Track50}
+Vertex8 x=0.0739128 y=-0.105002 z=2.02319 vertexPt=1.15384 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 tracks={Track31,Track50}
+Vertex9 x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}
+[List of pT Ordered Vertices]
+rank0 -> Vertex1 x=0.0233482 y=0.0816949 z=2.41046 vertexPt=20.4557 chi2=0.120571 dBV=1.98929 dBVErr=0.0904274 tracks={Track1,Track2}
+rank1 -> Vertex2 x=-0.0472084 y=-0.192781 z=1.32361 vertexPt=20.3238 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 tracks={Track1,Track3}
+rank2 -> Vertex3 x=-0.0296933 y=-0.126211 z=1.58296 vertexPt=16.0533 chi2=2.1173 dBV=1.16599 dBVErr=0.0810869 tracks={Track1,Track50}
+rank3 -> Vertex4 x=-0.154272 y=-0.400469 z=0.485768 vertexPt=8.54407 chi2=0.234309 dBV=0.429736 dBVErr=0.0132322 tracks={Track3,Track9}
+rank4 -> Vertex6 x=-0.30343 y=-0.692538 z=-0.694171 vertexPt=6.71395 chi2=0.250636 dBV=1.3478 dBVErr=0.444392 tracks={Track3,Track34}
+rank5 -> Vertex7 x=-0.00606442 y=-0.113968 z=1.64666 vertexPt=6.23371 chi2=0.151096 dBV=1.22742 dBVErr=0.0891498 tracks={Track3,Track50}
+rank6 -> Vertex5 x=0.0542002 y=0.00189994 z=2.12149 vertexPt=4.9883 chi2=1.21121 dBV=1.69818 dBVErr=0.0137169 tracks={Track3,Track27}
+rank7 -> Vertex9 x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}
+rank8 -> Vertex8 x=0.0739128 y=-0.105002 z=2.02319 vertexPt=1.15384 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 tracks={Track31,Track50}
+------------------------------------------------------------
+ 
+[Vertex Merging and Cleanup Loop: Compare Vertex Pairs]
+This loop continues until one full scan causes no changes.
+Any merge, drop, or refit causes [Restart Loop].
+Track-to-vertex compatibility distance mode: 2D transverse IP (use_2d_track_dist=True)
+Configured thresholds used in this stage: max_track_vertex_dist=-1, max_track_vertex_sig=5, min_track_vertex_sig_to_remove=1.5, remove_one_track_at_a_time=True, merge_shared_dist=-1, merge_shared_sig=4
+[Rule 1]
+If Vertex B tracks are entirely contained in Vertex A tracks, Vertex B is removed as redundant.
+Drop smaller redundant vertex, then [Restart Loop].
+[Do 2 Vertices Have a Shared Track?]
+If no: continue scanning remaining vertex pairs.
+Only return reconstructed vertices after a full scan completes with no changes.
+[Are the 2 Vertices Close?]
+Compare vertex distances: distance(vertexA, vertexB) and significance(vertexA, vertexB).
+Thresholds: max_vertex_dist (= merge_shared_dist) and max_vertex_sig (= merge_shared_sig).
+This stage answers closeness and, in the same answer, marks merge (YES) or refit-only (NO).
+This is vertex-to-vertex closeness. This is NOT track-to-vertex distance.
+[Union Merge (Kalman fit a vertex for the union of set of tracks)]
+Build a temporary merged vertex candidate from the union of all unique tracks.
+If merged fit returns exactly one valid full-union vertex: replace source vertices, drop source vertices, [Restart Loop].
+If merged fit does not pass valid full-union checks: ignore merged candidate and continue with original two vertices.
+[Force Drop a Track (OR 2!)]
+For each shared track and each vertex side, report exact threshold checks.
+hardFail = track_dist invalid OR NOT( dist < max_track_vertex_dist OR sig < max_track_vertex_sig )
+remove_from_0 = hardFail0; remove_from_1 = hardFail1
+Further checks:
+If both sig < min_track_vertex_sig_to_remove: keep bigger vertex; if equal size, drop from first vertex in hand.
+Else: keep lower-significance side and drop from higher-significance side.
+So either 1 OR 2 tracks can be marked for removal (at least 1). 
+[Refit for the vertices whose tracks were dropped]
+This stage performs actual removal by rebuilding with surviving tracks only.
+Rebuild only affected vertices; unchanged vertices stay untouched.
+If a refit side no longer has enough tracks for a valid vertex, drop that vertex; then [Restart Loop].
+------------------------------------------------------------
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 1 ================
+Compare Vertex1 {x=0.0233482 y=0.0816949 z=2.41046 vertexPt=20.4557 chi2=0.120571 dBV=1.98929 dBVErr=0.0904274 tracks={Track1,Track2}}  vs  Vertex2 {x=-0.0472084 y=-0.192781 z=1.32361 vertexPt=20.3238 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 tracks={Track1,Track3}}
+[Do 2 Vertices Have a Shared Track?] YES sharedTracks={Track1}
+[Are the 2 Vertices Close?] NO
+Reason: dist and significance both failed merge thresholds (vertexDistance=1.12318 vs max_vertex_dist=-1, vertexSignificance=10.005 vs max_vertex_sig=4)
+Action: marked for refit only
+This stage ONLY marks possible removals.
+Nothing is removed from the actual vertex yet.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] Track1
+track_dist_valid_v0=1 track_dist_valid_v1=1
+distToV0=0.000275808 vs max_track_vertex_dist=-1 -> FAIL
+sigToV0=0.0721834 vs max_track_vertex_sig=5 -> PASS
+distToV1=0.000227195 vs max_track_vertex_dist=-1 -> FAIL
+sigToV1=0.0627779 vs max_track_vertex_sig=5 -> PASS
+dxyToV0=0.000272503 dxySigToV0=0.10104 dxyToV1=-0.000240686 dxySigToV1=-0.0892424 dzToV0=0.0026524 dzSigToV0=0.232575 dzToV1=-0.0048345 dzSigToV1=-0.423911
+Decision: kept in bigger vertex; removed from Vertex1 because both significances are below min_track_vertex_sig_to_remove=1.5 and size tie-break chose this side.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] remove_one_track_at_a_time=True -> stop after first shared-track decision.
+[Refit for the vertices whose tracks were dropped]
+Marked tracks become actual removals here, by rebuilding from surviving tracks only.
+[Refit Result] VertexSide=0 removedTracks={Track1} survivingTracks={Track2}
+temporaryRefitCandidate={NONE}
+Outcome=FAILURE_DROP reason=<2 tracks survived
+[REFIT UPDATE]
+Drop Vertex1 because no valid replacement was produced
+DROP_VERTEX reason=refit/arbitration could not produce a valid replacement eraseV0=1 eraseV1=0 originalV0={x=0.0233482 y=0.0816949 z=2.41046 vertexPt=20.4557 chi2=0.120571 dBV=1.98929 dBVErr=0.0904274 tracks={Track1,Track2}} originalV1={x=-0.0472084 y=-0.192781 z=1.32361 vertexPt=20.3238 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 tracks={Track1,Track3}}
+Refit for this side did not return exactly one valid vertex, so that side is dropped.
+State after a merge/drop/refit step:
+Vertex1 x=-0.0472084 y=-0.192781 z=1.32361 vertexPt=20.3238 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 tracks={Track1,Track3}
+Vertex2 x=-0.0296933 y=-0.126211 z=1.58296 vertexPt=16.0533 chi2=2.1173 dBV=1.16599 dBVErr=0.0810869 tracks={Track1,Track50}
+Vertex3 x=-0.154272 y=-0.400469 z=0.485768 vertexPt=8.54407 chi2=0.234309 dBV=0.429736 dBVErr=0.0132322 tracks={Track3,Track9}
+Vertex4 x=0.0542002 y=0.00189994 z=2.12149 vertexPt=4.9883 chi2=1.21121 dBV=1.69818 dBVErr=0.0137169 tracks={Track3,Track27}
+Vertex5 x=-0.30343 y=-0.692538 z=-0.694171 vertexPt=6.71395 chi2=0.250636 dBV=1.3478 dBVErr=0.444392 tracks={Track3,Track34}
+Vertex6 x=-0.00606442 y=-0.113968 z=1.64666 vertexPt=6.23371 chi2=0.151096 dBV=1.22742 dBVErr=0.0891498 tracks={Track3,Track50}
+Vertex7 x=0.0739128 y=-0.105002 z=2.02319 vertexPt=1.15384 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 tracks={Track31,Track50}
+Vertex8 x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}
+[Restart Loop]
+Reason: vertex list topology changed after merge/refit/drop
+Restart full pairwise scan from beginning
+============================================================
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 2 ================
+Compare Vertex1 {x=-0.0472084 y=-0.192781 z=1.32361 vertexPt=20.3238 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 tracks={Track1,Track3}}  vs  Vertex2 {x=-0.0296933 y=-0.126211 z=1.58296 vertexPt=16.0533 chi2=2.1173 dBV=1.16599 dBVErr=0.0810869 tracks={Track1,Track50}}
+[Do 2 Vertices Have a Shared Track?] YES sharedTracks={Track1}
+[Are the 2 Vertices Close?] YES
+Reason: significance threshold passed (vertexSignificance=2.50367 < max_vertex_sig=4)
+Action: marked for merge
+Pair: Vertex1 vs Vertex2
+Temporary union tracks={Track1,Track3,Track50}
+[Mark to Drop a Track (From 1 OR 2 vertices!)] Track1
+track_dist_valid_v0=1 track_dist_valid_v1=1
+distToV0=0.000227195 vs max_track_vertex_dist=-1 -> FAIL
+sigToV0=0.0627779 vs max_track_vertex_sig=5 -> PASS
+distToV1=0.000500478 vs max_track_vertex_dist=-1 -> FAIL
+sigToV1=0.135795 vs max_track_vertex_sig=5 -> PASS
+dxyToV0=-0.000240686 dxySigToV0=-0.0892424 dxyToV1=-0.000505949 dxySigToV1=-0.187598 dzToV0=-0.0048345 dzSigToV0=-0.423911 dzToV1=0.0016282 dzSigToV1=0.142768
+Decision: kept in bigger vertex; removed from Vertex1 because both significances are below min_track_vertex_sig_to_remove=1.5 and size tie-break chose this side.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] remove_one_track_at_a_time=True -> stop after first shared-track decision.
+[Temporary Merge Candidate]
+count=1
+candidate0={x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}}
+[Merge Outcome] SUCCESS
+Reason: exactly one valid full-union vertex returned
+Overrule: previously marked track drops are ignored
+[Vertex Update]
+SUCCESSFUL MERGE:
+Overwrite Vertex1 with merged vertex
+Erase Vertex2 from vertex collection
+MergedVertex={x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}}
+DroppedSourceVertex={x=-0.0296933 y=-0.126211 z=1.58296 vertexPt=16.0533 chi2=2.1173 dBV=1.16599 dBVErr=0.0810869 tracks={Track1,Track50}}
+State after a merge/drop/refit step:
+Vertex1 x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}
+Vertex2 x=-0.154272 y=-0.400469 z=0.485768 vertexPt=8.54407 chi2=0.234309 dBV=0.429736 dBVErr=0.0132322 tracks={Track3,Track9}
+Vertex3 x=0.0542002 y=0.00189994 z=2.12149 vertexPt=4.9883 chi2=1.21121 dBV=1.69818 dBVErr=0.0137169 tracks={Track3,Track27}
+Vertex4 x=-0.30343 y=-0.692538 z=-0.694171 vertexPt=6.71395 chi2=0.250636 dBV=1.3478 dBVErr=0.444392 tracks={Track3,Track34}
+Vertex5 x=-0.00606442 y=-0.113968 z=1.64666 vertexPt=6.23371 chi2=0.151096 dBV=1.22742 dBVErr=0.0891498 tracks={Track3,Track50}
+Vertex6 x=0.0739128 y=-0.105002 z=2.02319 vertexPt=1.15384 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 tracks={Track31,Track50}
+Vertex7 x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}
+[Restart Loop]
+Reason: vertex list topology changed after merge/refit/drop
+Restart full pairwise scan from beginning
+============================================================
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 3 ================
+Compare Vertex1 {x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}}  vs  Vertex2 {x=-0.154272 y=-0.400469 z=0.485768 vertexPt=8.54407 chi2=0.234309 dBV=0.429736 dBVErr=0.0132322 tracks={Track3,Track9}}
+[Do 2 Vertices Have a Shared Track?] YES sharedTracks={Track3}
+[Are the 2 Vertices Close?] NO
+Reason: dist and significance both failed merge thresholds (vertexDistance=0.97625 vs max_vertex_dist=-1, vertexSignificance=7.785 vs max_vertex_sig=4)
+Action: marked for refit only
+This stage ONLY marks possible removals.
+Nothing is removed from the actual vertex yet.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] Track3
+track_dist_valid_v0=1 track_dist_valid_v1=1
+distToV0=0.00381403 vs max_track_vertex_dist=-1 -> FAIL
+sigToV0=1.0145 vs max_track_vertex_sig=5 -> PASS
+distToV1=0.000682132 vs max_track_vertex_dist=-1 -> FAIL
+sigToV1=0.194274 vs max_track_vertex_sig=5 -> PASS
+dxyToV0=0.00384347 dxySigToV0=1.29421 dxyToV1=0.00088063 dxySigToV1=0.296534 dzToV0=0.000320278 dzSigToV0=0.0315802 dzToV1=0.000821113 dzSigToV1=0.0809639
+Decision: kept in bigger vertex; removed from Vertex2 because both significances are below min_track_vertex_sig_to_remove=1.5 and size tie-break chose this side.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] remove_one_track_at_a_time=True -> stop after first shared-track decision.
+[Refit for the vertices whose tracks were dropped]
+Marked tracks become actual removals here, by rebuilding from surviving tracks only.
+[Refit Result] VertexSide=1 removedTracks={Track3} survivingTracks={Track9}
+temporaryRefitCandidate={NONE}
+Outcome=FAILURE_DROP reason=<2 tracks survived
+[REFIT UPDATE]
+Drop Vertex2 because no valid replacement was produced
+DROP_VERTEX reason=refit/arbitration could not produce a valid replacement eraseV0=0 eraseV1=1 originalV0={x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}} originalV1={x=-0.154272 y=-0.400469 z=0.485768 vertexPt=8.54407 chi2=0.234309 dBV=0.429736 dBVErr=0.0132322 tracks={Track3,Track9}}
+Refit for this side did not return exactly one valid vertex, so that side is dropped.
+State after a merge/drop/refit step:
+Vertex1 x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}
+Vertex2 x=0.0542002 y=0.00189994 z=2.12149 vertexPt=4.9883 chi2=1.21121 dBV=1.69818 dBVErr=0.0137169 tracks={Track3,Track27}
+Vertex3 x=-0.30343 y=-0.692538 z=-0.694171 vertexPt=6.71395 chi2=0.250636 dBV=1.3478 dBVErr=0.444392 tracks={Track3,Track34}
+Vertex4 x=-0.00606442 y=-0.113968 z=1.64666 vertexPt=6.23371 chi2=0.151096 dBV=1.22742 dBVErr=0.0891498 tracks={Track3,Track50}
+Vertex5 x=0.0739128 y=-0.105002 z=2.02319 vertexPt=1.15384 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 tracks={Track31,Track50}
+Vertex6 x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}
+[Restart Loop]
+Reason: vertex list topology changed after merge/refit/drop
+Restart full pairwise scan from beginning
+============================================================
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 4 ================
+Compare Vertex1 {x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}}  vs  Vertex2 {x=0.0542002 y=0.00189994 z=2.12149 vertexPt=4.9883 chi2=1.21121 dBV=1.69818 dBVErr=0.0137169 tracks={Track3,Track27}}
+[Do 2 Vertices Have a Shared Track?] YES sharedTracks={Track3}
+[Are the 2 Vertices Close?] NO
+Reason: dist and significance both failed merge thresholds (vertexDistance=0.721103 vs max_vertex_dist=-1, vertexSignificance=13.6277 vs max_vertex_sig=4)
+Action: marked for refit only
+This stage ONLY marks possible removals.
+Nothing is removed from the actual vertex yet.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] Track3
+track_dist_valid_v0=1 track_dist_valid_v1=1
+distToV0=0.00381403 vs max_track_vertex_dist=-1 -> FAIL
+sigToV0=1.0145 vs max_track_vertex_sig=5 -> PASS
+distToV1=0.000890703 vs max_track_vertex_dist=-1 -> FAIL
+sigToV1=0.214683 vs max_track_vertex_sig=5 -> PASS
+dxyToV0=0.00384347 dxySigToV0=1.29421 dxyToV1=-0.000889834 dxySigToV1=-0.299633 dzToV0=0.000320278 dzSigToV0=0.0315802 dzToV1=-0.00460403 dzSigToV1=-0.453969
+Decision: kept in bigger vertex; removed from Vertex2 because both significances are below min_track_vertex_sig_to_remove=1.5 and size tie-break chose this side.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] remove_one_track_at_a_time=True -> stop after first shared-track decision.
+[Refit for the vertices whose tracks were dropped]
+Marked tracks become actual removals here, by rebuilding from surviving tracks only.
+[Refit Result] VertexSide=1 removedTracks={Track3} survivingTracks={Track27}
+temporaryRefitCandidate={NONE}
+Outcome=FAILURE_DROP reason=<2 tracks survived
+[REFIT UPDATE]
+Drop Vertex2 because no valid replacement was produced
+DROP_VERTEX reason=refit/arbitration could not produce a valid replacement eraseV0=0 eraseV1=1 originalV0={x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}} originalV1={x=0.0542002 y=0.00189994 z=2.12149 vertexPt=4.9883 chi2=1.21121 dBV=1.69818 dBVErr=0.0137169 tracks={Track3,Track27}}
+Refit for this side did not return exactly one valid vertex, so that side is dropped.
+State after a merge/drop/refit step:
+Vertex1 x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}
+Vertex2 x=-0.30343 y=-0.692538 z=-0.694171 vertexPt=6.71395 chi2=0.250636 dBV=1.3478 dBVErr=0.444392 tracks={Track3,Track34}
+Vertex3 x=-0.00606442 y=-0.113968 z=1.64666 vertexPt=6.23371 chi2=0.151096 dBV=1.22742 dBVErr=0.0891498 tracks={Track3,Track50}
+Vertex4 x=0.0739128 y=-0.105002 z=2.02319 vertexPt=1.15384 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 tracks={Track31,Track50}
+Vertex5 x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}
+[Restart Loop]
+Reason: vertex list topology changed after merge/refit/drop
+Restart full pairwise scan from beginning
+============================================================
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 5 ================
+Compare Vertex1 {x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}}  vs  Vertex2 {x=-0.30343 y=-0.692538 z=-0.694171 vertexPt=6.71395 chi2=0.250636 dBV=1.3478 dBVErr=0.444392 tracks={Track3,Track34}}
+[Do 2 Vertices Have a Shared Track?] YES sharedTracks={Track3}
+[Are the 2 Vertices Close?] NO
+Reason: dist and significance both failed merge thresholds (vertexDistance=2.20092 vs max_vertex_dist=-1, vertexSignificance=4.66838 vs max_vertex_sig=4)
+Action: marked for refit only
+This stage ONLY marks possible removals.
+Nothing is removed from the actual vertex yet.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] Track3
+track_dist_valid_v0=1 track_dist_valid_v1=1
+distToV0=0.00381403 vs max_track_vertex_dist=-1 -> FAIL
+sigToV0=1.0145 vs max_track_vertex_sig=5 -> PASS
+distToV1=0.000384834 vs max_track_vertex_dist=-1 -> FAIL
+sigToV1=0.1137 vs max_track_vertex_sig=5 -> PASS
+dxyToV0=0.00384347 dxySigToV0=1.29421 dxyToV1=0.000238134 dxySigToV1=0.0801868 dzToV0=0.000320278 dzSigToV0=0.0315802 dzToV1=0.000927768 dzSigToV1=0.0914803
+Decision: kept in bigger vertex; removed from Vertex2 because both significances are below min_track_vertex_sig_to_remove=1.5 and size tie-break chose this side.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] remove_one_track_at_a_time=True -> stop after first shared-track decision.
+[Refit for the vertices whose tracks were dropped]
+Marked tracks become actual removals here, by rebuilding from surviving tracks only.
+[Refit Result] VertexSide=1 removedTracks={Track3} survivingTracks={Track34}
+temporaryRefitCandidate={NONE}
+Outcome=FAILURE_DROP reason=<2 tracks survived
+[REFIT UPDATE]
+Drop Vertex2 because no valid replacement was produced
+DROP_VERTEX reason=refit/arbitration could not produce a valid replacement eraseV0=0 eraseV1=1 originalV0={x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}} originalV1={x=-0.30343 y=-0.692538 z=-0.694171 vertexPt=6.71395 chi2=0.250636 dBV=1.3478 dBVErr=0.444392 tracks={Track3,Track34}}
+Refit for this side did not return exactly one valid vertex, so that side is dropped.
+State after a merge/drop/refit step:
+Vertex1 x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}
+Vertex2 x=-0.00606442 y=-0.113968 z=1.64666 vertexPt=6.23371 chi2=0.151096 dBV=1.22742 dBVErr=0.0891498 tracks={Track3,Track50}
+Vertex3 x=0.0739128 y=-0.105002 z=2.02319 vertexPt=1.15384 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 tracks={Track31,Track50}
+Vertex4 x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}
+[Restart Loop]
+Reason: vertex list topology changed after merge/refit/drop
+Restart full pairwise scan from beginning
+============================================================
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 6 ================
+Compare Vertex1 {x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}}  vs  Vertex2 {x=-0.00606442 y=-0.113968 z=1.64666 vertexPt=6.23371 chi2=0.151096 dBV=1.22742 dBVErr=0.0891498 tracks={Track3,Track50}}
+[Rule 1] Vertex2 tracks are contained in Vertex1 and Vertex2 tracksA={Track1,Track3,Track50} tracksB={Track3,Track50} rule=R1
+[Rule 1] drop smaller redundant vertex droppedVertexIndex=2 content={x=-0.00606442 y=-0.113968 z=1.64666 vertexPt=6.23371 chi2=0.151096 dBV=1.22742 dBVErr=0.0891498 tracks={Track3,Track50}} rule=R1
+[Restart Loop]
+State after a merge/drop/refit step:
+Vertex1 x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}
+Vertex2 x=0.0739128 y=-0.105002 z=2.02319 vertexPt=1.15384 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 tracks={Track31,Track50}
+Vertex3 x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}
+[Restart Loop]
+Reason: vertex list topology changed after merge/refit/drop
+Restart full pairwise scan from beginning
+============================================================
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 7 ================
+Compare Vertex1 {x=-0.0375996 y=-0.166621 z=1.42639 vertexPt=21.2006 chi2=3.04568 dBV=1.01611 dBVErr=0.0492744 tracks={Track1,Track3,Track50}}  vs  Vertex2 {x=0.0739128 y=-0.105002 z=2.02319 vertexPt=1.15384 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 tracks={Track31,Track50}}
+[Do 2 Vertices Have a Shared Track?] YES sharedTracks={Track50}
+[Are the 2 Vertices Close?] NO
+Reason: dist and significance both failed merge thresholds (vertexDistance=0.61025 vs max_vertex_dist=-1, vertexSignificance=8.94362 vs max_vertex_sig=4)
+Action: marked for refit only
+This stage ONLY marks possible removals.
+Nothing is removed from the actual vertex yet.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] Track50
+track_dist_valid_v0=1 track_dist_valid_v1=1
+distToV0=0.0306418 vs max_track_vertex_dist=-1 -> FAIL
+sigToV0=1.65937 vs max_track_vertex_sig=5 -> PASS
+distToV1=0.0251021 vs max_track_vertex_dist=-1 -> FAIL
+sigToV1=1.29309 vs max_track_vertex_sig=5 -> PASS
+dxyToV0=-0.030568 dxySigToV0=-1.86354 dxyToV1=-0.0251021 dxySigToV1=-1.53032 dzToV0=-0.161955 dzSigToV0=-1.5011 dzToV1=0.0913804 dzSigToV1=0.84697
+Decision: lower significance side won; removed from Vertex1 because sigToV0=1.65937 is not lower than sigToV1=1.29309.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] remove_one_track_at_a_time=True -> stop after first shared-track decision.
+[Refit for the vertices whose tracks were dropped]
+Marked tracks become actual removals here, by rebuilding from surviving tracks only.
+[Refit Result] VertexSide=0 removedTracks={Track50} survivingTracks={Track1,Track3}
+temporaryRefitCandidate={x=-0.0472084 y=-0.192781 z=1.32361 vertexPt=20.3238 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 tracks={Track1,Track3}}
+Outcome=SUCCESS_REPLACE
+[REFIT UPDATE]
+Overwrite Vertex1 with surviving-track refit result
+State after a merge/drop/refit step:
+Vertex1 x=-0.0472084 y=-0.192781 z=1.32361 vertexPt=20.3238 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 tracks={Track1,Track3}
+Vertex2 x=0.0739128 y=-0.105002 z=2.02319 vertexPt=1.15384 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 tracks={Track31,Track50}
+Vertex3 x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}
+[Restart Loop]
+Reason: vertex list topology changed after merge/refit/drop
+Restart full pairwise scan from beginning
+============================================================
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 8 ================
+Compare Vertex1 {x=-0.0472084 y=-0.192781 z=1.32361 vertexPt=20.3238 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 tracks={Track1,Track3}}  vs  Vertex2 {x=0.0739128 y=-0.105002 z=2.02319 vertexPt=1.15384 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 tracks={Track31,Track50}}
+[Do 2 Vertices Have a Shared Track?] NO -> continue scanning remaining vertex pairs.
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 9 ================
+Compare Vertex1 {x=-0.0472084 y=-0.192781 z=1.32361 vertexPt=20.3238 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 tracks={Track1,Track3}}  vs  Vertex3 {x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}}
+[Do 2 Vertices Have a Shared Track?] NO -> continue scanning remaining vertex pairs.
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 10 ================
+Compare Vertex2 {x=0.0739128 y=-0.105002 z=2.02319 vertexPt=1.15384 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 tracks={Track31,Track50}}  vs  Vertex3 {x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}}
+[Do 2 Vertices Have a Shared Track?] YES sharedTracks={Track50}
+[Are the 2 Vertices Close?] YES
+Reason: significance threshold passed (vertexSignificance=1.43028 < max_vertex_sig=4)
+Action: marked for merge
+Pair: Vertex2 vs Vertex3
+Temporary union tracks={Track31,Track34,Track50}
+[Mark to Drop a Track (From 1 OR 2 vertices!)] Track50
+track_dist_valid_v0=1 track_dist_valid_v1=1
+distToV0=0.0251021 vs max_track_vertex_dist=-1 -> FAIL
+sigToV0=1.29309 vs max_track_vertex_sig=5 -> PASS
+distToV1=0.00085148 vs max_track_vertex_dist=-1 -> FAIL
+sigToV1=0.0383737 vs max_track_vertex_sig=5 -> PASS
+dxyToV0=-0.0251021 dxySigToV0=-1.53032 dxyToV1=-0.000845723 dxySigToV1=-0.0515584 dzToV0=0.0913804 dzSigToV0=0.84697 dzToV1=0.0120233 dzSigToV1=0.111439
+Decision: kept in bigger vertex; removed from Vertex2 because both significances are below min_track_vertex_sig_to_remove=1.5 and size tie-break chose this side.
+[Mark to Drop a Track (From 1 OR 2 vertices!)] remove_one_track_at_a_time=True -> stop after first shared-track decision.
+[Temporary Merge Candidate]
+count=0
+[Merge Outcome] FAILURE
+Reason: zero vertices returned OR chi2 wrapper rejected fit
+Action: ignore temporary merge candidate, proceed to [Refit for the vertices whose tracks were dropped]
+[Refit for the vertices whose tracks were dropped]
+Marked tracks become actual removals here, by rebuilding from surviving tracks only.
+[Refit Result] VertexSide=0 removedTracks={Track50} survivingTracks={Track31}
+temporaryRefitCandidate={NONE}
+Outcome=FAILURE_DROP reason=<2 tracks survived
+[REFIT UPDATE]
+Drop Vertex2 because no valid replacement was produced
+DROP_VERTEX reason=refit/arbitration could not produce a valid replacement eraseV0=1 eraseV1=0 originalV0={x=0.0739128 y=-0.105002 z=2.02319 vertexPt=1.15384 chi2=3.90078 dBV=1.60268 dBVErr=0.0485467 tracks={Track31,Track50}} originalV1={x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}}
+Refit for this side did not return exactly one valid vertex, so that side is dropped.
+State after a merge/drop/refit step:
+Vertex1 x=-0.0472084 y=-0.192781 z=1.32361 vertexPt=20.3238 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 tracks={Track1,Track3}
+Vertex2 x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}
+[Restart Loop]
+Reason: vertex list topology changed after merge/refit/drop
+Restart full pairwise scan from beginning
+============================================================
+================ [Vertex Merging and Cleanup Loop: Compare Vertex Pairs] Iteration 11 ================
+Compare Vertex1 {x=-0.0472084 y=-0.192781 z=1.32361 vertexPt=20.3238 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 tracks={Track1,Track3}}  vs  Vertex2 {x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}}
+[Do 2 Vertices Have a Shared Track?] NO -> continue scanning remaining vertex pairs.
+ 
+[Return the reconstructed vertices]
+No pairs of vertices share a common track after a full scan:
+Return the reconstructed vertices
+Final vertex state:
+Vertex1 x=-0.0472084 y=-0.192781 z=1.32361 vertexPt=20.3238 chi2=0.370773 dBV=0.920229 dBVErr=0.0587232 tracks={Track1,Track3}
+Vertex2 x=0.0306064 y=-0.0994653 z=1.8601 vertexPt=2.62744 chi2=0.0193672 dBV=1.43889 dBVErr=0.109063 tracks={Track34,Track50}
+Return complete: only reconstructed output vertices are persisted to the event.
+============================================================

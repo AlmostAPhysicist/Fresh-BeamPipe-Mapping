@@ -779,12 +779,14 @@ void ScoutingCountMakerRun3::analyze(const edm::Event &iEvent, const edm::EventS
 
     // Write event folders only for events with at least one selected vertex in either collection.
     if (scoutingSelected > 0 || offlineSelected > 0) {
-        std::cout << "Selected vertices found in event " << iEvent.id().event()
-                  << " (run:lumi:event=" << iEvent.id().run() << ":"
-                  << iEvent.id().luminosityBlock() << ":" << iEvent.id().event() << ")"
-                  << " scouting=" << scoutingSelected
-                  << " offline=" << offlineSelected
-                  << std::endl;
+        if (verbose_) {
+            std::cout << "Selected vertices found in event " << iEvent.id().event()
+                      << " (run:lumi:event=" << iEvent.id().run() << ":"
+                      << iEvent.id().luminosityBlock() << ":" << iEvent.id().event() << ")"
+                      << " scouting=" << scoutingSelected
+                      << " offline=" << offlineSelected
+                      << std::endl;
+        }
 
         edm::Service<TFileService> fs;
         if (fs.isAvailable()) {

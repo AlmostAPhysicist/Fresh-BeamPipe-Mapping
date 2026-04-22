@@ -33,6 +33,7 @@ process.source = cms.Source("PoolSource",
 # process.source.skipEvents = cms.untracked.uint32(85) #2,2
 # process.source.skipEvents = cms.untracked.uint32(964) #3,2
 # process.source.skipEvents = cms.untracked.uint32(4103) #5,7
+# process.source.skipEvents = cms.untracked.uint32(4848) # 3 matched tracks but no reconstructed vertex in scouting
 
 # -------------------------- GLOBAL TAG / GEOM ------------------------------
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
@@ -44,7 +45,7 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 
 # -------------------------- TFileService -----------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/vertex_counts_print1.root")
+    fileName = cms.string("test-outputs/vertex_counts_print3.root")
 )
 
 # -------------------------- HLT Scouting Unpacker --------------------------
@@ -69,7 +70,7 @@ process.packedCandidateToTrack = cms.EDProducer("PackedCandidateToTrackProducer"
 
 referencePreference = 'BS'
 useOnlineBeamSpot = True
-printVertexerLogs = False
+printVertexerLogs = True
 offlineBeamSpotTag = cms.InputTag('offlineBeamSpot')
 
 process.Vertexer = cms.EDProducer('Vertexer',
@@ -178,7 +179,7 @@ process.ScoutingCountTreeMakerRun3 = cms.EDAnalyzer("ScoutingCountTreeMakerRun3"
     track_dxySig_min_cut = cms.untracked.double(4.0),
     track_dxySig_max_cut = cms.untracked.double(100.0),
 
-    applyHitCuts = cms.bool(True),
+    applyHitCuts = cms.bool(False),
     hit_minPixelHits = cms.untracked.int32(3),
     hit_minStripHits = cms.untracked.int32(2),
     hit_minTrackerLayers = cms.untracked.int32(6),
@@ -191,7 +192,7 @@ process.ScoutingCountTreeMakerRun3 = cms.EDAnalyzer("ScoutingCountTreeMakerRun3"
     useOnlineBeamSpot = cms.untracked.bool(useOnlineBeamSpot),
     refPreference = cms.untracked.string(referencePreference),
 
-    verbose = cms.untracked.bool(True),
+    verbose = cms.untracked.bool(False),
     printSummary = cms.untracked.bool(True)
 )
 

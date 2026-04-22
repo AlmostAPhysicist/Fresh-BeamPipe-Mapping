@@ -1123,11 +1123,12 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       
 
       // 5) Do 2 Vertices Have a Shared Track?
-      if (shared_tracks.size() == 0) {
+      const bool hasSharedTracks = !shared_tracks.empty();
+      if (!hasSharedTracks) {
         logLine("[Do 2 Vertices Have a Shared Track?] NO -> continue scanning remaining vertex pairs.");
       }
 
-      if (shared_tracks.size() > 0){
+      if (hasSharedTracks){
     	// 6) Are the 2 Vertices Close?
 	Measurement1D v_dist = vertex_dist(*v[0], *v[1]);
 	{
@@ -1138,12 +1139,13 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	}
   const bool distancePass = (v_dist.value() < merge_shared_dist);
   const bool significancePass = (v_dist.significance() < merge_shared_sig);
+  const bool shouldMerge = (distancePass || significancePass);
   {
     std::ostringstream msg;
-    msg << "[Are the 2 Vertices Close?] " << ((distancePass || significancePass) ? "YES" : "NO");
+    msg << "[Are the 2 Vertices Close?] " << (shouldMerge ? "YES" : "NO");
     logLine(msg.str());
   }
-  if (distancePass || significancePass) {
+  if (shouldMerge) {
     std::ostringstream reason;
     if (distancePass && significancePass) {
       reason << "Reason: distance threshold passed and significance threshold passed "
@@ -1170,7 +1172,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         if (verbose)
           printf("   vertex dist (2d? %i) %7.3f  sig %7.3f\n", use_2d_vertex_dist, v_dist.value(), v_dist.significance());
 	
-  if (distancePass || significancePass) {
+  if (shouldMerge) {
     // 7) Union Merge (Kalman fit a vertex for the union of set of tracks)
           {
             std::ostringstream msg;
@@ -1218,15 +1220,17 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     const bool v0SigPass = (t_dist_0.second.significance() < max_track_vertex_sig);
     const bool v1DistPass = (t_dist_1.second.value() < max_track_vertex_dist);
     const bool v1SigPass = (t_dist_1.second.significance() < max_track_vertex_sig);
-	  
-	  
-	  t_dist_0.first = t_dist_0.first && (t_dist_0.second.value() < max_track_vertex_dist || t_dist_0.second.significance() < max_track_vertex_sig);
-	  t_dist_1.first = t_dist_1.first && (t_dist_1.second.value() < max_track_vertex_dist || t_dist_1.second.significance() < max_track_vertex_sig);
-    const bool v0CompatibilityFailed = !t_dist_0.first;
-    const bool v1CompatibilityFailed = !t_dist_1.first;
-	  bool remove_from_0 = !t_dist_0.first;
-	  bool remove_from_1 = !t_dist_1.first;
-	  if (t_dist_0.second.significance() < min_track_vertex_sig_to_remove && t_dist_1.second.significance() < min_track_vertex_sig_to_remove) {
+
+    const bool v0CompatibilityPass = trackDistValid0 && (v0DistPass || v0SigPass);
+    const bool v1CompatibilityPass = trackDistValid1 && (v1DistPass || v1SigPass);
+    const bool v0CompatibilityFailed = !v0CompatibilityPass;
+    const bool v1CompatibilityFailed = !v1CompatibilityPass;
+    const bool bothBelowMinSig =
+        (t_dist_0.second.significance() < min_track_vertex_sig_to_remove &&
+         t_dist_1.second.significance() < min_track_vertex_sig_to_remove);
+	  bool remove_from_0 = v0CompatibilityFailed;
+	  bool remove_from_1 = v1CompatibilityFailed;
+	  if (bothBelowMinSig) {
 	    if (tracks[0].size() > tracks[1].size())
 	    remove_from_1 = true;
 	    else
@@ -1276,8 +1280,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
               << ", sigToV0=" << t_dist_0.second.significance()
               << ", max_track_vertex_dist=" << max_track_vertex_dist
               << ", max_track_vertex_sig=" << max_track_vertex_sig << ").";
-      } else if (t_dist_0.second.significance() < min_track_vertex_sig_to_remove &&
-                 t_dist_1.second.significance() < min_track_vertex_sig_to_remove) {
+      } else if (bothBelowMinSig) {
         block << "Decision: kept in bigger vertex; removed from Vertex" << (ivtx[0] + 1)
               << " because both significances are below min_track_vertex_sig_to_remove="
               << min_track_vertex_sig_to_remove << " and size tie-break chose this side.";
@@ -1293,8 +1296,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
               << ", sigToV1=" << t_dist_1.second.significance()
               << ", max_track_vertex_dist=" << max_track_vertex_dist
               << ", max_track_vertex_sig=" << max_track_vertex_sig << ").";
-      } else if (t_dist_0.second.significance() < min_track_vertex_sig_to_remove &&
-                 t_dist_1.second.significance() < min_track_vertex_sig_to_remove) {
+      } else if (bothBelowMinSig) {
         block << "Decision: kept in bigger vertex; removed from Vertex" << (ivtx[1] + 1)
               << " because both significances are below min_track_vertex_sig_to_remove="
               << min_track_vertex_sig_to_remove << " and size tie-break chose this side.";

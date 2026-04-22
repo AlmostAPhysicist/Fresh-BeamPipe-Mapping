@@ -657,6 +657,9 @@ void ScoutingPlotMakerRun3::analyze(const edm::Event& iEvent, const edm::EventSe
 
             // fill singleton debug histos
             h_allTracks_pt->Fill(trRef->pt());
+            if (dxyErr > 0 && std::isfinite(dxyErr)) {
+                h_allTracks_simpleDxySig->Fill(std::fabs(dxy0 / dxyErr));
+            }
 
             // transient track for IP calculations
             reco::TransientTrack ttk = ttBuilder.build(trRef);

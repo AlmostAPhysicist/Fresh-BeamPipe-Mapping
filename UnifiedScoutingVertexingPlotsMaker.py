@@ -3,12 +3,12 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("CHAIN")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkSummary.reportEvery = 5
-process.MessageLogger.cerr.FwkReport.reportEvery = 5
+# process.MessageLogger.cerr.FwkSummary.reportEvery = 5
+# process.MessageLogger.cerr.FwkReport.reportEvery = 5
 # process.MessageLogger.cerr.FwkSummary.reportEvery = 100
 # process.MessageLogger.cerr.FwkReport.reportEvery = 100
-# process.MessageLogger.cerr.FwkSummary.reportEvery = 1000
-# process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkSummary.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 # process.MessageLogger.cerr.threshold = cms.untracked.string('DEBUG')
 # process.MessageLogger.debugModules = cms.untracked.vstring('hltScoutingUnpackProducer', 'Vertexer', 'scoutingTree')
@@ -24,10 +24,10 @@ process.options = cms.untracked.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)  # Limited events for testing
+    # input = cms.untracked.int32(10)  # Limited events for testing
     # input = cms.untracked.int32(150000)  # Local
     # input = cms.untracked.int32(500000)  # Process all events
-    # input = cms.untracked.int32(-1)  # Process all events
+    input = cms.untracked.int32(-1)  # Process all events
 )
 
 # -------------------------- INPUT PATH --------------------------------
@@ -67,8 +67,8 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 # -------------------------- OUTPUT PATH --------------------------------
 #-----------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/onlineBeamSpot_v1.root")
-    # fileName = cms.string("Scouting_MC_2024H_withHitCuts.root")  # Histogram/plot output
+    # fileName = cms.string("onlineBeamSpot_v1.root")
+    fileName = cms.string("Scouting_MC_2024H_withHitCuts.root")  # Histogram/plot output
 )
 #-----------------------------------------------------------------------
 
@@ -143,6 +143,10 @@ process.Vertexer = cms.EDProducer('Vertexer',
     max_nm1_refit_dist3 = cms.double(-1),
     max_nm1_refit_distz = cms.double(-1), # changed from 0.005 to -1
     max_nm1_refit_count = cms.int32(-1),
+    logBeamspotSource = cms.untracked.bool(True),
+    printVertexerLogs = cms.untracked.bool(False),
+    order_seed_vertex = cms.untracked.bool(False),
+    use_seed_tracks_raw = cms.untracked.bool(False),
     verbose = cms.bool(False),
 )
 
@@ -178,7 +182,7 @@ process.scoutingPlots = cms.EDAnalyzer('ScoutingPlotMakerRun3',
     # ------------------------------
     # Track-level quality cuts used by the analyzer (NOT used by Vertexer).
     # Keep these in the treemaker so the Vertexer remains focused on finding seeds.
-    track_pt_min_cut            = cms.untracked.double(0.9),
+    track_pt_min_cut            = cms.untracked.double(1.0),
     track_dxySig_min_cut        = cms.untracked.double(4.0),
     track_dxySig_max_cut        = cms.untracked.double(100.0),
     # track_npixelHits_min_cut    = cms.untracked.int32(1),
