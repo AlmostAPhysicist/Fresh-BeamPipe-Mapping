@@ -13,8 +13,8 @@ process.options = cms.untracked.PSet(
 )
 
 process.maxEvents = cms.untracked.PSet(
-    # input = cms.untracked.int32(1)
-    input = cms.untracked.int32(10000)
+    input = cms.untracked.int32(1)
+    # input = cms.untracked.int32(10000)
 )
 
 
@@ -34,6 +34,8 @@ process.source = cms.Source("PoolSource",
 # process.source.skipEvents = cms.untracked.uint32(964) #3,2
 # process.source.skipEvents = cms.untracked.uint32(4103) #5,7
 # process.source.skipEvents = cms.untracked.uint32(4848) # 3 matched tracks but no reconstructed vertex in scouting
+process.source.skipEvents = cms.untracked.uint32(9292) # 2,4, no match track
+
 
 # -------------------------- GLOBAL TAG / GEOM ------------------------------
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
@@ -45,7 +47,7 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 
 # -------------------------- TFileService -----------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string("test-outputs/vertex_counts_print3.root")
+    fileName = cms.string("test-outputs/vertex_counts_print4.root")
 )
 
 # -------------------------- HLT Scouting Unpacker --------------------------
