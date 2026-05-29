@@ -7,10 +7,20 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 # -------------------- Options --------------------
-process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
+process.options = cms.untracked.PSet(
+    wantSummary = cms.untracked.bool(True),
+    numberOfThreads = cms.untracked.uint32(4),    # adjust to machine cores
+    numberOfStreams = cms.untracked.uint32(0),     # let framework pick sensible streams
+    )
+
+# -------------------- Histogram Output --------------------
+process.TFileService = cms.Service(
+    "TFileService",
+    fileName = cms.string("gen_scouting_comparer.root"),
+)
 
 # -------------------- Max Events To Process --------------------
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10000))
 
 # -------------------- Input Source --------------------
 process.source = cms.Source(
@@ -107,9 +117,9 @@ process.scoutingComparer = cms.EDAnalyzer(
     jet_eta_max = cms.double(2.4),
     min_selected_jets = cms.uint32(3),
 
-    verbose = cms.untracked.bool(True),
+    verbose = cms.untracked.bool(False),
     verbose_unselected = cms.untracked.bool(False),
-    verbose_selected_only = cms.untracked.bool(True),
+    verbose_selected_only = cms.untracked.bool(False),
     ntracks_raw = cms.untracked.bool(False),
     cost_raw = cms.untracked.bool(False),
     require_jet_selection = cms.untracked.bool(True),
