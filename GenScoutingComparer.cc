@@ -10,30 +10,18 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-#include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/HitPattern.h"
 #include "DataFormats/Math/interface/Vector3D.h"
-#include "DataFormats/Scouting/interface/Run3ScoutingTrack.h"
 #include "DataFormats/Scouting/interface/Run3ScoutingPFJet.h"
 
 class GenScoutingComparer : public edm::one::EDAnalyzer<> {
 private:
-    struct SelectedVertexInfo {
-        const reco::Vertex* vertex = nullptr;
-        math::XYZVector trackMomentumSum{0, 0, 0};
-        double trackEnergySum = 0.0;
-        unsigned int rawTracks = 0;
-        unsigned int validTracks = 0;
-        unsigned int rawTrackRefs = 0;
-    };
-
     edm::EDGetTokenT<std::vector<reco::GenParticle>> genParticlesToken_;
     edm::EDGetTokenT<std::vector<reco::Vertex>> scoutingVerticesToken_;
     edm::EDGetTokenT<reco::BeamSpot> beamspotToken_;
-    edm::EDGetTokenT<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> trackToScoutingMapToken_;
     edm::EDGetTokenT<std::vector<Run3ScoutingPFJet>> scoutingJetsToken_;
 
     // Configurable Cut Thresholds
@@ -67,7 +55,6 @@ public:
         genParticlesToken_ = consumes<std::vector<reco::GenParticle>>(config.getParameter<edm::InputTag>("genParticles"));
         scoutingVerticesToken_ = consumes<std::vector<reco::Vertex>>(config.getParameter<edm::InputTag>("scoutingVertices"));
         beamspotToken_ = consumes<reco::BeamSpot>(config.getParameter<edm::InputTag>("beamspot"));
-        trackToScoutingMapToken_ = consumes<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>>(config.getParameter<edm::InputTag>("trackToScoutingMap"));
         scoutingJetsToken_ = consumes<std::vector<Run3ScoutingPFJet>>(config.getParameter<edm::InputTag>("scoutingJets"));
 
         // Load configuration parameters
@@ -116,10 +103,6 @@ public:
         edm::Handle<std::vector<Run3ScoutingPFJet>> scoutingJets;
         event.getByToken(scoutingJetsToken_, scoutingJets);
 
-        edm::Handle<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> trackToScoutingMap;
-        event.getByToken(trackToScoutingMapToken_, trackToScoutingMap);
-        const bool haveTrackToScoutingMap = trackToScoutingMap.isValid();
-
         unsigned int selectedJets = 0;
         if (scoutingJets.isValid()) {
             for (const auto& jet : *scoutingJets) {
@@ -163,29 +146,13 @@ public:
         if ((verbose_ || verbose_unselected_) && stop1 && stop2) { 
             verboseOut << "========== Event: " << event.id().event() << " ==========\n";
             verboseOut << "========== 2 STOPs found ==========\n";
-            verboseOut << "Stop1 -> x=" << stop1->vx()
-                       << " y=" << stop1->vy()
-                       << " z=" << stop1->vz()
-                       << " pt=" << stop1->pt()
-                       << " mass=" << stop1->mass()
-                       << " eta=" << stop1->eta()
-                       << " phi=" << stop1->phi()
-                       << " | vxy: " << vxy(stop1) << "\n";
-            verboseOut << "Stop2 -> x=" << stop2->vx()
-                       << " y=" << stop2->vy()
-                       << " z=" << stop2->vz()
-                       << " pt=" << stop2->pt()
-                       << " mass=" << stop2->mass()
-                       << " eta=" << stop2->eta()
-                       << " phi=" << stop2->phi()
-                       << " | vxy: " << vxy(stop2) << "\n";
+            verboseOut << "Stop1 -> Pt: " << stop1->pt() << " | vxy: " << vxy(stop1) << "\n";
+            verboseOut << "Stop2 -> Pt: " << stop2->pt() << " | vxy: " << vxy(stop2) << "\n";
         }
 
         // ------------- Reco scouting vertices --------------
         std::vector<const reco::Vertex*> selectedRecoVertices;
-        std::vector<SelectedVertexInfo> selectedVertexInfos;
         selectedRecoVertices.reserve(scoutingVertices->size());
-        selectedVertexInfos.reserve(scoutingVertices->size());
 
         if (verbose_unselected_) {
             verboseOut << "========== UNSELECTED RECO VERTICES EVALUATION ==========\n";
@@ -204,8 +171,11 @@ public:
             unsigned int rawTrackRefs = 0;
             math::XYZVector rawPSum(0, 0, 0);
             math::XYZVector selectedPSum(0, 0, 0);
-            double selectedEnergySum = 0.0;
             std::ostringstream trackOut;
+
+            auto symbolFor = [](bool pass, const char* failSymbol, const char* passSymbol) {
+                return pass ? passSymbol : failSymbol;
+            };
 
             unsigned int trackIndex = 0;
             for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it, ++trackIndex) {
@@ -214,37 +184,26 @@ public:
                     ++rawTrackRefs;
                     rawPSum += trk->momentum();
 
-                    int nPixelHits = 0;
-                    int nStripHits = 0;
-                    int nTrackerLayers = 0;
-                    if (haveTrackToScoutingMap) {
-                        auto scoutingRef = (*trackToScoutingMap)[trk];
-                        if (scoutingRef.isNonnull()) {
-                            nPixelHits = scoutingRef->tk_nValidPixelHits();
-                            nStripHits = scoutingRef->tk_nValidStripHits();
-                            nTrackerLayers = scoutingRef->tk_nTrackerLayersWithMeasurement();
-                        }
-                    }
-
-                    const bool passPixelHits = (nPixelHits >= cut_track_pixelHits_min_);
-                    const bool passStripHits = (nStripHits >= cut_track_stripHits_min_);
-                    const bool passTrackerLayers = (nTrackerLayers >= cut_track_trackerLayers_min_);
+                    const reco::HitPattern& hp = trk->hitPattern();
+                    const bool passPixelHits = (hp.numberOfValidPixelHits() >= cut_track_pixelHits_min_);
+                    const bool passStripHits = (hp.numberOfValidStripHits() >= cut_track_stripHits_min_);
+                    const bool passTrackerLayers = (hp.trackerLayersWithMeasurement() >= cut_track_trackerLayers_min_);
                     const bool passTrack = passPixelHits && passStripHits && passTrackerLayers;
 
                     if (verbose_unselected_) {
                         trackOut << "    track " << trackIndex << ": pT=" << trk->pt()
-                                 << " | pixelHits=" << nPixelHits << (passPixelHits ? " (>= " : " (!>= ") << cut_track_pixelHits_min_ << ")"
-                                 << " | stripHits=" << nStripHits << (passStripHits ? " (>= " : " (!>= ") << cut_track_stripHits_min_ << ")"
-                                 << " | trackerLayers=" << nTrackerLayers << (passTrackerLayers ? " (>= " : " (!>= ") << cut_track_trackerLayers_min_ << ")"
+                                 << " | pixelHits=" << hp.numberOfValidPixelHits()
+                                 << symbolFor(passPixelHits, " (!< ", " (>= ") << cut_track_pixelHits_min_ << ")"
+                                 << " | stripHits=" << hp.numberOfValidStripHits()
+                                 << symbolFor(passStripHits, " (!< ", " (>= ") << cut_track_stripHits_min_ << ")"
+                                 << " | trackerLayers=" << hp.trackerLayersWithMeasurement()
+                                 << symbolFor(passTrackerLayers, " (!< ", " (>= ") << cut_track_trackerLayers_min_ << ")"
                                  << " -> " << (passTrack ? "SELECTED" : "REJECTED") << "\n";
                     }
 
                     if (passTrack) {
                         validTracks++;
                         selectedPSum += trk->momentum();
-                        constexpr double pionMass = 0.13957039;
-                        const double trackMomentum = trk->p();
-                        selectedEnergySum += std::sqrt(trackMomentum * trackMomentum + pionMass * pionMass);
                     }
                 }
             }
@@ -289,14 +248,6 @@ public:
             if (!passChi2 || !passDbvMin || !passDbvMax || !passDdbv || !passCosT || !passNtk || !eventPassesJetGate) continue;
 
             selectedRecoVertices.push_back(&v);
-            selectedVertexInfos.push_back(SelectedVertexInfo{
-                &v,
-                selectedPSum,
-                selectedEnergySum,
-                rawTracks,
-                validTracks,
-                rawTrackRefs,
-            });
         }
 
         if (verbose_selected_only_ && selectedRecoVertices.empty()) {
@@ -315,38 +266,9 @@ public:
         }
 
         if (verbose_) {
-            if (verbose_ || verbose_selected_only_) {
-                verboseOut << "========== SELECTED RECO SCOUTING VERTICES (" << selectedRecoVertices.size() << ") ==========\n";
-                verboseOut << "Jet selection: " << (passJetSelection ? "PASSED" : "FAILED")
-                           << " (need >= " << min_selected_jets_ << " selected jets)\n";
-                for (size_t i = 0; i < selectedVertexInfos.size(); ++i) {
-                    const auto& info = selectedVertexInfos[i];
-                    const auto& v = *info.vertex;
-
-                    const double px = info.trackMomentumSum.x();
-                    const double py = info.trackMomentumSum.y();
-                    const double pz = info.trackMomentumSum.z();
-                    const double pt = std::hypot(px, py);
-                    const double phi = std::atan2(py, px);
-                    const double eta = (pt > 0.0) ? std::asinh(pz / pt) : 0.0;
-                    const double p2 = info.trackMomentumSum.mag2();
-                    const double mass2 = info.trackEnergySum * info.trackEnergySum - p2;
-                    const double mass = mass2 > 0.0 ? std::sqrt(mass2) : 0.0;
-
-                    verboseOut << "  Vertex " << i << ":"
-                               << " x=" << v.x()
-                               << " y=" << v.y()
-                               << " z=" << v.z()
-                               << " pt=" << pt
-                               << " mass=" << mass
-                               << " eta=" << eta
-                               << " phi=" << phi
-                               << " [rawTracks=" << info.rawTracks
-                               << ", selectedTracks=" << info.validTracks
-                               << ", rawRefs=" << info.rawTrackRefs
-                               << "]\n";
-                }
-            }
+            verboseOut << "========== SELECTED RECO SCOUTING VERTICES (" << selectedRecoVertices.size() << ") ==========\n";
+            verboseOut << "Jet selection: " << (passJetSelection ? "PASSED" : "FAILED")
+                       << " (need >= " << min_selected_jets_ << " selected jets)\n";
         }
 
         if (verbose_ || verbose_unselected_) {
