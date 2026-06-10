@@ -110,8 +110,9 @@ private:
 
   const int n_tracks_per_seed_vertex;
   const double max_seed_vertex_chi2;
-  const bool use_2d_vertex_dist;
-  const bool use_2d_track_dist;
+  const bool use_2d_vv_dist_forReco;
+  const bool use_2d_tv_dist_bsIPpresel;
+  const bool use_2d_tv_dist_forReco;
   const bool remove_one_track_at_a_time;
   const double merge_shared_dist;
   const double merge_shared_sig;
@@ -141,6 +142,9 @@ private:
   // RESTORE original seed knobs
   const double minSeedIPSig;
   const double minSeedPt;
+  const int minSeedPixelHits;
+  const int minSeedStripHits;
+  const int minSeedTrackerLayers;
 
   enum class RefMode { UsePVCollection, UseBeamSpot };
   enum class RefPreference { PreferPV, PreferBeamSpot };
@@ -148,10 +152,14 @@ private:
   const bool useOnlineBeamSpot_;
   const bool logBeamspotSource_;
   const edm::InputTag seedTracksTag_;
+  const edm::InputTag seedJetsTag_;
   const edm::EDGetTokenT<std::vector<reco::Vertex>> primaryVerticesToken_;  // vector of PVs
   const edm::EDGetTokenT<reco::BeamSpot>            beamspotToken_;         // fallback
   const edm::ESGetToken<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd> beamspotOnlineToken_;
   const edm::EDGetTokenT<std::vector<reco::Track>>  seed_tracks_token_;
+  const edm::EDGetTokenT<std::vector<Run3ScoutingPFJet>> seed_jets_token_;
+  const edm::EDGetTokenT<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> trackToScoutingMapToken_;
+  const double seedJetDrMax;
   const edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> token_builder;
 
   edm::EDPutTokenT<reco::VertexCollection> putToken_;
@@ -175,14 +183,6 @@ private:
     return is_subset;
   }
   
-  
-  Measurement1D vertex_dist(const reco::Vertex & v0, const reco::Vertex & v1) {
-    if (use_2d_vertex_dist)
-      return vertex_dist_2d.distance(v0, v1);
-    else
-      return vertex_dist_3d.distance(v0, v1);
-  }
-  
     track_set vertex_track_set(const reco::Vertex & v, const double min_weight = 0.5) const {
      track_set result;
  
@@ -198,11 +198,28 @@ private:
 
   
   
-  std::pair<bool, Measurement1D> track_dist(const reco::TransientTrack& t, const reco::Vertex & v) const {
-    if (use_2d_track_dist)
-      return IPTools::absoluteTransverseImpactParameter(t, v);
-    else
-      return IPTools::absoluteImpactParameter3D(t, v);
+  std::pair<bool, Measurement1D>
+  track_ip_to_ref(const reco::TransientTrack& t, const reco::Vertex& ref) const {
+      // used only for seed-track preselection
+      return use_2d_tv_dist_bsIPpresel
+          ? IPTools::absoluteTransverseImpactParameter(t, ref)
+          : IPTools::absoluteImpactParameter3D(t, ref);
+  }
+
+  std::pair<bool, Measurement1D>
+  track_vertex_dist_for_arbitration(const reco::TransientTrack& t,
+                                    const reco::Vertex& v) const {
+      // used only when deciding what to do with a shared track
+      return use_2d_tv_dist_forReco
+          ? IPTools::absoluteTransverseImpactParameter(t, v)
+          : IPTools::absoluteImpactParameter3D(t, v);
+  }
+
+  Measurement1D
+  vertex_vertex_dist(const reco::Vertex& v0, const reco::Vertex& v1) const {
+      return use_2d_vv_dist_forReco
+          ? vertex_dist_2d.distance(v0, v1)
+          : vertex_dist_3d.distance(v0, v1);
   }
 
   track_vec vertex_track_vec(const reco::Vertex & v, const double min_weight = 0.5) const {
@@ -236,7 +253,7 @@ private:
     if (ttks.size() < 2) return {};
     for (auto const& tt : ttks) if (!tt.isValid()) return {};
     std::vector<TransientVertex> v(1, kv_reco_.vertex(ttks));
-    if (!v[0].isValid() || v[0].normalisedChiSquared() > 5) return {};
+    if (!v[0].isValid() || v[0].normalisedChiSquared() >= 5) return {};
     return v;
   }
 
@@ -265,8 +282,8 @@ Glossary (Vertexer):
 - Signed vs Absolute IP:
   IPTools provides signedTransverseImpactParameter (with a sign from track direction)
   and absolute(Transverse/3D)ImpactParameter (magnitude only). For seed selection we use
-  absolute IP significance (magnitude), via track_dist() which switches between 2D/3D
-  using the use_2d_track_dist configuration.
+  absolute IP significance (magnitude), via track_ip_to_ref() which switches between 2D/3D
+  using the use_2d_tv_dist_bsIPpresel configuration.
 
 - fake_ref_vtx (reference vertex):
   A proxy reco::Vertex used for distances/IP:
@@ -289,12 +306,11 @@ Glossary (Vertexer):
   Lower is better; we keep seed vertices with normalizedChi2 < max_seed_vertex_chi2 (default 5).
 
 - dBV:
-  The distance between a displaced vertex and the chosen reference (avgPV or BeamSpot),
-  computed in XY (2D) or 3D consistently with configuration. Used in merging/plots.
+  The transverse (XY, 2D) distance between a displaced vertex and the chosen reference (avgPV or BeamSpot).
 
 - Seed tracks vs Vertex tracks:
   * Seed tracks: global preselection (pt > minSeedPt and |IP|/err(ref) > minSeedIPSig),
-    computed via track_dist and fake_ref_vtx. No hit/layer cuts and no IP upper bound.
+    computed via track_ip_to_ref and fake_ref_vtx. No hit/layer cuts and no IP upper bound.
   * Vertex tracks: the tracks attached to final fitted vertices after sharing resolution
     and merging; internally restricted by vertexing/arbitration logic.
 
@@ -324,8 +340,9 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
   :
   n_tracks_per_seed_vertex(params.getParameter<int>("n_tracks_per_seed_vertex")),
   max_seed_vertex_chi2(params.getParameter<double>("max_seed_vertex_chi2")),
-  use_2d_vertex_dist(params.getParameter<bool>("use_2d_vertex_dist")),
-  use_2d_track_dist(params.getParameter<bool>("use_2d_track_dist")),
+  use_2d_vv_dist_forReco(params.getParameter<bool>("use_2d_vv_dist_forReco")),
+  use_2d_tv_dist_bsIPpresel(params.getParameter<bool>("use_2d_tv_dist_bsIPpresel")),
+  use_2d_tv_dist_forReco(params.getParameter<bool>("use_2d_tv_dist_forReco")),
   remove_one_track_at_a_time(params.getParameter<bool>("remove_one_track_at_a_time")),
   merge_shared_dist(params.getParameter<double>("merge_shared_dist")),
   merge_shared_sig(params.getParameter<double>("merge_shared_sig")),
@@ -359,11 +376,15 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
   // RESTORE original seed thresholds (defaults match your working config)
   minSeedIPSig(params.getUntrackedParameter<double>("minSeedIPSig", 4.0)),
   minSeedPt   (params.getUntrackedParameter<double>("minSeedPt",    0.9)),
+  minSeedPixelHits(params.existsAs<int>("minSeedPixelHits") ? params.getUntrackedParameter<int>("minSeedPixelHits") : params.getUntrackedParameter<int>("track_pixelHits_min", 2)),
+  minSeedStripHits(params.existsAs<int>("minSeedStripHits") ? params.getUntrackedParameter<int>("minSeedStripHits") : params.getUntrackedParameter<int>("track_stripHits_min", 1)),
+  minSeedTrackerLayers(params.existsAs<int>("minSeedTrackerLayers") ? params.getUntrackedParameter<int>("minSeedTrackerLayers") : params.getUntrackedParameter<int>("track_trackerLayers_min", 5)),
   refPreference_(params.getUntrackedParameter<std::string>("refPreference", "BeamSpot") == "PV" ? 
                   RefPreference::PreferPV : RefPreference::PreferBeamSpot),
   useOnlineBeamSpot_(params.getUntrackedParameter<bool>("useOnlineBeamSpot", false)),
   logBeamspotSource_(params.getUntrackedParameter<bool>("logBeamspotSource", false)),
   seedTracksTag_(params.getParameter<edm::InputTag>("seed_tracks_src")),
+  seedJetsTag_(params.existsAs<edm::InputTag>("seed_jets_src") ? params.getParameter<edm::InputTag>("seed_jets_src") : edm::InputTag()),
   primaryVerticesToken_((params.existsAs<edm::InputTag>("primaryVertices_src") || 
                         params.existsAs<edm::InputTag>("primaryVertices")) ?
                         consumes<std::vector<reco::Vertex>>( getPVTag(params) ) :
@@ -373,6 +394,9 @@ Vertexer::Vertexer(edm::ParameterSet const& params)
                 consumes<reco::BeamSpot>( edm::InputTag("offlineBeamSpot") )),
   beamspotOnlineToken_(esConsumes<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd>()),
   seed_tracks_token_(consumes(seedTracksTag_)),
+  seed_jets_token_(seedJetsTag_.label().empty() ? edm::EDGetTokenT<std::vector<Run3ScoutingPFJet>>() : consumes<std::vector<Run3ScoutingPFJet>>(seedJetsTag_)),
+  trackToScoutingMapToken_(params.existsAs<edm::InputTag>("trackToScoutingMap") ? consumes<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>>(params.getParameter<edm::InputTag>("trackToScoutingMap") ) : consumes<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>>( edm::InputTag() )),
+  seedJetDrMax(params.getUntrackedParameter<double>("jet_dr_max", 0.4)),
   token_builder(esConsumes(edm::ESInputTag("", "TransientTrackBuilder"))),
 
   putToken_{produces()} {}
@@ -434,9 +458,9 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       logFile << "Notation legend:\n";
       logFile << "  - TrackN means pT-ordered label within this event (N=0 is highest pT).\n";
       logFile << "  - dxy and dxySig use transverse impact parameter of reco::Track relative to a point.\n";
-      logFile << "  - dist/sig in TRACK_ARBITRATION use track_dist():\n";
-      logFile << "      * if use_2d_track_dist=True -> absoluteTransverseImpactParameter (2D IP)\n";
-      logFile << "      * if use_2d_track_dist=False -> absoluteImpactParameter3D (3D IP)\n";
+      logFile << "  - dist/sig in TRACK_ARBITRATION use track_vertex_dist_for_arbitration():\n";
+      logFile << "      * if use_2d_tv_dist_forReco=True -> absoluteTransverseImpactParameter (2D IP)\n";
+      logFile << "      * if use_2d_tv_dist_forReco=False -> absoluteImpactParameter3D (3D IP)\n";
       logFile << "  - dBV is vertex distance from chosen reference (PV-average or beamspot).\n";
       logFile << "  - dBVErr is inferred as dBV/significance when significance is non-zero.\n";
       logFile << "  - DROP_* entries are explicit removals and include the reason + content.\n";
@@ -456,6 +480,14 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     iEvent.emplace(putToken_, reco::VertexCollection());
     return;
   }
+
+  // Optional scouting ValueMap for hit counts (only used when provided)
+  edm::Handle<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> trackToScoutingMapHandle;
+  if (!trackToScoutingMapToken_.isUninitialized()) iEvent.getByToken(trackToScoutingMapToken_, trackToScoutingMapHandle);
+  const bool haveTrackToScoutingMap = trackToScoutingMapHandle.isValid();
+
+  edm::Handle<std::vector<Run3ScoutingPFJet>> seed_jets_handle;
+  const bool haveSeedJets = !seedJetsTag_.label().empty() && iEvent.getByToken(seed_jets_token_, seed_jets_handle) && seed_jets_handle.isValid();
 
   // ------------------------------------------------------------------
   // LOGGING PREP: prepare PV/BS references and a stable track label map (pT-ordered)
@@ -649,8 +681,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::Ref<reco::TrackCollection> tk_ref(seed_track_handle, i_tk);
     reco::TransientTrack ttk = tt_builder.build(tk_ref);
     if (!ttk.isValid()) continue;
-    // RESTORE original: use track_dist (2D/3D according to use_2d_track_dist)
-    auto ttk_dist = track_dist(ttk, fake_ref_vtx);
+    auto ttk_dist = track_ip_to_ref(ttk, fake_ref_vtx);
     if (!ttk_dist.first) continue;
 
     const float IP_sig = ttk_dist.second.significance();
@@ -659,6 +690,47 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     // RESTORE original seed preselection: only IPsig and pT
     if (!(IP_sig > minSeedIPSig)) continue;
     if (!(tk_ref->pt() > minSeedPt)) continue;
+
+    if (haveSeedJets) {
+      bool matchedJet = false;
+      for (const auto& jet : *seed_jets_handle) {
+        const double dEta = tk_ref->eta() - jet.eta();
+        double dPhi = tk_ref->phi() - jet.phi();
+        while (dPhi > M_PI) dPhi -= 2.0 * M_PI;
+        while (dPhi <= -M_PI) dPhi += 2.0 * M_PI;
+        const double dR = std::hypot(dEta, dPhi);
+        if (dR < seedJetDrMax) {
+          matchedJet = true;
+          break;
+        }
+      }
+      if (!matchedJet) {
+        if (verbose) printf("Seed reject (jet dR >= %.3f) key=%u pt=%.3f\n", seedJetDrMax, tk_ref.key(), tk_ref->pt());
+        continue;
+      }
+    }
+
+    // Apply hit-based preselection only when scouting ValueMap is available
+    if (haveTrackToScoutingMap) {
+      const auto scoutingRef = (*trackToScoutingMapHandle)[tk_ref];
+      if (scoutingRef.isNonnull()) {
+        const int nPixel = scoutingRef->tk_nValidPixelHits();
+        const int nStrip = scoutingRef->tk_nValidStripHits();
+        const int nLayers = scoutingRef->tk_nTrackerLayersWithMeasurement();
+        if (nPixel <= minSeedPixelHits) {
+          if (verbose) printf("Seed reject (pixelHits=%d <= %d) key=%u pt=%.3f\n", nPixel, minSeedPixelHits, tk_ref.key(), tk_ref->pt());
+          continue;
+        }
+        if (nStrip <= minSeedStripHits) {
+          if (verbose) printf("Seed reject (stripHits=%d <= %d) key=%u pt=%.3f\n", nStrip, minSeedStripHits, tk_ref.key(), tk_ref->pt());
+          continue;
+        }
+        if (nLayers <= minSeedTrackerLayers) {
+          if (verbose) printf("Seed reject (layers=%d <= %d) key=%u pt=%.3f\n", nLayers, minSeedTrackerLayers, tk_ref.key(), tk_ref->pt());
+          continue;
+        }
+      }
+    }
 
     // Keep the seed
     seed_tracks_raw.push_back(tk_ref);
@@ -788,7 +860,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     TransientVertex seed_vertex = kv_reco_.vertex(ttks);
     if (seed_vertex.isValid()) {
       const reco::Vertex candidate(seed_vertex);
-      const auto dBV = vertex_dist(candidate, fake_ref_vtx);
+      const auto dBV = vertex_dist_2d.distance(candidate, fake_ref_vtx);
       const double dBVErr = (std::abs(dBV.significance()) > 0.0) ? (dBV.value() / dBV.significance()) : std::numeric_limits<double>::quiet_NaN();
 
       std::ostringstream seedLine;
@@ -851,7 +923,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   };
 
   auto vertexSummary = [&](const reco::Vertex& vv) {
-    const auto dBV = vertex_dist(vv, fake_ref_vtx);
+    const auto dBV = vertex_dist_2d.distance(vv, fake_ref_vtx);
     const double dBVErr = (std::abs(dBV.significance()) > 0.0) ? (dBV.value() / dBV.significance()) : std::numeric_limits<double>::quiet_NaN();
     const auto tset = vertex_track_set(vv, 0.0);
     std::ostringstream out;
@@ -935,8 +1007,8 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   {
     std::ostringstream modeLine;
     modeLine << "Track-to-vertex compatibility distance mode: "
-             << (use_2d_track_dist ? "2D transverse IP" : "3D absolute IP")
-             << " (use_2d_track_dist=" << (use_2d_track_dist ? "True" : "False") << ")";
+             << (use_2d_tv_dist_forReco ? "2D transverse IP" : "3D absolute IP")
+             << " (use_2d_tv_dist_forReco=" << (use_2d_tv_dist_forReco ? "True" : "False") << ")";
     logLine(modeLine.str());
   }
   {
@@ -967,7 +1039,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   logLine("If merged fit does not pass valid full-union checks: ignore merged candidate and continue with original two vertices.");
   logLine("[Force Drop a Track (OR 2!)]");
   logLine("For each shared track and each vertex side, report exact threshold checks.");
-  logLine("hardFail = track_dist invalid OR NOT( dist < max_track_vertex_dist OR sig < max_track_vertex_sig )");
+  logLine("hardFail = track_vertex_dist_for_arbitration invalid OR NOT( dist < max_track_vertex_dist OR sig < max_track_vertex_sig )");
   logLine("remove_from_0 = hardFail0; remove_from_1 = hardFail1");
   logLine("Further checks:");
   logLine("If both sig < min_track_vertex_sig_to_remove: keep bigger vertex; if equal size, drop from first vertex in hand.");
@@ -1130,7 +1202,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       if (hasSharedTracks){
     	// 6) Are the 2 Vertices Close?
-	Measurement1D v_dist = vertex_dist(*v[0], *v[1]);
+	Measurement1D v_dist = vertex_vertex_dist(*v[0], *v[1]);
 	{
 	  std::ostringstream msg;
 	  msg << "[Do 2 Vertices Have a Shared Track?] YES sharedTracks="
@@ -1170,7 +1242,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   }
 	
         if (verbose)
-          printf("   vertex dist (2d? %i) %7.3f  sig %7.3f\n", use_2d_vertex_dist, v_dist.value(), v_dist.significance());
+          printf("   vertex dist (2d? %i) %7.3f  sig %7.3f\n", use_2d_vv_dist_forReco, v_dist.value(), v_dist.significance());
 	
   if (shouldMerge) {
     // 7) Union Merge (Kalman fit a vertex for the union of set of tracks)
@@ -1212,8 +1284,8 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     const double dxySigToV1 = (tk->dxyError() > 0.0) ? (dxyToV1 / tk->dxyError()) : std::numeric_limits<double>::quiet_NaN();
     const double dzSigToV0 = (tk->dzError() > 0.0) ? (dzToV0 / tk->dzError()) : std::numeric_limits<double>::quiet_NaN();
     const double dzSigToV1 = (tk->dzError() > 0.0) ? (dzToV1 / tk->dzError()) : std::numeric_limits<double>::quiet_NaN();
-    auto t_dist_0 = track_dist(ttk, *v[0]);
-    auto t_dist_1 = track_dist(ttk, *v[1]);
+    auto t_dist_0 = track_vertex_dist_for_arbitration(ttk, *v[0]);
+    auto t_dist_1 = track_vertex_dist_for_arbitration(ttk, *v[1]);
     const bool trackDistValid0 = t_dist_0.first;
     const bool trackDistValid1 = t_dist_1.first;
     const bool v0DistPass = (t_dist_0.second.value() < max_track_vertex_dist);
@@ -1592,7 +1664,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
           //ivtx[1] = v[1] - vertices->begin();
 
 
-          Measurement1D v_dist = vertex_dist(*v[0], *v[1]);
+          Measurement1D v_dist = vertex_vertex_dist(*v[0], *v[1]);
 
           //v0x = v[0]->x() - bsx;
           //v0y = v[0]->y() - bsy;
@@ -1619,7 +1691,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
               for (auto it = merged_vertices[0].tracks_begin(), ite = merged_vertices[0].tracks_end(); it != ite; ++it) {
                 reco::TransientTrack seed_track = getTransientTrack(*it);
-                std::pair<bool, Measurement1D> tk_vtx_dist = track_dist(seed_track, merged_vertices[0]);
+                std::pair<bool, Measurement1D> tk_vtx_dist = track_vertex_dist_for_arbitration(seed_track, merged_vertices[0]);
               }
             }
 

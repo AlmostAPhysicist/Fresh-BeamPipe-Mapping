@@ -50,9 +50,8 @@ private:
         const reco::Vertex* vertex = nullptr;
         LorentzVector p4{0., 0., 0., 0.};
         math::XYZVector p3{0., 0., 0.};
-        unsigned int rawTracks = 0;
-        unsigned int selectedTracks = 0;
-        unsigned int rawTrackRefs = 0;
+        unsigned int nTracks = 0;
+        std::vector<double> selectedTrackPts;
         double chi2 = 0.0;
         double dBV = 0.0;
         double dBVErr = 0.0;
@@ -215,7 +214,6 @@ private:
     edm::EDGetTokenT<std::vector<reco::GenParticle>> genParticlesToken_;
     edm::EDGetTokenT<std::vector<reco::Vertex>> scoutingVerticesToken_;
     edm::EDGetTokenT<reco::BeamSpot> offlineBeamspotToken_;
-    edm::EDGetTokenT<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> trackToScoutingMapToken_;
     edm::EDGetTokenT<std::vector<Run3ScoutingPFJet>> scoutingJetsToken_;
     edm::ESGetToken<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd> bsOnlineToken_;
 
@@ -228,14 +226,9 @@ private:
     double cut_vtx_ddbv_max_ = 0.005;
     double cut_vtx_cosT_min_ = 0.0;
 
-    int cut_track_pixelHits_min_ = 2;
-    int cut_track_stripHits_min_ = 1;
-    int cut_track_trackerLayers_min_ = 5;
-
     bool verbose_ = false;
     bool verbose_unselected_ = false;
     bool verbose_selected_only_ = false;
-    bool ntracks_raw_ = false;
     bool cost_raw_ = false;
 
     double jet_pt_min_ = 30.0;
@@ -250,6 +243,15 @@ private:
 
     std::array<BucketPlots, 2> plots_;
     CounterSet counters_;
+    // Configurable truth PDG selections (signed list, exact match)
+    std::vector<int> parentPDG_;
+    std::vector<int> daughterPDG_;
+
+    // Simple bookkeeping histograms
+    TH1F* h_nSelectedVertices = nullptr;
+    TH3F* h_bs_pos = nullptr;
+    TH1F* h_sel_vtx_ntracks = nullptr;
+    TH1F* h_sel_vtx_trackPt = nullptr;
 
     static double wrapDeltaPhi(double a, double b) {
         constexpr double kPi = 3.14159265358979323846;
@@ -308,13 +310,17 @@ private:
     std::array<const reco::GenParticle*, 2> findStops(const std::vector<reco::GenParticle>& genParticles, std::ostringstream* log) const {
         std::array<const reco::GenParticle*, 2> stops{{nullptr, nullptr}};
         for (const auto& p : genParticles) {
-            if (std::abs(p.pdgId()) != 1000006) continue;
-            int downCount = 0;
+            // Check parent PDG (exact signed match against configured list)
+            const int pdg = p.pdgId();
+            if (std::find(parentPDG_.begin(), parentPDG_.end(), pdg) == parentPDG_.end()) continue;
+            int dauCountMatch = 0;
             for (size_t d = 0; d < p.numberOfDaughters(); ++d) {
                 const reco::Candidate* dau = p.daughter(d);
-                if (dau && std::abs(dau->pdgId()) == 1) ++downCount;
+                if (!dau) continue;
+                const int pdgd = dau->pdgId();
+                if (std::find(daughterPDG_.begin(), daughterPDG_.end(), pdgd) != daughterPDG_.end()) ++dauCountMatch;
             }
-            if (downCount != 2) continue;
+            if (dauCountMatch != 2) continue;
             if (!stops[0]) stops[0] = &p;
             else if (!stops[1]) {
                 stops[1] = &p;
@@ -337,8 +343,6 @@ private:
 
     std::vector<SelectedVertexInfo> buildSelectedVertices(const edm::Handle<std::vector<reco::Vertex>>& scoutingVertices,
                                                           const reco::BeamSpot* beamspot,
-                                                          const edm::Handle<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>>& trackToScoutingMap,
-                                                          bool haveTrackToScoutingMap,
                                                           bool eventPassesJetGate,
                                                           std::ostringstream* log) const {
         std::vector<SelectedVertexInfo> selected;
@@ -353,7 +357,7 @@ private:
             const auto& v = scoutingVertices->at(i);
             SelectedVertexInfo info;
             info.vertex = &v;
-            info.rawTracks = v.tracksSize();
+            info.nTracks = v.tracksSize();
             info.chi2 = v.normalizedChi2();
             info.dBV = std::hypot(v.x() - bsX, v.y() - bsY);
             info.dBVErr = std::hypot(v.xError(), v.yError());
@@ -371,38 +375,15 @@ private:
             for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it, ++trackIndex) {
                 reco::TrackRef trk = it->castTo<reco::TrackRef>();
                 if (trk.isNonnull()) {
-                    ++info.rawTrackRefs;
+                    // Assume seed preselection (hit & IP cuts) already applied in Vertexer.
                     rawPSum += trk->momentum();
-
-                    int nPixelHits = 0;
-                    int nStripHits = 0;
-                    int nTrackerLayers = 0;
-                    if (haveTrackToScoutingMap && trackToScoutingMap.isValid()) {
-                        const auto scoutingRef = (*trackToScoutingMap)[trk];
-                        if (scoutingRef.isNonnull()) {
-                            nPixelHits = scoutingRef->tk_nValidPixelHits();
-                            nStripHits = scoutingRef->tk_nValidStripHits();
-                            nTrackerLayers = scoutingRef->tk_nTrackerLayersWithMeasurement();
-                        }
-                    }
-
-                    const bool passPixelHits = (nPixelHits >= cut_track_pixelHits_min_);
-                    const bool passStripHits = (nStripHits >= cut_track_stripHits_min_);
-                    const bool passTrackerLayers = (nTrackerLayers >= cut_track_trackerLayers_min_);
-                    const bool passTrack = passPixelHits && passStripHits && passTrackerLayers;
-
-                    if (passTrack) {
-                        ++info.selectedTracks;
-                        selectedPSum += trk->momentum();
-                        selectedEnergySum += trackP4(*trk).E();
-                    }
+                    ++info.nTracks;
+                    selectedPSum += trk->momentum();
+                    selectedEnergySum += trackP4(*trk).E();
+                    info.selectedTrackPts.push_back(trk->pt());
 
                     if (verbose_unselected_) {
-                        trackLog << "track " << trackIndex << ": pT=" << trk->pt()
-                                 << " | pixelHits=" << nPixelHits
-                                 << " | stripHits=" << nStripHits
-                                 << " | trackerLayers=" << nTrackerLayers
-                                 << " -> " << (passTrack ? "SELECTED" : "REJECTED") << "\n";
+                        trackLog << "track " << trackIndex << ": pT=" << trk->pt() << " -> SELECTED\n";
                     }
                 }
             }
@@ -413,13 +394,13 @@ private:
                 info.cosT = disp.Dot(pSum) / (disp.R() * pSum.R());
             }
 
-            const unsigned int nTracksForCut = ntracks_raw_ ? info.rawTracks : info.selectedTracks;
+            const unsigned int nTracksForCut = info.nTracks;
             const bool passChi2 = info.chi2 < cut_vtx_chi2_max_;
             const bool passDbvMin = info.dBV >= cut_vtx_dbv_min_;
             const bool passDbvMax = info.dBV < cut_vtx_dbv_max_;
             const bool passDdbv = info.dBVErr < cut_vtx_ddbv_max_;
             const bool passCosT = info.cosT > cut_vtx_cosT_min_;
-            const bool passNtk = nTracksForCut >= cut_vtx_tracks_min_;
+            const bool passNtk = nTracksForCut > cut_vtx_tracks_min_;
             const bool passAll = passChi2 && passDbvMin && passDbvMax && passDdbv && passCosT && passNtk && eventPassesJetGate;
 
             if (verbose_unselected_) {
@@ -430,8 +411,7 @@ private:
                      << "  ddBV     : " << info.dBVErr << (passDdbv ? " (< " : " (!< ") << cut_vtx_ddbv_max_ << ")\n"
                      << "  cosT     : " << info.cosT << (passCosT ? " (> " : " (!> ") << cut_vtx_cosT_min_ << ") ["
                      << (cost_raw_ ? "raw" : "selected") << " track sum]\n"
-                     << "  nTracks  : " << nTracksForCut << (passNtk ? " (>= " : " (!>= ") << cut_vtx_tracks_min_ << ") [raw="
-                     << info.rawTracks << ", selected=" << info.selectedTracks << ", rawRefs=" << info.rawTrackRefs << "]\n";
+                     << "  nTracks  : " << nTracksForCut << (passNtk ? " (> " : " (!> ") << cut_vtx_tracks_min_ << ")\n";
                 *log << trackLog.str();
                 *log << "  -> STATUS: " << (passAll ? "PASSED ALL CUTS" : "FAILED") << "\n";
             }
@@ -623,7 +603,6 @@ public:
         genParticlesToken_ = consumes<std::vector<reco::GenParticle>>(config.getParameter<edm::InputTag>("genParticles"));
         scoutingVerticesToken_ = consumes<std::vector<reco::Vertex>>(config.getParameter<edm::InputTag>("scoutingVertices"));
         offlineBeamspotToken_ = consumes<reco::BeamSpot>(config.getParameter<edm::InputTag>("beamspot"));
-        trackToScoutingMapToken_ = consumes<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>>(config.getParameter<edm::InputTag>("trackToScoutingMap"));
         scoutingJetsToken_ = consumes<std::vector<Run3ScoutingPFJet>>(config.getParameter<edm::InputTag>("scoutingJets"));
         bsOnlineToken_ = esConsumes<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd>();
 
@@ -634,14 +613,11 @@ public:
         cut_vtx_ddbv_max_ = config.getParameter<double>("vtx_ddbv_max");
         cut_vtx_cosT_min_ = config.getParameter<double>("vtx_cosT_min");
 
-        cut_track_pixelHits_min_ = config.getParameter<int>("track_pixelHits_min");
-        cut_track_stripHits_min_ = config.getParameter<int>("track_stripHits_min");
-        cut_track_trackerLayers_min_ = config.getParameter<int>("track_trackerLayers_min");
+        // track hit preselection is performed in the Vertexer; comparer does not apply hit cuts
 
         verbose_ = config.getUntrackedParameter<bool>("verbose", false);
         verbose_unselected_ = config.getUntrackedParameter<bool>("verbose_unselected", false);
         verbose_selected_only_ = config.getUntrackedParameter<bool>("verbose_selected_only", false);
-        ntracks_raw_ = config.getUntrackedParameter<bool>("ntracks_raw", false);
         cost_raw_ = config.getUntrackedParameter<bool>("cost_raw", false);
 
         jet_pt_min_ = config.getParameter<double>("jet_pt_min");
@@ -660,6 +636,14 @@ public:
             matchMode_ = MatchDistanceMode::k2D;
             matchModeLabel_ = "2D";
         }
+
+        // Truth PDG-ID configuration (allow user to provide lists)
+        const auto parentList = config.getUntrackedParameter<std::vector<int>>("parent_pdgids", std::vector<int>{1000006, -1000006});
+        const auto daughterList = config.getUntrackedParameter<std::vector<int>>("daughter_pdgids", std::vector<int>{1, -1});
+        parentPDG_.clear();
+        daughterPDG_.clear();
+        for (int v : parentList) parentPDG_.push_back(v);
+        for (int v : daughterList) daughterPDG_.push_back(v);
     }
 
     void beginJob() override {
@@ -671,6 +655,13 @@ public:
 
         plots_[0].book(fs, "1", matchModeLabel_, massHint_, decayHint_);
         plots_[1].book(fs, "2", matchModeLabel_, massHint_, decayHint_);
+
+        // Book simple bookkeeping histograms
+        h_nSelectedVertices = fs->make<TH1F>("n_selected_vertices", "n_selected_vertices;N;Events", 21, -0.5, 20.5);
+        // Single 3D histogram for beamspot positions (x,y,z)
+        h_bs_pos = fs->make<TH3F>("beamspot_xyz", "beamspot_xyz; x [cm]; y [cm]; z [cm]", 200, -0.1, 0.1, 200, -0.1, 0.1, 400, -50.0, 50.0);
+        h_sel_vtx_ntracks = fs->make<TH1F>("selected_vertex_ntracks", "selected_vertex_ntracks;ntracks;Vertices", 50, -0.5, 49.5);
+        h_sel_vtx_trackPt = fs->make<TH1F>("selected_vertex_track_pt", "selected_vertex_track_pt;track p_{T} [GeV];Entries", 100, 0.0, 100.0);
 
         edm::LogInfo("GenScoutingComparer") << "setup done";
         edm::LogInfo("GenScoutingComparer") << "match mode: " << matchModeLabel_;
@@ -726,10 +717,6 @@ public:
         edm::Handle<std::vector<Run3ScoutingPFJet>> scoutingJets;
         event.getByToken(scoutingJetsToken_, scoutingJets);
 
-        edm::Handle<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> trackToScoutingMap;
-        event.getByToken(trackToScoutingMapToken_, trackToScoutingMap);
-        const bool haveTrackToScoutingMap = trackToScoutingMap.isValid();
-
         unsigned int selectedJets = 0;
         if (scoutingJets.isValid()) {
             for (const auto& jet : *scoutingJets) {
@@ -753,10 +740,18 @@ public:
         }
 
         std::vector<SelectedVertexInfo> selectedVertices = buildSelectedVertices(
-            scoutingVertices, bs, trackToScoutingMap, haveTrackToScoutingMap, eventPassesJetGate,
+            scoutingVertices, bs, eventPassesJetGate,
             (verbose_ || verbose_unselected_) ? &log : nullptr);
 
         counters_.selectedVertices += selectedVertices.size();
+        if (h_nSelectedVertices) h_nSelectedVertices->Fill(static_cast<int>(selectedVertices.size()));
+        if (bs) {
+            if (h_bs_pos) h_bs_pos->Fill(bs->x0(), bs->y0(), bs->z0());
+        }
+        for (const auto & vinfo : selectedVertices) {
+            if (h_sel_vtx_ntracks) h_sel_vtx_ntracks->Fill(static_cast<double>(vinfo.nTracks));
+            for (double pt : vinfo.selectedTrackPts) if (h_sel_vtx_trackPt) h_sel_vtx_trackPt->Fill(pt);
+        }
         if (selectedVertices.empty() && verbose_selected_only_) {
             if (verbose_ || verbose_unselected_) {
                 edm::LogVerbatim("GenScoutingComparer") << log.str();
@@ -812,9 +807,7 @@ public:
                         << " mass=" << info.p4.mass()
                         << " eta=" << info.p4.eta()
                         << " phi=" << info.p4.phi()
-                        << " [rawTracks=" << info.rawTracks
-                        << ", selectedTracks=" << info.selectedTracks
-                        << ", rawRefs=" << info.rawTrackRefs << "]\n";
+                        << " [nTracks=" << info.nTracks << "]\n";
                 }
             }
         }
