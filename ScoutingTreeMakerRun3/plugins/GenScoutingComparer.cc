@@ -1,4 +1,3 @@
-
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -25,6 +24,7 @@
 
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/Math/interface/Vector3D.h"
@@ -38,6 +38,15 @@
 #include "TH2F.h"
 #include "TH3F.h"
 
+// ============================================================
+// GenScoutingComparer
+//
+// Pure gen-truth ↔ selected-reco-vertex comparer.
+// Track selection (IPSig, hits, ΔR jet cut, arbitration, N-1)
+// is performed entirely inside the Vertexer; every track in
+// each input vertex is already accepted.
+// ============================================================
+
 class GenScoutingComparer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
 private:
     using LorentzVector = reco::Candidate::LorentzVector;
@@ -46,217 +55,307 @@ private:
 
     enum class MatchDistanceMode { k2D, k3D };
 
+    // ------------------------------------------------------------------
+    // Per-vertex information built in buildSelectedVertices()
+    // ------------------------------------------------------------------
     struct SelectedVertexInfo {
-        const reco::Vertex* vertex = nullptr;
-        LorentzVector p4{0., 0., 0., 0.};
-        math::XYZVector p3{0., 0., 0.};
-        unsigned int nTracks = 0;
-        std::vector<double> selectedTrackPts;
-        double chi2 = 0.0;
-        double dBV = 0.0;
-        double dBVErr = 0.0;
-        double significance = 0.0;
-        double rDistxyGlobal00 = 0.0;
-        double rDistxyzGlobal00 = 0.0;
-        double rDistxyBeamSpot = 0.0;
-        double rDistxyzBeamSpot = 0.0;
-        double cosT = -999.0;
+        const reco::Vertex* vertex  = nullptr;
+        LorentzVector       p4{0., 0., 0., 0.};
+        math::XYZVector     p3{0., 0., 0.};
+        unsigned int        nTracks = 0;
+        std::vector<double> trackPts;        // pT of every track in the vertex
+        double              totalPt  = 0.0; // scalar sum of track pT
+        double              chi2     = 0.0;
+        double              dBV      = 0.0;
+        double              dBVErr   = 0.0;
+        double              significance = -1.0;
+        double              rDistxyGlobal00  = 0.0;
+        double              rDistxyzGlobal00 = 0.0;
+        double              rDistxyBeamSpot  = 0.0;
+        double              rDistxyzBeamSpot = 0.0;
+        double              cosT = -999.0;
     };
 
+    // ------------------------------------------------------------------
+    // Matching result
+    // ------------------------------------------------------------------
     struct MatchSolution {
-        std::array<int, 2> recoForGen{{-1, -1}};
+        std::array<int, 2>    recoForGen{{-1, -1}};
         std::array<double, 2> distance{{-1.0, -1.0}};
         double totalScore = std::numeric_limits<double>::max();
     };
 
+    // ------------------------------------------------------------------
+    // Per-bucket (per gen vertex) histograms
+    // ------------------------------------------------------------------
     struct BucketPlots {
-        TH2F* xyDiff = nullptr;
-        TH3F* xyzDiff = nullptr;
+        // --- position residuals ---
+        TH2F* xyDiff   = nullptr;
+        TH3F* xyzDiff  = nullptr;
 
-        TH2F* xyGlobal00Gen = nullptr;
-        TH2F* xyGlobal00Reco = nullptr;
+        // --- absolute positions ---
+        TH2F* xyGlobal00Gen    = nullptr;
+        TH2F* xyGlobal00Reco   = nullptr;
+        TH3F* xyzGlobal00Gen   = nullptr;
+        TH3F* xyzGlobal00Reco  = nullptr;
+        TH2F* xyBeamSpotGen    = nullptr;
+        TH2F* xyBeamSpotReco   = nullptr;
+        TH3F* xyzBeamSpotGen   = nullptr;
+        TH3F* xyzBeamSpotReco  = nullptr;
 
-        TH3F* xyzGlobal00Gen = nullptr;
-        TH3F* xyzGlobal00Reco = nullptr;
+        // --- radial distances (particle / vertex wrt origin or beamspot) ---
+        TH1F* rDistxyGlobal00Gen    = nullptr;
+        TH1F* rDistxyGlobal00Reco   = nullptr;
+        TH1F* rDistxyGlobal00Diff   = nullptr;
+        TH1F* rDistxyzGlobal00Gen   = nullptr;
+        TH1F* rDistxyzGlobal00Reco  = nullptr;
+        TH1F* rDistxyzGlobal00Diff  = nullptr;
+        TH1F* rDistxyBeamSpotGen    = nullptr;
+        TH1F* rDistxyBeamSpotReco   = nullptr;
+        TH1F* rDistxyBeamSpotDiff   = nullptr;
+        TH1F* rDistxyzBeamSpotGen   = nullptr;
+        TH1F* rDistxyzBeamSpotReco  = nullptr;
+        TH1F* rDistxyzBeamSpotDiff  = nullptr;
 
-        TH2F* xyBeamSpotGen = nullptr;
-        TH2F* xyBeamSpotReco = nullptr;
-
-        TH3F* xyzBeamSpotGen = nullptr;
-        TH3F* xyzBeamSpotReco = nullptr;
-
-        TH1F* rDistxyGlobal00Gen = nullptr;
-        TH1F* rDistxyGlobal00Reco = nullptr;
-        TH1F* rDistxyGlobal00Diff = nullptr;
-
-        TH1F* rDistxyzGlobal00Gen = nullptr;
-        TH1F* rDistxyzGlobal00Reco = nullptr;
-        TH1F* rDistxyzGlobal00Diff = nullptr;
-
-        TH1F* rDistxyBeamSpotGen = nullptr;
-        TH1F* rDistxyBeamSpotReco = nullptr;
-        TH1F* rDistxyBeamSpotDiff = nullptr;
-
-        TH1F* rDistxyzBeamSpotGen = nullptr;
-        TH1F* rDistxyzBeamSpotReco = nullptr;
-        TH1F* rDistxyzBeamSpotDiff = nullptr;
-
-        TH1F* ptGen = nullptr;
-        TH1F* ptReco = nullptr;
-        TH1F* ptDiff = nullptr;
-
-        TH1F* etaGen = nullptr;
+        // --- kinematics ---
+        TH1F* ptGen   = nullptr;
+        TH1F* ptReco  = nullptr;
+        TH1F* ptDiff  = nullptr;
+        TH1F* etaGen  = nullptr;
         TH1F* etaReco = nullptr;
         TH1F* etaDiff = nullptr;
-
-        TH1F* phiGen = nullptr;
+        TH1F* phiGen  = nullptr;
         TH1F* phiReco = nullptr;
         TH1F* phiDiff = nullptr;
-
-        TH1F* massGen = nullptr;
+        TH1F* massGen  = nullptr;
         TH1F* massReco = nullptr;
         TH1F* massDiff = nullptr;
 
-        TH1F* chi2Reco = nullptr;
-        TH1F* significanceReco = nullptr;
-        TH1F* dxyErrorReco = nullptr;
+        // --- vertex quality ---
+        TH1F* chi2Reco        = nullptr;
+        TH1F* significanceReco = nullptr;   // dBV / sigma(dBV)
+        TH1F* dxyErrorReco    = nullptr;    // sigma(dBV) [cm]
 
-        TH1F* deltaR = nullptr;
+        // --- matching ---
+        TH1F* deltaR       = nullptr;
         TH1F* matchDistance = nullptr;
+
+        // --- ΔR vs match distance vs gen particle d_xy wrt beamspot (3D) ---
+        TH3F* deltaR_vs_matchDist_vs_genDxyBS = nullptr;
+
+        // --- vertex tracks ---
+        TH1F* vtxNtracks    = nullptr;  // number of tracks per matched vertex
+        TH1F* vtxTrackPt    = nullptr;  // pT of each track in matched vertex
+        TH1F* vtxTotalTrackPt = nullptr; // scalar sum of track pT per matched vertex
 
         void book(edm::Service<TFileService>& fs,
                   const std::string& suffix,
                   const std::string& modeLabel,
                   double massHint,
                   double decayHint) {
-            const auto makeName = [&](const std::string& base) {
-                return base + "_" + suffix;
-            };
-            const double xyPositionMax = 5.0 * decayHint;
-            const double xyzPositionMax = 100.0 * decayHint;
-            const double xyDiffMax = 1.0 * decayHint;
-            const double xyzDiffMax = 1.0 * decayHint;
-            const double rDistxyMax = 10.0 * decayHint;
-            const double rDistxyzMax = 100.0 * decayHint;
-            const double massMax = 3.0 * massHint;
+            const auto n = [&](const std::string& base) { return base + "_" + suffix; };
+
+            const double xyPosMax   = 5.0  * decayHint;
+            const double xyzPosMax  = 100.0 * decayHint;
+            const double xyDiffMax  = 1.0  * decayHint;
+            const double xyzDiffMax = 1.0  * decayHint;
+            const double rxyMax     = 10.0 * decayHint;
+            const double rxyzMax    = 100.0 * decayHint;
+            const double massMax    = 3.0  * massHint;
             const double massDiffMax = massHint;
-            const double ptDiffMax = 1.5 * massHint;
+            const double ptDiffMax  = 1.5  * massHint;
 
-            xyDiff = fs->make<TH2F>(makeName("xy_diff").c_str(),
-                                    ";reco - gen x [cm];reco - gen y [cm];Events",
-                                    220, -xyDiffMax, xyDiffMax, 220, -xyDiffMax, xyDiffMax);
-            xyzDiff = fs->make<TH3F>(makeName("xyz_diff").c_str(),
-                                     ";reco - gen x [cm];reco - gen y [cm];reco - gen z [cm];Events",
-                                     160, -xyzDiffMax, xyzDiffMax, 160, -xyzDiffMax, xyzDiffMax, 160, -xyzDiffMax, xyzDiffMax);
+            // position residuals
+            xyDiff  = fs->make<TH2F>(n("xy_diff").c_str(),
+                ";#Deltax (reco#minusgen) [cm];#Deltay (reco#minusgen) [cm];Events",
+                220, -xyDiffMax, xyDiffMax, 220, -xyDiffMax, xyDiffMax);
+            xyzDiff = fs->make<TH3F>(n("xyz_diff").c_str(),
+                ";#Deltax [cm];#Deltay [cm];#Deltaz [cm];Events",
+                160, -xyzDiffMax, xyzDiffMax,
+                160, -xyzDiffMax, xyzDiffMax,
+                160, -xyzDiffMax, xyzDiffMax);
 
-            xyGlobal00Gen = fs->make<TH2F>(makeName("xy_position_global00_gen").c_str(), ";x gen wrt (0,0) [cm];y gen wrt (0,0) [cm];Events", 220, -xyPositionMax, xyPositionMax, 220, -xyPositionMax, xyPositionMax);
-            xyGlobal00Reco = fs->make<TH2F>(makeName("xy_position_global00_reco").c_str(), ";x reco wrt (0,0) [cm];y reco wrt (0,0) [cm];Events", 220, -xyPositionMax, xyPositionMax, 220, -xyPositionMax, xyPositionMax);
+            // absolute positions – global origin
+            xyGlobal00Gen  = fs->make<TH2F>(n("xy_global00_gen").c_str(),
+                ";x_{gen} wrt (0,0) [cm];y_{gen} wrt (0,0) [cm];Events",
+                220, -xyPosMax, xyPosMax, 220, -xyPosMax, xyPosMax);
+            xyGlobal00Reco = fs->make<TH2F>(n("xy_global00_reco").c_str(),
+                ";x_{reco} wrt (0,0) [cm];y_{reco} wrt (0,0) [cm];Events",
+                220, -xyPosMax, xyPosMax, 220, -xyPosMax, xyPosMax);
+            xyzGlobal00Gen  = fs->make<TH3F>(n("xyz_global00_gen").c_str(),
+                ";x_{gen} [cm];y_{gen} [cm];z_{gen} [cm];Events",
+                160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax);
+            xyzGlobal00Reco = fs->make<TH3F>(n("xyz_global00_reco").c_str(),
+                ";x_{reco} [cm];y_{reco} [cm];z_{reco} [cm];Events",
+                160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax);
 
-            xyzGlobal00Gen = fs->make<TH3F>(makeName("xyz_position_global00_gen").c_str(), ";x gen wrt (0,0,0) [cm];y gen wrt (0,0,0) [cm];z gen wrt (0,0,0) [cm];Events", 160, -xyzPositionMax, xyzPositionMax, 160, -xyzPositionMax, xyzPositionMax, 160, -xyzPositionMax, xyzPositionMax);
-            xyzGlobal00Reco = fs->make<TH3F>(makeName("xyz_position_global00_reco").c_str(), ";x reco wrt (0,0,0) [cm];y reco wrt (0,0,0) [cm];z reco wrt (0,0,0) [cm];Events", 160, -xyzPositionMax, xyzPositionMax, 160, -xyzPositionMax, xyzPositionMax, 160, -xyzPositionMax, xyzPositionMax);
+            // absolute positions – relative to beamspot
+            xyBeamSpotGen  = fs->make<TH2F>(n("xy_beamspot_gen").c_str(),
+                ";x_{gen} wrt beamspot [cm];y_{gen} wrt beamspot [cm];Events",
+                220, -xyPosMax, xyPosMax, 220, -xyPosMax, xyPosMax);
+            xyBeamSpotReco = fs->make<TH2F>(n("xy_beamspot_reco").c_str(),
+                ";x_{reco} wrt beamspot [cm];y_{reco} wrt beamspot [cm];Events",
+                220, -xyPosMax, xyPosMax, 220, -xyPosMax, xyPosMax);
+            xyzBeamSpotGen  = fs->make<TH3F>(n("xyz_beamspot_gen").c_str(),
+                ";x_{gen} wrt BS [cm];y_{gen} wrt BS [cm];z_{gen} wrt BS [cm];Events",
+                160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax);
+            xyzBeamSpotReco = fs->make<TH3F>(n("xyz_beamspot_reco").c_str(),
+                ";x_{reco} wrt BS [cm];y_{reco} wrt BS [cm];z_{reco} wrt BS [cm];Events",
+                160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax);
 
-            xyBeamSpotGen = fs->make<TH2F>(makeName("xy_position_beamspot_gen").c_str(), ";x gen wrt beamspot [cm];y gen wrt beamspot [cm];Events", 220, -xyPositionMax, xyPositionMax, 220, -xyPositionMax, xyPositionMax);
-            xyBeamSpotReco = fs->make<TH2F>(makeName("xy_position_beamspot_reco").c_str(), ";x reco wrt beamspot [cm];y reco wrt beamspot [cm];Events", 220, -xyPositionMax, xyPositionMax, 220, -xyPositionMax, xyPositionMax);
+            // radial distances – global origin
+            rDistxyGlobal00Gen  = fs->make<TH1F>(n("rdist_xy_global00_gen").c_str(),
+                ";|r_{xy}| (particle wrt origin) [cm];Events", 160, 0.0, rxyMax);
+            rDistxyGlobal00Reco = fs->make<TH1F>(n("rdist_xy_global00_reco").c_str(),
+                ";|r_{xy}| (vertex wrt origin) [cm];Events",   160, 0.0, rxyMax);
+            rDistxyGlobal00Diff = fs->make<TH1F>(n("rdist_xy_global00_diff").c_str(),
+                ";|r_{xy}| vertex #minus particle wrt origin [cm];Events", 160, -rxyMax, rxyMax);
 
-            xyzBeamSpotGen = fs->make<TH3F>(makeName("xyz_position_beamspot_gen").c_str(), ";x gen wrt beamspot [cm];y gen wrt beamspot [cm];z gen wrt beamspot [cm];Events", 160, -xyzPositionMax, xyzPositionMax, 160, -xyzPositionMax, xyzPositionMax, 160, -xyzPositionMax, xyzPositionMax);
-            xyzBeamSpotReco = fs->make<TH3F>(makeName("xyz_position_beamspot_reco").c_str(), ";x reco wrt beamspot [cm];y reco wrt beamspot [cm];z reco wrt beamspot [cm];Events", 160, -xyzPositionMax, xyzPositionMax, 160, -xyzPositionMax, xyzPositionMax, 160, -xyzPositionMax, xyzPositionMax);
+            rDistxyzGlobal00Gen  = fs->make<TH1F>(n("rdist_xyz_global00_gen").c_str(),
+                ";|r| (particle wrt origin) [cm];Events", 160, 0.0, rxyzMax);
+            rDistxyzGlobal00Reco = fs->make<TH1F>(n("rdist_xyz_global00_reco").c_str(),
+                ";|r| (vertex wrt origin) [cm];Events",   160, 0.0, rxyzMax);
+            rDistxyzGlobal00Diff = fs->make<TH1F>(n("rdist_xyz_global00_diff").c_str(),
+                ";|r| vertex #minus particle wrt origin [cm];Events", 160, -rxyzMax, rxyzMax);
 
-            rDistxyGlobal00Gen = fs->make<TH1F>(makeName("rdist_xy_global00_gen").c_str(), ";|r_{xy}| wrt (0,0) gen [cm];Events", 160, 0.0, rDistxyMax);
-            rDistxyGlobal00Reco = fs->make<TH1F>(makeName("rdist_xy_global00_reco").c_str(), ";|r_{xy}| wrt (0,0) reco [cm];Events", 160, 0.0, rDistxyMax);
-            rDistxyGlobal00Diff = fs->make<TH1F>(makeName("rdist_xy_global00_diff").c_str(), ";reco - gen |r_{xy}| wrt (0,0) [cm];Events", 160, -rDistxyMax, rDistxyMax);
+            // radial distances – beamspot
+            rDistxyBeamSpotGen  = fs->make<TH1F>(n("rdist_xy_beamspot_gen").c_str(),
+                ";d_{xy} (particle wrt beamspot) [cm];Events", 160, 0.0, rxyMax);
+            rDistxyBeamSpotReco = fs->make<TH1F>(n("rdist_xy_beamspot_reco").c_str(),
+                ";d_{xy} (vertex wrt beamspot) [cm];Events",   160, 0.0, rxyMax);
+            rDistxyBeamSpotDiff = fs->make<TH1F>(n("rdist_xy_beamspot_diff").c_str(),
+                ";d_{xy} vertex #minus particle wrt beamspot [cm];Events", 160, -rxyMax, rxyMax);
 
-            rDistxyzGlobal00Gen = fs->make<TH1F>(makeName("rdist_xyz_global00_gen").c_str(), ";|r| wrt (0,0,0) gen [cm];Events", 160, 0.0, rDistxyzMax);
-            rDistxyzGlobal00Reco = fs->make<TH1F>(makeName("rdist_xyz_global00_reco").c_str(), ";|r| wrt (0,0,0) reco [cm];Events", 160, 0.0, rDistxyzMax);
-            rDistxyzGlobal00Diff = fs->make<TH1F>(makeName("rdist_xyz_global00_diff").c_str(), ";reco - gen |r| wrt (0,0,0) [cm];Events", 160, -rDistxyzMax, rDistxyzMax);
+            rDistxyzBeamSpotGen  = fs->make<TH1F>(n("rdist_xyz_beamspot_gen").c_str(),
+                ";d_{3D} (particle wrt beamspot) [cm];Events", 160, 0.0, rxyzMax);
+            rDistxyzBeamSpotReco = fs->make<TH1F>(n("rdist_xyz_beamspot_reco").c_str(),
+                ";d_{3D} (vertex wrt beamspot) [cm];Events",   160, 0.0, rxyzMax);
+            rDistxyzBeamSpotDiff = fs->make<TH1F>(n("rdist_xyz_beamspot_diff").c_str(),
+                ";d_{3D} vertex #minus particle wrt beamspot [cm];Events", 160, -rxyzMax, rxyzMax);
 
-            rDistxyBeamSpotGen = fs->make<TH1F>(makeName("rdist_xy_beamspot_gen").c_str(), ";|r_{xy}| wrt beamspot gen [cm];Events", 160, 0.0, rDistxyMax);
-            rDistxyBeamSpotReco = fs->make<TH1F>(makeName("rdist_xy_beamspot_reco").c_str(), ";|r_{xy}| wrt beamspot reco [cm];Events", 160, 0.0, rDistxyMax);
-            rDistxyBeamSpotDiff = fs->make<TH1F>(makeName("rdist_xy_beamspot_diff").c_str(), ";reco - gen |r_{xy}| wrt beamspot [cm];Events", 160, -rDistxyMax, rDistxyMax);
+            // kinematics
+            ptGen  = fs->make<TH1F>(n("pt_gen").c_str(),  ";p_{T,gen} [GeV];Events",  180, 0.0, massMax);
+            ptReco = fs->make<TH1F>(n("pt_reco").c_str(), ";p_{T,reco} [GeV];Events", 180, 0.0, massMax);
+            ptDiff = fs->make<TH1F>(n("pt_diff").c_str(),
+                ";p_{T,reco} #minus p_{T,gen} [GeV];Events", 180, -ptDiffMax, ptDiffMax);
 
-            rDistxyzBeamSpotGen = fs->make<TH1F>(makeName("rdist_xyz_beamspot_gen").c_str(), ";|r| wrt beamspot gen [cm];Events", 160, 0.0, rDistxyzMax);
-            rDistxyzBeamSpotReco = fs->make<TH1F>(makeName("rdist_xyz_beamspot_reco").c_str(), ";|r| wrt beamspot reco [cm];Events", 160, 0.0, rDistxyzMax);
-            rDistxyzBeamSpotDiff = fs->make<TH1F>(makeName("rdist_xyz_beamspot_diff").c_str(), ";reco - gen |r| wrt beamspot [cm];Events", 160, -rDistxyzMax, rDistxyzMax);
+            etaGen  = fs->make<TH1F>(n("eta_gen").c_str(),  ";#eta_{gen};Events",  120, -6.0, 6.0);
+            etaReco = fs->make<TH1F>(n("eta_reco").c_str(), ";#eta_{reco};Events", 120, -6.0, 6.0);
+            etaDiff = fs->make<TH1F>(n("eta_diff").c_str(), ";#eta_{reco} #minus #eta_{gen};Events", 120, -6.0, 6.0);
 
-            ptGen = fs->make<TH1F>(makeName("pt_gen").c_str(), ";p_{T} gen [GeV];Events", 180, 0.0, massMax);
-            ptReco = fs->make<TH1F>(makeName("pt_reco").c_str(), ";p_{T} reco [GeV];Events", 180, 0.0, massMax);
-            ptDiff = fs->make<TH1F>(makeName("pt_diff").c_str(), ";reco - gen p_{T} [GeV];Events", 180, -ptDiffMax, ptDiffMax);
+            phiGen  = fs->make<TH1F>(n("phi_gen").c_str(),  ";#phi_{gen};Events",  128, -3.2, 3.2);
+            phiReco = fs->make<TH1F>(n("phi_reco").c_str(), ";#phi_{reco};Events", 128, -3.2, 3.2);
+            phiDiff = fs->make<TH1F>(n("phi_diff").c_str(), ";#phi_{reco} #minus #phi_{gen};Events", 128, -3.2, 3.2);
 
-            etaGen = fs->make<TH1F>(makeName("eta_gen").c_str(), ";#eta gen;Events", 120, -6.0, 6.0);
-            etaReco = fs->make<TH1F>(makeName("eta_reco").c_str(), ";#eta reco;Events", 120, -6.0, 6.0);
-            etaDiff = fs->make<TH1F>(makeName("eta_diff").c_str(), ";reco - gen #eta;Events", 120, -6.0, 6.0);
+            massGen  = fs->make<TH1F>(n("mass_gen").c_str(),  ";m_{gen} [GeV];Events",  180, 0.0, massMax);
+            massReco = fs->make<TH1F>(n("mass_reco").c_str(), ";m_{reco} [GeV];Events", 180, 0.0, massMax);
+            massDiff = fs->make<TH1F>(n("mass_diff").c_str(),
+                ";m_{reco} #minus m_{gen} [GeV];Events", 180, -massDiffMax, massDiffMax);
 
-            phiGen = fs->make<TH1F>(makeName("phi_gen").c_str(), ";#phi gen;Events", 128, -3.2, 3.2);
-            phiReco = fs->make<TH1F>(makeName("phi_reco").c_str(), ";#phi reco;Events", 128, -3.2, 3.2);
-            phiDiff = fs->make<TH1F>(makeName("phi_diff").c_str(), ";reco - gen #phi;Events", 128, -3.2, 3.2);
+            // vertex quality
+            chi2Reco         = fs->make<TH1F>(n("chi2_reco").c_str(),
+                ";reduced #chi^{2} (vertex);Vertices", 120, 0.0, 10.0);
+            significanceReco = fs->make<TH1F>(n("significance_reco").c_str(),
+                ";d_{BV}/#sigma(d_{BV}) (vertex);Vertices", 200, 0.0, 200.0);
+            dxyErrorReco     = fs->make<TH1F>(n("dxy_error_reco").c_str(),
+                ";#sigma(d_{BV}) (vertex) [cm];Vertices", 200, 0.0, 0.02);
 
-            massGen = fs->make<TH1F>(makeName("mass_gen").c_str(), ";mass gen [GeV];Events", 180, 0.0, massMax);
-            massReco = fs->make<TH1F>(makeName("mass_reco").c_str(), ";mass reco [GeV];Events", 180, 0.0, massMax);
-            massDiff = fs->make<TH1F>(makeName("mass_diff").c_str(), ";reco - gen mass [GeV];Events", 180, -massDiffMax, massDiffMax);
+            // matching
+            deltaR       = fs->make<TH1F>(n("deltaR").c_str(),
+                ";#DeltaR(reco vertex, gen particle);Events", 140, 0.0, 5.0);
+            matchDistance = fs->make<TH1F>(n("match_distance").c_str(),
+                (";match distance (" + modeLabel + ") [cm];Events").c_str(),
+                140, 0.0, 0.1);
 
-            chi2Reco = fs->make<TH1F>(makeName("chi2_reco").c_str(), ";reduced #chi^{2} reco;Events", 120, 0.0, 10.0);
-            significanceReco = fs->make<TH1F>(makeName("significance_reco").c_str(), ";d_{BV}/#sigma(d_{BV}) reco;Events", 200, 0.0, 200.0);
-            dxyErrorReco = fs->make<TH1F>(makeName("dxy_error_reco").c_str(), ";#sigma(d_{BV}) reco [cm];Events", 200, 0.0, 0.02);
+            // ΔR vs match distance vs gen particle d_xy wrt beamspot (3D diagnostic)
+            deltaR_vs_matchDist_vs_genDxyBS = fs->make<TH3F>(
+                n("deltaR_vs_matchDist_vs_genDxyBS").c_str(),
+                ";#DeltaR;Match Distance [cm];Gen d_{xy}^{BS} [cm]",
+                100, 0.0, 5.0,
+                100, 0.0, 0.1,
+                100, 0.0, rxyMax);
 
-            deltaR = fs->make<TH1F>(makeName("deltaR").c_str(), ";#DeltaR(reco, gen);Events", 140, 0.0, 5.0);
-            matchDistance = fs->make<TH1F>(makeName("match_distance").c_str(),
-                                           (std::string(";pairing metric for ") + modeLabel + " match [cm];Events").c_str(),
-                                           140, 0.0, 0.1);
+            // track-level plots for matched vertices
+            vtxNtracks      = fs->make<TH1F>(n("vtx_ntracks").c_str(),
+                ";N_{tracks} per matched vertex;Vertices", 50, -0.5, 49.5);
+            vtxTrackPt      = fs->make<TH1F>(n("vtx_track_pt").c_str(),
+                ";track p_{T} in matched vertex [GeV];Tracks", 100, 0.0, 100.0);
+            vtxTotalTrackPt = fs->make<TH1F>(n("vtx_total_track_pt").c_str(),
+                ";#Sigma p_{T} of tracks in matched vertex [GeV];Vertices", 100, 0.0, massMax);
         }
     };
 
     struct CounterSet {
-        uint64_t events = 0;
-        uint64_t truthEvents = 0;
+        uint64_t events           = 0;
+        uint64_t truthEvents      = 0;
         uint64_t eventsWithMatches = 0;
-        uint64_t selectedVertices = 0;
+        uint64_t selectedVertices  = 0;
     };
 
-    edm::EDGetTokenT<std::vector<reco::GenParticle>> genParticlesToken_;
-    edm::EDGetTokenT<std::vector<reco::Vertex>> scoutingVerticesToken_;
-    edm::EDGetTokenT<reco::BeamSpot> offlineBeamspotToken_;
-    edm::EDGetTokenT<std::vector<Run3ScoutingPFJet>> scoutingJetsToken_;
+    // ------------------------------------------------------------------
+    // Tokens / ES tokens
+    // ------------------------------------------------------------------
+    edm::EDGetTokenT<std::vector<reco::GenParticle>>   genParticlesToken_;
+    edm::EDGetTokenT<std::vector<reco::Vertex>>        scoutingVerticesToken_;
+    edm::EDGetTokenT<reco::BeamSpot>                   offlineBeamspotToken_;
+    edm::EDGetTokenT<std::vector<Run3ScoutingPFJet>>   scoutingJetsToken_;
+    edm::EDGetTokenT<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> trackToScoutingMapToken_;
     edm::ESGetToken<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd> bsOnlineToken_;
 
     bool useOnlineBeamSpot_ = false;
 
-    double cut_vtx_chi2_max_ = 3.0;
-    double cut_vtx_dbv_min_ = 0.01;
-    double cut_vtx_dbv_max_ = 2.0;
+    // ------------------------------------------------------------------
+    // Signal-region vertex cuts (analysis definition)
+    // ------------------------------------------------------------------
+    double       cut_vtx_chi2_max_   = 2.5;
+    double       cut_vtx_dbv_min_    = 0.01;
+    double       cut_vtx_dbv_max_    = 2.0;
     unsigned int cut_vtx_tracks_min_ = 8;
-    double cut_vtx_ddbv_max_ = 0.005;
-    double cut_vtx_cosT_min_ = 0.0;
+    double       cut_vtx_ddbv_max_   = 0.005;
+    double       cut_vtx_cosT_min_   = 0.0;
 
-    bool verbose_ = false;
-    bool verbose_unselected_ = false;
-    bool verbose_selected_only_ = false;
-    bool cost_raw_ = false;
+    // ------------------------------------------------------------------
+    // Jet gate
+    // ------------------------------------------------------------------
+    double       jet_pt_min_         = 30.0;
+    double       jet_eta_max_        = 2.5;
+    unsigned int min_selected_jets_  = 3;
+    bool         require_jet_selection_ = true;
 
-    double jet_pt_min_ = 30.0;
-    double jet_eta_max_ = 2.5;
-    unsigned int min_selected_jets_ = 3;
-    bool require_jet_selection_ = true;
+    // ------------------------------------------------------------------
+    // Misc config
+    // ------------------------------------------------------------------
+    bool        verbose_           = false;
+    bool        verbose_unselected_ = false;
 
-    MatchDistanceMode matchMode_ = MatchDistanceMode::k2D;
-    std::string matchModeLabel_ = "2D";
-    double massHint_ = 200.0;
-    double decayHint_ = 0.1;
+    MatchDistanceMode matchMode_      = MatchDistanceMode::k2D;
+    std::string       matchModeLabel_ = "2D";
+    double            massHint_       = 200.0;
+    double            decayHint_      = 0.1;
 
-    std::array<BucketPlots, 2> plots_;
-    CounterSet counters_;
-    // Configurable truth PDG selections (signed list, exact match)
     std::vector<int> parentPDG_;
     std::vector<int> daughterPDG_;
 
-    // Simple bookkeeping histograms
-    TH1F* h_nSelectedVertices = nullptr;
-    TH3F* h_bs_pos = nullptr;
-    TH1F* h_sel_vtx_ntracks = nullptr;
-    TH1F* h_sel_vtx_trackPt = nullptr;
+    // ------------------------------------------------------------------
+    // Histograms (global / bookkeeping)
+    // ------------------------------------------------------------------
+    std::array<BucketPlots, 2> plots_;
+    CounterSet counters_;
 
+    // per-event / all-selected-vertices (before matching)
+    TH1F* h_nSelectedVertices  = nullptr;  // N selected vertices per event
+    TH3F* h_bs_pos             = nullptr;  // beamspot (x,y,z) per event
+    TH1F* h_sel_vtx_ntracks    = nullptr;  // tracks per selected vertex (all events)
+    TH1F* h_sel_vtx_trackPt    = nullptr;  // track pT in selected vertices
+    TH1F* h_sel_vtx_totalTrackPt = nullptr; // scalar sum pT per selected vertex
+
+    // ------------------------------------------------------------------
+    // Static helpers
+    // ------------------------------------------------------------------
     static double wrapDeltaPhi(double a, double b) {
         constexpr double kPi = 3.14159265358979323846;
         double d = a - b;
-        while (d > kPi) d -= 2.0 * kPi;
+        while (d >  kPi) d -= 2.0 * kPi;
         while (d <= -kPi) d += 2.0 * kPi;
         return d;
     }
@@ -277,74 +376,65 @@ private:
         return std::hypot(x1 - x2, y1 - y2);
     }
 
-    static double dist3D(double x1, double y1, double z1, double x2, double y2, double z2) {
-        const double dx = x1 - x2;
-        const double dy = y1 - y2;
-        const double dz = z1 - z2;
-        return std::sqrt(dx * dx + dy * dy + dz * dz);
+    static double dist3D(double x1, double y1, double z1,
+                         double x2, double y2, double z2) {
+        return std::sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2));
     }
 
-    static double vertexDistxy(double x, double y) {
-        return std::hypot(x, y);
-    }
+    static double vertexDistxy(double x, double y)            { return std::hypot(x, y); }
+    static double vertexDistxyz(double x, double y, double z) { return std::sqrt(x*x + y*y + z*z); }
 
-    static double vertexDistxyz(double x, double y, double z) {
-        return std::sqrt(x * x + y * y + z * z);
-    }
-
-    double matchDistance(const reco::Vertex& v, const reco::GenParticle& g) const {
-        if (matchMode_ == MatchDistanceMode::k3D) {
+    double matchDistanceValue(const reco::Vertex& v, const reco::GenParticle& g) const {
+        if (matchMode_ == MatchDistanceMode::k3D)
             return dist3D(v.x(), v.y(), v.z(), g.vx(), g.vy(), g.vz());
-        }
         return dist2D(v.x(), v.y(), g.vx(), g.vy());
     }
 
-    double matchDistanceValue(const reco::Vertex& v, const reco::GenParticle& g) const {
-        return matchDistance(v, g);
-    }
-
-    LorentzVector makeVertexP4(const SelectedVertexInfo& info) const {
-        return info.p4;
-    }
-
-    std::array<const reco::GenParticle*, 2> findStops(const std::vector<reco::GenParticle>& genParticles, std::ostringstream* log) const {
+    // ------------------------------------------------------------------
+    // Gen-truth search
+    // ------------------------------------------------------------------
+    std::array<const reco::GenParticle*, 2>
+    findStops(const std::vector<reco::GenParticle>& genParticles,
+              std::ostringstream* log) const {
         std::array<const reco::GenParticle*, 2> stops{{nullptr, nullptr}};
         for (const auto& p : genParticles) {
-            // Check parent PDG (exact signed match against configured list)
-            const int pdg = p.pdgId();
-            if (std::find(parentPDG_.begin(), parentPDG_.end(), pdg) == parentPDG_.end()) continue;
-            int dauCountMatch = 0;
+            if (std::find(parentPDG_.begin(), parentPDG_.end(), p.pdgId()) == parentPDG_.end())
+                continue;
+            int dauMatch = 0;
             for (size_t d = 0; d < p.numberOfDaughters(); ++d) {
                 const reco::Candidate* dau = p.daughter(d);
                 if (!dau) continue;
-                const int pdgd = dau->pdgId();
-                if (std::find(daughterPDG_.begin(), daughterPDG_.end(), pdgd) != daughterPDG_.end()) ++dauCountMatch;
+                if (std::find(daughterPDG_.begin(), daughterPDG_.end(), dau->pdgId()) != daughterPDG_.end())
+                    ++dauMatch;
             }
-            if (dauCountMatch != 2) continue;
-            if (!stops[0]) stops[0] = &p;
-            else if (!stops[1]) {
-                stops[1] = &p;
-                break;
-            }
+            if (dauMatch != 2) continue;
+            if (!stops[0])      stops[0] = &p;
+            else if (!stops[1]) { stops[1] = &p; break; }
         }
         if (log && stops[0] && stops[1]) {
             *log << "========== 2 STOPs found ==========\n";
-            *log << "Stop1 -> x=" << stops[0]->vx() << " y=" << stops[0]->vy() << " z=" << stops[0]->vz()
-                 << " pt=" << stops[0]->pt() << " mass=" << stops[0]->mass()
-                 << " eta=" << stops[0]->eta() << " phi=" << stops[0]->phi()
-                 << " | vxy: " << std::hypot(stops[0]->vx(), stops[0]->vy()) << "\n";
-            *log << "Stop2 -> x=" << stops[1]->vx() << " y=" << stops[1]->vy() << " z=" << stops[1]->vz()
-                 << " pt=" << stops[1]->pt() << " mass=" << stops[1]->mass()
-                 << " eta=" << stops[1]->eta() << " phi=" << stops[1]->phi()
-                 << " | vxy: " << std::hypot(stops[1]->vx(), stops[1]->vy()) << "\n";
+            for (int i = 0; i < 2; ++i)
+                *log << "Stop" << (i+1)
+                     << " x=" << stops[i]->vx() << " y=" << stops[i]->vy() << " z=" << stops[i]->vz()
+                     << " pt=" << stops[i]->pt() << " mass=" << stops[i]->mass()
+                     << " eta=" << stops[i]->eta() << " phi=" << stops[i]->phi()
+                     << " r_xy=" << std::hypot(stops[i]->vx(), stops[i]->vy()) << "\n";
         }
         return stops;
     }
 
-    std::vector<SelectedVertexInfo> buildSelectedVertices(const edm::Handle<std::vector<reco::Vertex>>& scoutingVertices,
-                                                          const reco::BeamSpot* beamspot,
-                                                          bool eventPassesJetGate,
-                                                          std::ostringstream* log) const {
+    // ------------------------------------------------------------------
+    // Build selected vertex collection
+    //
+    // Every track in the input vertex is already accepted by the
+    // Vertexer (IPSig, hit cuts, ΔR jet gate, arbitration, N-1).
+    // We simply sum all tracks and apply signal-region cuts.
+    // ------------------------------------------------------------------
+    std::vector<SelectedVertexInfo>
+    buildSelectedVertices(const edm::Handle<std::vector<reco::Vertex>>& scoutingVertices,
+                          const reco::BeamSpot* beamspot,
+                          bool eventPassesJetGate,
+                          std::ostringstream* log) const {
         std::vector<SelectedVertexInfo> selected;
         if (!scoutingVertices.isValid()) return selected;
         selected.reserve(scoutingVertices->size());
@@ -356,79 +446,94 @@ private:
         for (size_t i = 0; i < scoutingVertices->size(); ++i) {
             const auto& v = scoutingVertices->at(i);
             SelectedVertexInfo info;
-            info.vertex = &v;
-            info.nTracks = v.tracksSize();
-            info.chi2 = v.normalizedChi2();
-            info.dBV = std::hypot(v.x() - bsX, v.y() - bsY);
-            info.dBVErr = std::hypot(v.xError(), v.yError());
-            info.rDistxyGlobal00 = vertexDistxy(v.x(), v.y());
-            info.rDistxyzGlobal00 = vertexDistxyz(v.x(), v.y(), v.z());
-            info.rDistxyBeamSpot = std::hypot(v.x() - bsX, v.y() - bsY);
-            info.rDistxyzBeamSpot = dist3D(v.x(), v.y(), v.z(), bsX, bsY, bsZ);
+            info.vertex  = &v;
+            info.chi2    = v.normalizedChi2();
+            info.dBV     = std::hypot(v.x() - bsX, v.y() - bsY);
+            info.dBVErr  = std::hypot(v.xError(), v.yError());
+            info.significance = (info.dBVErr > 0.0) ? info.dBV / info.dBVErr : -1.0;
+            info.rDistxyGlobal00   = vertexDistxy(v.x(), v.y());
+            info.rDistxyzGlobal00  = vertexDistxyz(v.x(), v.y(), v.z());
+            info.rDistxyBeamSpot   = std::hypot(v.x() - bsX, v.y() - bsY);
+            info.rDistxyzBeamSpot  = dist3D(v.x(), v.y(), v.z(), bsX, bsY, bsZ);
 
-            math::XYZVector rawPSum(0., 0., 0.);
-            math::XYZVector selectedPSum(0., 0., 0.);
-            double selectedEnergySum = 0.0;
-            unsigned int trackIndex = 0;
+            // Sum over all tracks – selection already done in Vertexer
+            math::XYZVector pSum(0., 0., 0.);
+            double energySum = 0.0;
+            info.nTracks = 0;
 
             std::ostringstream trackLog;
+            unsigned int trackIndex = 0;
             for (auto it = v.tracks_begin(); it != v.tracks_end(); ++it, ++trackIndex) {
                 reco::TrackRef trk = it->castTo<reco::TrackRef>();
-                if (trk.isNonnull()) {
-                    // Assume seed preselection (hit & IP cuts) already applied in Vertexer.
-                    rawPSum += trk->momentum();
-                    ++info.nTracks;
-                    selectedPSum += trk->momentum();
-                    selectedEnergySum += trackP4(*trk).E();
-                    info.selectedTrackPts.push_back(trk->pt());
+                if (!trk.isNonnull()) continue;
 
-                    if (verbose_unselected_) {
-                        trackLog << "track " << trackIndex << ": pT=" << trk->pt() << " -> SELECTED\n";
-                    }
+                pSum += trk->momentum();
+                energySum += trackP4(*trk).E();
+                ++info.nTracks;
+                info.trackPts.push_back(trk->pt());
+                info.totalPt += trk->pt();
+
+                if (verbose_unselected_) {
+                    trackLog << "    track " << trackIndex
+                             << ": pt=" << trk->pt()
+                             << " eta=" << trk->eta()
+                             << " phi=" << trk->phi()
+                             << " nhits=" << trk->numberOfValidHits()
+                             << " npixel=" << trk->hitPattern().numberOfValidPixelHits()
+                             << " nstrip=" << trk->hitPattern().numberOfValidStripHits()
+                             << " nlayers=" << trk->hitPattern().trackerLayersWithMeasurement()
+                             << "\n";
                 }
             }
 
+            // cos(angle between displacement and momentum)
             const math::XYZVector disp(v.x() - bsX, v.y() - bsY, v.z() - bsZ);
-            const math::XYZVector& pSum = cost_raw_ ? rawPSum : selectedPSum;
-            if (disp.R() > 0.0 && pSum.R() > 0.0) {
+            if (disp.R() > 0.0 && pSum.R() > 0.0)
                 info.cosT = disp.Dot(pSum) / (disp.R() * pSum.R());
-            }
 
-            const unsigned int nTracksForCut = info.nTracks;
-            const bool passChi2 = info.chi2 < cut_vtx_chi2_max_;
-            const bool passDbvMin = info.dBV >= cut_vtx_dbv_min_;
-            const bool passDbvMax = info.dBV < cut_vtx_dbv_max_;
-            const bool passDdbv = info.dBVErr < cut_vtx_ddbv_max_;
-            const bool passCosT = info.cosT > cut_vtx_cosT_min_;
-            const bool passNtk = nTracksForCut > cut_vtx_tracks_min_;
-            const bool passAll = passChi2 && passDbvMin && passDbvMax && passDdbv && passCosT && passNtk && eventPassesJetGate;
+            // Signal-region cuts
+            const bool passChi2   = info.chi2 < cut_vtx_chi2_max_;
+            const bool passDbvMin = info.dBV  >= cut_vtx_dbv_min_;
+            const bool passDbvMax = info.dBV  <  cut_vtx_dbv_max_;
+            const bool passDdbv   = info.dBVErr < cut_vtx_ddbv_max_;
+            const bool passCosT   = info.cosT   > cut_vtx_cosT_min_;
+            const bool passNtk    = info.nTracks > cut_vtx_tracks_min_;
+            const bool passAll    = passChi2 && passDbvMin && passDbvMax
+                                 && passDdbv && passCosT  && passNtk
+                                 && eventPassesJetGate;
 
-            if (verbose_unselected_) {
+            if (verbose_unselected_ && log) {
                 *log << "Vertex " << i << ":\n"
-                     << "  chi2/dof : " << info.chi2 << (passChi2 ? " (< " : " (!< ") << cut_vtx_chi2_max_ << ")\n"
-                     << "  dBV      : " << info.dBV << (passDbvMin ? " (>= " : " (!>= ") << cut_vtx_dbv_min_ << ") and "
-                     << (passDbvMax ? "(< " : "(!< ") << cut_vtx_dbv_max_ << "\n"
-                     << "  ddBV     : " << info.dBVErr << (passDdbv ? " (< " : " (!< ") << cut_vtx_ddbv_max_ << ")\n"
-                     << "  cosT     : " << info.cosT << (passCosT ? " (> " : " (!> ") << cut_vtx_cosT_min_ << ") ["
-                     << (cost_raw_ ? "raw" : "selected") << " track sum]\n"
-                     << "  nTracks  : " << nTracksForCut << (passNtk ? " (> " : " (!> ") << cut_vtx_tracks_min_ << ")\n";
-                *log << trackLog.str();
-                *log << "  -> STATUS: " << (passAll ? "PASSED ALL CUTS" : "FAILED") << "\n";
+                     << "  nTracks  : " << info.nTracks
+                     << (passNtk ? " (> " : " (!> ") << cut_vtx_tracks_min_ << ")\n"
+                     << "  chi2/dof : " << info.chi2
+                     << (passChi2 ? " (< " : " (!< ") << cut_vtx_chi2_max_ << ")\n"
+                     << "  d_BV     : " << info.dBV
+                     << (passDbvMin ? " (>= " : " (!>= ") << cut_vtx_dbv_min_
+                     << ") and " << (passDbvMax ? "(< " : "(!< ") << cut_vtx_dbv_max_ << ")\n"
+                     << "  sigma_dBV: " << info.dBVErr
+                     << (passDdbv ? " (< " : " (!< ") << cut_vtx_ddbv_max_ << ")\n"
+                     << "  cosT     : " << info.cosT
+                     << (passCosT ? " (> " : " (!> ") << cut_vtx_cosT_min_ << ")\n"
+                     << "  -> " << (passAll ? "PASSED" : "FAILED") << "\n"
+                     << trackLog.str();
             }
 
             if (passAll) {
-                info.p3 = selectedPSum;
-                const LorentzVector p4(selectedPSum.x(), selectedPSum.y(), selectedPSum.z(), selectedEnergySum);
-                info.p4 = p4;
+                info.p3 = pSum;
+                info.p4 = LorentzVector(pSum.x(), pSum.y(), pSum.z(), energySum);
                 selected.push_back(info);
             }
         }
-
         return selected;
     }
 
-    MatchSolution matchVertices(const std::vector<SelectedVertexInfo>& recoVertices,
-                                const std::array<const reco::GenParticle*, 2>& genStops) const {
+    // ------------------------------------------------------------------
+    // Optimal matching (min-score bipartite assignment)
+    // ------------------------------------------------------------------
+    MatchSolution
+    matchVertices(const std::vector<SelectedVertexInfo>& recoVertices,
+                  const std::array<const reco::GenParticle*, 2>& genStops) const {
         MatchSolution out;
         if (!genStops[0] || !genStops[1] || recoVertices.empty()) return out;
 
@@ -439,15 +544,8 @@ private:
         if (recoVertices.size() == 1) {
             const double d0 = dist(recoVertices[0], *genStops[0]);
             const double d1 = dist(recoVertices[0], *genStops[1]);
-            if (d0 <= d1) {
-                out.recoForGen[0] = 0;
-                out.distance[0] = d0;
-                out.totalScore = d0;
-            } else {
-                out.recoForGen[1] = 0;
-                out.distance[1] = d1;
-                out.totalScore = d1;
-            }
+            if (d0 <= d1) { out.recoForGen[0] = 0; out.distance[0] = d0; out.totalScore = d0; }
+            else          { out.recoForGen[1] = 0; out.distance[1] = d1; out.totalScore = d1; }
             return out;
         }
 
@@ -461,26 +559,23 @@ private:
                 const double scoreA = d00 + d11;
                 if (scoreA < out.totalScore) {
                     out.totalScore = scoreA;
-                    out.recoForGen[0] = static_cast<int>(i);
-                    out.recoForGen[1] = static_cast<int>(j);
-                    out.distance[0] = d00;
-                    out.distance[1] = d11;
+                    out.recoForGen = {static_cast<int>(i), static_cast<int>(j)};
+                    out.distance   = {d00, d11};
                 }
-
                 const double scoreB = d10 + d01;
                 if (scoreB < out.totalScore) {
                     out.totalScore = scoreB;
-                    out.recoForGen[0] = static_cast<int>(j);
-                    out.recoForGen[1] = static_cast<int>(i);
-                    out.distance[0] = d10;
-                    out.distance[1] = d01;
+                    out.recoForGen = {static_cast<int>(j), static_cast<int>(i)};
+                    out.distance   = {d10, d01};
                 }
             }
         }
-
         return out;
     }
 
+    // ------------------------------------------------------------------
+    // Fill per-bucket histograms for one matched pair
+    // ------------------------------------------------------------------
     void fillBucket(size_t bucketIndex,
                     const SelectedVertexInfo& reco,
                     const reco::GenParticle& gen,
@@ -490,339 +585,277 @@ private:
         const auto& h = plots_[bucketIndex];
         const auto& v = *reco.vertex;
 
+        const double bsX = beamspot ? beamspot->x0() : 0.0;
+        const double bsY = beamspot ? beamspot->y0() : 0.0;
+        const double bsZ = beamspot ? beamspot->z0() : 0.0;
+
+        // position residuals
         const double dx = v.x() - gen.vx();
         const double dy = v.y() - gen.vy();
         const double dz = v.z() - gen.vz();
 
-        const LorentzVector genP4(gen.px(), gen.py(), gen.pz(), gen.energy());
-        const LorentzVector recoP4 = reco.p4;
-
-        const double recoXGlobal00 = v.x();
-        const double recoYGlobal00 = v.y();
-        const double recoZGlobal00 = v.z();
-        const double genXGlobal00 = gen.vx();
-        const double genYGlobal00 = gen.vy();
-        const double genZGlobal00 = gen.vz();
-
-        const double bsX = beamspot ? beamspot->x0() : 0.0;
-        const double bsY = beamspot ? beamspot->y0() : 0.0;
-        const double bsZ = beamspot ? beamspot->z0() : 0.0;
-        const double recoXBeamSpot = v.x() - bsX;
-        const double recoYBeamSpot = v.y() - bsY;
-        const double recoZBeamSpot = v.z() - bsZ;
-        const double genXBeamSpot = gen.vx() - bsX;
-        const double genYBeamSpot = gen.vy() - bsY;
-        const double genZBeamSpot = gen.vz() - bsZ;
-
-        const double recoDistxy00 = reco.rDistxyGlobal00;
-        const double genDistxy00 = vertexDistxy(gen.vx(), gen.vy());
-        const double recoDistxyz00 = reco.rDistxyzGlobal00;
-        const double genDistxyz00 = vertexDistxyz(gen.vx(), gen.vy(), gen.vz());
-
-        const double recoDistxyBS = reco.rDistxyBeamSpot;
-        const double genDistxyBS = std::hypot(gen.vx() - bsX, gen.vy() - bsY);
-        const double recoDistxyzBS = reco.rDistxyzBeamSpot;
-        const double genDistxyzBS = dist3D(gen.vx(), gen.vy(), gen.vz(), bsX, bsY, bsZ);
-
-        const double ptGen = genP4.pt();
-        const double ptReco = recoP4.pt();
-        const double etaGen = genP4.eta();
-        const double etaReco = recoP4.eta();
-        const double phiGen = genP4.phi();
-        const double phiReco = recoP4.phi();
-        const double massGen = genP4.mass();
-        const double massReco = recoP4.mass();
-        const double dR = deltaR(recoP4, genP4);
-
-        if (h.xyDiff) h.xyDiff->Fill(dx, dy);
+        if (h.xyDiff)  h.xyDiff->Fill(dx, dy);
         if (h.xyzDiff) h.xyzDiff->Fill(dx, dy, dz);
 
-        if (h.xyGlobal00Gen) h.xyGlobal00Gen->Fill(genXGlobal00, genYGlobal00);
-        if (h.xyGlobal00Reco) h.xyGlobal00Reco->Fill(recoXGlobal00, recoYGlobal00);
-        if (h.xyzGlobal00Gen) h.xyzGlobal00Gen->Fill(genXGlobal00, genYGlobal00, genZGlobal00);
-        if (h.xyzGlobal00Reco) h.xyzGlobal00Reco->Fill(recoXGlobal00, recoYGlobal00, recoZGlobal00);
+        // absolute positions – global origin
+        if (h.xyGlobal00Gen)   h.xyGlobal00Gen->Fill(gen.vx(), gen.vy());
+        if (h.xyGlobal00Reco)  h.xyGlobal00Reco->Fill(v.x(), v.y());
+        if (h.xyzGlobal00Gen)  h.xyzGlobal00Gen->Fill(gen.vx(), gen.vy(), gen.vz());
+        if (h.xyzGlobal00Reco) h.xyzGlobal00Reco->Fill(v.x(), v.y(), v.z());
 
-        if (h.xyBeamSpotGen) h.xyBeamSpotGen->Fill(genXBeamSpot, genYBeamSpot);
-        if (h.xyBeamSpotReco) h.xyBeamSpotReco->Fill(recoXBeamSpot, recoYBeamSpot);
+        // absolute positions – beamspot
+        if (h.xyBeamSpotGen)   h.xyBeamSpotGen->Fill(gen.vx()-bsX, gen.vy()-bsY);
+        if (h.xyBeamSpotReco)  h.xyBeamSpotReco->Fill(v.x()-bsX,   v.y()-bsY);
+        if (h.xyzBeamSpotGen)  h.xyzBeamSpotGen->Fill(gen.vx()-bsX, gen.vy()-bsY, gen.vz()-bsZ);
+        if (h.xyzBeamSpotReco) h.xyzBeamSpotReco->Fill(v.x()-bsX,   v.y()-bsY,   v.z()-bsZ);
 
-        if (h.xyzBeamSpotGen) h.xyzBeamSpotGen->Fill(genXBeamSpot, genYBeamSpot, genZBeamSpot);
-        if (h.xyzBeamSpotReco) h.xyzBeamSpotReco->Fill(recoXBeamSpot, recoYBeamSpot, recoZBeamSpot);
+        // radial distances – global origin
+        const double genRxy00   = vertexDistxy(gen.vx(), gen.vy());
+        const double genRxyz00  = vertexDistxyz(gen.vx(), gen.vy(), gen.vz());
+        const double recoRxy00  = reco.rDistxyGlobal00;
+        const double recoRxyz00 = reco.rDistxyzGlobal00;
 
-        if (h.rDistxyGlobal00Gen) h.rDistxyGlobal00Gen->Fill(genDistxy00);
-        if (h.rDistxyGlobal00Reco) h.rDistxyGlobal00Reco->Fill(recoDistxy00);
-        if (h.rDistxyGlobal00Diff) h.rDistxyGlobal00Diff->Fill(recoDistxy00 - genDistxy00);
+        if (h.rDistxyGlobal00Gen)   h.rDistxyGlobal00Gen->Fill(genRxy00);
+        if (h.rDistxyGlobal00Reco)  h.rDistxyGlobal00Reco->Fill(recoRxy00);
+        if (h.rDistxyGlobal00Diff)  h.rDistxyGlobal00Diff->Fill(recoRxy00 - genRxy00);
+        if (h.rDistxyzGlobal00Gen)  h.rDistxyzGlobal00Gen->Fill(genRxyz00);
+        if (h.rDistxyzGlobal00Reco) h.rDistxyzGlobal00Reco->Fill(recoRxyz00);
+        if (h.rDistxyzGlobal00Diff) h.rDistxyzGlobal00Diff->Fill(recoRxyz00 - genRxyz00);
 
-        if (h.rDistxyzGlobal00Gen) h.rDistxyzGlobal00Gen->Fill(genDistxyz00);
-        if (h.rDistxyzGlobal00Reco) h.rDistxyzGlobal00Reco->Fill(recoDistxyz00);
-        if (h.rDistxyzGlobal00Diff) h.rDistxyzGlobal00Diff->Fill(recoDistxyz00 - genDistxyz00);
+        // radial distances – beamspot
+        const double genDxyBS   = std::hypot(gen.vx()-bsX, gen.vy()-bsY);
+        const double genDxyzBS  = dist3D(gen.vx(), gen.vy(), gen.vz(), bsX, bsY, bsZ);
+        const double recoDxyBS  = reco.rDistxyBeamSpot;
+        const double recoDxyzBS = reco.rDistxyzBeamSpot;
 
-        if (h.rDistxyBeamSpotGen) h.rDistxyBeamSpotGen->Fill(genDistxyBS);
-        if (h.rDistxyBeamSpotReco) h.rDistxyBeamSpotReco->Fill(recoDistxyBS);
-        if (h.rDistxyBeamSpotDiff) h.rDistxyBeamSpotDiff->Fill(recoDistxyBS - genDistxyBS);
+        if (h.rDistxyBeamSpotGen)   h.rDistxyBeamSpotGen->Fill(genDxyBS);
+        if (h.rDistxyBeamSpotReco)  h.rDistxyBeamSpotReco->Fill(recoDxyBS);
+        if (h.rDistxyBeamSpotDiff)  h.rDistxyBeamSpotDiff->Fill(recoDxyBS - genDxyBS);
+        if (h.rDistxyzBeamSpotGen)  h.rDistxyzBeamSpotGen->Fill(genDxyzBS);
+        if (h.rDistxyzBeamSpotReco) h.rDistxyzBeamSpotReco->Fill(recoDxyzBS);
+        if (h.rDistxyzBeamSpotDiff) h.rDistxyzBeamSpotDiff->Fill(recoDxyzBS - genDxyzBS);
 
-        if (h.rDistxyzBeamSpotGen) h.rDistxyzBeamSpotGen->Fill(genDistxyzBS);
-        if (h.rDistxyzBeamSpotReco) h.rDistxyzBeamSpotReco->Fill(recoDistxyzBS);
-        if (h.rDistxyzBeamSpotDiff) h.rDistxyzBeamSpotDiff->Fill(recoDistxyzBS - genDistxyzBS);
+        // kinematics
+        const LorentzVector genP4(gen.px(), gen.py(), gen.pz(), gen.energy());
+        const LorentzVector& recoP4 = reco.p4;
 
-        if (h.ptGen) h.ptGen->Fill(ptGen);
-        if (h.ptReco) h.ptReco->Fill(ptReco);
-        if (h.ptDiff) h.ptDiff->Fill(ptReco - ptGen);
+        if (h.ptGen)   h.ptGen->Fill(genP4.pt());
+        if (h.ptReco)  h.ptReco->Fill(recoP4.pt());
+        if (h.ptDiff)  h.ptDiff->Fill(recoP4.pt() - genP4.pt());
+        if (h.etaGen)  h.etaGen->Fill(genP4.eta());
+        if (h.etaReco) h.etaReco->Fill(recoP4.eta());
+        if (h.etaDiff) h.etaDiff->Fill(recoP4.eta() - genP4.eta());
+        if (h.phiGen)  h.phiGen->Fill(genP4.phi());
+        if (h.phiReco) h.phiReco->Fill(recoP4.phi());
+        if (h.phiDiff) h.phiDiff->Fill(wrapDeltaPhi(recoP4.phi(), genP4.phi()));
+        if (h.massGen)  h.massGen->Fill(genP4.mass());
+        if (h.massReco) h.massReco->Fill(recoP4.mass());
+        if (h.massDiff) h.massDiff->Fill(recoP4.mass() - genP4.mass());
 
-        if (h.etaGen) h.etaGen->Fill(etaGen);
-        if (h.etaReco) h.etaReco->Fill(etaReco);
-        if (h.etaDiff) h.etaDiff->Fill(etaReco - etaGen);
+        // vertex quality
+        if (h.chi2Reco)         h.chi2Reco->Fill(reco.chi2);
+        if (h.significanceReco) h.significanceReco->Fill(reco.significance);
+        if (h.dxyErrorReco)     h.dxyErrorReco->Fill(reco.dBVErr);
 
-        if (h.phiGen) h.phiGen->Fill(phiGen);
-        if (h.phiReco) h.phiReco->Fill(phiReco);
-        if (h.phiDiff) h.phiDiff->Fill(wrapDeltaPhi(phiReco, phiGen));
-
-        if (h.massGen) h.massGen->Fill(massGen);
-        if (h.massReco) h.massReco->Fill(massReco);
-        if (h.massDiff) h.massDiff->Fill(massReco - massGen);
-
-        if (h.chi2Reco) h.chi2Reco->Fill(reco.chi2);
-        if (h.significanceReco) h.significanceReco->Fill((reco.dBVErr > 0.0) ? (reco.dBV / reco.dBVErr) : -1.0);
-        if (h.dxyErrorReco) h.dxyErrorReco->Fill(reco.dBVErr);
-
-        if (h.deltaR) h.deltaR->Fill(dR);
+        // matching
+        const double dR = deltaR(recoP4, genP4);
+        if (h.deltaR)        h.deltaR->Fill(dR);
         if (h.matchDistance) h.matchDistance->Fill(matchMetric);
-    }
 
-    void fillCounters(const std::vector<SelectedVertexInfo>& recoVertices,
-                      const std::array<const reco::GenParticle*, 2>& genStops,
-                      const MatchSolution& match) const {
-        (void)recoVertices;
-        (void)genStops;
-        (void)match;
+        // ΔR vs match distance vs gen particle d_xy wrt beamspot
+        if (h.deltaR_vs_matchDist_vs_genDxyBS)
+            h.deltaR_vs_matchDist_vs_genDxyBS->Fill(dR, matchMetric, genDxyBS);
+
+        // per-vertex track plots
+        if (h.vtxNtracks)      h.vtxNtracks->Fill(static_cast<double>(reco.nTracks));
+        if (h.vtxTotalTrackPt) h.vtxTotalTrackPt->Fill(reco.totalPt);
+        if (h.vtxTrackPt) {
+            for (double pt : reco.trackPts) h.vtxTrackPt->Fill(pt);
+        }
     }
 
 public:
     explicit GenScoutingComparer(const edm::ParameterSet& config) {
         usesResource("TFileService");
 
-        genParticlesToken_ = consumes<std::vector<reco::GenParticle>>(config.getParameter<edm::InputTag>("genParticles"));
+        genParticlesToken_    = consumes<std::vector<reco::GenParticle>>(config.getParameter<edm::InputTag>("genParticles"));
         scoutingVerticesToken_ = consumes<std::vector<reco::Vertex>>(config.getParameter<edm::InputTag>("scoutingVertices"));
-        offlineBeamspotToken_ = consumes<reco::BeamSpot>(config.getParameter<edm::InputTag>("beamspot"));
-        scoutingJetsToken_ = consumes<std::vector<Run3ScoutingPFJet>>(config.getParameter<edm::InputTag>("scoutingJets"));
-        bsOnlineToken_ = esConsumes<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd>();
+        offlineBeamspotToken_  = consumes<reco::BeamSpot>(config.getParameter<edm::InputTag>("beamspot"));
+        scoutingJetsToken_     = consumes<std::vector<Run3ScoutingPFJet>>(config.getParameter<edm::InputTag>("scoutingJets"));
+        bsOnlineToken_         = esConsumes<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd>();
 
-        cut_vtx_chi2_max_ = config.getParameter<double>("vtx_chi2_max");
-        cut_vtx_dbv_min_ = config.getParameter<double>("vtx_dbv_min");
-        cut_vtx_dbv_max_ = config.getParameter<double>("vtx_dbv_max");
+        cut_vtx_chi2_max_   = config.getParameter<double>("vtx_chi2_max");
+        cut_vtx_dbv_min_    = config.getParameter<double>("vtx_dbv_min");
+        cut_vtx_dbv_max_    = config.getParameter<double>("vtx_dbv_max");
         cut_vtx_tracks_min_ = config.getParameter<unsigned int>("vtx_tracks_min");
-        cut_vtx_ddbv_max_ = config.getParameter<double>("vtx_ddbv_max");
-        cut_vtx_cosT_min_ = config.getParameter<double>("vtx_cosT_min");
+        cut_vtx_ddbv_max_   = config.getParameter<double>("vtx_ddbv_max");
+        cut_vtx_cosT_min_   = config.getParameter<double>("vtx_cosT_min");
 
-        // track hit preselection is performed in the Vertexer; comparer does not apply hit cuts
+        jet_pt_min_          = config.getParameter<double>("jet_pt_min");
+        jet_eta_max_         = config.getParameter<double>("jet_eta_max");
+        min_selected_jets_   = config.getParameter<unsigned int>("min_selected_jets");
+        require_jet_selection_ = config.getParameter<bool>("require_jet_selection");
 
-        verbose_ = config.getUntrackedParameter<bool>("verbose", false);
+        useOnlineBeamSpot_ = config.getUntrackedParameter<bool>("useOnlineBeamSpot", true);
+        massHint_          = config.getUntrackedParameter<double>("masshint", 200.0);
+        decayHint_         = config.getUntrackedParameter<double>("decayhint", 0.1);
+        verbose_           = config.getUntrackedParameter<bool>("verbose", false);
         verbose_unselected_ = config.getUntrackedParameter<bool>("verbose_unselected", false);
-        verbose_selected_only_ = config.getUntrackedParameter<bool>("verbose_selected_only", false);
-        cost_raw_ = config.getUntrackedParameter<bool>("cost_raw", false);
-
-        jet_pt_min_ = config.getParameter<double>("jet_pt_min");
-        jet_eta_max_ = config.getParameter<double>("jet_eta_max");
-        min_selected_jets_ = config.getParameter<unsigned int>("min_selected_jets");
-        require_jet_selection_ = config.getUntrackedParameter<bool>("require_jet_selection", true);
-        massHint_ = config.getUntrackedParameter<double>("masshint", 200.0);
-        decayHint_ = config.getUntrackedParameter<double>("decayhint", 0.1);
-        useOnlineBeamSpot_ = config.getUntrackedParameter<bool>("useOnlineBeamSpot", false);
 
         matchModeLabel_ = config.getUntrackedParameter<std::string>("match_distance_mode", "2D");
         if (matchModeLabel_ == "3D" || matchModeLabel_ == "3d") {
-            matchMode_ = MatchDistanceMode::k3D;
-            matchModeLabel_ = "3D";
+            matchMode_ = MatchDistanceMode::k3D; matchModeLabel_ = "3D";
         } else {
-            matchMode_ = MatchDistanceMode::k2D;
-            matchModeLabel_ = "2D";
+            matchMode_ = MatchDistanceMode::k2D; matchModeLabel_ = "2D";
         }
 
-        // Truth PDG-ID configuration (allow user to provide lists)
-        const auto parentList = config.getUntrackedParameter<std::vector<int>>("parent_pdgids", std::vector<int>{1000006, -1000006});
-        const auto daughterList = config.getUntrackedParameter<std::vector<int>>("daughter_pdgids", std::vector<int>{1, -1});
-        parentPDG_.clear();
-        daughterPDG_.clear();
-        for (int v : parentList) parentPDG_.push_back(v);
-        for (int v : daughterList) daughterPDG_.push_back(v);
+        for (int v : config.getUntrackedParameter<std::vector<int>>("parent_pdgids",  {1000006, -1000006})) parentPDG_.push_back(v);
+        for (int v : config.getUntrackedParameter<std::vector<int>>("daughter_pdgids", {1, -1}))            daughterPDG_.push_back(v);
     }
 
     void beginJob() override {
         edm::Service<TFileService> fs;
-        if (!fs) {
-            edm::LogWarning("GenScoutingComparer") << "TFileService missing";
-            return;
-        }
+        if (!fs) { edm::LogWarning("GenScoutingComparer") << "TFileService missing"; return; }
 
         plots_[0].book(fs, "1", matchModeLabel_, massHint_, decayHint_);
         plots_[1].book(fs, "2", matchModeLabel_, massHint_, decayHint_);
 
-        // Book simple bookkeeping histograms
-        h_nSelectedVertices = fs->make<TH1F>("n_selected_vertices", "n_selected_vertices;N;Events", 21, -0.5, 20.5);
-        // Single 3D histogram for beamspot positions (x,y,z)
-        h_bs_pos = fs->make<TH3F>("beamspot_xyz", "beamspot_xyz; x [cm]; y [cm]; z [cm]", 200, -0.1, 0.1, 200, -0.1, 0.1, 400, -50.0, 50.0);
-        h_sel_vtx_ntracks = fs->make<TH1F>("selected_vertex_ntracks", "selected_vertex_ntracks;ntracks;Vertices", 50, -0.5, 49.5);
-        h_sel_vtx_trackPt = fs->make<TH1F>("selected_vertex_track_pt", "selected_vertex_track_pt;track p_{T} [GeV];Entries", 100, 0.0, 100.0);
+        // global bookkeeping histograms
+        h_nSelectedVertices  = fs->make<TH1F>("n_selected_vertices",
+            "N selected vertices per event;N_{sel. vtx};Events", 21, -0.5, 20.5);
+        h_bs_pos             = fs->make<TH3F>("beamspot_xyz",
+            "Beamspot position per event;x_{BS} [cm];y_{BS} [cm];z_{BS} [cm]",
+            200, -0.1, 0.1, 200, -0.1, 0.1, 400, -50.0, 50.0);
+        h_sel_vtx_ntracks    = fs->make<TH1F>("sel_vtx_ntracks",
+            "Tracks per selected vertex (all events);N_{tracks};Vertices",
+            50, -0.5, 49.5);
+        h_sel_vtx_trackPt    = fs->make<TH1F>("sel_vtx_track_pt",
+            "Track p_{T} in selected vertices (all events);p_{T,track} [GeV];Tracks",
+            100, 0.0, 100.0);
+        h_sel_vtx_totalTrackPt = fs->make<TH1F>("sel_vtx_total_track_pt",
+            "#Sigma p_{T} of tracks per selected vertex (all events);#Sigma p_{T} [GeV];Vertices",
+            100, 0.0, 3.0 * massHint_);
 
-        edm::LogInfo("GenScoutingComparer") << "setup done";
-        edm::LogInfo("GenScoutingComparer") << "match mode: " << matchModeLabel_;
+        edm::LogInfo("GenScoutingComparer") << "setup done; match mode: " << matchModeLabel_;
     }
 
     void analyze(const edm::Event& event, const edm::EventSetup& eventSetup) override {
         ++counters_.events;
 
         std::ostringstream log;
-        log << "========== Event: " << event.id().event() << " ==========\n";
+        if (verbose_ || verbose_unselected_)
+            log << "========== Event: " << event.id().event() << " ==========\n";
 
+        // ---- gen particles ----
         edm::Handle<std::vector<reco::GenParticle>> genParticles;
-        if (!event.getByToken(genParticlesToken_, genParticles) || !genParticles.isValid()) {
-            return;
-        }
+        if (!event.getByToken(genParticlesToken_, genParticles) || !genParticles.isValid()) return;
 
+        // ---- reco vertices ----
         edm::Handle<std::vector<reco::Vertex>> scoutingVertices;
-        if (!event.getByToken(scoutingVerticesToken_, scoutingVertices) || !scoutingVertices.isValid()) {
-            return;
-        }
+        if (!event.getByToken(scoutingVerticesToken_, scoutingVertices) || !scoutingVertices.isValid()) return;
 
+        // ---- beamspot (offline fallback, online preferred) ----
         edm::Handle<reco::BeamSpot> beamspot;
-        const bool haveOfflineBeamSpot = event.getByToken(offlineBeamspotToken_, beamspot) && beamspot.isValid();
-        const reco::BeamSpot* bs = haveOfflineBeamSpot ? &(*beamspot) : nullptr;
+        const bool haveOffline = event.getByToken(offlineBeamspotToken_, beamspot) && beamspot.isValid();
+        const reco::BeamSpot* bs = haveOffline ? &(*beamspot) : nullptr;
 
         if (useOnlineBeamSpot_) {
             auto bsOnlineHandle = eventSetup.getHandle(bsOnlineToken_);
             if (bsOnlineHandle.isValid()) {
-                static reco::BeamSpot onlineBeamSpot;
-                reco::BeamSpot::CovarianceMatrix onlineError;
-                for (int i = 0; i < 7; ++i) {
-                    for (int j = i; j < 7; ++j) {
-                        onlineError(i, j) = bsOnlineHandle->covariance(i, j);
-                    }
-                }
+                static reco::BeamSpot onlineBs;
+                reco::BeamSpot::CovarianceMatrix onlineCov;
+                for (int i = 0; i < 7; ++i)
+                    for (int j = i; j < 7; ++j)
+                        onlineCov(i, j) = bsOnlineHandle->covariance(i, j);
                 const reco::BeamSpot::Point onlinePos(bsOnlineHandle->x(), bsOnlineHandle->y(), bsOnlineHandle->z());
-                onlineBeamSpot = reco::BeamSpot(onlinePos,
-                                                bsOnlineHandle->sigmaZ(),
-                                                bsOnlineHandle->dxdz(),
-                                                bsOnlineHandle->dydz(),
-                                                bsOnlineHandle->beamWidthX(),
-                                                onlineError);
-                bs = &onlineBeamSpot;
-            } else if (bs) {
-                edm::LogWarning("GenScoutingComparer")
-                    << "Online beamspot unavailable; proceeding with offline beamspot as fallback.";
+                onlineBs = reco::BeamSpot(onlinePos, bsOnlineHandle->sigmaZ(),
+                                          bsOnlineHandle->dxdz(), bsOnlineHandle->dydz(),
+                                          bsOnlineHandle->beamWidthX(), onlineCov);
+                bs = &onlineBs;
             } else {
                 edm::LogWarning("GenScoutingComparer")
-                    << "Online beamspot unavailable and offline beamspot missing; proceeding with a null beamspot.";
+                    << "Online beamspot unavailable; using " << (bs ? "offline" : "null") << " beamspot.";
             }
         }
 
+        // ---- jet gate ----
         edm::Handle<std::vector<Run3ScoutingPFJet>> scoutingJets;
         event.getByToken(scoutingJetsToken_, scoutingJets);
 
-        unsigned int selectedJets = 0;
+        unsigned int nSelectedJets = 0;
         if (scoutingJets.isValid()) {
-            for (const auto& jet : *scoutingJets) {
-                if (jet.pt() > jet_pt_min_ && std::abs(jet.eta()) < jet_eta_max_) {
-                    ++selectedJets;
-                }
-            }
+            for (const auto& jet : *scoutingJets)
+                if (jet.pt() > jet_pt_min_ && std::abs(jet.eta()) < jet_eta_max_)
+                    ++nSelectedJets;
         }
-        const bool passJetSelection = (selectedJets >= min_selected_jets_);
-        const bool eventPassesJetGate = (!require_jet_selection_ || passJetSelection);
+        const bool eventPassesJetGate = !require_jet_selection_ || (nSelectedJets >= min_selected_jets_);
 
-        if (scoutingJets.isValid()) {
-            // jet gate
-        }
-
+        // ---- gen truth ----
         auto stops = findStops(*genParticles, (verbose_ || verbose_unselected_) ? &log : nullptr);
         if (stops[0] && stops[1]) ++counters_.truthEvents;
 
-        if ((verbose_ || verbose_unselected_) && stops[0] && stops[1]) {
-            log << "========== 2 STOPs found ==========\n";
-        }
-
-        std::vector<SelectedVertexInfo> selectedVertices = buildSelectedVertices(
-            scoutingVertices, bs, eventPassesJetGate,
-            (verbose_ || verbose_unselected_) ? &log : nullptr);
+        // ---- selected reco vertices ----
+        std::vector<SelectedVertexInfo> selectedVertices =
+            buildSelectedVertices(scoutingVertices, bs, eventPassesJetGate,
+                                  (verbose_ || verbose_unselected_) ? &log : nullptr);
 
         counters_.selectedVertices += selectedVertices.size();
+
+        // global bookkeeping fills (every event)
         if (h_nSelectedVertices) h_nSelectedVertices->Fill(static_cast<int>(selectedVertices.size()));
-        if (bs) {
-            if (h_bs_pos) h_bs_pos->Fill(bs->x0(), bs->y0(), bs->z0());
-        }
-        for (const auto & vinfo : selectedVertices) {
-            if (h_sel_vtx_ntracks) h_sel_vtx_ntracks->Fill(static_cast<double>(vinfo.nTracks));
-            for (double pt : vinfo.selectedTrackPts) if (h_sel_vtx_trackPt) h_sel_vtx_trackPt->Fill(pt);
-        }
-        if (selectedVertices.empty() && verbose_selected_only_) {
-            if (verbose_ || verbose_unselected_) {
-                edm::LogVerbatim("GenScoutingComparer") << log.str();
-            }
-            return;
+        if (bs && h_bs_pos)      h_bs_pos->Fill(bs->x0(), bs->y0(), bs->z0());
+        for (const auto& vinfo : selectedVertices) {
+            if (h_sel_vtx_ntracks)     h_sel_vtx_ntracks->Fill(static_cast<double>(vinfo.nTracks));
+            if (h_sel_vtx_totalTrackPt) h_sel_vtx_totalTrackPt->Fill(vinfo.totalPt);
+            if (h_sel_vtx_trackPt)
+                for (double pt : vinfo.trackPts) h_sel_vtx_trackPt->Fill(pt);
         }
 
-        if (verbose_ || verbose_unselected_) {
-            log << "========== SCOUTING JETS (" << (scoutingJets.isValid() ? scoutingJets->size() : 0) << ") ==========\n";
-            log << "Selected jets passing pT > " << jet_pt_min_ << " and |eta| < " << jet_eta_max_ << ": "
-                << selectedJets << " / " << (scoutingJets.isValid() ? scoutingJets->size() : 0) << "\n";
-            if (scoutingJets.isValid() && !scoutingJets->empty()) {
-                log << "Leading jet -> Pt: " << scoutingJets->front().pt()
-                    << " | Eta: " << scoutingJets->front().eta()
-                    << " | Phi: " << scoutingJets->front().phi() << "\n";
-            }
-        }
-
+        // ---- matching and resolution plots ----
         if (stops[0] && stops[1] && !selectedVertices.empty()) {
             const MatchSolution match = matchVertices(selectedVertices, stops);
 
-            for (int genIndex = 0; genIndex < 2; ++genIndex) {
-                const int recoIndex = match.recoForGen[genIndex];
-                if (recoIndex < 0) continue;
-
-                const int otherGenIndex = 1 - genIndex;
-                const SelectedVertexInfo* otherReco = nullptr;
-                if (otherGenIndex >= 0 && otherGenIndex < 2) {
-                    const int otherRecoIndex = match.recoForGen[otherGenIndex];
-                    if (otherRecoIndex >= 0 && otherRecoIndex != recoIndex) {
-                        otherReco = &selectedVertices.at(static_cast<size_t>(otherRecoIndex));
-                    }
-                }
-                (void)otherReco;
-                fillBucket(static_cast<size_t>(genIndex), selectedVertices.at(static_cast<size_t>(recoIndex)), *stops[genIndex], bs, match.distance[genIndex]);
+            for (int gi = 0; gi < 2; ++gi) {
+                const int ri = match.recoForGen[gi];
+                if (ri < 0) continue;
+                fillBucket(static_cast<size_t>(gi),
+                           selectedVertices.at(static_cast<size_t>(ri)),
+                           *stops[gi], bs, match.distance[gi]);
             }
 
-            if (match.recoForGen[0] >= 0 || match.recoForGen[1] >= 0) {
+            if (match.recoForGen[0] >= 0 || match.recoForGen[1] >= 0)
                 ++counters_.eventsWithMatches;
-            }
 
             if (verbose_) {
-                log << "========== SELECTED RECO SCOUTING VERTICES (" << selectedVertices.size() << ") ==========\n";
-                log << "Jet selection: " << (passJetSelection ? "PASSED" : "FAILED")
-                    << " (need >= " << min_selected_jets_ << " selected jets)\n";
+                log << "========== SCOUTING JETS selected=" << nSelectedJets
+                    << " / total=" << (scoutingJets.isValid() ? scoutingJets->size() : 0)
+                    << " (need>=" << min_selected_jets_ << ") => "
+                    << (eventPassesJetGate ? "PASS" : "FAIL") << " ==========\n";
+                log << "========== SELECTED RECO VERTICES (" << selectedVertices.size() << ") ==========\n";
                 for (size_t i = 0; i < selectedVertices.size(); ++i) {
                     const auto& info = selectedVertices[i];
-                    log << "  Vertex " << i
-                        << " x=" << info.vertex->x()
-                        << " y=" << info.vertex->y()
-                        << " z=" << info.vertex->z()
-                        << " pt=" << info.p4.pt()
-                        << " mass=" << info.p4.mass()
-                        << " eta=" << info.p4.eta()
-                        << " phi=" << info.p4.phi()
-                        << " [nTracks=" << info.nTracks << "]\n";
+                    log << "  Vtx " << i
+                        << "  x=" << info.vertex->x() << " y=" << info.vertex->y() << " z=" << info.vertex->z()
+                        << "  pt=" << info.p4.pt() << "  mass=" << info.p4.mass()
+                        << "  nTracks=" << info.nTracks
+                        << "  sumPt=" << info.totalPt
+                        << "  chi2=" << info.chi2
+                        << "  dBV=" << info.dBV << "+/-" << info.dBVErr
+                        << "  sig=" << info.significance << "\n";
                 }
             }
         }
 
-        if (verbose_ || verbose_unselected_) {
+        if (verbose_ || verbose_unselected_)
             edm::LogVerbatim("GenScoutingComparer") << log.str();
-        }
     }
 
     void endJob() override {
         edm::LogInfo("GenScoutingComparer")
-            << "events=" << counters_.events
-            << " truthEvents=" << counters_.truthEvents
+            << "events="          << counters_.events
+            << " truthEvents="   << counters_.truthEvents
             << " matchedEvents=" << counters_.eventsWithMatches
-            << " selectedVertices=" << counters_.selectedVertices;
+            << " selectedVtx="   << counters_.selectedVertices;
     }
 };
 
