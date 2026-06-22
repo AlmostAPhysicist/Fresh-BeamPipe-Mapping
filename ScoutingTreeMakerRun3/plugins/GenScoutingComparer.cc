@@ -21,6 +21,10 @@
 
 #include "CondFormats/BeamSpotObjects/interface/BeamSpotOnlineObjects.h"
 #include "CondFormats/DataRecord/interface/BeamSpotOnlineHLTObjectsRcd.h"
+#include "TrackingTools/IPTools/interface/IPTools.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrack.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
@@ -148,21 +152,24 @@ private:
         TH1F* vtxTrackPt    = nullptr;  // pT of each track in matched vertex
         TH1F* vtxTotalTrackPt = nullptr; // scalar sum of track pT per matched vertex
 
+
+
         void book(edm::Service<TFileService>& fs,
                   const std::string& suffix,
                   const std::string& modeLabel,
                   double massHint,
                   double decayHint) {
             const auto n = [&](const std::string& base) { return base + "_" + suffix; };
-
-            const double xyPosMax   = 5.0  * decayHint;
-            const double xyzPosMax  = 100.0 * decayHint;
-            const double xyDiffMax  = 1.0  * decayHint;
-            const double xyzDiffMax = 1.0  * decayHint;
-            const double rxyMax     = 10.0 * decayHint;
-            const double rxyzMax    = 100.0 * decayHint;
-            const double massMax    = 3.0  * massHint;
-            const double massDiffMax = massHint;
+            
+            const double scaling_factor = (0.1 + decayHint/10);
+            const double xyPosMax   = 5.0  * scaling_factor;
+            const double xyzPosMax  = 100.0 * scaling_factor;
+            const double xyDiffMax  = 1.0  * scaling_factor;
+            const double xyzDiffMax = 1.0  * scaling_factor;
+            const double rxyMax     = 10.0 * scaling_factor;
+            const double rxyzMax    = 100.0 * scaling_factor;
+            const double massMax    = 2.0  * massHint;
+            const double massDiffMax = 1.1*massHint;
             const double ptDiffMax  = 1.5  * massHint;
 
             // position residuals
@@ -171,8 +178,8 @@ private:
                 220, -xyDiffMax, xyDiffMax, 220, -xyDiffMax, xyDiffMax);
             xyzDiff = fs->make<TH3F>(n("xyz_diff").c_str(),
                 ";#Deltax [cm];#Deltay [cm];#Deltaz [cm];Events",
-                160, -xyzDiffMax, xyzDiffMax,
-                160, -xyzDiffMax, xyzDiffMax,
+                160, -xyDiffMax, xyDiffMax,
+                160, -xyDiffMax, xyDiffMax,
                 160, -xyzDiffMax, xyzDiffMax);
 
             // absolute positions – global origin
@@ -184,10 +191,10 @@ private:
                 220, -xyPosMax, xyPosMax, 220, -xyPosMax, xyPosMax);
             xyzGlobal00Gen  = fs->make<TH3F>(n("xyz_global00_gen").c_str(),
                 ";x_{gen} [cm];y_{gen} [cm];z_{gen} [cm];Events",
-                160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax);
+                160, -xyPosMax, xyPosMax, 160, -xyPosMax, xyPosMax, 160, -xyzPosMax, xyzPosMax);
             xyzGlobal00Reco = fs->make<TH3F>(n("xyz_global00_reco").c_str(),
                 ";x_{reco} [cm];y_{reco} [cm];z_{reco} [cm];Events",
-                160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax);
+                160, -xyPosMax, xyPosMax, 160, -xyPosMax, xyPosMax, 160, -xyzPosMax, xyzPosMax);
 
             // absolute positions – relative to beamspot
             xyBeamSpotGen  = fs->make<TH2F>(n("xy_beamspot_gen").c_str(),
@@ -265,7 +272,7 @@ private:
                 ";#DeltaR(reco vertex, gen particle);Events", 140, 0.0, 5.0);
             matchDistance = fs->make<TH1F>(n("match_distance").c_str(),
                 (";match distance (" + modeLabel + ") [cm];Events").c_str(),
-                140, 0.0, 0.1);
+                140, 0.0, 0.05);
 
             // ΔR vs match distance vs gen particle d_xy wrt beamspot (3D diagnostic)
             deltaR_vs_matchDist_vs_genDxyBS = fs->make<TH3F>(
@@ -300,6 +307,7 @@ private:
     edm::EDGetTokenT<reco::BeamSpot>                   offlineBeamspotToken_;
     edm::EDGetTokenT<std::vector<Run3ScoutingPFJet>>   scoutingJetsToken_;
     edm::EDGetTokenT<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> trackToScoutingMapToken_;
+    edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> ttBuilderToken_;
     edm::ESGetToken<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd> bsOnlineToken_;
 
     bool useOnlineBeamSpot_ = false;
@@ -348,6 +356,11 @@ private:
     TH1F* h_sel_vtx_ntracks    = nullptr;  // tracks per selected vertex (all events)
     TH1F* h_sel_vtx_trackPt    = nullptr;  // track pT in selected vertices
     TH1F* h_sel_vtx_totalTrackPt = nullptr; // scalar sum pT per selected vertex
+
+    TH1F* h_trackPreselIpsig         = nullptr;
+    TH1F* h_trackPreselNValidPixelHits = nullptr;
+    TH1F* h_trackPreselNValidStripHits = nullptr;
+    TH1F* h_trackPreselNTrackerLayers  = nullptr;
 
     // ------------------------------------------------------------------
     // Static helpers
@@ -432,9 +445,12 @@ private:
     // ------------------------------------------------------------------
     std::vector<SelectedVertexInfo>
     buildSelectedVertices(const edm::Handle<std::vector<reco::Vertex>>& scoutingVertices,
-                          const reco::BeamSpot* beamspot,
-                          bool eventPassesJetGate,
-                          std::ostringstream* log) const {
+                      const reco::BeamSpot* beamspot,
+                      bool eventPassesJetGate,
+                      const edm::Handle<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>>& scoutingMapH,
+                      bool haveScoutingMap,
+                      const TransientTrackBuilder& tt_builder,
+                      std::ostringstream* log) {
         std::vector<SelectedVertexInfo> selected;
         if (!scoutingVertices.isValid()) return selected;
         selected.reserve(scoutingVertices->size());
@@ -473,18 +489,34 @@ private:
                 info.trackPts.push_back(trk->pt());
                 info.totalPt += trk->pt();
 
-                if (verbose_unselected_) {
-                    trackLog << "    track " << trackIndex
-                             << ": pt=" << trk->pt()
-                             << " eta=" << trk->eta()
-                             << " phi=" << trk->phi()
-                             << " nhits=" << trk->numberOfValidHits()
-                             << " npixel=" << trk->hitPattern().numberOfValidPixelHits()
-                             << " nstrip=" << trk->hitPattern().numberOfValidStripHits()
-                             << " nlayers=" << trk->hitPattern().trackerLayersWithMeasurement()
-                             << "\n";
+                int nPixelHits = trk->hitPattern().numberOfValidPixelHits();
+                int nStripHits = trk->hitPattern().numberOfValidStripHits();
+                int nLayers    = trk->hitPattern().trackerLayersWithMeasurement();
+
+                if (haveScoutingMap) {
+                    const auto scRef = (*scoutingMapH)[trk];
+                    if (scRef.isNonnull()) {
+                        nPixelHits = scRef->tk_nValidPixelHits();
+                        nStripHits = scRef->tk_nValidStripHits();
+                        nLayers    = scRef->tk_nTrackerLayersWithMeasurement();
+                    }
+                }
+
+                if (h_trackPreselNValidPixelHits) h_trackPreselNValidPixelHits->Fill(nPixelHits);
+                if (h_trackPreselNValidStripHits) h_trackPreselNValidStripHits->Fill(nStripHits);
+                if (h_trackPreselNTrackerLayers)  h_trackPreselNTrackerLayers->Fill(nLayers);
+                if (h_trackPreselIpsig) {
+                    reco::Vertex::Error bsErr = beamspot ? beamspot->covariance3D() : reco::Vertex::Error{};
+                    reco::Vertex fakeBsVtx(reco::Vertex::Point(bsX, bsY, bsZ), bsErr);
+
+                    auto tt = tt_builder.build(trk);
+                    if (tt.isValid()) {
+                        auto ip = IPTools::absoluteTransverseImpactParameter(tt, fakeBsVtx);
+                        if (ip.first) h_trackPreselIpsig->Fill(ip.second.significance());
+                    }
                 }
             }
+
 
             // cos(angle between displacement and momentum)
             const math::XYZVector disp(v.x() - bsX, v.y() - bsY, v.z() - bsZ);
@@ -559,14 +591,14 @@ private:
                 const double scoreA = d00 + d11;
                 if (scoreA < out.totalScore) {
                     out.totalScore = scoreA;
-                    out.recoForGen = {static_cast<int>(i), static_cast<int>(j)};
-                    out.distance   = {d00, d11};
+                    out.recoForGen = std::array<int, 2>{{static_cast<int>(i), static_cast<int>(j)}};
+                    out.distance   = std::array<double, 2>{{d00, d11}};
                 }
                 const double scoreB = d10 + d01;
                 if (scoreB < out.totalScore) {
                     out.totalScore = scoreB;
-                    out.recoForGen = {static_cast<int>(j), static_cast<int>(i)};
-                    out.distance   = {d10, d01};
+                    out.recoForGen = std::array<int, 2>{{static_cast<int>(j), static_cast<int>(i)}};
+                    out.distance   = std::array<double, 2>{{d10, d01}};
                 }
             }
         }
@@ -682,7 +714,15 @@ public:
         scoutingVerticesToken_ = consumes<std::vector<reco::Vertex>>(config.getParameter<edm::InputTag>("scoutingVertices"));
         offlineBeamspotToken_  = consumes<reco::BeamSpot>(config.getParameter<edm::InputTag>("beamspot"));
         scoutingJetsToken_     = consumes<std::vector<Run3ScoutingPFJet>>(config.getParameter<edm::InputTag>("scoutingJets"));
+        trackToScoutingMapToken_ =
+            consumes<
+                edm::ValueMap<
+                    edm::Ref<std::vector<Run3ScoutingTrack>>
+                >
+            >(config.getParameter<edm::InputTag>("trackToScoutingMap"));
         bsOnlineToken_         = esConsumes<BeamSpotOnlineObjects, BeamSpotOnlineHLTObjectsRcd>();
+        ttBuilderToken_ = esConsumes<TransientTrackBuilder,TransientTrackRecord>(edm::ESInputTag("", "TransientTrackBuilder"));
+        
 
         cut_vtx_chi2_max_   = config.getParameter<double>("vtx_chi2_max");
         cut_vtx_dbv_min_    = config.getParameter<double>("vtx_dbv_min");
@@ -694,7 +734,7 @@ public:
         jet_pt_min_          = config.getParameter<double>("jet_pt_min");
         jet_eta_max_         = config.getParameter<double>("jet_eta_max");
         min_selected_jets_   = config.getParameter<unsigned int>("min_selected_jets");
-        require_jet_selection_ = config.getParameter<bool>("require_jet_selection");
+        require_jet_selection_ = config.getUntrackedParameter<bool>("require_jet_selection", true);
 
         useOnlineBeamSpot_ = config.getUntrackedParameter<bool>("useOnlineBeamSpot", true);
         massHint_          = config.getUntrackedParameter<double>("masshint", 200.0);
@@ -736,6 +776,26 @@ public:
             "#Sigma p_{T} of tracks per selected vertex (all events);#Sigma p_{T} [GeV];Vertices",
             100, 0.0, 3.0 * massHint_);
 
+        h_trackPreselIpsig = fs->make<TH1F>(
+            "track_presel_ipsig",
+            "Track preselection IP significance;IP significance;Tracks",
+            200, 0.0, 200.0);
+
+        h_trackPreselNValidPixelHits = fs->make<TH1F>(
+            "track_presel_nValidPixelHits",
+            "Track preselection valid pixel hits;N_{pixel};Tracks",
+            20, -0.5, 19.5);
+
+        h_trackPreselNValidStripHits = fs->make<TH1F>(
+            "track_presel_nValidStripHits",
+            "Track preselection valid strip hits;N_{strip};Tracks",
+            30, -0.5, 29.5);
+
+        h_trackPreselNTrackerLayers = fs->make<TH1F>(
+            "track_presel_nTrackerLayers",
+            "Track preselection tracker layers;N_{layers};Tracks",
+            30, -0.5, 29.5);
+
         edm::LogInfo("GenScoutingComparer") << "setup done; match mode: " << matchModeLabel_;
     }
 
@@ -763,10 +823,13 @@ public:
             auto bsOnlineHandle = eventSetup.getHandle(bsOnlineToken_);
             if (bsOnlineHandle.isValid()) {
                 static reco::BeamSpot onlineBs;
-                reco::BeamSpot::CovarianceMatrix onlineCov;
-                for (int i = 0; i < 7; ++i)
-                    for (int j = i; j < 7; ++j)
-                        onlineCov(i, j) = bsOnlineHandle->covariance(i, j);
+                reco::BeamSpot::CovarianceMatrix onlineCov{};
+                for (int i = 0; i < 7; ++i) {
+                    for (int j = i; j < 7; ++j) {
+                        onlineCov(i,j) = bsOnlineHandle->covariance(i,j);
+                        onlineCov(j,i) = bsOnlineHandle->covariance(i,j);
+                    }
+                }
                 const reco::BeamSpot::Point onlinePos(bsOnlineHandle->x(), bsOnlineHandle->y(), bsOnlineHandle->z());
                 onlineBs = reco::BeamSpot(onlinePos, bsOnlineHandle->sigmaZ(),
                                           bsOnlineHandle->dxdz(), bsOnlineHandle->dydz(),
@@ -777,6 +840,14 @@ public:
                     << "Online beamspot unavailable; using " << (bs ? "offline" : "null") << " beamspot.";
             }
         }
+
+        edm::Handle<edm::ValueMap<edm::Ref<std::vector<Run3ScoutingTrack>>>> scoutingMapH;
+        const bool haveScoutingMap =
+            !trackToScoutingMapToken_.isUninitialized() &&
+            event.getByToken(trackToScoutingMapToken_, scoutingMapH) &&
+            scoutingMapH.isValid();
+
+        auto const& tt_builder = eventSetup.getData(ttBuilderToken_);
 
         // ---- jet gate ----
         edm::Handle<std::vector<Run3ScoutingPFJet>> scoutingJets;
@@ -797,7 +868,8 @@ public:
         // ---- selected reco vertices ----
         std::vector<SelectedVertexInfo> selectedVertices =
             buildSelectedVertices(scoutingVertices, bs, eventPassesJetGate,
-                                  (verbose_ || verbose_unselected_) ? &log : nullptr);
+                          scoutingMapH, haveScoutingMap, tt_builder,
+                          (verbose_ || verbose_unselected_) ? &log : nullptr);
 
         counters_.selectedVertices += selectedVertices.size();
 

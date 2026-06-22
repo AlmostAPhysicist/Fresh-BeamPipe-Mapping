@@ -1,6 +1,158 @@
+import os
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("SCOUTINGCOMPARE")
+
+# -------------------- Choose sample key --------------------
+SAMPLE_KEY = os.environ.get("SAMPLE_KEY", "M800_CT10")
+
+SAMPLES = {
+    "M200_CT1": {
+        "files": [
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_5.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_3.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_2.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_6.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_8.root",
+        ],
+        "masshint": 200.0,
+        "decayhint": 0.001,
+    },
+    "M200_CT3": {
+        "files": [
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_miniAOD_v2/250214_150918/0000/stop_dbar_miniAOD_10.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_miniAOD_v2/250214_150918/0000/stop_dbar_miniAOD_8.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_miniAOD_v2/250214_150918/0000/stop_dbar_miniAOD_7.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_miniAOD_v2/250214_150918/0000/stop_dbar_miniAOD_3.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_miniAOD_v2/250214_150918/0000/stop_dbar_miniAOD_4.root",
+        ],
+        "masshint": 200.0,
+        "decayhint": 0.003,
+    },
+    "M200_CT10": {
+        "files": [
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_miniAOD_v2/250214_144856/0000/stop_dbar_miniAOD_2.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_miniAOD_v2/250214_144856/0000/stop_dbar_miniAOD_8.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_miniAOD_v2/250214_144856/0000/stop_dbar_miniAOD_9.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_miniAOD_v2/250214_144856/0000/stop_dbar_miniAOD_1.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_miniAOD_v2/250214_144856/0000/stop_dbar_miniAOD_4.root",
+        ],
+        "masshint": 200.0,
+        "decayhint": 0.010,
+    },
+    "M400_CT1": {
+        "files": [
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151149/0000/stop_dbar_miniAOD_10.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151149/0000/stop_dbar_miniAOD_8.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151149/0000/stop_dbar_miniAOD_4.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151149/0000/stop_dbar_miniAOD_5.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151149/0000/stop_dbar_miniAOD_9.root",
+        ],
+        "masshint": 400.0,
+        "decayhint": 0.001,
+    },
+    "M400_CT3": {
+        "files": [
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151323/0000/stop_dbar_miniAOD_2.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151323/0000/stop_dbar_miniAOD_7.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151323/0000/stop_dbar_miniAOD_4.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151323/0000/stop_dbar_miniAOD_9.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151323/0000/stop_dbar_miniAOD_10.root",
+        ],
+        "masshint": 400.0,
+        "decayhint": 0.003,
+    },
+    "M400_CT10": {
+        "files": [
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151028/0000/stop_dbar_miniAOD_2.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151028/0000/stop_dbar_miniAOD_4.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151028/0000/stop_dbar_miniAOD_6.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151028/0000/stop_dbar_miniAOD_7.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151028/0000/stop_dbar_miniAOD_9.root",
+        ],
+        "masshint": 400.0,
+        "decayhint": 0.010,
+    },
+    "M600_CT1": {
+        "files": [
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151500/0000/stop_dbar_miniAOD_8.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151500/0000/stop_dbar_miniAOD_5.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151500/0000/stop_dbar_miniAOD_3.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151500/0000/stop_dbar_miniAOD_7.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151500/0000/stop_dbar_miniAOD_2.root",
+        ],
+        "masshint": 600.0,
+        "decayhint": 0.001,
+    },
+    "M600_CT3": {
+        "files": [
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151548/0000/stop_dbar_miniAOD_7.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151548/0000/stop_dbar_miniAOD_9.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151548/0000/stop_dbar_miniAOD_8.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151548/0000/stop_dbar_miniAOD_4.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151548/0000/stop_dbar_miniAOD_3.root",
+        ],
+        "masshint": 600.0,
+        "decayhint": 0.003,
+    },
+    "M600_CT10": {
+        "files": [
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151410/0000/stop_dbar_miniAOD_3.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151410/0000/stop_dbar_miniAOD_6.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151410/0000/stop_dbar_miniAOD_10.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151410/0000/stop_dbar_miniAOD_4.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151410/0000/stop_dbar_miniAOD_2.root",
+        ],
+        "masshint": 600.0,
+        "decayhint": 0.010,
+    },
+    "M800_CT1": {
+        "files": [
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151734/0000/stop_dbar_miniAOD_9.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151734/0000/stop_dbar_miniAOD_5.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151734/0000/stop_dbar_miniAOD_10.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151734/0000/stop_dbar_miniAOD_8.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151734/0000/stop_dbar_miniAOD_2.root",
+        ],
+        "masshint": 800.0,
+        "decayhint": 0.001,
+    },
+    "M800_CT3": {
+        "files": [
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151828/0000/stop_dbar_miniAOD_4.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151828/0000/stop_dbar_miniAOD_2.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151828/0000/stop_dbar_miniAOD_3.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151828/0000/stop_dbar_miniAOD_1.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151828/0000/stop_dbar_miniAOD_6.root",
+        ],
+        "masshint": 800.0,
+        "decayhint": 0.003,
+    },
+    "M800_CT10": {
+        "files": [
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151643/0000/stop_dbar_miniAOD_3.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151643/0000/stop_dbar_miniAOD_10.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151643/0000/stop_dbar_miniAOD_7.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151643/0000/stop_dbar_miniAOD_8.root",
+            "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151643/0000/stop_dbar_miniAOD_6.root",
+        ],
+        "masshint": 800.0,
+        "decayhint": 0.010,
+    },
+}
+
+sample = SAMPLES[SAMPLE_KEY]
+ACTIVE_FILES = sample["files"]
+MASS_HINT = sample["masshint"] # GeV
+DECAY_HINT = 100 * sample["decayhint"] # sample has units of meters (SI). Decay hint is in cm (Geant4).
+
+
+print("="*80)
+print("SAMPLE_KEY =", SAMPLE_KEY)
+print("MASS_HINT =", MASS_HINT)
+print("DECAY_HINT =", DECAY_HINT)
+print("NFILES =", len(ACTIVE_FILES))
+print("="*80)
 
 # -------------------- Message Logger --------------------
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -16,131 +168,16 @@ process.options = cms.untracked.PSet(
 # -------------------- Histogram Output Target --------------------
 process.TFileService = cms.Service(
     "TFileService",
-    fileName = cms.string("gen_scouting_comparer_GluGluH-Hto2Sto4D_Par-ctauS-10-MH-125-MS-55.root"),
+    fileName = cms.string(f"gen_scouting_comparer_{SAMPLE_KEY}.root"),
 )
 
 # -------------------- Event Limits --------------------
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100_000))
+process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(-1))
 
 # -------------------- Input Source Pool --------------------
-
-# Pick one block, then set:
-# process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(*ACTIVE_FILES))
-
-M200_CT1 = [
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_5.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_3.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_2.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_6.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_8.root",
-]
-
-M200_CT3 = [
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_miniAOD_v2/250214_150918/0000/stop_dbar_miniAOD_10.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_miniAOD_v2/250214_150918/0000/stop_dbar_miniAOD_8.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_miniAOD_v2/250214_150918/0000/stop_dbar_miniAOD_7.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_miniAOD_v2/250214_150918/0000/stop_dbar_miniAOD_3.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_miniAOD_v2/250214_150918/0000/stop_dbar_miniAOD_4.root",
-]
-
-M200_CT10 = [
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_miniAOD_v2/250214_144856/0000/stop_dbar_miniAOD_2.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_miniAOD_v2/250214_144856/0000/stop_dbar_miniAOD_8.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_miniAOD_v2/250214_144856/0000/stop_dbar_miniAOD_9.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_miniAOD_v2/250214_144856/0000/stop_dbar_miniAOD_1.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_miniAOD_v2/250214_144856/0000/stop_dbar_miniAOD_4.root",
-]
-
-M400_CT1 = [
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151149/0000/stop_dbar_miniAOD_10.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151149/0000/stop_dbar_miniAOD_8.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151149/0000/stop_dbar_miniAOD_4.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151149/0000/stop_dbar_miniAOD_5.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151149/0000/stop_dbar_miniAOD_9.root",
-]
-
-M400_CT3 = [
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151323/0000/stop_dbar_miniAOD_2.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151323/0000/stop_dbar_miniAOD_7.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151323/0000/stop_dbar_miniAOD_4.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151323/0000/stop_dbar_miniAOD_9.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151323/0000/stop_dbar_miniAOD_10.root",
-]
-
-M400_CT10 = [
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151028/0000/stop_dbar_miniAOD_2.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151028/0000/stop_dbar_miniAOD_4.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151028/0000/stop_dbar_miniAOD_6.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151028/0000/stop_dbar_miniAOD_7.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151028/0000/stop_dbar_miniAOD_9.root",
-]
-
-M600_CT1 = [
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151500/0000/stop_dbar_miniAOD_8.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151500/0000/stop_dbar_miniAOD_5.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151500/0000/stop_dbar_miniAOD_3.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151500/0000/stop_dbar_miniAOD_7.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151500/0000/stop_dbar_miniAOD_2.root",
-]
-
-M600_CT3 = [
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151548/0000/stop_dbar_miniAOD_7.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151548/0000/stop_dbar_miniAOD_9.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151548/0000/stop_dbar_miniAOD_8.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151548/0000/stop_dbar_miniAOD_4.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151548/0000/stop_dbar_miniAOD_3.root",
-]
-
-M600_CT10 = [
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151410/0000/stop_dbar_miniAOD_3.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151410/0000/stop_dbar_miniAOD_6.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151410/0000/stop_dbar_miniAOD_10.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151410/0000/stop_dbar_miniAOD_4.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151410/0000/stop_dbar_miniAOD_2.root",
-]
-
-M800_CT1 = [
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151734/0000/stop_dbar_miniAOD_9.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151734/0000/stop_dbar_miniAOD_5.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151734/0000/stop_dbar_miniAOD_10.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151734/0000/stop_dbar_miniAOD_8.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151734/0000/stop_dbar_miniAOD_2.root",
-]
-
-M800_CT3 = [
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151828/0000/stop_dbar_miniAOD_4.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151828/0000/stop_dbar_miniAOD_2.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151828/0000/stop_dbar_miniAOD_3.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151828/0000/stop_dbar_miniAOD_1.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151828/0000/stop_dbar_miniAOD_6.root",
-]
-
-M800_CT10 = [
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151643/0000/stop_dbar_miniAOD_3.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151643/0000/stop_dbar_miniAOD_10.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151643/0000/stop_dbar_miniAOD_7.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151643/0000/stop_dbar_miniAOD_8.root",
-    "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-10mm_Summer24_100k_miniAOD_v2/250214_151643/0000/stop_dbar_miniAOD_6.root",
-]
-
-# Example:
-ACTIVE_FILES = M200_CT1
-
-
 process.source = cms.Source(
     "PoolSource",
-    fileNames = cms.untracked.vstring(
-        # "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_5.root"
-        # "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-3mm_Summer24_100k_miniAOD_v2/250214_150918/0000/stop_dbar_miniAOD_10.root"
-        # "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-10mm_Summer24_100k_miniAOD_v2/250214_144856/0000/stop_dbar_miniAOD_2.root"
-        # "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151149/0000/stop_dbar_miniAOD_10.root"
-        # "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-400_CTau-3mm_Summer24_100k_miniAOD_v2/250214_151323/0000/stop_dbar_miniAOD_2.root"
-        # "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-600_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151500/0000/stop_dbar_miniAOD_8.root"
-        # "root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-800_CTau-1mm_Summer24_100k_miniAOD_v2/250214_151734/0000/stop_dbar_miniAOD_9.root"
-        # "root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-15_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/130000/8a1fca64-198c-4723-aa1b-c56277938c06.root"
-        # "root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-10-MH-125-MS-55_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/110000/8e2233eb-7fb3-4d8e-94f2-a66f9b24b63d.root"
-        *ACTIVE_FILES
-    ),
+    fileNames = cms.untracked.vstring(*ACTIVE_FILES),
 )
 
 # -------------------- Scouting Unpacker Setup --------------------
@@ -179,22 +216,22 @@ process.Vertexer = cms.EDProducer(
     minSeedPt = cms.untracked.double(0.9),
     minSeedIPSig = cms.untracked.double(4.0),
     maxSeedEta = cms.untracked.double(2.4),
-    # minSeedPixelHits = cms.int32(2),#0
-    # minSeedStripHits = cms.int32(1),#0
-    # minSeedTrackerLayers = cms.int32(5),#0
-    minSeedPixelHits = cms.int32(0),#0
-    minSeedStripHits = cms.int32(0),#0
-    minSeedTrackerLayers = cms.int32(0),#0
+    minSeedPixelHits = cms.int32(2),#0
+    minSeedStripHits = cms.int32(1),#0
+    minSeedTrackerLayers = cms.int32(5),#0
+    # minSeedPixelHits = cms.int32(0),#0
+    # minSeedStripHits = cms.int32(0),#0
+    # minSeedTrackerLayers = cms.int32(0),#0
 
-    # jet_pt_min = cms.double(30.0),#0
-    # jet_eta_max = cms.double(5.0),#100
-    # min_selected_jets = cms.int32(3),#0
-    # jet_dr_max = cms.untracked.double(0.4),#100
+    jet_pt_min = cms.double(30.0),#0
+    jet_eta_max = cms.double(5.0),#100
+    min_selected_jets = cms.int32(3),#0
+    jet_dr_max = cms.untracked.double(0.4),#100
 
-    jet_pt_min = cms.double(0.0),#0
-    jet_eta_max = cms.double(100),#100
-    min_selected_jets = cms.int32(0),#0
-    jet_dr_max = cms.untracked.double(1000),#100
+    # jet_pt_min = cms.double(0.0),#0
+    # jet_eta_max = cms.double(100),#100
+    # min_selected_jets = cms.int32(0),#0
+    # jet_dr_max = cms.untracked.double(1000),#100
 
     n_tracks_per_seed_vertex = cms.int32(2),
     max_seed_vertex_chi2 = cms.double(5.0),
@@ -242,15 +279,15 @@ process.scoutingComparer = cms.EDAnalyzer(
     match_distance_mode = cms.untracked.string("2D"),
 
     # Signal Truth Decay Configuration
-    # parent_pdgids = cms.untracked.vint32(1000006, -1000006),
-    parent_pdgids = cms.untracked.vint32(9000006, -9000006),
+    parent_pdgids = cms.untracked.vint32(1000006, -1000006), #STOP
+    # parent_pdgids = cms.untracked.vint32(9000006, -9000006), #Scalar
     daughter_pdgids = cms.untracked.vint32(1, -1),
 
     # Offline Signal Region Definition Vertex Cuts
     vtx_chi2_max = cms.double(2.5),
     vtx_dbv_min = cms.double(0.01),
     vtx_dbv_max = cms.double(2.0),
-    vtx_tracks_min = cms.uint32(2),#8
+    vtx_tracks_min = cms.uint32(8),#2
     vtx_ddbv_max = cms.double(0.005),
     vtx_cosT_min = cms.double(0.0),
 

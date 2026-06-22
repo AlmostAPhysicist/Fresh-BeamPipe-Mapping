@@ -326,7 +326,7 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // STEP 0 – Build beamspot reference vertex
   // ----------------------------------------------------------------
   double bs_x = 0, bs_y = 0, bs_z = 0;
-  reco::Vertex::Error bs_err;
+  reco::Vertex::Error bs_err{};
   for (int i = 0; i < 3; ++i)
     for (int j = i; j < 3; ++j)
       bs_err(i, j) = 0.0;
@@ -339,9 +339,11 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       bs_x = bsOnlineH->x();
       bs_y = bsOnlineH->y();
       bs_z = bsOnlineH->z();
-      for (int i = 0; i < 3; ++i)
-        for (int j = i; j < 3; ++j)
+      for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
           bs_err(i, j) = bsOnlineH->covariance(i, j);
+        }
+      }
       haveBS = true;
       if (logBeamspotSource_)
         edm::LogInfo("Vertexer") << "Using online beamspot x=" << bs_x
@@ -446,18 +448,22 @@ void Vertexer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if (!std::isfinite(ip_sig) || ip_sig <= minSeedIPSig_) continue;
 
     // Hit quality – prefer scouting ValueMap, fall back to reco::Track hitPattern
+    int nPixelHits = tk.hitPattern().numberOfValidPixelHits();
+    int nStripHits = tk.hitPattern().numberOfValidStripHits();
+    int nLayers    = tk.hitPattern().trackerLayersWithMeasurement();
+
     if (haveScoutingMap) {
       const auto scRef = (*scoutingMapH)[tk_ref];
       if (scRef.isNonnull()) {
-        if (scRef->tk_nValidPixelHits()                   <= minSeedPixelHits_)    continue;
-        if (scRef->tk_nValidStripHits()                   <= minSeedStripHits_)    continue;
-        if (scRef->tk_nTrackerLayersWithMeasurement()     <= minSeedTrackerLayers_) continue;
+        nPixelHits = scRef->tk_nValidPixelHits();
+        nStripHits = scRef->tk_nValidStripHits();
+        nLayers    = scRef->tk_nTrackerLayersWithMeasurement();
       }
-    } else {
-      if (tk.hitPattern().numberOfValidPixelHits()           <= minSeedPixelHits_)    continue;
-      if (tk.hitPattern().numberOfValidStripHits()           <= minSeedStripHits_)    continue;
-      if (tk.hitPattern().trackerLayersWithMeasurement()     <= minSeedTrackerLayers_) continue;
     }
+
+    if (nPixelHits <= minSeedPixelHits_)    continue;
+    if (nStripHits <= minSeedStripHits_)    continue;
+    if (nLayers    <= minSeedTrackerLayers_) continue;
 
     // Must be within dR < seedJetDrMax_ of at least one selected jet
     bool matched = false;

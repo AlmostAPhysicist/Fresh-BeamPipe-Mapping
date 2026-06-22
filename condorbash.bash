@@ -1,78 +1,41 @@
 #!/bin/bash
+set -e
 
-PROCESS=$1
-FILELIST=$2
-FILES_PER_JOB=$3
-OUTPUTDIR=$4
-NJOBS=$5
+SAMPLE_KEY=$1
+CLUSTER_ID=$2
+export SAMPLE_KEY
 
-echo "=== Job ${PROCESS} started at $(date) ==="
-echo "Input file list: ${FILELIST}"
-echo "Files per job: ${FILES_PER_JOB}"
-echo "Output directory: ${OUTPUTDIR}"
+echo "=================================================="
+echo "Starting Condor Job for Sample Key: ${SAMPLE_KEY}"
+echo "Cluster ID Reference: ${CLUSTER_ID}"
+echo "=================================================="
 
-# Setup CMSSW environment
+# Establish initial system default paths
 source /cvmfs/cms.cern.ch/cmsset_default.sh
+
+# 1. FIX: Switch folder back to core CMSSW area to build software paths cleanly
 cd /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src
 eval `scramv1 runtime -sh`
 
-# Calculate which files this job should process
-TOTAL_FILES=$(wc -l < ${FILELIST})
-START_LINE=$((PROCESS * FILES_PER_JOB + 1))
-END_LINE=$(((PROCESS + 1) * FILES_PER_JOB))
+# 2. Navigate back down to execute your tool collection config
+cd /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools
 
-# Don't go past the end of the file
-if [ ${END_LINE} -gt ${TOTAL_FILES} ]; then
-    END_LINE=${TOTAL_FILES}
-fi
+# Run your analyzer config over the sample target
+cmsRun gen_scouting_comparer_cfg.py
 
-echo "Processing lines ${START_LINE} to ${END_LINE} of ${TOTAL_FILES}"
+echo "Job execution processing completed. Beginning clean-up and staging..."
 
-# Extract the files for this job - use /tmp for temporary file
-CHUNK_FILE="/tmp/chunk_${PROCESS}_$$.txt"
-sed -n "${START_LINE},${END_LINE}p" ${FILELIST} > ${CHUNK_FILE}
+# 3. FIX: Handle creating the output folder structure manually on EOS via XRDFS
+EOS_DIR="/eos/user/a/amalhotr/Run3ScoutingAnalysisTools/condor_out/${CLUSTER_ID}"
+xrdfs eosuser.cern.ch mkdir -p ${EOS_DIR}
 
-CHUNK_SIZE=$(wc -l < ${CHUNK_FILE})
-echo "Chunk contains ${CHUNK_SIZE} files"
+# 4. FIX: Use xrdcp to ship the resulting file straight to your target EOS home folder
+LOCAL_FILE="gen_scouting_comparer_${SAMPLE_KEY}.root"
+echo "Staging ${LOCAL_FILE} to root://eosuser.cern.ch/${EOS_DIR}/${LOCAL_FILE}"
 
-# Run hadd if chunk has files
-if [ -s ${CHUNK_FILE} ]; then
-    OUTPUT_FILE="${OUTPUTDIR}/chunk_${PROCESS}.root"
-    echo "Running hadd to create ${OUTPUT_FILE}"
-    
-    # Ensure output directory exists on EOS
-    mkdir -p ${OUTPUTDIR}
-    
-    # Use @ syntax if more than one file, direct if single file
-    if [ ${CHUNK_SIZE} -eq 1 ]; then
-        cp $(cat ${CHUNK_FILE}) ${OUTPUT_FILE}
-        echo "Single file - copied directly"
-    else
-        hadd -f ${OUTPUT_FILE} @${CHUNK_FILE}
-        HADD_STATUS=$?
-        if [ ${HADD_STATUS} -ne 0 ]; then
-            echo "ERROR: hadd failed with status ${HADD_STATUS}"
-            rm -f ${CHUNK_FILE}
-            exit 1
-        fi
-    fi
-    
-    if [ -f ${OUTPUT_FILE} ]; then
-        SIZE=$(stat -f%z ${OUTPUT_FILE} 2>/dev/null || stat -c%s ${OUTPUT_FILE} 2>/dev/null)
-        echo "Successfully created ${OUTPUT_FILE} (${SIZE} bytes)"
-    else
-        echo "ERROR: Output file not created"
-        rm -f ${CHUNK_FILE}
-        exit 1
-    fi
-else
-    echo "ERROR: No files to process for job ${PROCESS}"
-    rm -f ${CHUNK_FILE}
-    exit 1
-fi
+xrdcp -f ${LOCAL_FILE} root://eosuser.cern.ch/${EOS_DIR}/${LOCAL_FILE}
 
-# Cleanup
-rm -f ${CHUNK_FILE}
+# 5. FIX: Wipe the file locally out of AFS so your user storage quota doesn't fill up
+rm -f ${LOCAL_FILE}
 
-echo "=== Job ${PROCESS} completed at $(date) ==="
-exit 0
+echo "Job completed successfully."

@@ -1,12 +1,38 @@
 universe = vanilla
-log = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/log.$(Process)
-error = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/err.$(Process)
-output = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/out.$(Process)
-should_transfer_files = YES
-transfer_output_files = ""
-when_to_transfer_output = ON_EXIT_OR_EVICT
+getenv = True
+
+# 1. FIX: Explicitly point to your live grid proxy file path
+# Change this line in your submit.jdl:
+x509userproxy = /afs/cern.ch/user/a/amalhotr/private/x509proxy
+
+# Explicit paths pointing to your analysis subdirectory logs
+log    = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/log.$(ClusterId).$(ProcId)
+error  = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/err.$(ClusterId).$(ProcId)
+output = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/out.$(ClusterId).$(ProcId)
+
+# 2. FIX: Let bash cleanly handle shipping files to your EOS area 
+# to bypass AFS shared-system transfer locking issues
+should_transfer_files = NO
+
 executable = condorbash.bash
+arguments = $(samplekey) $(ClusterId)
+
 RequestDisk = 5000000
-arguments = $(Process)
+# 3. FIX: Lowering down to match actual single-thread processing for quick scheduling
+RequestCpus = 1
 +JobFlavour = "tomorrow"
-queue 100
+
+queue samplekey from (
+M200_CT1
+M200_CT3
+M200_CT10
+M400_CT1
+M400_CT3
+M400_CT10
+M600_CT1
+M600_CT3
+M600_CT10
+M800_CT1
+M800_CT3
+M800_CT10
+)
