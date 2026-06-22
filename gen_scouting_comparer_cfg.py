@@ -234,9 +234,9 @@ process.scoutingComparer = cms.EDAnalyzer(
     
     # Enforce global beamspot matching with Vertexer setup
     useOnlineBeamSpot = cms.untracked.bool(True),
-    
-    masshint = cms.untracked.double(55.0),
-    decayhint = cms.untracked.double(0.2),
+
+    masshint = cms.untracked.double(MASS_HINT),
+    decayhint = cms.untracked.double(DECAY_HINT),
 
     # Matching Configuration
     match_distance_mode = cms.untracked.string("2D"),
