@@ -17,14 +17,22 @@ process.source    = cms.Source("EmptySource")
 
 process.TFileService = cms.Service(
     "TFileService",
-    fileName=cms.string("scouting_3d_comparison_fixed.root"),
+    fileName=cms.string("GenScoutPlots_g8_Stop.root"),
 )
 
 process.scouting3DCompare = cms.EDAnalyzer(
     "ScoutingComparison3DPlotter",
-    inputListFile     = cms.string(os.environ.get("INPUT_LIST", os.path.abspath("input_paths.txt"))),
-    xyDiffHistPath    = cms.untracked.string("scoutingComparer/xy_diff_1"),
-    matchDistHistPath = cms.untracked.string("scoutingComparer/match_distance_1"),
+    inputListFile      = cms.string(os.environ.get("INPUT_LIST", os.path.abspath("input_paths.txt"))),
+    
+    # 3D core spatial mapping
+    xyDiffHistPath     = cms.untracked.string("scoutingComparer/xy_diff_1"),
+    matchDistHistPath  = cms.untracked.string("scoutingComparer/match_distance_1"),
+    
+    # 2D heatmap variables fetched straight from GenScoutingComparer
+    nSelVtxHistPath    = cms.untracked.string("scoutingComparer/n_selected_vertices"),
+    massRecoHistPath   = cms.untracked.string("scoutingComparer/mass_reco_1"),
+    rDistGenHistPath   = cms.untracked.string("scoutingComparer/rdist_xy_beamspot_gen_1"),
+    vtxNtracksHistPath = cms.untracked.string("scoutingComparer/vtx_ntracks_1"),
 )
 
 process.p = cms.Path(process.scouting3DCompare)

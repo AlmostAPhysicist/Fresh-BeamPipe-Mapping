@@ -319,6 +319,7 @@ private:
     double       cut_vtx_dbv_min_    = 0.01;
     double       cut_vtx_dbv_max_    = 2.0;
     unsigned int cut_vtx_tracks_min_ = 8;
+    unsigned int cut_vtx_tracks_max_ = 100;
     double       cut_vtx_ddbv_max_   = 0.005;
     double       cut_vtx_cosT_min_   = 0.0;
 
@@ -529,7 +530,7 @@ private:
             const bool passDbvMax = info.dBV  <  cut_vtx_dbv_max_;
             const bool passDdbv   = info.dBVErr < cut_vtx_ddbv_max_;
             const bool passCosT   = info.cosT   > cut_vtx_cosT_min_;
-            const bool passNtk    = info.nTracks > cut_vtx_tracks_min_;
+            const bool passNtk    = info.nTracks > cut_vtx_tracks_min_ && info.nTracks < cut_vtx_tracks_max_;
             const bool passAll    = passChi2 && passDbvMin && passDbvMax
                                  && passDdbv && passCosT  && passNtk
                                  && eventPassesJetGate;
@@ -537,7 +538,7 @@ private:
             if (verbose_unselected_ && log) {
                 *log << "Vertex " << i << ":\n"
                      << "  nTracks  : " << info.nTracks
-                     << (passNtk ? " (> " : " (!> ") << cut_vtx_tracks_min_ << ")\n"
+                     << (passNtk ? " (> " : " (!> ") << cut_vtx_tracks_min_ << " (or the relevant tracks_max))\n"
                      << "  chi2/dof : " << info.chi2
                      << (passChi2 ? " (< " : " (!< ") << cut_vtx_chi2_max_ << ")\n"
                      << "  d_BV     : " << info.dBV
@@ -728,6 +729,7 @@ public:
         cut_vtx_dbv_min_    = config.getParameter<double>("vtx_dbv_min");
         cut_vtx_dbv_max_    = config.getParameter<double>("vtx_dbv_max");
         cut_vtx_tracks_min_ = config.getParameter<unsigned int>("vtx_tracks_min");
+        cut_vtx_tracks_max_ = config.getParameter<unsigned int>("vtx_tracks_max");
         cut_vtx_ddbv_max_   = config.getParameter<double>("vtx_ddbv_max");
         cut_vtx_cosT_min_   = config.getParameter<double>("vtx_cosT_min");
 

@@ -1,4 +1,4 @@
-// ScoutingComparison3DPlotter.cc – Tiled Landscape & Uniform Box Color Edition
+// ScoutingComparison3DPlotter.cc – Tiled Landscape & 2D Parameter Metric Maps
 #include <algorithm>
 #include <cmath>
 #include <fstream>
@@ -58,6 +58,12 @@ private:
   std::string inputListFile_;
   std::string xyDiffHistPath_;
   std::string matchDistHistPath_;
+  
+  // New input paths for 2D summary mapping
+  std::string nSelVtxHistPath_;
+  std::string massRecoHistPath_;
+  std::string rDistGenHistPath_;
+  std::string vtxNtracksHistPath_;
 
   std::vector<Sample> samples_;
 
@@ -69,26 +75,28 @@ private:
   double md_xmin_ = 0.0,  md_xmax_ = 0.05;
 
   // Custom Contiguous Bin Boundaries (No spaces/gaps, tiles the landscape perfectly)
-  // Mass centers will fall perfectly into bins: 200, 400, 600, 800
   std::vector<double> massEdges_ = {100.0, 300.0, 500.0, 700.0, 900.0};
-  
-  // ctau centers will fall perfectly into bins: 1, 3, 10
   std::vector<double> ctEdges_   = {0.0, 2.0, 6.0, 14.0};
 
-  // 3D Grid Histograms (Color-mapped content via COLZ)
+  // 3D Grid Histograms
   TH3F* h_xyDiff_vs_mass_            = nullptr; 
   TH3F* h_xyDiff_vs_ct_              = nullptr; 
   TH3F* h_matchDist_vs_mass_ct_      = nullptr; 
-
-  // Calculated Parameter Metrics
   TH3F* h_mean_match_distance_vs_mass_ct_ = nullptr; 
   TH3F* h_std_match_distance_vs_mass_ct_  = nullptr; 
 
-  // 1D Tiled Profile Histograms (Connected bins, easy order tracking)
+  // 1D Tiled Profile Histograms
   TH1F* h_mean_match_distance_vs_mass_    = nullptr;
   TH1F* h_mean_match_distance_vs_ct_      = nullptr;
   TH1F* h_std_match_distance_vs_mass_     = nullptr;
   TH1F* h_std_match_distance_vs_ct_      = nullptr;
+
+  // New 2D Heatmaps
+  TH2F* h_nSelVtx_vs_mass_            = nullptr;
+  TH2F* h_nSelVtx_vs_ct_              = nullptr;
+  TH2F* h_mean_massReco_vs_mass_ct_   = nullptr;
+  TH2F* h_mean_rDistGen_vs_mass_ct_   = nullptr;
+  TH2F* h_mean_vtxNtracks_vs_mass_ct_ = nullptr;
 
   std::map<std::pair<int,int>, WStats> stats_;
 
@@ -133,6 +141,10 @@ ScoutingComparison3DPlotter::ScoutingComparison3DPlotter(const edm::ParameterSet
   : inputListFile_(cfg.getParameter<std::string>("inputListFile"))
   , xyDiffHistPath_(cfg.getUntrackedParameter<std::string>("xyDiffHistPath", "scoutingComparer/xy_diff_1"))
   , matchDistHistPath_(cfg.getUntrackedParameter<std::string>("matchDistHistPath", "scoutingComparer/match_distance_1"))
+  , nSelVtxHistPath_(cfg.getUntrackedParameter<std::string>("nSelVtxHistPath", "scoutingComparer/n_selected_vertices"))
+  , massRecoHistPath_(cfg.getUntrackedParameter<std::string>("massRecoHistPath", "scoutingComparer/mass_reco_1"))
+  , rDistGenHistPath_(cfg.getUntrackedParameter<std::string>("rDistGenHistPath", "scoutingComparer/rdist_xy_beamspot_gen_1"))
+  , vtxNtracksHistPath_(cfg.getUntrackedParameter<std::string>("vtxNtracksHistPath", "scoutingComparer/vtx_ntracks_1"))
 { usesResource("TFileService"); }
 
 // ================================================================
@@ -177,7 +189,6 @@ void ScoutingComparison3DPlotter::bookHistograms() {
   int nMassBins = massEdges_.size() - 1;
   int nCtBins   = ctEdges_.size() - 1;
 
-  // Generate continuous coordinate bin boundaries for uniform axes to avoid mixing constructor signatures
   std::vector<double> xy_xEdges(xy_nx_ + 1);
   double dx = (xy_xmax_ - xy_xmin_) / xy_nx_;
   for (int i = 0; i <= xy_nx_; ++i) xy_xEdges[i] = xy_xmin_ + i * dx;
@@ -190,45 +201,38 @@ void ScoutingComparison3DPlotter::bookHistograms() {
   double dmd = (md_xmax_ - md_xmin_) / md_nx_;
   for (int i = 0; i <= md_nx_; ++i) md_Edges[i] = md_xmin_ + i * dmd;
 
-  // 1. Booking Physics Grids using the uniform variable array constructor (8 arguments)
-  h_xyDiff_vs_mass_ = fs->make<TH3F>(
-    "xy_diff_vs_mass", "xy distribution vs Mass Profile;#Deltax [cm];#Deltay [cm];mass [GeV]",
-    xy_nx_, xy_xEdges.data(), xy_ny_, xy_yEdges.data(), nMassBins, massEdges_.data()
-  );
+  // 1. 3D Match and Difference Plots
+  h_xyDiff_vs_mass_ = fs->make<TH3F>("xy_diff_vs_mass", "xy distribution vs Mass Profile;#Deltax [cm];#Deltay [cm];mass [GeV]", xy_nx_, xy_xEdges.data(), xy_ny_, xy_yEdges.data(), nMassBins, massEdges_.data());
+  h_xyDiff_vs_ct_ = fs->make<TH3F>("xy_diff_vs_ct", "xy distribution vs c#tau Profile;#Deltax [cm];#Deltay [cm];c#tau [mm]", xy_nx_, xy_xEdges.data(), xy_ny_, xy_yEdges.data(), nCtBins, ctEdges_.data());
+  h_matchDist_vs_mass_ct_ = fs->make<TH3F>("match_distance_vs_mass_ct", "Continuous Match Distance Landscape;mass [GeV];c#tau [mm];match distance [cm]", nMassBins, massEdges_.data(), nCtBins, ctEdges_.data(), md_nx_, md_Edges.data());
+  h_mean_match_distance_vs_mass_ct_ = fs->make<TH3F>("mean_match_distance_vs_mass_ct", "Mean Match Distance Value Map;mass [GeV];c#tau [mm];Mean [cm]", nMassBins, massEdges_.data(), nCtBins, ctEdges_.data(), md_nx_, md_Edges.data());
+  h_std_match_distance_vs_mass_ct_ = fs->make<TH3F>("std_match_distance_vs_mass_ct", "StdDev Match Distance Value Map;mass [GeV];c#tau [mm];#sigma [cm]", nMassBins, massEdges_.data(), nCtBins, ctEdges_.data(), md_nx_, md_Edges.data());
 
-  h_xyDiff_vs_ct_ = fs->make<TH3F>(
-    "xy_diff_vs_ct", "xy distribution vs c#tau Profile;#Deltax [cm];#Deltay [cm];c#tau [mm]",
-    xy_nx_, xy_xEdges.data(), xy_ny_, xy_yEdges.data(), nCtBins, ctEdges_.data()
-  );
-
-  h_matchDist_vs_mass_ct_ = fs->make<TH3F>(
-    "match_distance_vs_mass_ct", "Continuous Match Distance Landscape;mass [GeV];c#tau [mm];match distance [cm]",
-    nMassBins, massEdges_.data(), nCtBins, ctEdges_.data(), md_nx_, md_Edges.data()
-  );
-
-  // 2. Booking Metric Value Maps
-  h_mean_match_distance_vs_mass_ct_ = fs->make<TH3F>(
-    "mean_match_distance_vs_mass_ct", "Mean Match Distance Value Map;mass [GeV];c#tau [mm];Mean [cm]",
-    nMassBins, massEdges_.data(), nCtBins, ctEdges_.data(), md_nx_, md_Edges.data()
-  );
-
-  h_std_match_distance_vs_mass_ct_ = fs->make<TH3F>(
-    "std_match_distance_vs_mass_ct", "StdDev Match Distance Value Map;mass [GeV];c#tau [mm];#sigma [cm]",
-    nMassBins, massEdges_.data(), nCtBins, ctEdges_.data(), md_nx_, md_Edges.data()
-  );
-
-  // Apply strict color-only drawing tags so JSROOT uses uniform tiling sizes automatically
   h_xyDiff_vs_mass_->SetDrawOption("COLZ");
   h_xyDiff_vs_ct_->SetDrawOption("COLZ");
   h_matchDist_vs_mass_ct_->SetDrawOption("COLZ");
   h_mean_match_distance_vs_mass_ct_->SetDrawOption("COLZ");
   h_std_match_distance_vs_mass_ct_->SetDrawOption("COLZ");
 
-  // 3. Booking Contiguous 1D Outline Profiles (tiled side-by-side for perfect contrast)
+  // 2. 1D Match Distance Profiles
   h_mean_match_distance_vs_mass_ = fs->make<TH1F>("mean_match_distance_vs_mass", "Mean Match Distance vs Mass;mass [GeV];Mean [cm]", nMassBins, massEdges_.data());
   h_mean_match_distance_vs_ct_   = fs->make<TH1F>("mean_match_distance_vs_ct",   "Mean Match Distance vs c#tau;c#tau [mm];Mean [cm]", nCtBins, ctEdges_.data());
   h_std_match_distance_vs_mass_  = fs->make<TH1F>("std_match_distance_vs_mass",  "StdDev Match Distance vs Mass;mass [GeV];#sigma [cm]", nMassBins, massEdges_.data());
   h_std_match_distance_vs_ct_    = fs->make<TH1F>("std_match_distance_vs_ct",    "StdDev Match Distance vs c#tau;c#tau [mm];#sigma [cm]", nCtBins, ctEdges_.data());
+
+  // 3. New 2D Heatmaps (COLZ enforces size filling, color represents content)
+  h_nSelVtx_vs_mass_ = fs->make<TH2F>("nSelVtx_vs_mass", "Event Class vs Mass;mass [GeV];N_{sel. vtx};Events", nMassBins, massEdges_.data(), 21, -0.5, 20.5);
+  h_nSelVtx_vs_ct_ = fs->make<TH2F>("nSelVtx_vs_ct", "Event Class vs c#tau;c#tau [mm];N_{sel. vtx};Events", nCtBins, ctEdges_.data(), 21, -0.5, 20.5);
+  
+  h_mean_massReco_vs_mass_ct_ = fs->make<TH2F>("mean_massReco_vs_mass_ct", "Mean Reco Mass vs (mass, c#tau);mass [GeV];c#tau [mm];Mean Reco Mass [GeV]", nMassBins, massEdges_.data(), nCtBins, ctEdges_.data());
+  h_mean_rDistGen_vs_mass_ct_ = fs->make<TH2F>("mean_rDistGen_vs_mass_ct", "Mean Gen d_{xy}^{BS} vs (mass, c#tau);mass [GeV];c#tau [mm];Mean d_{xy} [cm]", nMassBins, massEdges_.data(), nCtBins, ctEdges_.data());
+  h_mean_vtxNtracks_vs_mass_ct_ = fs->make<TH2F>("mean_vtxNtracks_vs_mass_ct", "Mean Vtx N_{tracks} vs (mass, c#tau);mass [GeV];c#tau [mm];Mean N_{tracks}", nMassBins, massEdges_.data(), nCtBins, ctEdges_.data());
+
+  h_nSelVtx_vs_mass_->SetDrawOption("COLZ");
+  h_nSelVtx_vs_ct_->SetDrawOption("COLZ");
+  h_mean_massReco_vs_mass_ct_->SetDrawOption("COLZ");
+  h_mean_rDistGen_vs_mass_ct_->SetDrawOption("COLZ");
+  h_mean_vtxNtracks_vs_mass_ct_->SetDrawOption("COLZ");
 }
 
 // ================================================================
@@ -236,9 +240,17 @@ void ScoutingComparison3DPlotter::fillFromFile(const Sample& s) {
   std::unique_ptr<TFile> f(TFile::Open(s.path.c_str(), "READ"));
   if (!f || f->IsZombie()) return;
 
+  // Retrieve standard structures
   TH2* hxy = dynamic_cast<TH2*>(f->Get(xyDiffHistPath_.c_str()));
   TH1* hmd = dynamic_cast<TH1*>(f->Get(matchDistHistPath_.c_str()));
 
+  // Retrieve explicitly requested metric plots
+  TH1* hnSel  = dynamic_cast<TH1*>(f->Get(nSelVtxHistPath_.c_str()));
+  TH1* hMass  = dynamic_cast<TH1*>(f->Get(massRecoHistPath_.c_str()));
+  TH1* hrDist = dynamic_cast<TH1*>(f->Get(rDistGenHistPath_.c_str()));
+  TH1* hTrk   = dynamic_cast<TH1*>(f->Get(vtxNtracksHistPath_.c_str()));
+
+  // Process core 3D histograms
   if (hxy) {
     accumulateTH2intoZslice(hxy, h_xyDiff_vs_mass_, s.mass);
     accumulateTH2intoZslice(hxy, h_xyDiff_vs_ct_,   s.ct);
@@ -258,6 +270,36 @@ void ScoutingComparison3DPlotter::fillFromFile(const Sample& s) {
       stats_[{s.mass, s.ct}].add(center, content);
     }
   }
+
+  // Populate 2D Event Class projections by porting bin contents sequentially
+  if (hnSel) {
+    for (int iy = 1; iy <= hnSel->GetNbinsX(); ++iy) {
+      double content = hnSel->GetBinContent(iy);
+      if (content == 0.0) continue;
+      double yCenter = hnSel->GetXaxis()->GetBinCenter(iy);
+      h_nSelVtx_vs_mass_->Fill(s.mass, yCenter, content);
+      h_nSelVtx_vs_ct_->Fill(s.ct, yCenter, content);
+    }
+  }
+
+  // Populate 2D Metric Maps by drawing the calculated mean from the source file directly onto the map coordinate
+  if (hMass) {
+    int iM = h_mean_massReco_vs_mass_ct_->GetXaxis()->FindBin(s.mass);
+    int iC = h_mean_massReco_vs_mass_ct_->GetYaxis()->FindBin(s.ct);
+    h_mean_massReco_vs_mass_ct_->SetBinContent(iM, iC, hMass->GetMean());
+  }
+
+  if (hrDist) {
+    int iM = h_mean_rDistGen_vs_mass_ct_->GetXaxis()->FindBin(s.mass);
+    int iC = h_mean_rDistGen_vs_mass_ct_->GetYaxis()->FindBin(s.ct);
+    h_mean_rDistGen_vs_mass_ct_->SetBinContent(iM, iC, hrDist->GetMean());
+  }
+
+  if (hTrk) {
+    int iM = h_mean_vtxNtracks_vs_mass_ct_->GetXaxis()->FindBin(s.mass);
+    int iC = h_mean_vtxNtracks_vs_mass_ct_->GetYaxis()->FindBin(s.ct);
+    h_mean_vtxNtracks_vs_mass_ct_->SetBinContent(iM, iC, hTrk->GetMean());
+  }
 }
 
 // ================================================================
@@ -276,7 +318,6 @@ void ScoutingComparison3DPlotter::fillSummaries() {
     int iM = h_mean_match_distance_vs_mass_ct_->GetXaxis()->FindBin(mass);
     int iC = h_mean_match_distance_vs_mass_ct_->GetYaxis()->FindBin(ct);
 
-    // Map calculated continuous stats to color-intensity value heights on the exact cell coordinate
     int iZ_mean = h_mean_match_distance_vs_mass_ct_->GetZaxis()->FindBin(meanVal);
     h_mean_match_distance_vs_mass_ct_->SetBinContent(iM, iC, iZ_mean, meanVal);
 
@@ -287,7 +328,6 @@ void ScoutingComparison3DPlotter::fillSummaries() {
     byCt[ct].merge(st);
   }
 
-  // Populate 1D profiles (now contiguous with zero spacer gaps, tracking relative sizes perfectly)
   for (const auto& kv : byMass) {
     int bin = h_mean_match_distance_vs_mass_->FindBin(kv.first);
     h_mean_match_distance_vs_mass_->SetBinContent(bin, kv.second.mean());

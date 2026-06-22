@@ -168,7 +168,7 @@ process.options = cms.untracked.PSet(
 # -------------------- Histogram Output Target --------------------
 process.TFileService = cms.Service(
     "TFileService",
-    fileName = cms.string(f"gen_scouting_comparer_{SAMPLE_KEY}.root"),
+    fileName = cms.string(f"GenScoutCompare_Stop_g2Tracks_{SAMPLE_KEY}.root"),
 )
 
 # -------------------- Event Limits --------------------
@@ -216,22 +216,14 @@ process.Vertexer = cms.EDProducer(
     minSeedPt = cms.untracked.double(0.9),
     minSeedIPSig = cms.untracked.double(4.0),
     maxSeedEta = cms.untracked.double(2.4),
-    minSeedPixelHits = cms.int32(2),#0
-    minSeedStripHits = cms.int32(1),#0
-    minSeedTrackerLayers = cms.int32(5),#0
-    # minSeedPixelHits = cms.int32(0),#0
-    # minSeedStripHits = cms.int32(0),#0
-    # minSeedTrackerLayers = cms.int32(0),#0
+    minSeedPixelHits = cms.int32(2),
+    minSeedStripHits = cms.int32(1),
+    minSeedTrackerLayers = cms.int32(5),
 
-    jet_pt_min = cms.double(30.0),#0
-    jet_eta_max = cms.double(5.0),#100
-    min_selected_jets = cms.int32(3),#0
-    jet_dr_max = cms.untracked.double(0.4),#100
-
-    # jet_pt_min = cms.double(0.0),#0
-    # jet_eta_max = cms.double(100),#100
-    # min_selected_jets = cms.int32(0),#0
-    # jet_dr_max = cms.untracked.double(1000),#100
+    jet_pt_min = cms.double(20.0),
+    jet_eta_max = cms.double(5.0),
+    min_selected_jets = cms.int32(3),
+    jet_dr_max = cms.untracked.double(0.4),
 
     n_tracks_per_seed_vertex = cms.int32(2),
     max_seed_vertex_chi2 = cms.double(5.0),
@@ -240,7 +232,7 @@ process.Vertexer = cms.EDProducer(
     use_2d_tv_dist_forReco = cms.bool(False),
 
     merge_shared_dist = cms.double(-1.0),
-    merge_shared_sig = cms.double(4.0),
+    merge_shared_sig = cms.double(3.0),
     max_track_vertex_dist = cms.double(-1.0),
     max_track_vertex_sig = cms.double(5.0),
     min_track_vertex_sig_to_remove = cms.double(2.0),
@@ -249,11 +241,11 @@ process.Vertexer = cms.EDProducer(
     max_nm1_refit_dist3 = cms.double(0.003),
     max_nm1_refit_distz = cms.double(-1.0),
 
-    resolve_split_vertices_loose = cms.bool(True),
+    resolve_split_vertices_loose = cms.bool(False),
     merge_anyway_dist = cms.double(0.05),
     merge_anyway_sig = cms.double(3.0),
 
-    resolve_split_vertices_tight = cms.bool(False),
+    resolve_split_vertices_tight = cms.bool(True),
     split_merge_dbv_min = cms.double(0.01),
     split_merge_dvv2d_max = cms.double(0.05),
     split_merge_dphi_max = cms.double(0.5),
@@ -287,15 +279,16 @@ process.scoutingComparer = cms.EDAnalyzer(
     vtx_chi2_max = cms.double(2.5),
     vtx_dbv_min = cms.double(0.01),
     vtx_dbv_max = cms.double(2.0),
-    vtx_tracks_min = cms.uint32(8),#2
+    vtx_tracks_min = cms.uint32(2),
+    vtx_tracks_max = cms.uint32(100),
     vtx_ddbv_max = cms.double(0.005),
     vtx_cosT_min = cms.double(0.0),
 
     # Analysis Event Level Jet Gate Configuration
-    jet_pt_min = cms.double(30),#0
-    jet_eta_max = cms.double(2.5),#10
+    jet_pt_min = cms.double(30),
+    jet_eta_max = cms.double(2.5),
     min_selected_jets = cms.uint32(3),
-    require_jet_selection = cms.untracked.bool(False),
+    require_jet_selection = cms.untracked.bool(True),
 
     verbose = cms.untracked.bool(False),
     verbose_unselected = cms.untracked.bool(False),
