@@ -17,7 +17,7 @@ process.source    = cms.Source("EmptySource")
 
 process.TFileService = cms.Service(
     "TFileService",
-    fileName=cms.string("GenScoutPlots_g8_Stop.root"),
+    fileName=cms.string("GenScoutPlots_g8_Higgs.root"),
 )
 
 process.scouting3DCompare = cms.EDAnalyzer(

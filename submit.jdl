@@ -20,19 +20,31 @@ arguments = $(samplekey) $(ClusterId)
 RequestDisk = 5000000
 # 3. FIX: Lowering down to match actual single-thread processing for quick scheduling
 RequestCpus = 1
-+JobFlavour = "tomorrow"
++JobFlavour = "longlunch"
+
+#queue samplekey from (
+#M200_CT1
+#M200_CT3
+#M200_CT10
+#M400_CT1
+#M400_CT3
+#M400_CT10
+#M600_CT1
+#M600_CT3
+#M600_CT10
+#M800_CT1
+#M800_CT3
+#M800_CT10
+#)
 
 queue samplekey from (
-M200_CT1
-M200_CT3
-M200_CT10
-M400_CT1
-M400_CT3
-M400_CT10
-M600_CT1
-M600_CT3
-M600_CT10
-M800_CT1
-M800_CT3
-M800_CT10
+H_MS30_CT0p1
+H_MS30_CT1
+H_MS30_CT10
+H_MS40_CT0p1
+H_MS40_CT1
+H_MS40_CT10
+H_MS55_CT0p1
+H_MS55_CT1
+H_MS55_CT10
 )

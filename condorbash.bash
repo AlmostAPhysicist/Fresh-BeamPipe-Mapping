@@ -30,7 +30,9 @@ EOS_DIR="/eos/user/a/amalhotr/Run3ScoutingAnalysisTools/condor_out/${CLUSTER_ID}
 xrdfs eosuser.cern.ch mkdir -p ${EOS_DIR}
 
 # 4. FIX: Use xrdcp to ship the resulting file straight to your target EOS home folder
-LOCAL_FILE="GenScoutCompare_Stop_g2Tracks_${SAMPLE_KEY}.root"
+LOCAL_FILE="GenScoutCompare_H2SGlu_g2Tracks_NoJets_${SAMPLE_KEY}.root"
+# LOCAL_FILE = "GenScoutCompare_Stop_g2l5Tracks_${SAMPLE_KEY}.root"
+
 echo "Staging ${LOCAL_FILE} to root://eosuser.cern.ch/${EOS_DIR}/${LOCAL_FILE}"
 
 xrdcp -f ${LOCAL_FILE} root://eosuser.cern.ch/${EOS_DIR}/${LOCAL_FILE}

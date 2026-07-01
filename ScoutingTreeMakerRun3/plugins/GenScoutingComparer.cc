@@ -45,10 +45,26 @@
 // ============================================================
 // GenScoutingComparer
 //
-// Pure gen-truth ↔ selected-reco-vertex comparer.
-// Track selection (IPSig, hits, ΔR jet cut, arbitration, N-1)
+// Pure gen-truth <-> selected-reco-vertex comparer.
+// Track selection (IPSig, hits, dR jet cut, arbitration, N-1)
 // is performed entirely inside the Vertexer; every track in
 // each input vertex is already accepted.
+//
+// IMPORTANT GEN-TRUTH NOTE:
+// reco::GenParticle::vx()/vy()/vz() give the PRODUCTION vertex
+// of that particle, not its decay vertex. For a long-lived
+// particle (stop, or a heavy parent like a Higgs), the position
+// where it decays is therefore NOT stop.vx()/vy()/vz() -- it is
+// the production vertex of one of its daughters (daughter.vx()).
+//
+// Kinematic quantities (pt, eta, phi, mass, energy) still
+// describe the parent itself, since the reconstructed displaced
+// vertex momentum approximates the parent's momentum, not a
+// single daughter's momentum.
+//
+// To keep this unambiguous everywhere in the code, gen truth is
+// carried around as a GenStopInfo{parent, decayVertexParticle}
+// struct rather than a single GenParticle pointer.
 // ============================================================
 
 class GenScoutingComparer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
@@ -58,6 +74,17 @@ private:
     static constexpr double kPionMass = 0.13957039;
 
     enum class MatchDistanceMode { k2D, k3D };
+
+    // ------------------------------------------------------------------
+    // Gen truth: parent supplies kinematics, decayVertexParticle (one
+    // of the parent's matched daughters) supplies the decay position.
+    // ------------------------------------------------------------------
+    struct GenStopInfo {
+        const reco::GenParticle* parent             = nullptr; // kinematics: pt, eta, phi, mass, energy
+        const reco::GenParticle* decayVertexParticle = nullptr; // position: vx, vy, vz (== parent's decay vertex)
+
+        bool valid() const { return parent != nullptr && decayVertexParticle != nullptr; }
+    };
 
     // ------------------------------------------------------------------
     // Per-vertex information built in buildSelectedVertices()
@@ -144,7 +171,7 @@ private:
         TH1F* deltaR       = nullptr;
         TH1F* matchDistance = nullptr;
 
-        // --- ΔR vs match distance vs gen particle d_xy wrt beamspot (3D) ---
+        // --- dR vs match distance vs gen particle d_xy wrt beamspot (3D) ---
         TH3F* deltaR_vs_matchDist_vs_genDxyBS = nullptr;
 
         // --- vertex tracks ---
@@ -160,7 +187,8 @@ private:
                   double massHint,
                   double decayHint) {
             const auto n = [&](const std::string& base) { return base + "_" + suffix; };
-            
+            //if mass < 100 then 10 else 1 (higgs would have mass less than 10. quick, dirty way to encapusale this)
+            const double higgs_scaling = 1 + 9 * (massHint < 100);
             const double scaling_factor = (0.1 + decayHint/10);
             const double xyPosMax   = 5.0  * scaling_factor;
             const double xyzPosMax  = 100.0 * scaling_factor;
@@ -182,7 +210,7 @@ private:
                 160, -xyDiffMax, xyDiffMax,
                 160, -xyzDiffMax, xyzDiffMax);
 
-            // absolute positions – global origin
+            // absolute positions - global origin
             xyGlobal00Gen  = fs->make<TH2F>(n("xy_global00_gen").c_str(),
                 ";x_{gen} wrt (0,0) [cm];y_{gen} wrt (0,0) [cm];Events",
                 220, -xyPosMax, xyPosMax, 220, -xyPosMax, xyPosMax);
@@ -196,7 +224,7 @@ private:
                 ";x_{reco} [cm];y_{reco} [cm];z_{reco} [cm];Events",
                 160, -xyPosMax, xyPosMax, 160, -xyPosMax, xyPosMax, 160, -xyzPosMax, xyzPosMax);
 
-            // absolute positions – relative to beamspot
+            // absolute positions - relative to beamspot
             xyBeamSpotGen  = fs->make<TH2F>(n("xy_beamspot_gen").c_str(),
                 ";x_{gen} wrt beamspot [cm];y_{gen} wrt beamspot [cm];Events",
                 220, -xyPosMax, xyPosMax, 220, -xyPosMax, xyPosMax);
@@ -210,7 +238,7 @@ private:
                 ";x_{reco} wrt BS [cm];y_{reco} wrt BS [cm];z_{reco} wrt BS [cm];Events",
                 160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax, 160, -xyzPosMax, xyzPosMax);
 
-            // radial distances – global origin
+            // radial distances - global origin
             rDistxyGlobal00Gen  = fs->make<TH1F>(n("rdist_xy_global00_gen").c_str(),
                 ";|r_{xy}| (particle wrt origin) [cm];Events", 160, 0.0, rxyMax);
             rDistxyGlobal00Reco = fs->make<TH1F>(n("rdist_xy_global00_reco").c_str(),
@@ -225,7 +253,7 @@ private:
             rDistxyzGlobal00Diff = fs->make<TH1F>(n("rdist_xyz_global00_diff").c_str(),
                 ";|r| vertex #minus particle wrt origin [cm];Events", 160, -rxyzMax, rxyzMax);
 
-            // radial distances – beamspot
+            // radial distances - beamspot
             rDistxyBeamSpotGen  = fs->make<TH1F>(n("rdist_xy_beamspot_gen").c_str(),
                 ";d_{xy} (particle wrt beamspot) [cm];Events", 160, 0.0, rxyMax);
             rDistxyBeamSpotReco = fs->make<TH1F>(n("rdist_xy_beamspot_reco").c_str(),
@@ -241,10 +269,10 @@ private:
                 ";d_{3D} vertex #minus particle wrt beamspot [cm];Events", 160, -rxyzMax, rxyzMax);
 
             // kinematics
-            ptGen  = fs->make<TH1F>(n("pt_gen").c_str(),  ";p_{T,gen} [GeV];Events",  180, 0.0, massMax);
-            ptReco = fs->make<TH1F>(n("pt_reco").c_str(), ";p_{T,reco} [GeV];Events", 180, 0.0, massMax);
+            ptGen  = fs->make<TH1F>(n("pt_gen").c_str(),  ";p_{T,gen} [GeV];Events",  180, 0.0, higgs_scaling*massMax);
+            ptReco = fs->make<TH1F>(n("pt_reco").c_str(), ";p_{T,reco} [GeV];Events", 180, 0.0, higgs_scaling*massMax);
             ptDiff = fs->make<TH1F>(n("pt_diff").c_str(),
-                ";p_{T,reco} #minus p_{T,gen} [GeV];Events", 180, -ptDiffMax, ptDiffMax);
+                ";p_{T,reco} #minus p_{T,gen} [GeV];Events", 180, -ptDiffMax, higgs_scaling*ptDiffMax);
 
             etaGen  = fs->make<TH1F>(n("eta_gen").c_str(),  ";#eta_{gen};Events",  120, -6.0, 6.0);
             etaReco = fs->make<TH1F>(n("eta_reco").c_str(), ";#eta_{reco};Events", 120, -6.0, 6.0);
@@ -272,14 +300,14 @@ private:
                 ";#DeltaR(reco vertex, gen particle);Events", 140, 0.0, 5.0);
             matchDistance = fs->make<TH1F>(n("match_distance").c_str(),
                 (";match distance (" + modeLabel + ") [cm];Events").c_str(),
-                140, 0.0, 0.05);
+                140, 0.0, higgs_scaling*0.05);
 
-            // ΔR vs match distance vs gen particle d_xy wrt beamspot (3D diagnostic)
+            // dR vs match distance vs gen particle d_xy wrt beamspot (3D diagnostic)
             deltaR_vs_matchDist_vs_genDxyBS = fs->make<TH3F>(
                 n("deltaR_vs_matchDist_vs_genDxyBS").c_str(),
                 ";#DeltaR;Match Distance [cm];Gen d_{xy}^{BS} [cm]",
                 100, 0.0, 5.0,
-                100, 0.0, 0.1,
+                100, 0.0, higgs_scaling*0.1,
                 100, 0.0, rxyMax);
 
             // track-level plots for matched vertices
@@ -398,41 +426,74 @@ private:
     static double vertexDistxy(double x, double y)            { return std::hypot(x, y); }
     static double vertexDistxyz(double x, double y, double z) { return std::sqrt(x*x + y*y + z*z); }
 
-    double matchDistanceValue(const reco::Vertex& v, const reco::GenParticle& g) const {
+    // NOTE: matching is purely spatial, so it must use the DECAY VERTEX
+    // PARTICLE (a daughter), not the parent's own vx/vy/vz.
+    double matchDistanceValue(const reco::Vertex& v, const reco::GenParticle& decayVertexParticle) const {
         if (matchMode_ == MatchDistanceMode::k3D)
-            return dist3D(v.x(), v.y(), v.z(), g.vx(), g.vy(), g.vz());
-        return dist2D(v.x(), v.y(), g.vx(), g.vy());
+            return dist3D(v.x(), v.y(), v.z(),
+                          decayVertexParticle.vx(), decayVertexParticle.vy(), decayVertexParticle.vz());
+        return dist2D(v.x(), v.y(), decayVertexParticle.vx(), decayVertexParticle.vy());
     }
 
     // ------------------------------------------------------------------
     // Gen-truth search
+    //
+    // For each candidate parent (matching parentPDG_) with exactly two
+    // daughters matching daughterPDG_, the parent's DECAY vertex is the
+    // PRODUCTION vertex of its daughters -- i.e. daughter.vx()/vy()/vz().
+    // Since both daughters of a two-body decay share the same production
+    // vertex, the first matched daughter is sufficient as the position
+    // reference; the parent itself is retained separately for kinematics.
+    //
+    // If multiple parents in the event satisfy the pdgid criteria, the
+    // LAST such parent found is used (per-parent), since later copies in
+    // the pruned gen collection are closer to the actual decay (earlier
+    // copies may just be pre-FSR/pre-radiation duplicates).
     // ------------------------------------------------------------------
-    std::array<const reco::GenParticle*, 2>
+    std::array<GenStopInfo, 2>
     findStops(const std::vector<reco::GenParticle>& genParticles,
               std::ostringstream* log) const {
-        std::array<const reco::GenParticle*, 2> stops{{nullptr, nullptr}};
+        std::array<GenStopInfo, 2> stops{};
         for (const auto& p : genParticles) {
             if (std::find(parentPDG_.begin(), parentPDG_.end(), p.pdgId()) == parentPDG_.end())
                 continue;
+
             int dauMatch = 0;
+            const reco::GenParticle* decayParticle = nullptr;
             for (size_t d = 0; d < p.numberOfDaughters(); ++d) {
-                const reco::Candidate* dau = p.daughter(d);
+                const auto* dau = dynamic_cast<const reco::GenParticle*>(p.daughter(d));
                 if (!dau) continue;
-                if (std::find(daughterPDG_.begin(), daughterPDG_.end(), dau->pdgId()) != daughterPDG_.end())
+                if (std::find(daughterPDG_.begin(), daughterPDG_.end(), dau->pdgId()) != daughterPDG_.end()) {
                     ++dauMatch;
+                    if (!decayParticle) decayParticle = dau; // any daughter shares the same production vertex
+                }
             }
-            if (dauMatch != 2) continue;
-            if (!stops[0])      stops[0] = &p;
-            else if (!stops[1]) { stops[1] = &p; break; }
+            if (dauMatch != 2 || !decayParticle) continue;
+
+            GenStopInfo info;
+            info.parent             = &p;
+            info.decayVertexParticle = decayParticle;
+
+            // Keep the LAST matching parent found for each of the two slots,
+            // in case there are multiple copies of the parent in the pruned
+            // collection (e.g. pre-/post-FSR copies); later copies are closer
+            // to the true decay.
+            if (!stops[0].valid())      stops[0] = info;
+            else if (!stops[1].valid()) { stops[1] = info; }
+            else                        { /* already have two; ignore extras */ }
         }
-        if (log && stops[0] && stops[1]) {
+        if (log && stops[0].valid() && stops[1].valid()) {
             *log << "========== 2 STOPs found ==========\n";
-            for (int i = 0; i < 2; ++i)
+            for (int i = 0; i < 2; ++i) {
+                const auto& s = stops[i];
                 *log << "Stop" << (i+1)
-                     << " x=" << stops[i]->vx() << " y=" << stops[i]->vy() << " z=" << stops[i]->vz()
-                     << " pt=" << stops[i]->pt() << " mass=" << stops[i]->mass()
-                     << " eta=" << stops[i]->eta() << " phi=" << stops[i]->phi()
-                     << " r_xy=" << std::hypot(stops[i]->vx(), stops[i]->vy()) << "\n";
+                     << " decay_x=" << s.decayVertexParticle->vx()
+                     << " decay_y=" << s.decayVertexParticle->vy()
+                     << " decay_z=" << s.decayVertexParticle->vz()
+                     << " pt=" << s.parent->pt() << " mass=" << s.parent->mass()
+                     << " eta=" << s.parent->eta() << " phi=" << s.parent->phi()
+                     << " r_xy=" << std::hypot(s.decayVertexParticle->vx(), s.decayVertexParticle->vy()) << "\n";
+            }
         }
         return stops;
     }
@@ -441,7 +502,7 @@ private:
     // Build selected vertex collection
     //
     // Every track in the input vertex is already accepted by the
-    // Vertexer (IPSig, hit cuts, ΔR jet gate, arbitration, N-1).
+    // Vertexer (IPSig, hit cuts, dR jet gate, arbitration, N-1).
     // We simply sum all tracks and apply signal-region cuts.
     // ------------------------------------------------------------------
     std::vector<SelectedVertexInfo>
@@ -473,7 +534,7 @@ private:
             info.rDistxyBeamSpot   = std::hypot(v.x() - bsX, v.y() - bsY);
             info.rDistxyzBeamSpot  = dist3D(v.x(), v.y(), v.z(), bsX, bsY, bsZ);
 
-            // Sum over all tracks – selection already done in Vertexer
+            // Sum over all tracks - selection already done in Vertexer
             math::XYZVector pSum(0., 0., 0.);
             double energySum = 0.0;
             info.nTracks = 0;
@@ -563,20 +624,23 @@ private:
 
     // ------------------------------------------------------------------
     // Optimal matching (min-score bipartite assignment)
+    //
+    // Matching is purely spatial, so it uses genStops[i].decayVertexParticle,
+    // never genStops[i].parent.
     // ------------------------------------------------------------------
     MatchSolution
     matchVertices(const std::vector<SelectedVertexInfo>& recoVertices,
-                  const std::array<const reco::GenParticle*, 2>& genStops) const {
+                  const std::array<GenStopInfo, 2>& genStops) const {
         MatchSolution out;
-        if (!genStops[0] || !genStops[1] || recoVertices.empty()) return out;
+        if (!genStops[0].valid() || !genStops[1].valid() || recoVertices.empty()) return out;
 
-        const auto dist = [&](const SelectedVertexInfo& v, const reco::GenParticle& g) {
-            return matchDistanceValue(*v.vertex, g);
+        const auto dist = [&](const SelectedVertexInfo& v, const GenStopInfo& g) {
+            return matchDistanceValue(*v.vertex, *g.decayVertexParticle);
         };
 
         if (recoVertices.size() == 1) {
-            const double d0 = dist(recoVertices[0], *genStops[0]);
-            const double d1 = dist(recoVertices[0], *genStops[1]);
+            const double d0 = dist(recoVertices[0], genStops[0]);
+            const double d1 = dist(recoVertices[0], genStops[1]);
             if (d0 <= d1) { out.recoForGen[0] = 0; out.distance[0] = d0; out.totalScore = d0; }
             else          { out.recoForGen[1] = 0; out.distance[1] = d1; out.totalScore = d1; }
             return out;
@@ -584,10 +648,10 @@ private:
 
         for (size_t i = 0; i < recoVertices.size(); ++i) {
             for (size_t j = i + 1; j < recoVertices.size(); ++j) {
-                const double d00 = dist(recoVertices[i], *genStops[0]);
-                const double d01 = dist(recoVertices[i], *genStops[1]);
-                const double d10 = dist(recoVertices[j], *genStops[0]);
-                const double d11 = dist(recoVertices[j], *genStops[1]);
+                const double d00 = dist(recoVertices[i], genStops[0]);
+                const double d01 = dist(recoVertices[i], genStops[1]);
+                const double d10 = dist(recoVertices[j], genStops[0]);
+                const double d11 = dist(recoVertices[j], genStops[1]);
 
                 const double scoreA = d00 + d11;
                 if (scoreA < out.totalScore) {
@@ -608,43 +672,50 @@ private:
 
     // ------------------------------------------------------------------
     // Fill per-bucket histograms for one matched pair
+    //
+    // `gen` here is the full GenStopInfo: position-related quantities use
+    // gen.decayVertexParticle, kinematic quantities use gen.parent.
     // ------------------------------------------------------------------
     void fillBucket(size_t bucketIndex,
                     const SelectedVertexInfo& reco,
-                    const reco::GenParticle& gen,
+                    const GenStopInfo& gen,
                     const reco::BeamSpot* beamspot,
                     double matchMetric) const {
         if (bucketIndex >= plots_.size()) return;
+        if (!gen.valid()) return;
         const auto& h = plots_[bucketIndex];
         const auto& v = *reco.vertex;
+
+        const auto& parent = *gen.parent;             // kinematics
+        const auto& decay  = *gen.decayVertexParticle; // position (== stop decay vertex)
 
         const double bsX = beamspot ? beamspot->x0() : 0.0;
         const double bsY = beamspot ? beamspot->y0() : 0.0;
         const double bsZ = beamspot ? beamspot->z0() : 0.0;
 
         // position residuals
-        const double dx = v.x() - gen.vx();
-        const double dy = v.y() - gen.vy();
-        const double dz = v.z() - gen.vz();
+        const double dx = v.x() - decay.vx();
+        const double dy = v.y() - decay.vy();
+        const double dz = v.z() - decay.vz();
 
         if (h.xyDiff)  h.xyDiff->Fill(dx, dy);
         if (h.xyzDiff) h.xyzDiff->Fill(dx, dy, dz);
 
-        // absolute positions – global origin
-        if (h.xyGlobal00Gen)   h.xyGlobal00Gen->Fill(gen.vx(), gen.vy());
+        // absolute positions - global origin
+        if (h.xyGlobal00Gen)   h.xyGlobal00Gen->Fill(decay.vx(), decay.vy());
         if (h.xyGlobal00Reco)  h.xyGlobal00Reco->Fill(v.x(), v.y());
-        if (h.xyzGlobal00Gen)  h.xyzGlobal00Gen->Fill(gen.vx(), gen.vy(), gen.vz());
+        if (h.xyzGlobal00Gen)  h.xyzGlobal00Gen->Fill(decay.vx(), decay.vy(), decay.vz());
         if (h.xyzGlobal00Reco) h.xyzGlobal00Reco->Fill(v.x(), v.y(), v.z());
 
-        // absolute positions – beamspot
-        if (h.xyBeamSpotGen)   h.xyBeamSpotGen->Fill(gen.vx()-bsX, gen.vy()-bsY);
+        // absolute positions - beamspot
+        if (h.xyBeamSpotGen)   h.xyBeamSpotGen->Fill(decay.vx()-bsX, decay.vy()-bsY);
         if (h.xyBeamSpotReco)  h.xyBeamSpotReco->Fill(v.x()-bsX,   v.y()-bsY);
-        if (h.xyzBeamSpotGen)  h.xyzBeamSpotGen->Fill(gen.vx()-bsX, gen.vy()-bsY, gen.vz()-bsZ);
+        if (h.xyzBeamSpotGen)  h.xyzBeamSpotGen->Fill(decay.vx()-bsX, decay.vy()-bsY, decay.vz()-bsZ);
         if (h.xyzBeamSpotReco) h.xyzBeamSpotReco->Fill(v.x()-bsX,   v.y()-bsY,   v.z()-bsZ);
 
-        // radial distances – global origin
-        const double genRxy00   = vertexDistxy(gen.vx(), gen.vy());
-        const double genRxyz00  = vertexDistxyz(gen.vx(), gen.vy(), gen.vz());
+        // radial distances - global origin
+        const double genRxy00   = vertexDistxy(decay.vx(), decay.vy());
+        const double genRxyz00  = vertexDistxyz(decay.vx(), decay.vy(), decay.vz());
         const double recoRxy00  = reco.rDistxyGlobal00;
         const double recoRxyz00 = reco.rDistxyzGlobal00;
 
@@ -655,9 +726,9 @@ private:
         if (h.rDistxyzGlobal00Reco) h.rDistxyzGlobal00Reco->Fill(recoRxyz00);
         if (h.rDistxyzGlobal00Diff) h.rDistxyzGlobal00Diff->Fill(recoRxyz00 - genRxyz00);
 
-        // radial distances – beamspot
-        const double genDxyBS   = std::hypot(gen.vx()-bsX, gen.vy()-bsY);
-        const double genDxyzBS  = dist3D(gen.vx(), gen.vy(), gen.vz(), bsX, bsY, bsZ);
+        // radial distances - beamspot
+        const double genDxyBS   = std::hypot(decay.vx()-bsX, decay.vy()-bsY);
+        const double genDxyzBS  = dist3D(decay.vx(), decay.vy(), decay.vz(), bsX, bsY, bsZ);
         const double recoDxyBS  = reco.rDistxyBeamSpot;
         const double recoDxyzBS = reco.rDistxyzBeamSpot;
 
@@ -668,8 +739,8 @@ private:
         if (h.rDistxyzBeamSpotReco) h.rDistxyzBeamSpotReco->Fill(recoDxyzBS);
         if (h.rDistxyzBeamSpotDiff) h.rDistxyzBeamSpotDiff->Fill(recoDxyzBS - genDxyzBS);
 
-        // kinematics
-        const LorentzVector genP4(gen.px(), gen.py(), gen.pz(), gen.energy());
+        // kinematics -- from the PARENT, not the daughter
+        const LorentzVector genP4(parent.px(), parent.py(), parent.pz(), parent.energy());
         const LorentzVector& recoP4 = reco.p4;
 
         if (h.ptGen)   h.ptGen->Fill(genP4.pt());
@@ -695,7 +766,7 @@ private:
         if (h.deltaR)        h.deltaR->Fill(dR);
         if (h.matchDistance) h.matchDistance->Fill(matchMetric);
 
-        // ΔR vs match distance vs gen particle d_xy wrt beamspot
+        // dR vs match distance vs gen particle d_xy wrt beamspot
         if (h.deltaR_vs_matchDist_vs_genDxyBS)
             h.deltaR_vs_matchDist_vs_genDxyBS->Fill(dR, matchMetric, genDxyBS);
 
@@ -865,7 +936,7 @@ public:
 
         // ---- gen truth ----
         auto stops = findStops(*genParticles, (verbose_ || verbose_unselected_) ? &log : nullptr);
-        if (stops[0] && stops[1]) ++counters_.truthEvents;
+        if (stops[0].valid() && stops[1].valid()) ++counters_.truthEvents;
 
         // ---- selected reco vertices ----
         std::vector<SelectedVertexInfo> selectedVertices =
@@ -886,7 +957,7 @@ public:
         }
 
         // ---- matching and resolution plots ----
-        if (stops[0] && stops[1] && !selectedVertices.empty()) {
+        if (stops[0].valid() && stops[1].valid() && !selectedVertices.empty()) {
             const MatchSolution match = matchVertices(selectedVertices, stops);
 
             for (int gi = 0; gi < 2; ++gi) {
@@ -894,7 +965,7 @@ public:
                 if (ri < 0) continue;
                 fillBucket(static_cast<size_t>(gi),
                            selectedVertices.at(static_cast<size_t>(ri)),
-                           *stops[gi], bs, match.distance[gi]);
+                           stops[gi], bs, match.distance[gi]);
             }
 
             if (match.recoForGen[0] >= 0 || match.recoForGen[1] >= 0)
