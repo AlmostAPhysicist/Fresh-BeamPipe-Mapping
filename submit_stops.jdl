@@ -1,0 +1,26 @@
+universe = vanilla
+getenv = True
+x509userproxy = /afs/cern.ch/user/a/amalhotr/private/x509proxy
+log    = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/log.$(ClusterId).$(ProcId)
+error  = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/err.$(ClusterId).$(ProcId)
+output = /afs/cern.ch/user/a/amalhotr/CMSSW_14_0_18_patch1/src/Run3ScoutingAnalysisTools/condor_logs/out.$(ClusterId).$(ProcId)
+should_transfer_files = NO
+executable = condorbash.bash
+arguments = $(samplekey) $(ClusterId) $(ProcId)
+RequestDisk = 5000000
+RequestCpus = 1
++JobFlavour = "longlunch"
+queue samplekey from (
+M200_CT1
+M200_CT3
+M200_CT10
+M400_CT1
+M400_CT3
+M400_CT10
+M600_CT1
+M600_CT3
+M600_CT10
+M800_CT1
+M800_CT3
+M800_CT10
+)

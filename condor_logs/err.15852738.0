@@ -1,0 +1,140 @@
+%MSG-i ThreadStreamSetup:  (NoModuleName) 08-Jul-2026 00:06:49 CEST pre-events
+setting # threads 8
+setting # streams 8
+%MSG
+08-Jul-2026 00:06:55 CEST  Initiating request to open file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_5.root
+08-Jul-2026 00:07:07 CEST  Successfully opened file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_5.root
+Begin processing the 1st record. Run 1, Event 41001, LumiSection 411 on stream 1 at 08-Jul-2026 00:07:15.193 CEST
+Begin processing the 1001st record. Run 1, Event 42001, LumiSection 421 on stream 6 at 08-Jul-2026 00:07:38.069 CEST
+Begin processing the 2001st record. Run 1, Event 43001, LumiSection 431 on stream 1 at 08-Jul-2026 00:07:39.221 CEST
+Begin processing the 3001st record. Run 1, Event 44001, LumiSection 441 on stream 5 at 08-Jul-2026 00:07:43.032 CEST
+Begin processing the 4001st record. Run 1, Event 45001, LumiSection 451 on stream 2 at 08-Jul-2026 00:07:43.917 CEST
+Begin processing the 5001st record. Run 1, Event 45901, LumiSection 460 on stream 4 at 08-Jul-2026 00:07:45.289 CEST
+Begin processing the 6001st record. Run 1, Event 47001, LumiSection 471 on stream 5 at 08-Jul-2026 00:07:49.153 CEST
+Begin processing the 7001st record. Run 1, Event 48001, LumiSection 481 on stream 7 at 08-Jul-2026 00:07:50.040 CEST
+Begin processing the 8001st record. Run 1, Event 48901, LumiSection 490 on stream 1 at 08-Jul-2026 00:07:50.872 CEST
+Begin processing the 9001st record. Run 1, Event 49901, LumiSection 500 on stream 0 at 08-Jul-2026 00:07:54.070 CEST
+08-Jul-2026 00:07:55 CEST  Closed file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_5.root
+08-Jul-2026 00:07:55 CEST  Initiating request to open file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_3.root
+08-Jul-2026 00:07:59 CEST  Successfully opened file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_3.root
+Begin processing the 10001st record. Run 1, Event 19901, LumiSection 200 on stream 0 at 08-Jul-2026 00:08:06.919 CEST
+Begin processing the 11001st record. Run 1, Event 21001, LumiSection 211 on stream 5 at 08-Jul-2026 00:08:12.838 CEST
+Begin processing the 12001st record. Run 1, Event 22001, LumiSection 221 on stream 0 at 08-Jul-2026 00:08:13.801 CEST
+Begin processing the 13001st record. Run 1, Event 22901, LumiSection 230 on stream 4 at 08-Jul-2026 00:08:18.011 CEST
+Begin processing the 14001st record. Run 1, Event 24001, LumiSection 241 on stream 6 at 08-Jul-2026 00:08:19.116 CEST
+Begin processing the 15001st record. Run 1, Event 24901, LumiSection 250 on stream 3 at 08-Jul-2026 00:08:20.189 CEST
+Begin processing the 16001st record. Run 1, Event 26001, LumiSection 261 on stream 3 at 08-Jul-2026 00:08:24.174 CEST
+Begin processing the 17001st record. Run 1, Event 27001, LumiSection 271 on stream 0 at 08-Jul-2026 00:08:25.164 CEST
+Begin processing the 18001st record. Run 1, Event 27901, LumiSection 280 on stream 7 at 08-Jul-2026 00:08:26.339 CEST
+Begin processing the 19001st record. Run 1, Event 28801, LumiSection 289 on stream 5 at 08-Jul-2026 00:08:29.301 CEST
+08-Jul-2026 00:08:30 CEST  Closed file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_3.root
+08-Jul-2026 00:08:30 CEST  Initiating request to open file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_2.root
+08-Jul-2026 00:08:34 CEST  Successfully opened file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_2.root
+Begin processing the 20001st record. Run 1, Event 9901, LumiSection 100 on stream 7 at 08-Jul-2026 00:08:41.858 CEST
+Begin processing the 21001st record. Run 1, Event 10901, LumiSection 110 on stream 6 at 08-Jul-2026 00:08:47.853 CEST
+Begin processing the 22001st record. Run 1, Event 12001, LumiSection 121 on stream 7 at 08-Jul-2026 00:08:48.870 CEST
+Begin processing the 23001st record. Run 1, Event 12901, LumiSection 130 on stream 0 at 08-Jul-2026 00:08:52.989 CEST
+Begin processing the 24001st record. Run 1, Event 13901, LumiSection 140 on stream 3 at 08-Jul-2026 00:08:53.944 CEST
+Begin processing the 25001st record. Run 1, Event 15001, LumiSection 151 on stream 4 at 08-Jul-2026 00:08:55.024 CEST
+Begin processing the 26001st record. Run 1, Event 16001, LumiSection 161 on stream 2 at 08-Jul-2026 00:08:58.926 CEST
+Begin processing the 27001st record. Run 1, Event 17001, LumiSection 171 on stream 4 at 08-Jul-2026 00:08:59.918 CEST
+Begin processing the 28001st record. Run 1, Event 18001, LumiSection 181 on stream 5 at 08-Jul-2026 00:09:00.983 CEST
+Begin processing the 29001st record. Run 1, Event 19001, LumiSection 191 on stream 3 at 08-Jul-2026 00:09:04.125 CEST
+08-Jul-2026 00:09:05 CEST  Closed file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_2.root
+08-Jul-2026 00:09:05 CEST  Initiating request to open file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_6.root
+08-Jul-2026 00:09:08 CEST  Successfully opened file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_6.root
+Begin processing the 30001st record. Run 1, Event 51001, LumiSection 511 on stream 0 at 08-Jul-2026 00:09:17.208 CEST
+Begin processing the 31001st record. Run 1, Event 51901, LumiSection 520 on stream 3 at 08-Jul-2026 00:09:26.134 CEST
+Begin processing the 32001st record. Run 1, Event 52901, LumiSection 530 on stream 4 at 08-Jul-2026 00:09:27.105 CEST
+Begin processing the 33001st record. Run 1, Event 54001, LumiSection 541 on stream 4 at 08-Jul-2026 00:09:46.832 CEST
+Begin processing the 34001st record. Run 1, Event 54901, LumiSection 550 on stream 6 at 08-Jul-2026 00:09:47.807 CEST
+Begin processing the 35001st record. Run 1, Event 56001, LumiSection 561 on stream 4 at 08-Jul-2026 00:09:48.917 CEST
+Begin processing the 36001st record. Run 1, Event 57001, LumiSection 571 on stream 0 at 08-Jul-2026 00:09:52.769 CEST
+Begin processing the 37001st record. Run 1, Event 58001, LumiSection 581 on stream 6 at 08-Jul-2026 00:09:53.702 CEST
+Begin processing the 38001st record. Run 1, Event 58901, LumiSection 590 on stream 6 at 08-Jul-2026 00:09:54.507 CEST
+Begin processing the 39001st record. Run 1, Event 60001, LumiSection 601 on stream 0 at 08-Jul-2026 00:09:58.021 CEST
+08-Jul-2026 00:09:59 CEST  Closed file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_6.root
+08-Jul-2026 00:09:59 CEST  Initiating request to open file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_8.root
+08-Jul-2026 00:10:03 CEST  Successfully opened file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_8.root
+Begin processing the 40001st record. Run 1, Event 70901, LumiSection 710 on stream 4 at 08-Jul-2026 00:10:10.992 CEST
+Begin processing the 41001st record. Run 1, Event 72001, LumiSection 721 on stream 1 at 08-Jul-2026 00:10:17.196 CEST
+Begin processing the 42001st record. Run 1, Event 73001, LumiSection 731 on stream 3 at 08-Jul-2026 00:10:18.074 CEST
+Begin processing the 43001st record. Run 1, Event 73901, LumiSection 740 on stream 6 at 08-Jul-2026 00:10:21.963 CEST
+Begin processing the 44001st record. Run 1, Event 75001, LumiSection 751 on stream 0 at 08-Jul-2026 00:10:23.031 CEST
+Begin processing the 45001st record. Run 1, Event 75901, LumiSection 760 on stream 0 at 08-Jul-2026 00:10:24.060 CEST
+Begin processing the 46001st record. Run 1, Event 76901, LumiSection 770 on stream 6 at 08-Jul-2026 00:10:28.042 CEST
+Begin processing the 47001st record. Run 1, Event 78001, LumiSection 781 on stream 0 at 08-Jul-2026 00:10:28.912 CEST
+Begin processing the 48001st record. Run 1, Event 79001, LumiSection 791 on stream 4 at 08-Jul-2026 00:10:29.933 CEST
+Begin processing the 49001st record. Run 1, Event 79901, LumiSection 800 on stream 7 at 08-Jul-2026 00:10:33.028 CEST
+08-Jul-2026 00:10:34 CEST  Closed file root://cms-xrd-global.cern.ch//store/user/brlopesd/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_v2/StopStopbarTo2Dbar2D_M-200_CTau-1mm_Summer24_100k_miniAOD_v2/250214_150834/0000/stop_dbar_miniAOD_8.root
+
+TrigReport ---------- Event  Summary ------------
+TrigReport Events total = 50000 passed = 50000 failed = 0
+
+TrigReport ---------- Path   Summary ------------
+TrigReport  Trig Bit#   Executed     Passed     Failed      Error Name
+TrigReport     1    0      50000      50000          0          0 p
+
+
+TrigReport -------End-Path   Summary ------------
+TrigReport  Trig Bit#   Executed     Passed     Failed      Error Name
+
+
+TrigReport ---------- Modules in Path: p ------------
+TrigReport  Trig Bit#    Visited     Passed     Failed      Error Name
+TrigReport     1    0      50000      50000          0          0 hltScoutingUnpackProducer
+TrigReport     1    1      50000      50000          0          0 offlineBeamSpot
+TrigReport     1    2      50000      50000          0          0 Vertexer
+TrigReport     1    3      50000      50000          0          0 scoutingComparer
+
+
+TrigReport ---------- Module Summary ------------
+TrigReport    Visited   Executed     Passed     Failed      Error Name
+TrigReport      50000      50000      50000          0          0 TriggerResults
+TrigReport      50000      50000      50000          0          0 Vertexer
+TrigReport      50000      50000      50000          0          0 hltScoutingUnpackProducer
+TrigReport      50000      50000      50000          0          0 offlineBeamSpot
+TrigReport      50000      50000      50000          0          0 p
+TrigReport      50000      50000      50000          0          0 scoutingComparer
+
+
+TimeReport ---------- Event  Summary ---[sec]----
+TimeReport       event loop CPU/event = 0.005099
+TimeReport      event loop Real/event = 0.004022
+TimeReport     sum Streams Real/event = 0.011223
+TimeReport efficiency CPU/Real/thread = 0.158467
+
+TimeReport ---------- Path   Summary ---[Real sec]----
+TimeReport  per event     per exec  Name
+TimeReport   0.011045     0.011045  p
+
+TimeReport  per event     per exec  Name
+
+TimeReport -------End-Path   Summary ---[Real sec]----
+TimeReport  per event     per exec  Name
+
+TimeReport  per event     per exec  Name
+
+TimeReport ---------- Modules in Path: p ---[Real sec]----
+TimeReport  per event    per visit  Name
+TimeReport   0.000046     0.000046  hltScoutingUnpackProducer
+TimeReport   0.000010     0.000010  offlineBeamSpot
+TimeReport   0.003887     0.003887  Vertexer
+TimeReport   0.000056     0.000056  scoutingComparer
+
+TimeReport  per event    per visit  Name
+
+TimeReport ---------- Module Summary ---[Real sec]----
+TimeReport  per event     per exec    per visit  Name
+TimeReport   0.000001     0.000001     0.000001  TriggerResults
+TimeReport   0.003887     0.003887     0.003887  Vertexer
+TimeReport   0.000046     0.000046     0.000046  hltScoutingUnpackProducer
+TimeReport   0.000010     0.000010     0.000010  offlineBeamSpot
+TimeReport   0.000002     0.000002     0.000002  p
+TimeReport   0.000056     0.000056     0.000056  scoutingComparer
+
+TimeReport  per event     per exec    per visit  Name
+
+T---Report end!
+
+

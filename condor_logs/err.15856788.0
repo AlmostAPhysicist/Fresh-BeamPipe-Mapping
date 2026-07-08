@@ -1,0 +1,354 @@
+%MSG-i ThreadStreamSetup:  (NoModuleName) 08-Jul-2026 10:24:33 CEST pre-events
+setting # threads 8
+setting # streams 8
+%MSG
+08-Jul-2026 10:24:46 CEST  Initiating request to open file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/8c69c404-096f-4320-9e45-14c36a83c30c.root
+08-Jul-2026 10:24:58 CEST  Successfully opened file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/8c69c404-096f-4320-9e45-14c36a83c30c.root
+Begin processing the 1st record. Run 1, Event 781777, LumiSection 1069 on stream 2 at 08-Jul-2026 10:25:06.125 CEST
+Begin processing the 1001st record. Run 1, Event 831089, LumiSection 1136 on stream 3 at 08-Jul-2026 10:25:26.391 CEST
+Begin processing the 2001st record. Run 1, Event 849662, LumiSection 1161 on stream 1 at 08-Jul-2026 10:25:27.593 CEST
+%MSG-w XrdAdaptorLvl3:  AfterSource 08-Jul-2026 10:25:44 CEST AfterSource
+Deactivating se27.cscs.ch from active sources because its quality (1984) is higher than 260 and 4 times larger than the other active server cmsstor718.fnal.gov (263) 
+%MSG
+Begin processing the 3001st record. Run 1, Event 2281723, LumiSection 3118 on stream 4 at 08-Jul-2026 10:25:46.870 CEST
+Begin processing the 4001st record. Run 1, Event 2282705, LumiSection 3119 on stream 5 at 08-Jul-2026 10:25:48.067 CEST
+Begin processing the 5001st record. Run 1, Event 2300551, LumiSection 3143 on stream 0 at 08-Jul-2026 10:25:49.256 CEST
+Begin processing the 6001st record. Run 1, Event 2438444, LumiSection 3332 on stream 0 at 08-Jul-2026 10:25:54.066 CEST
+Begin processing the 7001st record. Run 1, Event 2454807, LumiSection 3354 on stream 5 at 08-Jul-2026 10:25:55.326 CEST
+Begin processing the 8001st record. Run 1, Event 2459470, LumiSection 3360 on stream 7 at 08-Jul-2026 10:25:56.535 CEST
+Begin processing the 9001st record. Run 1, Event 2606148, LumiSection 3561 on stream 3 at 08-Jul-2026 10:26:03.378 CEST
+Begin processing the 10001st record. Run 1, Event 2672288, LumiSection 3651 on stream 3 at 08-Jul-2026 10:26:04.611 CEST
+Begin processing the 11001st record. Run 1, Event 2875315, LumiSection 3929 on stream 7 at 08-Jul-2026 10:26:09.311 CEST
+Begin processing the 12001st record. Run 1, Event 2895355, LumiSection 3956 on stream 3 at 08-Jul-2026 10:26:10.514 CEST
+Begin processing the 13001st record. Run 1, Event 2896368, LumiSection 3957 on stream 4 at 08-Jul-2026 10:26:11.753 CEST
+Begin processing the 14001st record. Run 1, Event 4417714, LumiSection 6036 on stream 6 at 08-Jul-2026 10:26:16.753 CEST
+Begin processing the 15001st record. Run 1, Event 4442873, LumiSection 6070 on stream 6 at 08-Jul-2026 10:26:17.984 CEST
+Begin processing the 16001st record. Run 1, Event 4443862, LumiSection 6071 on stream 5 at 08-Jul-2026 10:26:19.231 CEST
+Begin processing the 17001st record. Run 1, Event 4503442, LumiSection 6153 on stream 6 at 08-Jul-2026 10:26:24.059 CEST
+Begin processing the 18001st record. Run 1, Event 4586408, LumiSection 6266 on stream 3 at 08-Jul-2026 10:26:25.117 CEST
+Begin processing the 19001st record. Run 1, Event 4587412, LumiSection 6267 on stream 4 at 08-Jul-2026 10:26:29.485 CEST
+Begin processing the 20001st record. Run 1, Event 4667463, LumiSection 6377 on stream 1 at 08-Jul-2026 10:26:30.702 CEST
+Begin processing the 21001st record. Run 1, Event 4669200, LumiSection 6379 on stream 6 at 08-Jul-2026 10:26:31.809 CEST
+Begin processing the 22001st record. Run 1, Event 4709699, LumiSection 6435 on stream 0 at 08-Jul-2026 10:26:36.370 CEST
+Begin processing the 23001st record. Run 1, Event 4712205, LumiSection 6438 on stream 7 at 08-Jul-2026 10:26:37.526 CEST
+Begin processing the 24001st record. Run 1, Event 4725647, LumiSection 6456 on stream 2 at 08-Jul-2026 10:26:38.694 CEST
+Begin processing the 25001st record. Run 1, Event 4884752, LumiSection 6674 on stream 6 at 08-Jul-2026 10:26:43.374 CEST
+Begin processing the 26001st record. Run 1, Event 4889400, LumiSection 6680 on stream 4 at 08-Jul-2026 10:26:44.475 CEST
+Begin processing the 27001st record. Run 1, Event 4911632, LumiSection 6710 on stream 2 at 08-Jul-2026 10:26:45.624 CEST
+Begin processing the 28001st record. Run 1, Event 4944108, LumiSection 6755 on stream 2 at 08-Jul-2026 10:26:50.317 CEST
+Begin processing the 29001st record. Run 1, Event 4965612, LumiSection 6784 on stream 1 at 08-Jul-2026 10:26:51.529 CEST
+Begin processing the 30001st record. Run 1, Event 4968812, LumiSection 6788 on stream 2 at 08-Jul-2026 10:26:56.662 CEST
+Begin processing the 31001st record. Run 1, Event 5047390, LumiSection 6896 on stream 6 at 08-Jul-2026 10:26:57.922 CEST
+Begin processing the 32001st record. Run 1, Event 5071080, LumiSection 6928 on stream 4 at 08-Jul-2026 10:26:59.142 CEST
+Begin processing the 33001st record. Run 1, Event 5079404, LumiSection 6940 on stream 5 at 08-Jul-2026 10:27:03.783 CEST
+Begin processing the 34001st record. Run 1, Event 5085535, LumiSection 6948 on stream 1 at 08-Jul-2026 10:27:04.991 CEST
+Begin processing the 35001st record. Run 1, Event 5089470, LumiSection 6953 on stream 1 at 08-Jul-2026 10:27:06.190 CEST
+08-Jul-2026 10:27:09 CEST  Closed file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/8c69c404-096f-4320-9e45-14c36a83c30c.root
+08-Jul-2026 10:27:09 CEST  Initiating request to open file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/06967f31-a721-407e-a80e-9bd5cb99a7e8.root
+08-Jul-2026 10:27:11 CEST  Successfully opened file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/06967f31-a721-407e-a80e-9bd5cb99a7e8.root
+Begin processing the 36001st record. Run 1, Event 39664, LumiSection 55 on stream 6 at 08-Jul-2026 10:27:55.870 CEST
+Begin processing the 37001st record. Run 1, Event 154120, LumiSection 211 on stream 5 at 08-Jul-2026 10:27:57.061 CEST
+Begin processing the 38001st record. Run 1, Event 192445, LumiSection 263 on stream 7 at 08-Jul-2026 10:27:58.168 CEST
+Begin processing the 39001st record. Run 1, Event 358153, LumiSection 490 on stream 1 at 08-Jul-2026 10:28:14.819 CEST
+Begin processing the 40001st record. Run 1, Event 573633, LumiSection 784 on stream 6 at 08-Jul-2026 10:28:15.999 CEST
+Begin processing the 41001st record. Run 1, Event 759821, LumiSection 1039 on stream 0 at 08-Jul-2026 10:28:17.153 CEST
+Begin processing the 42001st record. Run 1, Event 798898, LumiSection 1092 on stream 5 at 08-Jul-2026 10:28:48.342 CEST
+Begin processing the 43001st record. Run 1, Event 813783, LumiSection 1112 on stream 6 at 08-Jul-2026 10:28:49.448 CEST
+Begin processing the 44001st record. Run 1, Event 888731, LumiSection 1215 on stream 1 at 08-Jul-2026 10:29:00.630 CEST
+Begin processing the 45001st record. Run 1, Event 901453, LumiSection 1232 on stream 5 at 08-Jul-2026 10:29:01.748 CEST
+Begin processing the 46001st record. Run 1, Event 934638, LumiSection 1277 on stream 6 at 08-Jul-2026 10:29:02.776 CEST
+Begin processing the 47001st record. Run 1, Event 952501, LumiSection 1302 on stream 2 at 08-Jul-2026 10:29:11.060 CEST
+Begin processing the 48001st record. Run 1, Event 967397, LumiSection 1322 on stream 1 at 08-Jul-2026 10:29:12.382 CEST
+Begin processing the 49001st record. Run 1, Event 974978, LumiSection 1332 on stream 0 at 08-Jul-2026 10:29:13.496 CEST
+Begin processing the 50001st record. Run 1, Event 1044766, LumiSection 1428 on stream 1 at 08-Jul-2026 10:29:24.952 CEST
+Begin processing the 51001st record. Run 1, Event 1101429, LumiSection 1505 on stream 7 at 08-Jul-2026 10:29:26.406 CEST
+Begin processing the 52001st record. Run 1, Event 1167568, LumiSection 1596 on stream 5 at 08-Jul-2026 10:29:27.519 CEST
+Begin processing the 53001st record. Run 1, Event 1224937, LumiSection 1674 on stream 0 at 08-Jul-2026 10:29:39.038 CEST
+Begin processing the 54001st record. Run 1, Event 1275707, LumiSection 1743 on stream 0 at 08-Jul-2026 10:29:40.240 CEST
+Begin processing the 55001st record. Run 1, Event 1329415, LumiSection 1817 on stream 4 at 08-Jul-2026 10:29:53.150 CEST
+Begin processing the 56001st record. Run 1, Event 1367746, LumiSection 1869 on stream 1 at 08-Jul-2026 10:29:54.375 CEST
+Begin processing the 57001st record. Run 1, Event 1375338, LumiSection 1879 on stream 4 at 08-Jul-2026 10:29:55.469 CEST
+Begin processing the 58001st record. Run 1, Event 2688806, LumiSection 3674 on stream 4 at 08-Jul-2026 10:30:06.741 CEST
+Begin processing the 59001st record. Run 1, Event 4475157, LumiSection 6114 on stream 1 at 08-Jul-2026 10:30:07.974 CEST
+[2026-07-08 10:30:08.960693 +0200][Error  ][PostMaster        ] [cmssrv608.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+Begin processing the 60001st record. Run 1, Event 4514957, LumiSection 6168 on stream 0 at 08-Jul-2026 10:30:09.268 CEST
+Begin processing the 61001st record. Run 1, Event 4694566, LumiSection 6414 on stream 2 at 08-Jul-2026 10:30:20.074 CEST
+Begin processing the 62001st record. Run 1, Event 4697771, LumiSection 6418 on stream 3 at 08-Jul-2026 10:30:21.359 CEST
+Begin processing the 63001st record. Run 1, Event 4807817, LumiSection 6569 on stream 0 at 08-Jul-2026 10:30:42.664 CEST
+Begin processing the 64001st record. Run 1, Event 4903243, LumiSection 6699 on stream 6 at 08-Jul-2026 10:30:43.740 CEST
+Begin processing the 65001st record. Run 1, Event 5052863, LumiSection 6903 on stream 2 at 08-Jul-2026 10:30:44.775 CEST
+Begin processing the 66001st record. Run 1, Event 5078733, LumiSection 6939 on stream 6 at 08-Jul-2026 10:31:01.488 CEST
+Begin processing the 67001st record. Run 1, Event 5101702, LumiSection 6970 on stream 5 at 08-Jul-2026 10:31:02.586 CEST
+Begin processing the 68001st record. Run 1, Event 5109276, LumiSection 6980 on stream 4 at 08-Jul-2026 10:31:03.610 CEST
+08-Jul-2026 10:31:03 CEST  Closed file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/06967f31-a721-407e-a80e-9bd5cb99a7e8.root
+08-Jul-2026 10:31:03 CEST  Initiating request to open file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/c55218b2-b07e-4ede-a0b9-e09dd40fc23a.root
+08-Jul-2026 10:31:05 CEST  Successfully opened file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/c55218b2-b07e-4ede-a0b9-e09dd40fc23a.root
+%MSG-w XrdAdaptorLvl3:  source 08-Jul-2026 10:31:13 CEST PreSource
+Deactivating cmsstor206.fnal.gov from active sources because its quality (1235) is higher than 260 and 4 times larger than the other active server se09.cscs.ch (250) 
+%MSG
+Begin processing the 69001st record. Run 1, Event 326666, LumiSection 447 on stream 5 at 08-Jul-2026 10:31:58.751 CEST
+Begin processing the 70001st record. Run 1, Event 457231, LumiSection 625 on stream 3 at 08-Jul-2026 10:31:59.883 CEST
+[2026-07-08 10:32:10.705502 +0200][Error  ][PostMaster        ] [se27.cscs.ch:36185] Forcing error on disconnect: [ERROR] Operation interrupted.
+[2026-07-08 10:32:24.218470 +0200][Error  ][PostMaster        ] [cmsstor718.fnal.gov:15859] Forcing error on disconnect: [ERROR] Operation interrupted.
+Begin processing the 71001st record. Run 1, Event 482377, LumiSection 659 on stream 2 at 08-Jul-2026 10:32:37.120 CEST
+Begin processing the 72001st record. Run 1, Event 502414, LumiSection 687 on stream 3 at 08-Jul-2026 10:32:38.312 CEST
+Begin processing the 73001st record. Run 1, Event 542955, LumiSection 742 on stream 5 at 08-Jul-2026 10:32:39.411 CEST
+Begin processing the 74001st record. Run 1, Event 560791, LumiSection 767 on stream 4 at 08-Jul-2026 10:33:24.748 CEST
+Begin processing the 75001st record. Run 1, Event 591063, LumiSection 808 on stream 7 at 08-Jul-2026 10:33:25.912 CEST
+Begin processing the 76001st record. Run 1, Event 606699, LumiSection 829 on stream 3 at 08-Jul-2026 10:33:26.995 CEST
+Begin processing the 77001st record. Run 1, Event 729218, LumiSection 997 on stream 5 at 08-Jul-2026 10:34:09.864 CEST
+Begin processing the 78001st record. Run 1, Event 921992, LumiSection 1260 on stream 0 at 08-Jul-2026 10:34:11.207 CEST
+Begin processing the 79001st record. Run 1, Event 1019623, LumiSection 1393 on stream 0 at 08-Jul-2026 10:34:56.531 CEST
+Begin processing the 80001st record. Run 1, Event 1115033, LumiSection 1524 on stream 5 at 08-Jul-2026 10:34:57.784 CEST
+Begin processing the 81001st record. Run 1, Event 1152648, LumiSection 1575 on stream 1 at 08-Jul-2026 10:34:59.009 CEST
+Begin processing the 82001st record. Run 1, Event 1209283, LumiSection 1653 on stream 0 at 08-Jul-2026 10:35:43.639 CEST
+Begin processing the 83001st record. Run 1, Event 1230781, LumiSection 1682 on stream 7 at 08-Jul-2026 10:35:45.183 CEST
+Begin processing the 84001st record. Run 1, Event 1339364, LumiSection 1830 on stream 3 at 08-Jul-2026 10:35:46.747 CEST
+[2026-07-08 10:36:05.038448 +0200][Error  ][PostMaster        ] [se25.cscs.ch:36617] Forcing error on disconnect: [ERROR] Operation interrupted.
+[2026-07-08 10:36:05.190437 +0200][Error  ][PostMaster        ] [cmsstor332.fnal.gov:19868] Forcing error on disconnect: [ERROR] Operation interrupted.
+[2026-07-08 10:36:06.732552 +0200][Error  ][PostMaster        ] [cms03.lcg.cscs.ch:1094] Forcing error on disconnect: [ERROR] Operation interrupted.
+[2026-07-08 10:36:26.566642 +0200][Error  ][PostMaster        ] [cmsxrootd-site3.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+Begin processing the 85001st record. Run 1, Event 1469210, LumiSection 2008 on stream 5 at 08-Jul-2026 10:36:27.764 CEST
+Begin processing the 86001st record. Run 1, Event 1471679, LumiSection 2011 on stream 2 at 08-Jul-2026 10:36:28.870 CEST
+Begin processing the 87001st record. Run 1, Event 1482920, LumiSection 2026 on stream 0 at 08-Jul-2026 10:37:15.448 CEST
+Begin processing the 88001st record. Run 1, Event 1505147, LumiSection 2057 on stream 2 at 08-Jul-2026 10:37:16.762 CEST
+Begin processing the 89001st record. Run 1, Event 3036028, LumiSection 4148 on stream 1 at 08-Jul-2026 10:37:18.124 CEST
+Begin processing the 90001st record. Run 1, Event 3135859, LumiSection 4284 on stream 2 at 08-Jul-2026 10:37:58.166 CEST
+Begin processing the 91001st record. Run 1, Event 3250309, LumiSection 4441 on stream 7 at 08-Jul-2026 10:37:59.371 CEST
+Begin processing the 92001st record. Run 1, Event 3281327, LumiSection 4483 on stream 5 at 08-Jul-2026 10:38:00.445 CEST
+Begin processing the 93001st record. Run 1, Event 3365036, LumiSection 4598 on stream 5 at 08-Jul-2026 10:38:44.546 CEST
+Begin processing the 94001st record. Run 1, Event 3387260, LumiSection 4628 on stream 0 at 08-Jul-2026 10:38:45.778 CEST
+Begin processing the 95001st record. Run 1, Event 3401442, LumiSection 4647 on stream 1 at 08-Jul-2026 10:38:47.075 CEST
+Begin processing the 96001st record. Run 1, Event 3458812, LumiSection 4726 on stream 5 at 08-Jul-2026 10:39:33.242 CEST
+Begin processing the 97001st record. Run 1, Event 3468598, LumiSection 4739 on stream 4 at 08-Jul-2026 10:39:34.618 CEST
+Begin processing the 98001st record. Run 1, Event 3522301, LumiSection 4812 on stream 1 at 08-Jul-2026 10:40:15.366 CEST
+Begin processing the 99001st record. Run 1, Event 3568694, LumiSection 4876 on stream 3 at 08-Jul-2026 10:40:16.485 CEST
+Begin processing the 100001st record. Run 1, Event 3637026, LumiSection 4969 on stream 6 at 08-Jul-2026 10:40:17.804 CEST
+Begin processing the 101001st record. Run 1, Event 4874382, LumiSection 6659 on stream 7 at 08-Jul-2026 10:40:49.581 CEST
+Begin processing the 102001st record. Run 1, Event 5988741, LumiSection 8182 on stream 5 at 08-Jul-2026 10:40:50.773 CEST
+08-Jul-2026 10:40:51 CEST  Closed file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/c55218b2-b07e-4ede-a0b9-e09dd40fc23a.root
+08-Jul-2026 10:40:51 CEST  Initiating request to open file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/5b6d5816-2d30-4995-be88-c0c464c7cfa0.root
+08-Jul-2026 10:40:54 CEST  Successfully opened file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/5b6d5816-2d30-4995-be88-c0c464c7cfa0.root
+Begin processing the 103001st record. Run 1, Event 306495, LumiSection 419 on stream 4 at 08-Jul-2026 10:41:02.777 CEST
+Begin processing the 104001st record. Run 1, Event 1476503, LumiSection 2018 on stream 2 at 08-Jul-2026 10:41:04.087 CEST
+Begin processing the 105001st record. Run 1, Event 1607050, LumiSection 2196 on stream 1 at 08-Jul-2026 10:41:05.324 CEST
+[2026-07-08 10:41:28.502767 +0200][Error  ][PostMaster        ] [cmsxrootd-site2.fnal.gov:1093] Forcing error on disconnect: [ERROR] Operation interrupted.
+%MSG-w XrdAdaptorLvl3:  AfterSource 08-Jul-2026 10:41:32 CEST AfterSource
+Deactivating se20.cscs.ch from active sources because the quality (6739) is above 5130 and it is not the only active server
+%MSG
+%MSG-w XrdAdaptorLvl3:  AfterSource 08-Jul-2026 10:41:32 CEST AfterSource
+Deactivating se20.cscs.ch from active sources because its quality (6739) is higher than 260 and 4 times larger than the other active server cmsstor108.fnal.gov (214) 
+%MSG
+Begin processing the 106001st record. Run 1, Event 1669554, LumiSection 2281 on stream 6 at 08-Jul-2026 10:41:36.110 CEST
+Begin processing the 107001st record. Run 1, Event 1715926, LumiSection 2345 on stream 0 at 08-Jul-2026 10:41:37.359 CEST
+Begin processing the 108001st record. Run 1, Event 1716937, LumiSection 2346 on stream 7 at 08-Jul-2026 10:41:42.302 CEST
+Begin processing the 109001st record. Run 1, Event 1721599, LumiSection 2352 on stream 5 at 08-Jul-2026 10:41:43.615 CEST
+Begin processing the 110001st record. Run 1, Event 1740173, LumiSection 2378 on stream 4 at 08-Jul-2026 10:41:44.893 CEST
+Begin processing the 111001st record. Run 1, Event 1776303, LumiSection 2427 on stream 0 at 08-Jul-2026 10:41:49.124 CEST
+Begin processing the 112001st record. Run 1, Event 1796331, LumiSection 2455 on stream 4 at 08-Jul-2026 10:41:50.381 CEST
+Begin processing the 113001st record. Run 1, Event 1803190, LumiSection 2464 on stream 6 at 08-Jul-2026 10:41:51.478 CEST
+Begin processing the 114001st record. Run 1, Event 1804923, LumiSection 2466 on stream 7 at 08-Jul-2026 10:41:55.984 CEST
+Begin processing the 115001st record. Run 1, Event 1810313, LumiSection 2474 on stream 4 at 08-Jul-2026 10:41:57.264 CEST
+Begin processing the 116001st record. Run 1, Event 1835471, LumiSection 2508 on stream 0 at 08-Jul-2026 10:42:01.725 CEST
+Begin processing the 117001st record. Run 1, Event 1862084, LumiSection 2544 on stream 6 at 08-Jul-2026 10:42:03.040 CEST
+Begin processing the 118001st record. Run 1, Event 1879927, LumiSection 2569 on stream 2 at 08-Jul-2026 10:42:04.293 CEST
+Begin processing the 119001st record. Run 1, Event 1908015, LumiSection 2607 on stream 7 at 08-Jul-2026 10:42:09.080 CEST
+Begin processing the 120001st record. Run 1, Event 1924390, LumiSection 2629 on stream 3 at 08-Jul-2026 10:42:10.466 CEST
+Begin processing the 121001st record. Run 1, Event 1972233, LumiSection 2695 on stream 7 at 08-Jul-2026 10:42:11.874 CEST
+Begin processing the 122001st record. Run 1, Event 1985670, LumiSection 2713 on stream 4 at 08-Jul-2026 10:42:16.367 CEST
+Begin processing the 123001st record. Run 1, Event 2005707, LumiSection 2741 on stream 0 at 08-Jul-2026 10:42:17.643 CEST
+Begin processing the 124001st record. Run 1, Event 2010362, LumiSection 2747 on stream 7 at 08-Jul-2026 10:42:18.980 CEST
+Begin processing the 125001st record. Run 1, Event 2061876, LumiSection 2817 on stream 4 at 08-Jul-2026 10:42:23.262 CEST
+Begin processing the 126001st record. Run 1, Event 2085552, LumiSection 2850 on stream 6 at 08-Jul-2026 10:42:24.561 CEST
+Begin processing the 127001st record. Run 1, Event 2130488, LumiSection 2911 on stream 3 at 08-Jul-2026 10:42:29.108 CEST
+Begin processing the 128001st record. Run 1, Event 3063317, LumiSection 4185 on stream 6 at 08-Jul-2026 10:42:30.418 CEST
+Begin processing the 129001st record. Run 1, Event 3348332, LumiSection 4575 on stream 3 at 08-Jul-2026 10:42:31.692 CEST
+Begin processing the 130001st record. Run 1, Event 3396919, LumiSection 4641 on stream 4 at 08-Jul-2026 10:42:35.948 CEST
+Begin processing the 131001st record. Run 1, Event 3513562, LumiSection 4800 on stream 4 at 08-Jul-2026 10:42:37.168 CEST
+Begin processing the 132001st record. Run 1, Event 3688801, LumiSection 5040 on stream 0 at 08-Jul-2026 10:42:38.471 CEST
+Begin processing the 133001st record. Run 1, Event 3755668, LumiSection 5131 on stream 5 at 08-Jul-2026 10:42:42.679 CEST
+Begin processing the 134001st record. Run 1, Event 3936009, LumiSection 5378 on stream 7 at 08-Jul-2026 10:42:44.000 CEST
+08-Jul-2026 10:42:44 CEST  Closed file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/5b6d5816-2d30-4995-be88-c0c464c7cfa0.root
+08-Jul-2026 10:42:44 CEST  Initiating request to open file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/a8699972-6afb-4d64-b374-b98db3ee4e42.root
+08-Jul-2026 10:42:50 CEST  Successfully opened file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/a8699972-6afb-4d64-b374-b98db3ee4e42.root
+%MSG-w XrdAdaptorLvl3:  AfterSource 08-Jul-2026 10:43:01 CEST AfterSource
+Deactivating se08.cscs.ch from active sources because its quality (4260) is higher than 260 and 4 times larger than the other active server cmsstor707.fnal.gov (201) 
+%MSG
+Begin processing the 135001st record. Run 1, Event 1628284, LumiSection 2225 on stream 7 at 08-Jul-2026 10:43:04.360 CEST
+Begin processing the 136001st record. Run 1, Event 1892068, LumiSection 2585 on stream 3 at 08-Jul-2026 10:43:05.498 CEST
+Begin processing the 137001st record. Run 1, Event 1967006, LumiSection 2688 on stream 7 at 08-Jul-2026 10:43:06.653 CEST
+Begin processing the 138001st record. Run 1, Event 2028748, LumiSection 2772 on stream 5 at 08-Jul-2026 10:43:11.157 CEST
+Begin processing the 139001st record. Run 1, Event 2057562, LumiSection 2811 on stream 7 at 08-Jul-2026 10:43:12.453 CEST
+Begin processing the 140001st record. Run 1, Event 2101026, LumiSection 2871 on stream 6 at 08-Jul-2026 10:43:13.523 CEST
+Begin processing the 141001st record. Run 1, Event 2154730, LumiSection 2944 on stream 3 at 08-Jul-2026 10:43:17.920 CEST
+Begin processing the 142001st record. Run 1, Event 3149791, LumiSection 4303 on stream 1 at 08-Jul-2026 10:43:19.105 CEST
+Begin processing the 143001st record. Run 1, Event 3710759, LumiSection 5070 on stream 4 at 08-Jul-2026 10:43:23.452 CEST
+Begin processing the 144001st record. Run 1, Event 3761535, LumiSection 5139 on stream 5 at 08-Jul-2026 10:43:24.724 CEST
+Begin processing the 145001st record. Run 1, Event 3833544, LumiSection 5238 on stream 2 at 08-Jul-2026 10:43:26.023 CEST
+Begin processing the 146001st record. Run 1, Event 3839669, LumiSection 5246 on stream 5 at 08-Jul-2026 10:43:30.430 CEST
+Begin processing the 147001st record. Run 1, Event 3881652, LumiSection 5303 on stream 3 at 08-Jul-2026 10:43:31.786 CEST
+Begin processing the 148001st record. Run 1, Event 3900974, LumiSection 5330 on stream 7 at 08-Jul-2026 10:43:32.927 CEST
+Begin processing the 149001st record. Run 1, Event 3903427, LumiSection 5333 on stream 5 at 08-Jul-2026 10:43:37.106 CEST
+Begin processing the 150001st record. Run 1, Event 3929314, LumiSection 5368 on stream 6 at 08-Jul-2026 10:43:38.326 CEST
+Begin processing the 151001st record. Run 1, Event 3988877, LumiSection 5450 on stream 0 at 08-Jul-2026 10:43:42.588 CEST
+Begin processing the 152001st record. Run 1, Event 4004524, LumiSection 5471 on stream 5 at 08-Jul-2026 10:43:43.936 CEST
+Begin processing the 153001st record. Run 1, Event 4072870, LumiSection 5565 on stream 5 at 08-Jul-2026 10:43:45.161 CEST
+Begin processing the 154001st record. Run 1, Event 4078989, LumiSection 5573 on stream 1 at 08-Jul-2026 10:43:49.558 CEST
+Begin processing the 155001st record. Run 1, Event 4165639, LumiSection 5691 on stream 2 at 08-Jul-2026 10:43:50.914 CEST
+Begin processing the 156001st record. Run 1, Event 4196645, LumiSection 5734 on stream 5 at 08-Jul-2026 10:43:52.080 CEST
+Begin processing the 157001st record. Run 1, Event 4277422, LumiSection 5844 on stream 2 at 08-Jul-2026 10:43:56.329 CEST
+Begin processing the 158001st record. Run 1, Event 4332604, LumiSection 5919 on stream 6 at 08-Jul-2026 10:43:57.588 CEST
+Begin processing the 159001st record. Run 1, Event 5265429, LumiSection 7194 on stream 2 at 08-Jul-2026 10:44:01.944 CEST
+Begin processing the 160001st record. Run 1, Event 5426745, LumiSection 7414 on stream 3 at 08-Jul-2026 10:44:03.301 CEST
+Begin processing the 161001st record. Run 1, Event 5508993, LumiSection 7526 on stream 1 at 08-Jul-2026 10:44:04.457 CEST
+Begin processing the 162001st record. Run 1, Event 5564143, LumiSection 7602 on stream 2 at 08-Jul-2026 10:44:09.176 CEST
+Begin processing the 163001st record. Run 1, Event 5585654, LumiSection 7631 on stream 7 at 08-Jul-2026 10:44:10.417 CEST
+Begin processing the 164001st record. Run 1, Event 5847985, LumiSection 7990 on stream 2 at 08-Jul-2026 10:44:11.742 CEST
+Begin processing the 165001st record. Run 1, Event 5931701, LumiSection 8104 on stream 2 at 08-Jul-2026 10:44:15.140 CEST
+08-Jul-2026 10:44:15 CEST  Closed file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/a8699972-6afb-4d64-b374-b98db3ee4e42.root
+08-Jul-2026 10:44:15 CEST  Initiating request to open file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/ccd7f6b3-a43e-4dbb-9e5f-70c690f1d444.root
+08-Jul-2026 10:44:18 CEST  Successfully opened file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/ccd7f6b3-a43e-4dbb-9e5f-70c690f1d444.root
+Begin processing the 166001st record. Run 1, Event 23244, LumiSection 32 on stream 1 at 08-Jul-2026 10:44:49.073 CEST
+Begin processing the 167001st record. Run 1, Event 104060, LumiSection 143 on stream 3 at 08-Jul-2026 10:44:50.506 CEST
+Begin processing the 168001st record. Run 1, Event 184106, LumiSection 252 on stream 6 at 08-Jul-2026 10:44:51.817 CEST
+Begin processing the 169001st record. Run 1, Event 186565, LumiSection 255 on stream 0 at 08-Jul-2026 10:45:03.009 CEST
+Begin processing the 170001st record. Run 1, Event 401318, LumiSection 549 on stream 3 at 08-Jul-2026 10:45:04.444 CEST
+Begin processing the 171001st record. Run 1, Event 489435, LumiSection 669 on stream 6 at 08-Jul-2026 10:45:17.277 CEST
+Begin processing the 172001st record. Run 1, Event 1303669, LumiSection 1781 on stream 3 at 08-Jul-2026 10:45:18.705 CEST
+Begin processing the 173001st record. Run 1, Event 1778287, LumiSection 2430 on stream 4 at 08-Jul-2026 10:45:20.033 CEST
+%MSG-w XrdAdaptorLvl3:  AfterSource 08-Jul-2026 10:45:23 CEST AfterSource
+Deactivating se09.cscs.ch from active sources because its quality (2273) is higher than 260 and 4 times larger than the other active server cmsstor313.fnal.gov (549) 
+%MSG
+Begin processing the 174001st record. Run 1, Event 1989344, LumiSection 2718 on stream 6 at 08-Jul-2026 10:45:25.745 CEST
+Begin processing the 175001st record. Run 1, Event 2275843, LumiSection 3110 on stream 2 at 08-Jul-2026 10:45:27.017 CEST
+Begin processing the 176001st record. Run 1, Event 2535241, LumiSection 3464 on stream 2 at 08-Jul-2026 10:45:28.322 CEST
+Begin processing the 177001st record. Run 1, Event 2541373, LumiSection 3472 on stream 0 at 08-Jul-2026 10:45:33.651 CEST
+Begin processing the 178001st record. Run 1, Event 2846878, LumiSection 3890 on stream 5 at 08-Jul-2026 10:45:34.884 CEST
+Begin processing the 179001st record. Run 1, Event 2867625, LumiSection 3918 on stream 2 at 08-Jul-2026 10:45:39.171 CEST
+Begin processing the 180001st record. Run 1, Event 2900093, LumiSection 3962 on stream 5 at 08-Jul-2026 10:45:40.346 CEST
+Begin processing the 181001st record. Run 1, Event 3475728, LumiSection 4749 on stream 3 at 08-Jul-2026 10:45:41.658 CEST
+Begin processing the 182001st record. Run 1, Event 3566772, LumiSection 4873 on stream 7 at 08-Jul-2026 10:45:46.378 CEST
+Begin processing the 183001st record. Run 1, Event 3590472, LumiSection 4906 on stream 0 at 08-Jul-2026 10:45:47.840 CEST
+Begin processing the 184001st record. Run 1, Event 3951616, LumiSection 5399 on stream 6 at 08-Jul-2026 10:45:49.144 CEST
+[2026-07-08 10:45:53.198486 +0200][Error  ][PostMaster        ] [cmsstor206.fnal.gov:23004] Forcing error on disconnect: [ERROR] Operation interrupted.
+Begin processing the 185001st record. Run 1, Event 4154632, LumiSection 5676 on stream 6 at 08-Jul-2026 10:45:53.940 CEST
+Begin processing the 186001st record. Run 1, Event 4204676, LumiSection 5745 on stream 0 at 08-Jul-2026 10:45:55.271 CEST
+Begin processing the 187001st record. Run 1, Event 4338169, LumiSection 5927 on stream 6 at 08-Jul-2026 10:45:56.474 CEST
+Begin processing the 188001st record. Run 1, Event 4360395, LumiSection 5957 on stream 7 at 08-Jul-2026 10:46:01.419 CEST
+Begin processing the 189001st record. Run 1, Event 5130718, LumiSection 7010 on stream 7 at 08-Jul-2026 10:46:02.713 CEST
+[2026-07-08 10:46:06.179577 +0200][Error  ][PostMaster        ] [se09.cscs.ch:36128] Forcing error on disconnect: [ERROR] Operation interrupted.
+Begin processing the 190001st record. Run 1, Event 5210057, LumiSection 7118 on stream 4 at 08-Jul-2026 10:46:07.885 CEST
+Begin processing the 191001st record. Run 1, Event 5271071, LumiSection 7201 on stream 7 at 08-Jul-2026 10:46:09.174 CEST
+Begin processing the 192001st record. Run 1, Event 5359189, LumiSection 7322 on stream 4 at 08-Jul-2026 10:46:10.482 CEST
+Begin processing the 193001st record. Run 1, Event 5372633, LumiSection 7340 on stream 1 at 08-Jul-2026 10:46:15.746 CEST
+Begin processing the 194001st record. Run 1, Event 5753536, LumiSection 7861 on stream 3 at 08-Jul-2026 10:46:17.035 CEST
+Begin processing the 195001st record. Run 1, Event 5764786, LumiSection 7876 on stream 7 at 08-Jul-2026 10:46:18.304 CEST
+Begin processing the 196001st record. Run 1, Event 5784083, LumiSection 7902 on stream 7 at 08-Jul-2026 10:46:23.648 CEST
+Begin processing the 197001st record. Run 1, Event 5807779, LumiSection 7935 on stream 4 at 08-Jul-2026 10:46:24.698 CEST
+Begin processing the 198001st record. Run 1, Event 5825604, LumiSection 7959 on stream 3 at 08-Jul-2026 10:46:28.516 CEST
+Begin processing the 199001st record. Run 1, Event 5835409, LumiSection 7972 on stream 0 at 08-Jul-2026 10:46:29.709 CEST
+08-Jul-2026 10:46:29 CEST  Closed file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/ccd7f6b3-a43e-4dbb-9e5f-70c690f1d444.root
+08-Jul-2026 10:46:29 CEST  Initiating request to open file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/6bc5739c-2785-43e0-9c64-91c356ddb068.root
+08-Jul-2026 10:46:31 CEST  Successfully opened file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/6bc5739c-2785-43e0-9c64-91c356ddb068.root
+%MSG-w XrdAdaptorLvl3:  AfterSource 08-Jul-2026 10:47:00 CEST AfterSource
+Deactivating se13.cscs.ch from active sources because its quality (1042) is higher than 260 and 4 times larger than the other active server cmsstor353.fnal.gov (260) 
+%MSG
+Begin processing the 200001st record. Run 1, Event 318581, LumiSection 436 on stream 1 at 08-Jul-2026 10:47:04.811 CEST
+Begin processing the 201001st record. Run 1, Event 430851, LumiSection 589 on stream 6 at 08-Jul-2026 10:47:06.130 CEST
+Begin processing the 202001st record. Run 1, Event 854215, LumiSection 1167 on stream 6 at 08-Jul-2026 10:47:11.164 CEST
+Begin processing the 203001st record. Run 1, Event 1639183, LumiSection 2240 on stream 3 at 08-Jul-2026 10:47:12.359 CEST
+Begin processing the 204001st record. Run 1, Event 1698006, LumiSection 2320 on stream 6 at 08-Jul-2026 10:47:13.619 CEST
+Begin processing the 205001st record. Run 1, Event 1818334, LumiSection 2485 on stream 0 at 08-Jul-2026 10:47:18.623 CEST
+Begin processing the 206001st record. Run 1, Event 1953287, LumiSection 2669 on stream 4 at 08-Jul-2026 10:47:19.884 CEST
+Begin processing the 207001st record. Run 1, Event 1998202, LumiSection 2730 on stream 7 at 08-Jul-2026 10:47:21.106 CEST
+Begin processing the 208001st record. Run 1, Event 2196103, LumiSection 3001 on stream 0 at 08-Jul-2026 10:47:26.127 CEST
+Begin processing the 209001st record. Run 1, Event 2229324, LumiSection 3046 on stream 1 at 08-Jul-2026 10:47:27.314 CEST
+Begin processing the 210001st record. Run 1, Event 2273512, LumiSection 3106 on stream 2 at 08-Jul-2026 10:47:32.300 CEST
+Begin processing the 211001st record. Run 1, Event 2961861, LumiSection 4047 on stream 0 at 08-Jul-2026 10:47:33.567 CEST
+Begin processing the 212001st record. Run 1, Event 3181727, LumiSection 4347 on stream 2 at 08-Jul-2026 10:47:34.930 CEST
+Begin processing the 213001st record. Run 1, Event 3291055, LumiSection 4496 on stream 5 at 08-Jul-2026 10:47:40.071 CEST
+Begin processing the 214001st record. Run 1, Event 3721741, LumiSection 5085 on stream 5 at 08-Jul-2026 10:47:41.355 CEST
+Begin processing the 215001st record. Run 1, Event 3826698, LumiSection 5228 on stream 2 at 08-Jul-2026 10:47:42.586 CEST
+[2026-07-08 10:47:45.073601 +0200][Error  ][PostMaster        ] [cmsstor108.fnal.gov:28848] Forcing error on disconnect: [ERROR] Operation interrupted.
+[2026-07-08 10:47:46.292495 +0200][Error  ][PostMaster        ] [se20.cscs.ch:36636] Forcing error on disconnect: [ERROR] Operation interrupted.
+Begin processing the 216001st record. Run 1, Event 3856968, LumiSection 5270 on stream 7 at 08-Jul-2026 10:47:48.784 CEST
+Begin processing the 217001st record. Run 1, Event 4043901, LumiSection 5525 on stream 0 at 08-Jul-2026 10:47:50.085 CEST
+Begin processing the 218001st record. Run 1, Event 4078568, LumiSection 5572 on stream 2 at 08-Jul-2026 10:47:51.417 CEST
+Begin processing the 219001st record. Run 1, Event 5324706, LumiSection 7275 on stream 7 at 08-Jul-2026 10:47:57.962 CEST
+Begin processing the 220001st record. Run 1, Event 5365225, LumiSection 7330 on stream 7 at 08-Jul-2026 10:47:59.711 CEST
+Begin processing the 221001st record. Run 1, Event 5454078, LumiSection 7451 on stream 3 at 08-Jul-2026 10:48:07.601 CEST
+Begin processing the 222001st record. Run 1, Event 5605116, LumiSection 7658 on stream 7 at 08-Jul-2026 10:48:08.996 CEST
+Begin processing the 223001st record. Run 1, Event 5688126, LumiSection 7771 on stream 6 at 08-Jul-2026 10:48:10.264 CEST
+Begin processing the 224001st record. Run 1, Event 5853088, LumiSection 7997 on stream 2 at 08-Jul-2026 10:48:16.485 CEST
+08-Jul-2026 10:48:17 CEST  Closed file root://cms-xrd-global.cern.ch//store/mc/RunIII2024Summer24MiniAOD/GluGluH-Hto2Sto4D_Par-ctauS-0p1-MH-125-MS-30_TuneCP5_13p6TeV_powheg-pythia8/MINIAODSIM/140X_mcRun3_2024_realistic_v26-v2/2810000/6bc5739c-2785-43e0-9c64-91c356ddb068.root
+
+TrigReport ---------- Event  Summary ------------
+TrigReport Events total = 224724 passed = 224724 failed = 0
+
+TrigReport ---------- Path   Summary ------------
+TrigReport  Trig Bit#   Executed     Passed     Failed      Error Name
+TrigReport     1    0     224724     224724          0          0 p
+
+
+TrigReport -------End-Path   Summary ------------
+TrigReport  Trig Bit#   Executed     Passed     Failed      Error Name
+
+
+TrigReport ---------- Modules in Path: p ------------
+TrigReport  Trig Bit#    Visited     Passed     Failed      Error Name
+TrigReport     1    0     224724     224724          0          0 hltScoutingUnpackProducer
+TrigReport     1    1     224724     224724          0          0 offlineBeamSpot
+TrigReport     1    2     224724     224724          0          0 Vertexer
+TrigReport     1    3     224724     224724          0          0 scoutingComparer
+
+
+TrigReport ---------- Module Summary ------------
+TrigReport    Visited   Executed     Passed     Failed      Error Name
+TrigReport     224724     224724     224724          0          0 TriggerResults
+TrigReport     224724     224724     224724          0          0 Vertexer
+TrigReport     224724     224724     224724          0          0 hltScoutingUnpackProducer
+TrigReport     224724     224724     224724          0          0 offlineBeamSpot
+TrigReport     224724     224724     224724          0          0 p
+TrigReport     224724     224724     224724          0          0 scoutingComparer
+
+
+TimeReport ---------- Event  Summary ---[sec]----
+TimeReport       event loop CPU/event = 0.004503
+TimeReport      event loop Real/event = 0.006200
+TimeReport     sum Streams Real/event = 0.024613
+TimeReport efficiency CPU/Real/thread = 0.090776
+
+TimeReport ---------- Path   Summary ---[Real sec]----
+TimeReport  per event     per exec  Name
+TimeReport   0.024496     0.024496  p
+
+TimeReport  per event     per exec  Name
+
+TimeReport -------End-Path   Summary ---[Real sec]----
+TimeReport  per event     per exec  Name
+
+TimeReport  per event     per exec  Name
+
+TimeReport ---------- Modules in Path: p ---[Real sec]----
+TimeReport  per event    per visit  Name
+TimeReport   0.000081     0.000081  hltScoutingUnpackProducer
+TimeReport   0.000022     0.000022  offlineBeamSpot
+TimeReport   0.000445     0.000445  Vertexer
+TimeReport   0.000023     0.000023  scoutingComparer
+
+TimeReport  per event    per visit  Name
+
+TimeReport ---------- Module Summary ---[Real sec]----
+TimeReport  per event     per exec    per visit  Name
+TimeReport   0.000002     0.000002     0.000002  TriggerResults
+TimeReport   0.000445     0.000445     0.000445  Vertexer
+TimeReport   0.000081     0.000081     0.000081  hltScoutingUnpackProducer
+TimeReport   0.000022     0.000022     0.000022  offlineBeamSpot
+TimeReport   0.000003     0.000003     0.000003  p
+TimeReport   0.000023     0.000023     0.000023  scoutingComparer
+
+TimeReport  per event     per exec    per visit  Name
+
+T---Report end!
+
+

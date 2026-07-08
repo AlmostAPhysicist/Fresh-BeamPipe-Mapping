@@ -21,7 +21,7 @@ process.TFileService = cms.Service(
 )
 
 process.scouting3DCompare = cms.EDAnalyzer(
-    "ScoutingComparison3DPlotter",
+    "ScoutingComparisonLinePlotter",
     inputListFile      = cms.string(os.environ.get("INPUT_LIST", os.path.abspath("input_paths.txt"))),
     
     # 3D core spatial mapping

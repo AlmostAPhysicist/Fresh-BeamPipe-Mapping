@@ -188,7 +188,7 @@ private:
                   double decayHint) {
             const auto n = [&](const std::string& base) { return base + "_" + suffix; };
             //if mass < 100 then 10 else 1 (higgs would have mass less than 10. quick, dirty way to encapusale this)
-            const double higgs_scaling = 1 + 9 * (massHint < 100);
+            const double higgs_scaling = 1; //+ 9 * (massHint < 100);
             const double scaling_factor = (0.1 + decayHint/10);
             const double xyPosMax   = 5.0  * scaling_factor;
             const double xyzPosMax  = 100.0 * scaling_factor;
