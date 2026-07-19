@@ -17,17 +17,16 @@ process.source    = cms.Source("EmptySource")
 
 process.TFileService = cms.Service(
     "TFileService",
-    fileName=cms.string("GenScoutPlots_g8_Higgs.root"),
+    fileName=cms.string("ComparisonPlots/GenScoutPlots_Stop_g3l100Tracks_NoJets.root"),
 )
 
 process.scouting3DCompare = cms.EDAnalyzer(
     "ScoutingComparisonLinePlotter",
     inputListFile      = cms.string(os.environ.get("INPUT_LIST", os.path.abspath("input_paths.txt"))),
-    
+
     # 3D core spatial mapping
-    xyDiffHistPath     = cms.untracked.string("scoutingComparer/xy_diff_1"),
     matchDistHistPath  = cms.untracked.string("scoutingComparer/match_distance_1"),
-    
+
     # 2D heatmap variables fetched straight from GenScoutingComparer
     nSelVtxHistPath    = cms.untracked.string("scoutingComparer/n_selected_vertices"),
     massRecoHistPath   = cms.untracked.string("scoutingComparer/mass_reco_1"),

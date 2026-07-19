@@ -5,7 +5,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("SCOUTINGCOMPARE")
 
 # -------------------- Choose sample key --------------------
-SAMPLE_KEY = os.environ.get("SAMPLE_KEY", "M800_CT10")
+SAMPLE_KEY = os.environ.get("SAMPLE_KEY", "M800_CT1")
 
 SAMPLES = {
     "M200_CT1": {
@@ -145,7 +145,7 @@ SAMPLES = {
 
 
 
-SAMPLE_KEY = os.environ.get("SAMPLE_KEY", "H_MS30_CT0p1")
+# SAMPLE_KEY = os.environ.get("SAMPLE_KEY", "H_MS30_CT0p1")
 
 # All decay hints below are stored in meters (SI).
 # 0p1 mm = 0.0001 m, 1 mm = 0.001 m, 10 mm = 0.01 m.
@@ -313,8 +313,8 @@ process.options = cms.untracked.PSet(
 # -------------------- Histogram Output Target --------------------
 process.TFileService = cms.Service(
     "TFileService",
-    # fileName=cms.string(f"GenScoutCompare_Stop_g8l100Tracks_NoJets_{SAMPLE_KEY}.root")
-    fileName = cms.string(f"GenScoutCompare_H2SGlu_g8l100Tracks_{SAMPLE_KEY}.root"),
+    fileName=cms.string(f"GenScoutCompare_Stop_g6l100Tracks_NoJets_{SAMPLE_KEY}.root")
+    # fileName = cms.string(f"GenScoutCompare_H2SGlu_g8l100Tracks_{SAMPLE_KEY}.root"),
 )
 
 # -------------------- Event Limits --------------------
@@ -366,15 +366,15 @@ process.Vertexer = cms.EDProducer(
     minSeedStripHits = cms.int32(1),
     minSeedTrackerLayers = cms.int32(5),
 
-    # jet_pt_min = cms.double(-1),
-    # jet_eta_max = cms.double(1000),
-    # min_selected_jets = cms.int32(-1),
-    # jet_dr_max = cms.untracked.double(1000),
+    jet_pt_min = cms.double(-1),
+    jet_eta_max = cms.double(1000),
+    min_selected_jets = cms.int32(-1),
+    jet_dr_max = cms.untracked.double(1000),
 
-    jet_pt_min = cms.double(20.0),
-    jet_eta_max = cms.double(5.0),
-    min_selected_jets = cms.int32(3),
-    jet_dr_max = cms.untracked.double(0.4),
+    # jet_pt_min = cms.double(20.0),
+    # jet_eta_max = cms.double(5.0),
+    # min_selected_jets = cms.int32(3),
+    # jet_dr_max = cms.untracked.double(0.4),
 
     n_tracks_per_seed_vertex = cms.int32(2),
     max_seed_vertex_chi2 = cms.double(5.0),
@@ -437,21 +437,21 @@ process.scoutingComparer = cms.EDAnalyzer(
     vtx_chi2_max = cms.double(2.5),
     vtx_dbv_min = cms.double(0.01),
     vtx_dbv_max = cms.double(2.0),
-    vtx_tracks_min = cms.uint32(8),
+    vtx_tracks_min = cms.uint32(3),
     vtx_tracks_max = cms.uint32(100),
     vtx_ddbv_max = cms.double(0.005),
     vtx_cosT_min = cms.double(0.0),
 
     # Analysis Event Level Jet Gate Configuration
-    # jet_pt_min = cms.double(-1),
-    # jet_eta_max = cms.double(1000),
-    # min_selected_jets = cms.uint32(0),
-    # require_jet_selection = cms.untracked.bool(False),
+    jet_pt_min = cms.double(-1),
+    jet_eta_max = cms.double(1000),
+    min_selected_jets = cms.uint32(0),
+    require_jet_selection = cms.untracked.bool(False),
 
-    jet_pt_min = cms.double(30),
-    jet_eta_max = cms.double(2.5),
-    min_selected_jets = cms.uint32(3),
-    require_jet_selection = cms.untracked.bool(True),
+    # jet_pt_min = cms.double(30),
+    # jet_eta_max = cms.double(2.5),
+    # min_selected_jets = cms.uint32(3),
+    # require_jet_selection = cms.untracked.bool(True),
 
     verbose = cms.untracked.bool(False),
     verbose_unselected = cms.untracked.bool(False),
